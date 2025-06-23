@@ -1,0 +1,20 @@
+[
+  {
+    "id": "getting_started",
+    "label": "Getting Started",
+    "description": "Complete your first recovery task",
+    "points": 2
+  },
+  {
+    "id": "consistency_champion",
+    "label": "Consistency Champion",
+    "description": "Complete recovery tasks for 7 days in a row",
+    "points": 20
+  },
+  {
+    "id": "weekly_goal_hit",
+    "label": "Weekly Target Achieved",
+    "description": "Earn enough points to meet your phase's weekly goal",
+    "points": 10
+  }
+] 

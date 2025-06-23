@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+keep in mind we are building towards https and transitioning towards that at the end of this build so we need it to be as easy as possible

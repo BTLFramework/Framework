@@ -1,0 +1,21 @@
+{
+  "RESET": {
+    "log_symptom": 2,
+    "watch_video": 5,
+    "daily_ritual": 5,
+    "short_exercise": 8,
+    "reflection": 5
+  },
+  "EDUCATE": {
+    "log_symptom": 2,
+    "belief_journal": 5,
+    "movement_task": 10,
+    "watch_video": 5
+  },
+  "REBUILD": {
+    "log_symptom": 2,
+    "active_workout": 15,
+    "rebuild_module": 10,
+    "reflection": 5
+  }
+} 

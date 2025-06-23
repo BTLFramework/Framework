@@ -1,0 +1,14 @@
+{
+  "RESET": {
+    "subject": "Welcome to Back to Life – Your RESET Phase Starts Now",
+    "body": "Hi {{firstName}},\n\nWelcome to Back to Life™ — we're excited to support your recovery.\n\nBased on your intake, you're currently in the **RESET phase**.\n\nThis phase focuses on:\n• Reducing pain and inflammation\n• Calming the nervous system\n• Rebuilding trust in your body and movement\n\nYour journey starts here — simple daily actions can lead to meaningful change.\n\n👉 **Set up your patient portal** to access:\n✓ Your Signature Recovery Score™\n✓ RESET-specific movement rituals\n✓ Cognitive reframing tools\n✓ Progress tracking and educational content\n\n[Set Up My Portal] → {{setupLink}}\n\nLet's get started,\n—The Back to Life Team"
+  },
+  "EDUCATE": {
+    "subject": "You're in the EDUCATE Phase – Let's Build Confidence",
+    "body": "Hi {{firstName}},\n\nGreat work — you're already making progress.\n\nYou're currently in the **EDUCATE phase**, which means your pain is becoming more manageable, and it's time to build deeper awareness around your body, triggers, and movement strategies.\n\nIn this phase, we'll help you:\n• Understand your pain better\n• Build movement confidence\n• Practice belief-shifting techniques that matter\n\n👉 **Activate your patient portal** for:\n✓ Your Signature Recovery Score™\n✓ EDUCATE-phase recommendations\n✓ Belief reframing tools\n✓ Self-guided movement and mindset sessions\n\n[Set Up My Portal] → {{setupLink}}\n\nLet's take this to the next level,\n—The Back to Life Team"
+  },
+  "REBUILD": {
+    "subject": "Welcome to the REBUILD Phase – Let's Get Stronger",
+    "body": "Hi {{firstName}},\n\nWelcome to the **REBUILD phase** — the final step in the Back to Life™ framework.\n\nThis phase is all about:\n• Building strength and resilience\n• Reinforcing healthy movement patterns\n• Returning to the life you want with confidence\n\nYour intake shows that you're ready for more progressive care and active strategies.\n\n👉 **Complete your portal setup** to access:\n✓ Your Signature Recovery Score™\n✓ REBUILD-focused training & resources\n✓ Exercise progressions\n✓ Tools to track strength, function, and mindset\n\n[Set Up My Portal] → {{setupLink}}\n\nWe're here to help you finish strong,\n—The Back to Life Team"
+  }
+} 
