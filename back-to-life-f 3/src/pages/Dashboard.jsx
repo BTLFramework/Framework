@@ -9,6 +9,8 @@ import PatientModal from "../components/PatientModal";
 const fetchPatientsFromAPI = async () => {
   try {
     console.log('🔄 Fetching patients data from backend...');
+    console.log('🔗 API URL:', 'http://localhost:3001/patients');
+    console.log('⏰ Timestamp:', new Date().toISOString());
     
     // Create timeout controller for better browser compatibility
     const controller = new AbortController();
@@ -24,25 +26,34 @@ const fetchPatientsFromAPI = async () => {
     
     clearTimeout(timeoutId);
     
+    console.log('📡 Response status:', response.status);
+    console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+    
     if (!response.ok) {
       const errorText = await response.text();
+      console.error('❌ API Error Response:', errorText);
       throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
     }
     
     const data = await response.json();
-    console.log('📊 Received patients data:', data);
+    console.log('📊 RAW API Response:', data);
+    console.log('📊 Number of patients received:', data.length);
+    console.log('📊 First patient sample:', data[0]);
     
     // Transform backend data to match frontend expectations
-    const transformedPatients = data.map(patient => {
+    console.log('🔄 Starting data transformation...');
+    const transformedPatients = data.map((patient, index) => {
+      console.log(`👤 Processing patient ${index + 1}:`, patient.name);
+      console.log(`👤 Full patient object:`, patient);
       const latestScore = patient.srsScores?.[0];
-      const srsScore = latestScore?.srsScore || 0;
+      const srsScore = patient.latestSrsScore || latestScore?.srsScore || 0;
+      console.log(`  📊 SRS Score: ${srsScore}`);
       
-      // Calculate phase based on SRS score
-      let phase = 'RESET';
-      if (srsScore > 3 && srsScore <= 7) phase = 'EDUCATE';
-      if (srsScore > 7) phase = 'REBUILD';
+      // Use phase from backend - check both possible locations
+      const phase = patient.phase?.label || patient.phase || 'RESET';
+      console.log(`  🔄 Phase: ${phase}`);
       
-      // Use real recovery points data from backend
+      // Use real recovery points data from backend (start new patients at 0)
       const recoveryPoints = patient.recoveryPoints || {
         weeklyPoints: 0,
         trend: 'stable',
@@ -69,6 +80,7 @@ const fetchPatientsFromAPI = async () => {
         recoveryPoints,
         engagementStatus,
         lastContact: Math.floor(Math.random() * 30) + 1, // Days ago - TODO: get from backend
+        lastUpdate: new Date(Date.now() - (Math.floor(Math.random() * 30) + 1) * 24 * 60 * 60 * 1000).toISOString(), // Convert days ago to actual date
         nextAppointment: patient.nextAppointment || new Date(Date.now() + Math.random() * 14 * 24 * 60 * 60 * 1000).toLocaleDateString(),
         priority: srsScore < 4 ? 'high' : srsScore < 7 ? 'medium' : 'low',
         alerts: srsScore < 4 ? ['Low SRS Score'] : [],
@@ -112,7 +124,7 @@ function isFlagged(patient) {
   return (
     patient.confidence <= 5 ||
     patient.groc <= 0 ||
-    (typeof patient.prevSrs === "number" && patient.prevSrs - patient.srs >= 2)
+    (typeof patient.prevSrsScore === "number" && patient.prevSrsScore - patient.srsScore >= 2)
   );
 }
 
@@ -188,7 +200,7 @@ function Dashboard() {
       data = data.filter((p) =>
         p.name.toLowerCase().includes(search.toLowerCase())
       );
-    if (phaseFilter) data = data.filter((p) => getPhase(p.srsScore) === phaseFilter);
+    if (phaseFilter) data = data.filter((p) => p.phase === phaseFilter);
     if (flagFilter === "flagged") data = data.filter((p) => isFlagged(p));
     if (flagFilter === "unflagged") data = data.filter((p) => !isFlagged(p));
     
@@ -206,7 +218,7 @@ function Dashboard() {
     data.sort((a, b) => {
       let aVal = a[sortCol];
       let bVal = b[sortCol];
-      if (sortCol === "intakeDate" || sortCol === "nextAppointment") {
+      if (sortCol === "intakeDate" || sortCol === "nextAppointment" || sortCol === "lastUpdate") {
         aVal = new Date(aVal);
         bVal = new Date(bVal);
       }
@@ -467,7 +479,6 @@ function Dashboard() {
           sortDir={sortDir}
           setSortDir={setSortDir}
           onRowClick={setExpanded}
-          getPhase={getPhase}
           isFlagged={isFlagged}
           needsFollowUp={needsFollowUp}
           selectedPatients={selectedPatients}
@@ -483,7 +494,6 @@ function Dashboard() {
         <PatientModal
           patient={patients.find((p) => p.id === expanded)}
           onClose={() => setExpanded(null)}
-          getPhase={getPhase}
           needsFollowUp={needsFollowUp}
           noteInput={noteInput}
           setNoteInput={setNoteInput}

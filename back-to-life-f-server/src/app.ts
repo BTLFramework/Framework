@@ -7,6 +7,7 @@ import authRoutes from "./routes/authRoutes";
 import janeRoutes from "./routes/janeRoutes";
 import patientRoutes from "./routes/patientRoutes";
 import patientPortalRoutes from "./routes/patientPortalRoutes2";
+const recoveryPointsRoutes = require("./routes/recoveryPointsRoutes");
 
 dotenv.config();
 
@@ -106,6 +107,7 @@ app.use("/auth", authRoutes);
 app.use("/jane", janeRoutes);
 app.use("/patients", patientRoutes);
 app.use("/api/patient-portal", patientPortalRoutes);
+app.use("/api/recovery-points", recoveryPointsRoutes);
 
 // Global error handler
 app.use((err: any, req: any, res: any, next: any) => {

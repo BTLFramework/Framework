@@ -17,6 +17,8 @@ export default function MultiStepForm() {
   const [showResult, setShowResult] = useState(false);
   const [resultScore, setResultScore] = useState(0);
   const [resultPhase, setResultPhase] = useState({ label: "", color: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionResult, setSubmissionResult] = useState(null);
 
   const [formData, setFormData] = useState({
     patientName: "",
@@ -143,14 +145,67 @@ export default function MultiStepForm() {
     setCurrentStep((prev) => Math.max(prev - 1, 0));
   };
 
-  // Submit: calculate SRS, derive phase, show results
-  const handleSubmit = (e) => {
+  // Submit: calculate SRS, derive phase, show results AND submit to dual portal system
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Calculate local results first
     const score = calculateSRS(formData);
     const phaseObj = getPhaseByScore(score);
     setResultScore(score);
     setResultPhase(phaseObj);
-    setShowResult(true);
+    
+    try {
+      console.log('🔄 Submitting intake form to dual portal system...', formData);
+
+      // Add email if not provided
+      const submissionData = {
+        ...formData,
+        email: formData.email || `${formData.patientName.toLowerCase().replace(' ', '.')}@patient.com`
+      };
+
+      // Submit to patient portal API (which forwards to backend)
+      console.log('🔄 Submitting to patient portal...', submissionData);
+      
+      const response = await fetch('http://localhost:3000/api/intake', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submissionData)
+      });
+
+      const result = await response.json();
+      console.log('✅ Patient portal response:', result);
+      
+      // Store patient data for portal access
+      if (result.success) {
+        const patientData = {
+          name: result.data.patient.name,
+          email: result.data.patient.email,
+          score: result.data.srsScore,
+          phase: result.data.phase,
+          timestamp: new Date().toISOString()
+        };
+        console.log('💾 Storing patient data for redirect:', patientData);
+        localStorage.setItem('btl_patient_data', JSON.stringify(patientData));
+      }
+      
+      setSubmissionResult(result);
+      setShowResult(true);
+      
+    } catch (error) {
+      console.error('❌ Submission error:', error);
+      setSubmissionResult({ 
+        success: false, 
+        error: 'Failed to connect to patient portal',
+        details: error.message 
+      });
+      setShowResult(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // If “showResult” is true, display the Recovery Results UI

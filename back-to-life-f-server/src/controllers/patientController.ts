@@ -109,6 +109,129 @@ const determineBeliefStatus = (beliefs: string[]) => {
   return "Negative";
 };
 
+// Get comprehensive recovery points data for patient
+const getPatientRecoveryPointsData = async (patientId: number) => {
+  const recoveryPointsService = require('../services/recoveryPointsService');
+  
+  try {
+    // Get weekly breakdown
+    const weeklyBreakdown = await recoveryPointsService.getWeeklyBreakdown(patientId);
+    
+    // Get SRS buffer status
+    const bufferStatus = await recoveryPointsService.getSRSBuffer(patientId);
+    
+    // Get recent activity
+    const recentActivity = await recoveryPointsService.getRecentActivity(patientId, 7);
+    
+    // Calculate streak (consecutive days with points)
+    let streak = 0;
+    const today = new Date();
+    for (let i = 0; i < 30; i++) {
+      const checkDate = new Date(today);
+      checkDate.setDate(today.getDate() - i);
+      const dayStart = new Date(checkDate.setHours(0, 0, 0, 0));
+      const dayEnd = new Date(checkDate.setHours(23, 59, 59, 999));
+      
+      const dayPoints = await prisma.recoveryPoint.aggregate({
+        where: {
+          patientId,
+          date: {
+            gte: dayStart,
+            lte: dayEnd
+          }
+        },
+        _sum: { points: true }
+      });
+      
+      if (dayPoints._sum.points && dayPoints._sum.points > 0) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    
+    // Calculate completion rate (percentage of days with activity in last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const activeDays = await prisma.recoveryPoint.groupBy({
+      by: ['date'],
+      where: {
+        patientId,
+        date: {
+          gte: thirtyDaysAgo
+        }
+      },
+      _sum: { points: true },
+      having: {
+        points: {
+          _sum: {
+            gt: 0
+          }
+        }
+      }
+    });
+    
+    const completionRate = Math.round((activeDays.length / 30) * 100);
+    
+    // Determine trend
+    const lastWeekTotal = weeklyBreakdown.total;
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    
+    const previousWeekPoints = await prisma.recoveryPoint.aggregate({
+      where: {
+        patientId,
+        date: {
+          gte: twoWeeksAgo,
+          lt: oneWeekAgo
+        }
+      },
+      _sum: { points: true }
+    });
+    
+    const previousWeekTotal = previousWeekPoints._sum.points || 0;
+    let trend = 'stable';
+    if (lastWeekTotal > previousWeekTotal * 1.1) trend = 'improving';
+    else if (lastWeekTotal < previousWeekTotal * 0.9) trend = 'declining';
+    
+    return {
+      total: bufferStatus.movementRP + bufferStatus.lifestyleRP + bufferStatus.mindsetRP + bufferStatus.educationRP,
+      thisWeek: lastWeekTotal,
+      lastWeek: previousWeekTotal,
+      weeklyAverage: Math.round((lastWeekTotal + previousWeekTotal) / 2),
+      trend,
+      lastActivity: recentActivity[0]?.date?.toISOString()?.split('T')[0] || null,
+      streakDays: streak,
+      completionRate,
+      breakdown: weeklyBreakdown.breakdown,
+      bufferStatus
+    };
+  } catch (error) {
+    console.error('Error getting comprehensive recovery points data:', error);
+    return {
+      total: 0,
+      thisWeek: 0,
+      lastWeek: 0,
+      weeklyAverage: 0,
+      trend: 'stable',
+      lastActivity: null,
+      streakDays: 0,
+      completionRate: 0,
+      breakdown: {
+        MOVEMENT: 0,
+        LIFESTYLE: 0,
+        MINDSET: 0,
+        EDUCATION: 0,
+        ADHERENCE: 0
+      },
+      bufferStatus: null
+    };
+  }
+};
+
 export const submitIntake = async (req: any, res: any) => {
   try {
     console.log('Received comprehensive intake submission:', req.body);
@@ -155,6 +278,11 @@ export const submitIntake = async (req: any, res: any) => {
       const tempPassword = Math.random().toString(36).slice(-8); // Simple temp password
       await createPatientPortalAccount(newPatient.id, email, tempPassword);
       console.log('Patient portal account created');
+      
+      // Initialize Recovery Points system for new patient
+      const recoveryPointsService = require('../services/recoveryPointsService');
+      await recoveryPointsService.initializePatientRecoveryPoints(newPatient.id);
+      console.log('Recovery points system initialized');
       
       // Get the full patient record with relations
       patient = await findPatientByEmail(email);
@@ -257,7 +385,7 @@ export const getAllPatientsWithScores = async (_req: any, res: any) => {
     const patients = await getAllPatientsWithLatestScores();
     
     // Transform data for clinician dashboard
-    const transformedPatients = patients.map((patient: any) => {
+    const transformedPatients = await Promise.all(patients.map(async (patient: any) => {
       const latestScore = patient.srsScores?.[0];
       
       return {
@@ -284,19 +412,10 @@ export const getAllPatientsWithScores = async (_req: any, res: any) => {
         lefs: latestScore?.lefs || null,
         lastUpdate: latestScore?.date || patient.createdAt,
         notes: [], // Clinical notes would come from a separate table
-        // Mock recovery points data (would come from patient portal activity)
-        recoveryPoints: {
-          total: Math.floor(Math.random() * 300) + 50,
-          thisWeek: Math.floor(Math.random() * 50) + 10,
-          lastWeek: Math.floor(Math.random() * 50) + 10,
-          weeklyAverage: Math.floor(Math.random() * 40) + 20,
-          trend: ["improving", "stable", "declining"][Math.floor(Math.random() * 3)],
-          lastActivity: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          streakDays: Math.floor(Math.random() * 10),
-          completionRate: Math.floor(Math.random() * 60) + 30
-        }
+        // Real recovery points data from database
+        recoveryPoints: await getPatientRecoveryPointsData(patient.id)
       };
-    });
+    }));
     
     res.json(transformedPatients);
   } catch (err) {

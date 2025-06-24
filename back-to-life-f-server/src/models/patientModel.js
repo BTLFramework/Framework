@@ -72,7 +72,15 @@ const updatePatientPortalPassword = (email, password) => __awaiter(void 0, void 
 });
 exports.updatePatientPortalPassword = updatePatientPortalPassword;
 const addSRSScore = (patientId, data) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield prisma.sRSScore.create({ data: Object.assign(Object.assign({}, data), { patientId }) });
+    // Convert string values to integers for database compatibility
+    const processedData = Object.assign(Object.assign({}, data), { 
+        patientId,
+        vas: data.vas ? parseInt(data.vas, 10) : 0,
+        confidence: data.confidence ? parseInt(data.confidence, 10) : 0,
+        groc: data.groc ? parseInt(data.groc, 10) : 0,
+        srsScore: data.srsScore ? parseInt(data.srsScore, 10) : 0
+    });
+    return yield prisma.sRSScore.create({ data: processedData });
 });
 exports.addSRSScore = addSRSScore;
 const getLatestSRSScore = (patientId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -121,12 +129,12 @@ const submitIntake = (intakeData) => __awaiter(void 0, void 0, void 0, function*
             formType,
             region,
             disabilityPercentage,
-            vas,
+            vas: parseInt(vas, 10),
             psfs: psfs,
             beliefs: beliefs,
-            confidence,
-            groc,
-            srsScore,
+            confidence: parseInt(confidence, 10),
+            groc: groc ? parseInt(groc, 10) : 0,
+            srsScore: parseInt(srsScore, 10),
         },
     });
     return { patient, srsScore: srsScoreRecord, patientPortal };

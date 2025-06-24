@@ -80,17 +80,21 @@ const submitIntake = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 disabilityPercentage = 50; // Default fallback
         }
 
-        // Calculate SRS Score using comprehensive algorithm
+        // Calculate SRS Score using your clinical methodology
         const scoreLogic = require('../helpers/scoreLogic');
-        const srsScore = scoreLogic.calculateSRS({
+        const srsResult = scoreLogic.calculateSRS({
             disabilityPercentage,
             vas,
             psfs: psfs || [],
             beliefs: beliefs || [],
             confidence,
-            groc: groc || 0
+            groc: groc || 0,
+            formType: formType || "Intake"  // This triggers the correct baseline calculation
         });
 
+        // Extract the numeric score from the result object
+        const srsScore = typeof srsResult === 'object' ? srsResult.score : srsResult;
+        
         console.log(`📊 Calculated SRS Score: ${srsScore} (Disability: ${disabilityPercentage}%, VAS: ${vas}, Confidence: ${confidence})`);
 
         // Create or find existing patient
@@ -190,8 +194,11 @@ const getAllPatientsWithScores = (_req, res) => __awaiter(void 0, void 0, void 0
         console.log(`📋 Found ${patients.length} patients`);
         
         // Transform data to ensure frontend compatibility
-        const transformedPatients = patients.map(patient => {
+        const transformedPatients = yield Promise.all(patients.map((patient) => __awaiter(void 0, void 0, void 0, function* () {
             const latestScore = patient.srsScores && patient.srsScores.length > 0 ? patient.srsScores[0] : null;
+            
+            // Get real recovery points data
+            const recoveryData = yield getPatientRecoveryPointsData(patient.id);
             
             return {
                 ...patient,
@@ -200,15 +207,17 @@ const getAllPatientsWithScores = (_req, res) => __awaiter(void 0, void 0, void 0
                 phase: getPhaseByScore(latestScore?.srsScore || 0),
                 lastUpdated: latestScore?.date || patient.intakeDate,
                 recoveryPoints: {
-                    weeklyPoints: Math.floor(Math.random() * 100) + 20,
-                    streak: Math.floor(Math.random() * 10) + 1,
-                    completionRate: Math.floor(Math.random() * 40) + 60,
-                    trend: ['improving', 'stable', 'declining'][Math.floor(Math.random() * 3)]
+                    weeklyPoints: recoveryData.thisWeek,
+                    streak: recoveryData.streakDays,
+                    completionRate: recoveryData.completionRate,
+                    trend: recoveryData.trend
                 },
-                engagement: ['Highly Engaged', 'Engaged', 'Moderate', 'Low Engagement'][Math.floor(Math.random() * 4)],
+                engagement: recoveryData.completionRate >= 80 ? 'Highly Engaged' :
+                           recoveryData.completionRate >= 60 ? 'Engaged' :
+                           recoveryData.completionRate >= 40 ? 'Moderate' : 'Low Engagement',
                 nextAppointment: new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
             };
-        });
+        })));
         
         console.log('📋 Transformed patient data for frontend compatibility');
         res.json(transformedPatients);
@@ -335,17 +344,179 @@ const completeTask = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 const getPatientRecoveryPoints = (patientId, date) => __awaiter(void 0, void 0, void 0, function* () {
-    // This would ideally be stored in a separate table
-    // For now, we'll simulate with mock data
-    return {
-        totalPoints: Math.floor(Math.random() * 25), // Mock daily points
-        tasksCompleted: Math.floor(Math.random() * 4),
-        date
-    };
+    // Get real recovery points from database
+    const recoveryPointsService = require('../services/recoveryPointsService');
+    
+    try {
+        const dateObj = new Date(date);
+        const startOfDay = new Date(dateObj.setHours(0, 0, 0, 0));
+        const endOfDay = new Date(dateObj.setHours(23, 59, 59, 999));
+        
+        const dayPoints = yield prisma.recoveryPoint.aggregate({
+            where: {
+                patientId,
+                date: {
+                    gte: startOfDay,
+                    lte: endOfDay
+                }
+            },
+            _sum: {
+                points: true
+            },
+            _count: {
+                id: true
+            }
+        });
+        
+        return {
+            totalPoints: dayPoints._sum.points || 0,
+            tasksCompleted: dayPoints._count.id || 0,
+            date
+        };
+    } catch (error) {
+        console.error('Error getting daily recovery points:', error);
+        return {
+            totalPoints: 0,
+            tasksCompleted: 0,
+            date
+        };
+    }
 });
+
 const getWeeklyRecoveryPoints = (patientId) => __awaiter(void 0, void 0, void 0, function* () {
-    // Mock weekly points calculation
-    return Math.floor(Math.random() * 50) + 20; // 20-70 points
+    // Get real weekly recovery points from database
+    const recoveryPointsService = require('../services/recoveryPointsService');
+    
+    try {
+        const breakdown = yield recoveryPointsService.getWeeklyBreakdown(patientId);
+        return breakdown.total;
+    } catch (error) {
+        console.error('Error getting weekly recovery points:', error);
+        return 0;
+    }
+});
+
+// Get comprehensive recovery points data for patient
+const getPatientRecoveryPointsData = (patientId) => __awaiter(void 0, void 0, void 0, function* () {
+    const recoveryPointsService = require('../services/recoveryPointsService');
+    
+    try {
+        // Get weekly breakdown
+        const weeklyBreakdown = yield recoveryPointsService.getWeeklyBreakdown(patientId);
+        
+        // Get SRS buffer status
+        const bufferStatus = yield recoveryPointsService.getSRSBuffer(patientId);
+        
+        // Get recent activity
+        const recentActivity = yield recoveryPointsService.getRecentActivity(patientId, 7);
+        
+        // Calculate streak (consecutive days with points)
+        let streak = 0;
+        const today = new Date();
+        for (let i = 0; i < 30; i++) {
+            const checkDate = new Date(today);
+            checkDate.setDate(today.getDate() - i);
+            const dayStart = new Date(checkDate.setHours(0, 0, 0, 0));
+            const dayEnd = new Date(checkDate.setHours(23, 59, 59, 999));
+            
+            const dayPoints = yield prisma.recoveryPoint.aggregate({
+                where: {
+                    patientId,
+                    date: {
+                        gte: dayStart,
+                        lte: dayEnd
+                    }
+                },
+                _sum: { points: true }
+            });
+            
+            if (dayPoints._sum.points > 0) {
+                streak++;
+            } else {
+                break;
+            }
+        }
+        
+        // Calculate completion rate (percentage of days with activity in last 30 days)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        
+        const activeDays = yield prisma.recoveryPoint.groupBy({
+            by: ['date'],
+            where: {
+                patientId,
+                date: {
+                    gte: thirtyDaysAgo
+                }
+            },
+            _sum: { points: true },
+            having: {
+                points: {
+                    _sum: {
+                        gt: 0
+                    }
+                }
+            }
+        });
+        
+        const completionRate = Math.round((activeDays.length / 30) * 100);
+        
+        // Determine trend
+        const lastWeekTotal = weeklyBreakdown.total;
+        const twoWeeksAgo = new Date();
+        twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        
+        const previousWeekPoints = yield prisma.recoveryPoint.aggregate({
+            where: {
+                patientId,
+                date: {
+                    gte: twoWeeksAgo,
+                    lt: oneWeekAgo
+                }
+            },
+            _sum: { points: true }
+        });
+        
+        const previousWeekTotal = previousWeekPoints._sum.points || 0;
+        let trend = 'stable';
+        if (lastWeekTotal > previousWeekTotal * 1.1) trend = 'improving';
+        else if (lastWeekTotal < previousWeekTotal * 0.9) trend = 'declining';
+        
+        return {
+            total: bufferStatus.movementRP + bufferStatus.lifestyleRP + bufferStatus.mindsetRP + bufferStatus.educationRP,
+            thisWeek: lastWeekTotal,
+            lastWeek: previousWeekTotal,
+            weeklyAverage: Math.round((lastWeekTotal + previousWeekTotal) / 2),
+            trend,
+            lastActivity: recentActivity[0]?.date?.toISOString()?.split('T')[0] || null,
+            streakDays: streak,
+            completionRate,
+            breakdown: weeklyBreakdown.breakdown,
+            bufferStatus
+        };
+    } catch (error) {
+        console.error('Error getting comprehensive recovery points data:', error);
+        return {
+            total: 0,
+            thisWeek: 0,
+            lastWeek: 0,
+            weeklyAverage: 0,
+            trend: 'stable',
+            lastActivity: null,
+            streakDays: 0,
+            completionRate: 0,
+            breakdown: {
+                MOVEMENT: 0,
+                LIFESTYLE: 0,
+                MINDSET: 0,
+                EDUCATION: 0,
+                ADHERENCE: 0
+            },
+            bufferStatus: null
+        };
+    }
 });
 const getPatientPortalData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -357,13 +528,8 @@ const getPatientPortalData = (req, res) => __awaiter(void 0, void 0, void 0, fun
         }
         const latestSRS = yield (0, patientModel_1.getLatestSRSScore)(patient.id);
         const phase = getPhaseByScore(latestSRS?.srsScore || 0);
-        // Mock recovery points data (extend database schema for real implementation)
-        const recoveryData = {
-            weeklyPoints: yield getWeeklyRecoveryPoints(patient.id),
-            todayPoints: (yield getPatientRecoveryPoints(patient.id, new Date().toISOString().split('T')[0]))?.totalPoints || 0,
-            streak: Math.floor(Math.random() * 10) + 1,
-            completionRate: Math.floor(Math.random() * 40) + 60 // 60-100%
-        };
+        // Real recovery points data from database
+        const recoveryData = yield getPatientRecoveryPointsData(patient.id);
         res.status(200).json({
             success: true,
             data: {
@@ -419,3 +585,4 @@ exports.completeTask = completeTask;
 exports.getPatientPortalData = getPatientPortalData;
 exports.updatePatientEngagement = updatePatientEngagement;
 exports.getPhaseByScore = getPhaseByScore;
+exports.getPatientRecoveryPointsData = getPatientRecoveryPointsData;

@@ -43,9 +43,13 @@ export default function PatientRecoveryDashboard() {
         const data = JSON.parse(urlPatientData)
         console.log('🔄 Loading patient data from URL:', data)
         console.log('📊 Setting patient data - Name:', data.name, 'Score:', data.score, 'Phase:', data.phase)
+        
+        // Clear any existing localStorage to ensure fresh start for new patient
+        localStorage.removeItem('btl_patient_data')
+        
         setPatientData(data)
         
-        // Also store in localStorage for future visits
+        // Store new patient data in localStorage for future visits
         localStorage.setItem('btl_patient_data', JSON.stringify(data))
         
         // Clean up URL to remove the parameters
@@ -175,7 +179,15 @@ export default function PatientRecoveryDashboard() {
   }, [patientData.email])
 
   // Extract current score number for the wheel
-  const currentScore = parseInt(patientData.score?.split('/')[0] || '7')
+  const currentScore = (() => {
+    if (typeof patientData.score === 'number') {
+      return patientData.score;
+    }
+    if (typeof patientData.score === 'string') {
+      return parseInt(patientData.score.split('/')[0] || '7');
+    }
+    return 7; // Default fallback
+  })()
 
       return (
       <div className="flex min-h-screen bg-gradient-to-br from-btl-50 to-white">
@@ -219,7 +231,7 @@ export default function PatientRecoveryDashboard() {
               </div>
 
               {/* Weekly Points */}
-              <WeeklyPointsSection key={`points-${refreshKey}`} />
+              <WeeklyPointsSection key={`points-${refreshKey}`} patientEmail={patientData.email} />
             </div>
 
             {/* Recovery Toolkit and Assessments */}

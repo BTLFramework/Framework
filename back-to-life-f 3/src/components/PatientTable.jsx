@@ -14,7 +14,6 @@ export default function PatientTable({
   sortDir,
   setSortDir,
   onRowClick,
-  getPhase,
   isFlagged,
   needsFollowUp,
   selectedPatients = [],
@@ -43,13 +42,13 @@ export default function PatientTable({
   };
 
   const getPriorityAlert = (patient) => {
-    if (patient.painScore >= 8 && patient.srs <= 3) {
+    if (patient.painLevel >= 8 && patient.srsScore <= 3) {
       return { type: "high-priority", label: "High Priority", icon: "🚨" };
     }
     if (needsFollowUp(patient.lastUpdate)) {
       return { type: "follow-up", label: "Follow-up Due", icon: "📅" };
     }
-    if (patient.srs <= 4) {
+    if (patient.srsScore <= 4) {
       return { type: "medium-priority", label: "Monitor", icon: "⚠️" };
     }
     return null;
@@ -333,10 +332,10 @@ export default function PatientTable({
                           <span>ID: {patient.id.toString().padStart(4, '0')}</span>
                           <span>•</span>
                           <span>Confidence: {patient.confidence}%</span>
-                          {patient.painScore && (
+                          {patient.painLevel && (
                             <>
                               <span>•</span>
-                              <span>Pain: {patient.painScore}/10</span>
+                              <span>Pain: {patient.painLevel}/10</span>
                             </>
                           )}
                         </div>
@@ -379,8 +378,8 @@ export default function PatientTable({
                     style={{ padding: '16px 20px', cursor: 'pointer' }}
                     onClick={() => onRowClick(patient.id)}
                   >
-                    <span className={`phase-badge ${getPhase(patient.srs).toLowerCase()}`}>
-                      {getPhase(patient.srs)}
+                    <span className={`phase-badge ${patient.phase.toLowerCase()}`}>
+                      {patient.phase}
                     </span>
                   </td>
 
@@ -392,10 +391,10 @@ export default function PatientTable({
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <span style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>
-                          {patient.srs}
+                          {patient.srsScore}
                         </span>
-                        <span className={`status-${getSRSStatus(patient.srs)}`}>
-                          {getSRSLabel(patient.srs)}
+                        <span className={`status-${getSRSStatus(patient.srsScore)}`}>
+                          {getSRSLabel(patient.srsScore)}
                         </span>
                       </div>
                     </div>

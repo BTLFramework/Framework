@@ -149,30 +149,60 @@ export default function MultiStepForm() {
   // Submit: calculate SRS, derive phase, show results, AND send to patient portal
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    console.log('🚀 Starting form submission...');
+    
+    // Use already calculated disability percentage from formData
+    const disabilityPercentage = Math.round(formData.disabilityPercentage);
+    
+    // Calculate SRS using new baseline logic
+    const srsResult = calculateSRS({
+      ...formData,
+      disabilityPercentage,
+      formType: 'Intake'  // Ensure we trigger baseline calculation
+    });
+    
+    console.log('📊 SRS Calculation Result:', srsResult);
+    
+    // Prepare submission data
+    const submissionData = {
+      patientName: formData.patientName,
+      email: formData.email,
+      date: formData.date,
+      formType: 'Intake',
+      region: formData.region,
+      ndi: formData.ndi,
+      odi: formData.odi,
+      ulfi: formData.ulfi,
+      lefs: formData.lefs,
+      disabilityPercentage,
+      vas: formData.vas,
+      psfs: formData.psfs,
+      beliefs: formData.beliefs,
+      confidence: formData.confidence,
+      groc: 0, // Always 0 for intake
+      srsScore: srsResult.formattedScore, // Send as "X/9" format
+      phase: srsResult.phase
+    };
+
     setIsSubmitting(true);
 
     try {
-      // Calculate SRS locally first
-      const score = calculateSRS(formData);
-      const phaseObj = getPhaseByScore(score);
-      setResultScore(score);
-      setResultPhase(phaseObj);
-
       // Add email if not provided
-      const submissionData = {
-        ...formData,
-        email: formData.email || `${formData.patientName.toLowerCase().replace(' ', '.')}@patient.com`
+      const submissionDataWithEmail = {
+        ...submissionData,
+        email: submissionData.email || `${submissionData.patientName.toLowerCase().replace(' ', '.')}@patient.com`
       };
 
       // Submit to patient portal API
-      console.log('🔄 Submitting to patient portal...', submissionData);
+      console.log('🔄 Submitting to patient portal...', submissionDataWithEmail);
       
       const response = await fetch('http://localhost:3000/api/intake', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(submissionData)
+        body: JSON.stringify(submissionDataWithEmail)
       });
 
       const result = await response.json();
@@ -183,11 +213,11 @@ export default function MultiStepForm() {
         const patientData = {
           name: result.data.patient.name,
           email: result.data.patient.email,
-          score: result.data.srsScore,
+          score: `${result.data.srsScore}/11`, // Format as string for portal compatibility
           phase: result.data.phase,
-          timestamp: result.data.timestamp
+          timestamp: new Date().toISOString()
         };
-        console.log('💾 Storing patient data:', patientData);
+        console.log('💾 Storing patient data for redirect:', patientData);
         localStorage.setItem('btl_patient_data', JSON.stringify(patientData));
       }
       
@@ -256,10 +286,11 @@ export default function MultiStepForm() {
                           const patientData = {
                             name: submissionResult.data.patient.name,
                             email: submissionResult.data.patient.email,
-                            score: submissionResult.data.srsScore,
+                            score: `${submissionResult.data.srsScore}/11`,
                             phase: submissionResult.data.phase,
-                            timestamp: submissionResult.data.timestamp
+                            timestamp: new Date().toISOString()
                           };
+                          console.log('🚀 Opening portal with patient data:', patientData);
                           const params = new URLSearchParams({
                             patientData: JSON.stringify(patientData)
                           });
@@ -276,9 +307,9 @@ export default function MultiStepForm() {
                           const patientData = {
                             name: submissionResult.data.patient.name,
                             email: submissionResult.data.patient.email,
-                            score: submissionResult.data.srsScore,
+                            score: `${submissionResult.data.srsScore}/11`,
                             phase: submissionResult.data.phase,
-                            timestamp: submissionResult.data.timestamp
+                            timestamp: new Date().toISOString()
                           };
                           console.log('🚀 Redirecting with patient data:', patientData);
                           const params = new URLSearchParams({
@@ -332,14 +363,15 @@ export default function MultiStepForm() {
                   const patientData = {
                     name: submissionResult.data.patient.name,
                     email: submissionResult.data.patient.email,
-                    score: submissionResult.data.srsScore,
+                    score: `${submissionResult.data.srsScore}/11`,
                     phase: submissionResult.data.phase,
-                    timestamp: submissionResult.data.timestamp
+                    timestamp: new Date().toISOString()
                   };
-                  const params = new URLSearchParams({
-                    patientData: JSON.stringify(patientData)
-                  });
-                  window.open(`http://localhost:3000?${params.toString()}`, '_blank');
+                                      console.log('🚀 Opening portal (bottom button) with patient data:', patientData);
+                    const params = new URLSearchParams({
+                      patientData: JSON.stringify(patientData)
+                    });
+                    window.open(`http://localhost:3000?${params.toString()}`, '_blank');
                 }}
                 className="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
               >
@@ -416,7 +448,7 @@ export default function MultiStepForm() {
               disabled={isSubmitting}
               className="px-6 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded hover:from-green-600 hover:to-green-700 disabled:opacity-50 font-semibold"
             >
-              {isSubmitting ? '🔄 Processing...' : '🚀 Submit & Create Patient Portal'}
+              {isSubmitting ? '🔄 Processing...' : '🚀 Submit & See Recovery Phase'}
             </button>
           )}
         </div>

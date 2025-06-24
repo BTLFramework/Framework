@@ -26,29 +26,102 @@ model Patient {
   intakeDate   DateTime
   srsScores    SRSScore[]
   portalAccount PatientPortal?
+  recoveryPoints RecoveryPoint[]
+  srsBuffers   SRSBuffer?
+  
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @default(now()) @updatedAt
 }
 
 model SRSScore {
-  id                  Int      @id @default(autoincrement())
-  patientId           Int
-  date                DateTime
-  formType            String
-  region              String
-  disabilityPercentage Float
-  vas                 Int
-  psfs                Json
-  beliefs             Json
-  confidence          Int
-  groc                Int?
-  srsScore            Int
-  patient             Patient  @relation(fields: [patientId], references: [id])
+  id                   Int      @id @default(autoincrement())
+  patientId            Int
+  patient              Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  date                 DateTime
+  formType             String
+  region               String
+  disabilityPercentage Int
+  vas                  Int
+  psfs                 Json
+  beliefs              String[] @default([])
+  confidence           Int
+  groc                 Int
+  srsScore             Int
+  
+  createdAt            DateTime @default(now())
+  
+  @@index([patientId, date])
 }
 
 model PatientPortal {
   id        Int      @id @default(autoincrement())
   patientId Int      @unique
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
-  patient   Patient  @relation(fields: [patientId], references: [id])
+}
+
+// Recovery Points System
+model RecoveryPoint {
+  id        Int      @id @default(autoincrement())
+  patientId Int
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  date      DateTime @default(now())
+  category  RPType
+  action    String   // Description of the action taken
+  points    Int      // Points earned for this action
+  
+  @@index([patientId, category, date])
+}
+
+enum RPType {
+  MOVEMENT
+  LIFESTYLE  
+  MINDSET
+  EDUCATION
+  ADHERENCE
+}
+
+// SRS Buffer - stores partial credit accumulation
+model SRSBuffer {
+  id           Int     @id @default(autoincrement())
+  patientId    Int     @unique
+  patient      Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  // Buffer values (0.0 to domain max)
+  psfsBuffer   Float   @default(0.0)    // Max 2.0 points
+  vasBuffer    Float   @default(0.0)    // Max 1.0 points  
+  confBuffer   Float   @default(0.0)    // Max 2.0 points
+  beliefBuffer Float   @default(0.0)    // Max 1.0 points
+  
+  // RP counters (reset when buffer increments)
+  movementRP   Int     @default(0)      // MOVEMENT category
+  lifestyleRP  Int     @default(0)      // LIFESTYLE category
+  mindsetRP    Int     @default(0)      // MINDSET category
+  educationRP  Int     @default(0)      // EDUCATION category
+  
+  updatedAt    DateTime @updatedAt
+}
+
+// Threshold tracking for clinician alerts
+model RPThresholdHit {
+  id        Int       @id @default(autoincrement())
+  patientId Int
+  domain    SRSDomain // Which SRS domain threshold was hit
+  windowEnd DateTime  // 4-week window end date
+  met       Boolean   // Whether threshold was met
+  rpTotal   Int       // Total RP earned in the window
+  
+  createdAt DateTime  @default(now())
+  
+  @@unique([patientId, domain, windowEnd])
+  @@index([patientId, domain, windowEnd])
+}
+
+enum SRSDomain {
+  PSFS
+  VAS  
+  CONFIDENCE
+  BELIEFS
 }

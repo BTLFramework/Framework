@@ -1,35 +1,122 @@
 "use client"
 
 import { Flame, Zap, Trophy, Star } from "lucide-react"
+import { useState, useEffect } from "react"
 
-export function WeeklyPointsSection() {
+interface WeeklyPointsSectionProps {
+  patientEmail?: string
+}
+
+export function WeeklyPointsSection({ patientEmail }: WeeklyPointsSectionProps) {
+  const [weeklyData, setWeeklyData] = useState({
+    total: 22,
+    target: 150,
+    breakdown: {
+      MOVEMENT: 0,
+      LIFESTYLE: 0,
+      MINDSET: 0,
+      EDUCATION: 0,
+      ADHERENCE: 0
+    },
+    streakDays: 3,
+    completionRate: 73
+  })
+  const [loading, setLoading] = useState(false)
+
+  // Fetch real recovery points data
+  useEffect(() => {
+    const fetchRecoveryPoints = async () => {
+      if (!patientEmail || patientEmail === 'sarah@example.com') {
+        console.log('ℹ️ No valid patient email or using default, skipping fetch')
+        return
+      }
+      
+      setLoading(true)
+      try {
+        console.log('🔄 Fetching recovery points for:', patientEmail)
+        
+        // Get patient data first to get patient ID
+        const patientResponse = await fetch(`http://localhost:3001/patients/portal-data/${patientEmail}`)
+        if (!patientResponse.ok) {
+          const errorText = await patientResponse.text()
+          console.log('❌ Patient not found or API error:', errorText)
+          // If patient not found, silently return without throwing error
+          if (patientResponse.status === 404) {
+            console.log('ℹ️ Patient not found, using default data')
+            return
+          }
+          throw new Error(`Failed to fetch patient data: ${errorText}`)
+        }
+        
+        const patientData = await patientResponse.json()
+        const patientId = patientData.data.patient.id
+        
+        console.log('📊 Patient ID:', patientId)
+        
+        // Get weekly breakdown
+        const weeklyResponse = await fetch(`http://localhost:3001/api/recovery-points/weekly/${patientId}`)
+        if (!weeklyResponse.ok) {
+          throw new Error('Failed to fetch weekly recovery points')
+        }
+        
+        const weeklyPoints = await weeklyResponse.json()
+        console.log('📈 Weekly points data:', weeklyPoints)
+        
+        // Get buffer status for additional data
+        const bufferResponse = await fetch(`http://localhost:3001/api/recovery-points/buffer/${patientId}`)
+        const bufferData = bufferResponse.ok ? await bufferResponse.json() : null
+        
+        // Update state with real data
+        setWeeklyData({
+          total: weeklyPoints.total,
+          target: 150, // Weekly target from config
+          breakdown: weeklyPoints.breakdown,
+          streakDays: patientData.data.recoveryPoints?.streakDays || 0,
+          completionRate: patientData.data.recoveryPoints?.completionRate || 0
+        })
+        
+        console.log('✅ Recovery points data updated')
+        
+      } catch (error) {
+        console.error('❌ Error fetching recovery points:', error)
+        // Keep default values on error
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchRecoveryPoints()
+  }, [patientEmail])
+
+  // Calculate progress percentage
+  const progressPercentage = Math.min(100, Math.round((weeklyData.total / weeklyData.target) * 100))
   const achievements = [
     {
       icon: Flame,
       title: "Daily Streak",
-      description: "3 days",
-      points: 2,
-      badgeClass: "badge-bronze",
-      iconColor: "text-amber-700", // Bronze color for icon
-      progress: 60,
+      description: `${weeklyData.streakDays} days`,
+      points: weeklyData.streakDays >= 7 ? 5 : weeklyData.streakDays >= 3 ? 3 : 1,
+      badgeClass: weeklyData.streakDays >= 7 ? "badge-gold" : weeklyData.streakDays >= 3 ? "badge-silver" : "badge-bronze",
+      iconColor: weeklyData.streakDays >= 7 ? "text-yellow-600" : weeklyData.streakDays >= 3 ? "text-gray-500" : "text-amber-700",
+      progress: Math.min(100, (weeklyData.streakDays / 7) * 100),
     },
     {
       icon: Zap,
-      title: "Perfect Week", 
-      description: "5/7 days",
-      points: 5,
-      badgeClass: "badge-gold", 
-      iconColor: "text-yellow-600", // Gold color for icon
-      progress: 71,
+      title: "Movement Goals", 
+      description: `${weeklyData.breakdown.MOVEMENT}/60 pts`,
+      points: Math.floor(weeklyData.breakdown.MOVEMENT / 20),
+      badgeClass: weeklyData.breakdown.MOVEMENT >= 50 ? "badge-gold" : weeklyData.breakdown.MOVEMENT >= 30 ? "badge-silver" : "badge-bronze",
+      iconColor: weeklyData.breakdown.MOVEMENT >= 50 ? "text-yellow-600" : weeklyData.breakdown.MOVEMENT >= 30 ? "text-gray-500" : "text-amber-700",
+      progress: Math.min(100, (weeklyData.breakdown.MOVEMENT / 60) * 100),
     },
     {
       icon: Trophy,
-      title: "Assessment Pro",
-      description: "2/3 done",
-      points: 3,
-      badgeClass: "badge-silver",
-      iconColor: "text-gray-500", // Silver color for icon
-      progress: 67,
+      title: "Weekly Progress",
+      description: `${weeklyData.total}/${weeklyData.target} pts`,
+      points: Math.floor(weeklyData.total / 50),
+      badgeClass: weeklyData.total >= 120 ? "badge-gold" : weeklyData.total >= 75 ? "badge-silver" : "badge-bronze",
+      iconColor: weeklyData.total >= 120 ? "text-yellow-600" : weeklyData.total >= 75 ? "text-gray-500" : "text-amber-700",
+      progress: progressPercentage,
     },
   ]
 
@@ -41,8 +128,8 @@ export function WeeklyPointsSection() {
           <h2 className="text-xl font-semibold gradient-text">Weekly Recovery Points</h2>
         </div>
         <div className="flex items-center space-x-2">
-          <span className="text-2xl font-bold text-btl-600">22</span>
-          <span className="text-charcoal-500">/30</span>
+          <span className="text-2xl font-bold text-btl-600">{loading ? "..." : weeklyData.total}</span>
+          <span className="text-charcoal-500">/{weeklyData.target}</span>
         </div>
       </div>
 
@@ -50,7 +137,7 @@ export function WeeklyPointsSection() {
       <div className="w-full bg-charcoal-200 rounded-full h-3 mb-6 overflow-hidden">
         <div
           className="back-to-life-gradient h-3 rounded-full transition-all duration-1000 ease-out shadow-sm"
-          style={{ width: "73%" }}
+          style={{ width: `${progressPercentage}%` }}
         ></div>
       </div>
 
