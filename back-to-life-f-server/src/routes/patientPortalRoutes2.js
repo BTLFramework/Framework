@@ -111,9 +111,16 @@ router.get("/profile", (req, res) => __awaiter(void 0, void 0, void 0, function*
         if (!patientPortal) {
             return res.status(404).json({ error: 'Patient not found' });
         }
-        // Include SRS scores in the response
-        const { PrismaClient } = require('@prisma/client');
-        const prisma = new PrismaClient();
+        
+        // Use centralized Prisma instance with fallback
+        let prisma;
+        try {
+            const db = require('../db');
+            prisma = db.default || db;
+        } catch (error) {
+            const { PrismaClient } = require('@prisma/client');
+            prisma = new PrismaClient();
+        }
         const patientWithScores = yield prisma.patient.findUnique({
             where: { id: patientPortal.patientId },
             include: {
@@ -122,15 +129,30 @@ router.get("/profile", (req, res) => __awaiter(void 0, void 0, void 0, function*
                 }
             }
         });
+        
         res.json(patientWithScores);
     }
     catch (error) {
+        console.error('Error in patient profile route:', error);
         res.status(500).json({ error: 'Server error' });
     }
 }));
 // Patient logout
 router.post('/logout', (req, res) => {
-    res.clearCookie('patientToken', { path: '/' });
-    res.json({ message: 'Logged out' });
+    try {
+        res.clearCookie('patientToken', { 
+            path: '/',
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax'
+        });
+        res.json({ 
+            message: 'Logged out successfully',
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('Error in logout route:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
 });
 exports.default = router;

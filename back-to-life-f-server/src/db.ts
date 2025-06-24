@@ -1,14 +1,37 @@
-import { Pool } from "pg";
-import dotenv from "dotenv";
+import { PrismaClient } from '@prisma/client';
 
-dotenv.config();
+// Global Prisma instance to prevent multiple connections
+declare global {
+  var __prisma: PrismaClient | undefined;
+}
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+// Create a single Prisma instance
+const prisma = globalThis.__prisma || new PrismaClient({
+  log: ['error', 'warn'],
+  errorFormat: 'pretty',
 });
 
-export default pool;
+// In development, attach to global to prevent hot reload issues
+if (process.env.NODE_ENV === 'development') {
+  globalThis.__prisma = prisma;
+}
+
+// Graceful shutdown
+process.on('beforeExit', async () => {
+  console.log('Disconnecting from database...');
+  await prisma.$disconnect();
+});
+
+process.on('SIGINT', async () => {
+  console.log('Received SIGINT, disconnecting from database...');
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('Received SIGTERM, disconnecting from database...');
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+export default prisma;

@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
-    // For now, we'll use the test endpoint from your backend
-    // Later we can switch to the authenticated endpoint
-    const backendUrl = 'http://localhost:5000/api/patient-portal/test-profile';
+    // Fixed: Use correct backend port 3001 instead of 5000
+    const backendUrl = 'http://localhost:3001/api/patient-portal/profile';
     
     const response = await fetch(backendUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        // Forward cookies for authentication
+        'Cookie': request.headers.get('cookie') || '',
       },
     });
 

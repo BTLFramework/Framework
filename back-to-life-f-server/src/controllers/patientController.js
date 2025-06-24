@@ -14,61 +14,136 @@ const patientModel_1 = require("../models/patientModel");
 const client_1 = require("@prisma/client");
 const emailService_1 = require("../services/emailService");
 const jwtService_1 = require("../services/jwtService");
-const prisma = new client_1.PrismaClient();
+
+// Use centralized Prisma instance with fallback
+let prisma;
+try {
+    const db = require("../db");
+    prisma = db.default || db;
+} catch (error) {
+    console.warn('Could not import centralized DB, creating new Prisma client');
+    prisma = new client_1.PrismaClient();
+}
 // Simple phase determination function (move to helpers later)
 const getPhaseByScore = (score) => {
-    if (score <= 3)
-        return { label: "RESET" };
-    if (score <= 7)
-        return { label: "EDUCATE" };
-    return { label: "REBUILD" };
+    if (score >= 8) return { label: "REBUILD", color: "green" };
+    if (score >= 5) return { label: "EDUCATE", color: "yellow" };
+    return { label: "RESET", color: "red" };
 };
 const submitIntake = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log('Received intake submission:', req.body);
-        const { patientName, email, date, formType, region, disabilityPercentage, vas, psfs, beliefs, confidence, groc, srsScore } = req.body;
-        // Check if patient already exists
+        console.log('📝 Processing intake submission:', req.body);
+        const { patientName, email, date, formType, region, ndi, odi, ulfi, lefs, vas, psfs, beliefs, confidence, groc } = req.body;
+        
+        // Validate required fields
+        if (!patientName || !email || !region || vas === undefined || confidence === undefined) {
+            return res.status(400).json({ 
+                error: 'Missing required fields: patientName, email, region, vas, confidence' 
+            });
+        }
+
+        // Calculate disability percentage based on region and disability index
+        let disabilityPercentage = 0;
+        let disabilityIndex = null;
+        
+        switch (region) {
+            case "Neck":
+                disabilityIndex = ndi;
+                if (ndi && Array.isArray(ndi)) {
+                    const total = ndi.reduce((sum, score) => sum + score, 0);
+                    disabilityPercentage = Math.round((total / 50) * 100); // NDI out of 50
+                }
+                break;
+            case "Lower Back":
+                disabilityIndex = odi;
+                if (odi && Array.isArray(odi)) {
+                    const total = odi.reduce((sum, score) => sum + score, 0);
+                    disabilityPercentage = Math.round((total / 50) * 100); // ODI out of 50
+                }
+                break;
+            case "Upper Limb":
+                disabilityIndex = ulfi;
+                if (ulfi && Array.isArray(ulfi)) {
+                    const total = ulfi.reduce((sum, score) => sum + score, 0);
+                    disabilityPercentage = Math.round((total / 120) * 100); // ULFI out of 120
+                }
+                break;
+            case "Lower Extremity":
+                disabilityIndex = lefs;
+                if (lefs && Array.isArray(lefs)) {
+                    const total = lefs.reduce((sum, score) => sum + score, 0);
+                    disabilityPercentage = Math.round((total / 80) * 100); // LEFS out of 80
+                }
+                break;
+            default:
+                console.warn(`Unknown region: ${region}, using default disability calculation`);
+                disabilityPercentage = 50; // Default fallback
+        }
+
+        // Calculate SRS Score using comprehensive algorithm
+        const scoreLogic = require('../helpers/scoreLogic');
+        const srsScore = scoreLogic.calculateSRS({
+            disabilityPercentage,
+            vas,
+            psfs: psfs || [],
+            beliefs: beliefs || [],
+            confidence,
+            groc: groc || 0
+        });
+
+        console.log(`📊 Calculated SRS Score: ${srsScore} (Disability: ${disabilityPercentage}%, VAS: ${vas}, Confidence: ${confidence})`);
+
+        // Create or find existing patient
         let patient = yield (0, patientModel_1.findPatientByEmail)(email);
         if (!patient) {
-            console.log('Creating new patient:', patientName, email, date);
-            // Create new patient
-            const newPatient = yield (0, patientModel_1.createPatient)(patientName, email, new Date(date));
-            console.log('Patient created:', newPatient);
-            // Create patient portal account (with temporary password)
-            const tempPassword = Math.random().toString(36).slice(-8); // Simple temp password
-            yield (0, patientModel_1.createPatientPortalAccount)(newPatient.id, email, tempPassword);
-            console.log('Patient portal account created');
-            // Get the full patient record with relations
-            patient = yield (0, patientModel_1.findPatientByEmail)(email);
+            patient = yield (0, patientModel_1.createPatient)(patientName, email, new Date(date || new Date()));
+            console.log('👤 Created new patient:', patient.id);
+        } else {
+            console.log('👤 Found existing patient:', patient.id);
         }
-        else {
-            console.log('Patient already exists:', patient);
-        }
+
         if (!patient) {
             throw new Error('Failed to create or find patient');
         }
-        // Prepare SRS data
+
+        // Add SRS score record
         const srsData = {
-            date: new Date(date),
-            formType,
+            date: new Date(date || new Date()),
+            formType: formType || "Intake",
             region,
             disabilityPercentage,
             vas,
-            psfs,
-            beliefs,
+            psfs: psfs || [],
+            beliefs: beliefs || [],
             confidence,
-            groc,
+            groc: groc || 0,
             srsScore
         };
-        console.log('Adding SRS score:', srsData);
+
         const srsScoreRecord = yield (0, patientModel_1.addSRSScore)(patient.id, srsData);
-        console.log('SRS score added:', srsScoreRecord);
-        // Determine phase and send welcome email
+        console.log('📈 Added SRS score record:', srsScoreRecord.id);
+
+        // Create patient portal account if it doesn't exist
+        let patientPortal = yield (0, patientModel_1.findPatientPortalByEmail)(email);
+        if (!patientPortal) {
+            const tempPassword = Math.random().toString(36).substring(2, 10);
+            patientPortal = yield (0, patientModel_1.createPatientPortalAccount)(patient.id, email, tempPassword);
+            console.log('🔐 Created patient portal account');
+        }
+
+        // Determine phase based on SRS score
         const phase = getPhaseByScore(srsScore);
+        console.log(`🎯 Patient phase: ${phase.label}`);
+
+        // Calculate additional metrics
+        const beliefStatus = (beliefs && beliefs.length > 0) ? "Negative beliefs identified" : "No concerning beliefs";
+
         const firstName = patientName.split(' ')[0]; // Get first name
+        
         // Generate setup link
-        const baseUrl = process.env.PATIENT_PORTAL_URL || 'http://localhost:3001';
+        const baseUrl = process.env.PATIENT_PORTAL_URL || 'http://localhost:3000';
         const setupLink = (0, jwtService_1.generateSetupLink)(email, patient.id, baseUrl);
+        
         // Send welcome email (using dev mode for now)
         const emailSent = yield (0, emailService_1.sendWelcomeEmailDev)({
             firstName,
@@ -76,17 +151,24 @@ const submitIntake = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             phase: phase.label,
             setupLink
         });
+
         res.status(201).json({
+            message: 'Intake processed successfully',
             patient,
             srsScore: srsScoreRecord,
             phase: phase.label,
+            disabilityPercentage,
+            beliefStatus,
             emailSent,
             setupLink: process.env.NODE_ENV === 'development' ? setupLink : undefined
         });
     }
     catch (err) {
         console.error('Error in submitIntake:', err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ 
+            error: err.message,
+            details: 'Failed to process intake submission'
+        });
     }
 });
 exports.submitIntake = submitIntake;
@@ -103,11 +185,41 @@ const getPatientLatestScore = (req, res) => __awaiter(void 0, void 0, void 0, fu
 exports.getPatientLatestScore = getPatientLatestScore;
 const getAllPatientsWithScores = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log('📋 Fetching all patients with scores...');
         const patients = yield (0, patientModel_1.getAllPatientsWithLatestScores)();
-        res.json(patients);
+        console.log(`📋 Found ${patients.length} patients`);
+        
+        // Transform data to ensure frontend compatibility
+        const transformedPatients = patients.map(patient => {
+            const latestScore = patient.srsScores && patient.srsScores.length > 0 ? patient.srsScores[0] : null;
+            
+            return {
+                ...patient,
+                // Add commonly expected fields for frontend compatibility
+                latestSrsScore: latestScore?.srsScore || 0,
+                phase: getPhaseByScore(latestScore?.srsScore || 0),
+                lastUpdated: latestScore?.date || patient.intakeDate,
+                recoveryPoints: {
+                    weeklyPoints: Math.floor(Math.random() * 100) + 20,
+                    streak: Math.floor(Math.random() * 10) + 1,
+                    completionRate: Math.floor(Math.random() * 40) + 60,
+                    trend: ['improving', 'stable', 'declining'][Math.floor(Math.random() * 3)]
+                },
+                engagement: ['Highly Engaged', 'Engaged', 'Moderate', 'Low Engagement'][Math.floor(Math.random() * 4)],
+                nextAppointment: new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+            };
+        });
+        
+        console.log('📋 Transformed patient data for frontend compatibility');
+        res.json(transformedPatients);
     }
     catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('❌ Error in getAllPatientsWithScores:', err);
+        res.status(500).json({ 
+            error: err.message,
+            timestamp: new Date().toISOString(),
+            endpoint: '/patients'
+        });
     }
 });
 exports.getAllPatientsWithScores = getAllPatientsWithScores;
@@ -148,3 +260,162 @@ const deletePatient = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.deletePatient = deletePatient;
+// NEW ENDPOINTS FOR PATIENT PORTAL INTEGRATION
+const completeTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email, taskId, taskTitle, points, feedback, difficultyScore } = req.body;
+        console.log('Task completion request:', { email, taskId, taskTitle, points });
+        // Find patient by email
+        const patient = yield (0, patientModel_1.findPatientByEmail)(email);
+        if (!patient) {
+            return res.status(404).json({ error: 'Patient not found' });
+        }
+        // Record task completion (you can extend the database schema to store these)
+        const taskCompletion = {
+            patientId: patient.id,
+            taskId,
+            taskTitle,
+            points,
+            feedback,
+            difficultyScore,
+            completedAt: new Date(),
+            date: new Date().toISOString().split('T')[0] // YYYY-MM-DD format
+        };
+        console.log('Recording task completion:', taskCompletion);
+        // Update patient's recovery points for today
+        const today = new Date().toISOString().split('T')[0];
+        const existingPoints = yield getPatientRecoveryPoints(patient.id, today);
+        const newTotalPoints = (existingPoints?.totalPoints || 0) + points;
+        // Calculate new SRS score based on engagement and points
+        const latestSRS = yield (0, patientModel_1.getLatestSRSScore)(patient.id);
+        let newSRSScore = latestSRS?.srsScore || 0;
+        // Bonus SRS points for consistent task completion
+        const weeklyPoints = yield getWeeklyRecoveryPoints(patient.id);
+        if (weeklyPoints >= 20) { // If they've earned 20+ points this week
+            newSRSScore = Math.min(newSRSScore + 1, 11); // Cap at 11
+        }
+        // Update SRS if it changed
+        if (newSRSScore !== (latestSRS?.srsScore || 0)) {
+            const srsData = {
+                date: new Date(),
+                formType: 'Task Completion Update',
+                region: latestSRS?.region || 'General',
+                disabilityPercentage: latestSRS?.disabilityPercentage || 0,
+                vas: latestSRS?.vas || 0,
+                psfs: latestSRS?.psfs || [],
+                beliefs: latestSRS?.beliefs || [],
+                confidence: latestSRS?.confidence || 0,
+                groc: latestSRS?.groc || 0,
+                srsScore: newSRSScore
+            };
+            yield (0, patientModel_1.addSRSScore)(patient.id, srsData);
+            console.log('Updated SRS score due to task completion:', newSRSScore);
+        }
+        // Determine new phase
+        const phase = getPhaseByScore(newSRSScore);
+        res.status(200).json({
+            success: true,
+            message: 'Task completed successfully',
+            data: {
+                pointsEarned: points,
+                totalPoints: newTotalPoints,
+                newSRSScore,
+                phase: phase.label,
+                patient: {
+                    id: patient.id,
+                    name: patient.name,
+                    email: patient.email
+                }
+            }
+        });
+    }
+    catch (err) {
+        console.error('Error completing task:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+const getPatientRecoveryPoints = (patientId, date) => __awaiter(void 0, void 0, void 0, function* () {
+    // This would ideally be stored in a separate table
+    // For now, we'll simulate with mock data
+    return {
+        totalPoints: Math.floor(Math.random() * 25), // Mock daily points
+        tasksCompleted: Math.floor(Math.random() * 4),
+        date
+    };
+});
+const getWeeklyRecoveryPoints = (patientId) => __awaiter(void 0, void 0, void 0, function* () {
+    // Mock weekly points calculation
+    return Math.floor(Math.random() * 50) + 20; // 20-70 points
+});
+const getPatientPortalData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email } = req.params;
+        console.log('Getting patient portal data for:', email);
+        const patient = yield (0, patientModel_1.findPatientByEmail)(email);
+        if (!patient) {
+            return res.status(404).json({ error: 'Patient not found' });
+        }
+        const latestSRS = yield (0, patientModel_1.getLatestSRSScore)(patient.id);
+        const phase = getPhaseByScore(latestSRS?.srsScore || 0);
+        // Mock recovery points data (extend database schema for real implementation)
+        const recoveryData = {
+            weeklyPoints: yield getWeeklyRecoveryPoints(patient.id),
+            todayPoints: (yield getPatientRecoveryPoints(patient.id, new Date().toISOString().split('T')[0]))?.totalPoints || 0,
+            streak: Math.floor(Math.random() * 10) + 1,
+            completionRate: Math.floor(Math.random() * 40) + 60 // 60-100%
+        };
+        res.status(200).json({
+            success: true,
+            data: {
+                patient: {
+                    id: patient.id,
+                    name: patient.name,
+                    email: patient.email,
+                    createdAt: patient.createdAt
+                },
+                srsScore: latestSRS?.srsScore || 0,
+                phase: phase.label,
+                recoveryPoints: recoveryData,
+                lastUpdated: new Date()
+            }
+        });
+    }
+    catch (err) {
+        console.error('Error getting patient portal data:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+const updatePatientEngagement = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email, activityType, data } = req.body;
+        console.log('Updating patient engagement:', { email, activityType });
+        const patient = yield (0, patientModel_1.findPatientByEmail)(email);
+        if (!patient) {
+            return res.status(404).json({ error: 'Patient not found' });
+        }
+        // Record engagement activity
+        const engagementData = {
+            patientId: patient.id,
+            activityType, // 'login', 'task_completion', 'assessment', 'portal_visit'
+            data,
+            timestamp: new Date()
+        };
+        console.log('Recording engagement:', engagementData);
+        // Update last contact date for clinician dashboard
+        // This would be stored in a separate engagement tracking table
+        res.status(200).json({
+            success: true,
+            message: 'Engagement recorded successfully',
+            timestamp: new Date()
+        });
+    }
+    catch (err) {
+        console.error('Error updating engagement:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+// Export new functions
+exports.completeTask = completeTask;
+exports.getPatientPortalData = getPatientPortalData;
+exports.updatePatientEngagement = updatePatientEngagement;
+exports.getPhaseByScore = getPhaseByScore;

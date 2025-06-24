@@ -11,7 +11,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deletePatient = exports.getAllPatientsWithScores = exports.getPatientLatestScore = exports.submitIntake = exports.getAllPatientsWithLatestScores = exports.getLatestSRSScore = exports.addSRSScore = exports.updatePatientPortalPassword = exports.findPatientPortalByEmail = exports.findPatientByEmail = exports.createPatientPortalAccount = exports.createPatient = void 0;
 const client_1 = require("@prisma/client");
-const prisma = new client_1.PrismaClient();
+
+// Use centralized Prisma instance with fallback
+let prisma;
+try {
+    // Import from the TypeScript file since we're using ts-node-dev
+    const db = require("../db");
+    prisma = db.default || db;
+} catch (error) {
+    console.warn('Could not import centralized DB, creating new Prisma client');
+    prisma = new client_1.PrismaClient();
+}
 const createPatient = (name, email, intakeDate) => __awaiter(void 0, void 0, void 0, function* () {
     return yield prisma.patient.create({
         data: {

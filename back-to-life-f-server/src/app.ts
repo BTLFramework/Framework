@@ -12,29 +12,48 @@ dotenv.config();
 
 const app = express();
 
-// Add logging middleware
+// Enhanced logging middleware
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`);
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] ${req.method} ${req.path} - Origin: ${req.headers.origin || 'none'}`);
+  
+  // Log response status
+  const originalSend = res.send;
+  res.send = function(data) {
+    console.log(`[${timestamp}] Response: ${res.statusCode} for ${req.method} ${req.path}`);
+    return originalSend.call(this, data);
+  };
+  
   next();
 });
 
+// CORS configuration - HTTP for development, HTTPS-ready for production
+const allowedOrigins = [
+  // Local development HTTP
+  "http://localhost:3000",
+  "http://localhost:3001", 
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175",
+  "http://localhost:5176",
+  "http://localhost:5177",
+  "http://localhost:5178",
+  // Production domains (will be HTTPS when deployed)
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+  ...(process.env.PATIENT_PORTAL_URL ? [process.env.PATIENT_PORTAL_URL] : []),
+  ...(process.env.CLINICIAN_DASHBOARD_URL ? [process.env.CLINICIAN_DASHBOARD_URL] : [])
+];
+
 app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://localhost:5174",
-    "http://localhost:5175",
-    "http://localhost:5176",
-    "http://localhost:5177",
-    "http://localhost:5178"
-  ],
+  origin: allowedOrigins,
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With'],
   optionsSuccessStatus: 200
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
 // Debug middleware to log request body
@@ -52,10 +71,61 @@ app.get("/test", (req, res) => {
   res.json({ message: "Test route working!" });
 });
 
+// Health check endpoint with database status
+app.get("/health", async (req, res) => {
+  try {
+    // Test database connection
+    const { PrismaClient } = require('@prisma/client');
+    const testPrisma = new PrismaClient();
+    await testPrisma.$queryRaw`SELECT 1`;
+    await testPrisma.$disconnect();
+    
+    res.json({ 
+      status: "OK", 
+      database: "Connected",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      endpoints: {
+        patients: "/patients",
+        patientPortal: "/api/patient-portal",
+        auth: "/auth"
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      status: "ERROR",
+      database: "Disconnected",
+      error: error.message || 'Unknown error',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    });
+  }
+});
+
 app.use("/auth", authRoutes);
 app.use("/jane", janeRoutes);
 app.use("/patients", patientRoutes);
 app.use("/api/patient-portal", patientPortalRoutes);
+
+// Global error handler
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error('Global error handler:', err);
+  res.status(500).json({ 
+    error: 'Internal server error',
+    message: err.message,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  console.log(`404 - Route not found: ${req.method} ${req.path}`);
+  res.status(404).json({ 
+    error: 'Route not found',
+    path: req.path,
+    method: req.method
+  });
+});
 
 const PORT = process.env.PORT || 3001;
 

@@ -8,52 +8,95 @@ import PatientModal from "../components/PatientModal";
 // API function to fetch patients from backend
 const fetchPatientsFromAPI = async () => {
   try {
+    console.log('🔄 Fetching patients data from backend...');
+    
+    // Create timeout controller for better browser compatibility
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    
     const response = await fetch('http://localhost:3001/patients', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
+      signal: controller.signal
     });
     
+    clearTimeout(timeoutId);
+    
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
     }
     
-    const backendPatients = await response.json();
-    console.log('Fetched patients from API:', backendPatients);
+    const data = await response.json();
+    console.log('📊 Received patients data:', data);
     
     // Transform backend data to match frontend expectations
-    const transformedPatients = backendPatients.map(patient => {
+    const transformedPatients = data.map(patient => {
       const latestScore = patient.srsScores?.[0];
+      const srsScore = latestScore?.srsScore || 0;
+      
+      // Calculate phase based on SRS score
+      let phase = 'RESET';
+      if (srsScore > 3 && srsScore <= 7) phase = 'EDUCATE';
+      if (srsScore > 7) phase = 'REBUILD';
+      
+      // Use real recovery points data from backend
+      const recoveryPoints = patient.recoveryPoints || {
+        weeklyPoints: 0,
+        trend: 'stable',
+        streak: 0,
+        completionRate: 0
+      };
+      
+      const engagementStatus = patient.engagement || 
+        (recoveryPoints.completionRate >= 80 ? 'highly_engaged' :
+         recoveryPoints.completionRate >= 60 ? 'engaged' :
+         recoveryPoints.completionRate >= 40 ? 'moderate' : 'low_engagement');
       
       return {
         id: patient.id,
         name: patient.name,
         email: patient.email,
-        intakeDate: patient.intakeDate,
-        lastUpdate: latestScore?.date || patient.intakeDate,
-        srs: latestScore?.srsScore || 0,
+        patientId: `BTL-${String(patient.id).padStart(4, '0')}`,
+        intakeDate: new Date(patient.intakeDate).toLocaleDateString(),
+        phase,
+        srsScore,
         groc: latestScore?.groc || 0,
-        pain: latestScore?.vas || 0,
+        painLevel: latestScore?.vas || 0,
         confidence: latestScore?.confidence || 0,
-        phase: getPhase(latestScore?.srsScore || 0),
-        notes: [],
-        prevSrs: null, // Would need to fetch previous scores for this
-        recoveryPoints: {
-          total: Math.floor(Math.random() * 100) + 50, // Mock data for now
-          weekly: Math.floor(Math.random() * 20) + 5,
-          trend: ['improving', 'stable', 'declining'][Math.floor(Math.random() * 3)],
-          streak: Math.floor(Math.random() * 30) + 1,
-          completionRate: Math.floor(Math.random() * 50) + 50,
-          lastActivity: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString() // Last 30 days max
-        }
+        recoveryPoints,
+        engagementStatus,
+        lastContact: Math.floor(Math.random() * 30) + 1, // Days ago - TODO: get from backend
+        nextAppointment: patient.nextAppointment || new Date(Date.now() + Math.random() * 14 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        priority: srsScore < 4 ? 'high' : srsScore < 7 ? 'medium' : 'low',
+        alerts: srsScore < 4 ? ['Low SRS Score'] : [],
+        // Additional patient details for modal
+        region: latestScore?.region || 'General',
+        disabilityPercentage: latestScore?.disabilityPercentage || 0,
+        vas: latestScore?.vas || 0,
+        psfs: latestScore?.psfs || [],
+        beliefs: latestScore?.beliefs || [],
+        formType: latestScore?.formType || 'Initial Assessment',
+        notes: `Patient showing ${phase.toLowerCase()} phase characteristics. SRS score: ${srsScore}/11.`
       };
     });
     
     return transformedPatients;
-  } catch (error) {
-    console.error('Error fetching patients:', error);
-    throw error;
+  } catch (err) {
+    console.error('❌ Error fetching patients:', err);
+    
+    // Provide more specific error messages
+    if (err.name === 'AbortError') {
+      throw new Error('Request timed out - backend server may be slow or unresponsive');
+    } else if (err.message.includes('Failed to fetch')) {
+      throw new Error('Unable to connect to backend server. Please ensure the server is running on port 3001.');
+    } else if (err.message.includes('NetworkError')) {
+      throw new Error('Network error - please check your internet connection and backend server status.');
+    }
+    
+    throw err;
   }
 };
 
@@ -86,12 +129,13 @@ function Dashboard() {
   const [search, setSearch] = useState("");
   const [phaseFilter, setPhaseFilter] = useState("");
   const [flagFilter, setFlagFilter] = useState("");
-  const [customFilter, setCustomFilter] = useState("");
+  const [customFilter, setCustomFilter] = useState(null);
   const [sortCol, setSortCol] = useState("intakeDate");
   const [sortDir, setSortDir] = useState("desc");
   const [expanded, setExpanded] = useState(null);
   const [noteInput, setNoteInput] = useState("");
   const [selectedPatients, setSelectedPatients] = useState([]);
+  const [lastUpdated, setLastUpdated] = useState(new Date());
 
   // Fetch patients on component mount
   useEffect(() => {
@@ -101,6 +145,7 @@ function Dashboard() {
         setError(null);
         const fetchedPatients = await fetchPatientsFromAPI();
         setPatients(fetchedPatients);
+        setLastUpdated(new Date());
       } catch (err) {
         setError(err.message);
         console.error('Failed to load patients:', err);
@@ -114,6 +159,24 @@ function Dashboard() {
     loadPatients();
   }, []);
 
+  // Set up real-time refresh every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log('🔄 Auto-refreshing patient data...');
+      fetchPatientsFromAPI()
+        .then(fetchedPatients => {
+          setPatients(fetchedPatients);
+          setLastUpdated(new Date());
+        })
+        .catch(err => {
+          console.error('❌ Error refreshing patient data:', err);
+          setError(err.message);
+        });
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
@@ -125,13 +188,13 @@ function Dashboard() {
       data = data.filter((p) =>
         p.name.toLowerCase().includes(search.toLowerCase())
       );
-    if (phaseFilter) data = data.filter((p) => getPhase(p.srs) === phaseFilter);
+    if (phaseFilter) data = data.filter((p) => getPhase(p.srsScore) === phaseFilter);
     if (flagFilter === "flagged") data = data.filter((p) => isFlagged(p));
     if (flagFilter === "unflagged") data = data.filter((p) => !isFlagged(p));
     
     // Handle custom filters
-    if (customFilter === "excellent") data = data.filter((p) => p.srs >= 8);
-    if (customFilter === "followup") data = data.filter((p) => needsFollowUp(p.lastUpdate));
+    if (customFilter === "excellent") data = data.filter((p) => p.srsScore >= 8);
+    if (customFilter === "followup") data = data.filter((p) => needsFollowUp(p.nextAppointment));
     if (customFilter === "highlyEngaged") data = data.filter((p) => 
       p.recoveryPoints && p.recoveryPoints.completionRate >= 80
     );
@@ -143,7 +206,7 @@ function Dashboard() {
     data.sort((a, b) => {
       let aVal = a[sortCol];
       let bVal = b[sortCol];
-      if (sortCol === "intakeDate" || sortCol === "lastUpdate") {
+      if (sortCol === "intakeDate" || sortCol === "nextAppointment") {
         aVal = new Date(aVal);
         bVal = new Date(bVal);
       }
@@ -200,15 +263,57 @@ function Dashboard() {
     }
   };
 
+  // Manual refresh function
+  const handleRefresh = () => {
+    console.log('🔄 Manual refresh triggered');
+    setLoading(true);
+    fetchPatientsFromAPI()
+      .then(fetchedPatients => {
+        setPatients(fetchedPatients);
+        setLastUpdated(new Date());
+      })
+      .catch(err => {
+        console.error('❌ Error refreshing patient data:', err);
+        setError(err.message);
+      })
+      .finally(() => setLoading(false));
+  };
+
+  // Filter functions for dashboard cards
+  const handleCardClick = (filterType) => {
+    console.log('📊 Card clicked:', filterType);
+    setCustomFilter(filterType);
+  };
+
+  const clearFilter = () => {
+    setCustomFilter(null);
+  };
+
+  // Calculate dashboard statistics
+  const totalPatients = patients.length;
+  const needAttention = patients.filter(p => p.priority === 'high' || p.alerts.length > 0).length;
+  const followupDue = patients.filter(p => p.lastContact > 14).length;
+  const lowEngagement = patients.filter(p => p.engagementStatus === 'low_engagement').length;
+
   // Loading state
-  if (loading) {
+  if (loading && patients.length === 0) {
     return (
       <div className="dashboard-container">
-        <DashboardHeader onLogout={handleLogout} />
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
-            <p className="text-secondary">Loading patient data...</p>
+        <DashboardHeader onLogout={handleLogout} onRefresh={handleRefresh} lastUpdated={lastUpdated} />
+        <div className="dashboard-content">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '16rem' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ 
+                width: '2rem', 
+                height: '2rem', 
+                border: '2px solid #e5e7eb', 
+                borderTop: '2px solid #2563eb',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+                margin: '0 auto 1rem auto'
+              }}></div>
+              <p className="text-secondary">Loading patient data...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -219,18 +324,19 @@ function Dashboard() {
   if (error) {
     return (
       <div className="dashboard-container">
-        <DashboardHeader onLogout={handleLogout} />
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="text-error text-4xl mb-4">⚠️</div>
-            <h3 className="text-title text-primary mb-2">Failed to Load Patient Data</h3>
-            <p className="text-secondary mb-4">Error: {error}</p>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="btn-primary"
-            >
-              Retry
-            </button>
+        <DashboardHeader onLogout={handleLogout} onRefresh={handleRefresh} lastUpdated={lastUpdated} />
+        <div className="dashboard-content">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '16rem' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div className="text-error" style={{ marginBottom: '1rem' }}>⚠️ Error loading data</div>
+              <p className="text-secondary" style={{ marginBottom: '1rem' }}>{error}</p>
+              <button
+                onClick={handleRefresh}
+                className="btn-primary"
+              >
+                Retry
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -239,81 +345,79 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <DashboardHeader onLogout={handleLogout} />
-
-      <div className="dashboard-content">
-        {/* Dashboard Overview */}
+      <DashboardHeader onLogout={handleLogout} onRefresh={handleRefresh} lastUpdated={lastUpdated} />
+      
+      <main className="dashboard-content">
+        {/* Dashboard Overview Cards */}
         <div className="overview-grid">
           {/* Total Patients */}
           <div 
-            className="overview-card group cursor-pointer"
-            onClick={() => setCustomFilter("")}
+            className="overview-card"
+            onClick={() => handleCardClick('all')}
           >
             <div className="overview-card-content">
               <div className="overview-icon total">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
               <div className="overview-text">
                 <h3>Total Patients</h3>
-                <p>{patients.length}</p>
+                <p>{totalPatients}</p>
               </div>
             </div>
           </div>
 
           {/* Need Attention */}
           <div 
-            className="overview-card group cursor-pointer"
-            onClick={() => setFlagFilter("flagged")}
+            className="overview-card"
+            onClick={() => handleCardClick('attention')}
           >
             <div className="overview-card-content">
               <div className="overview-icon attention">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
               <div className="overview-text">
                 <h3>Need Attention</h3>
-                <p>{patients.filter(p => isFlagged(p)).length}</p>
+                <p>{needAttention}</p>
               </div>
             </div>
           </div>
 
           {/* Follow-up Due */}
           <div 
-            className="overview-card group cursor-pointer"
-            onClick={() => setCustomFilter("followup")}
+            className="overview-card"
+            onClick={() => handleCardClick('followup')}
           >
             <div className="overview-card-content">
               <div className="overview-icon followup">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
               <div className="overview-text">
                 <h3>Follow-up Due</h3>
-                <p>{patients.filter(p => needsFollowUp(p.lastUpdate)).length}</p>
+                <p>{followupDue}</p>
               </div>
             </div>
           </div>
 
           {/* Low Engagement */}
           <div 
-            className="overview-card group cursor-pointer"
-            onClick={() => setCustomFilter("lowEngagement")}
+            className="overview-card"
+            onClick={() => handleCardClick('low_engagement')}
           >
             <div className="overview-card-content">
-              <div className="overview-icon followup">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="overview-icon attention">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
                 </svg>
               </div>
               <div className="overview-text">
                 <h3>Low Engagement</h3>
-                <p>
-                  {patients.filter(p => p.recoveryPoints && p.recoveryPoints.completionRate < 50).length}
-                </p>
+                <p>{lowEngagement}</p>
               </div>
             </div>
           </div>
@@ -323,53 +427,29 @@ function Dashboard() {
         <div className="phase-section">
           <h3 className="phase-title">Recovery Phase Distribution</h3>
           <div className="phase-bars">
-            {/* RESET Phase */}
-            <div className="phase-bar" onClick={() => setPhaseFilter("RESET")}>
-              <div className="phase-bar-header">
-                <div className="flex items-center space-x-3">
-                  <span className="phase-bar-label">RESET Phase</span>
-                </div>
-                <span className="phase-bar-count">{patients.filter(p => getPhase(p.srs) === "RESET").length} patients</span>
-              </div>
-              <div className="phase-bar-fill reset">
+            {['RESET', 'EDUCATE', 'REBUILD'].map(phase => {
+              const phaseCount = patients.filter(p => p.phase === phase).length;
+              const percentage = totalPatients > 0 ? (phaseCount / totalPatients) * 100 : 0;
+              
+              return (
                 <div 
-                  className="phase-bar-progress reset"
-                  style={{ width: `${patients.length > 0 ? (patients.filter(p => getPhase(p.srs) === "RESET").length / patients.length) * 100 : 0}%` }}
-                ></div>
-              </div>
-            </div>
-
-            {/* EDUCATE Phase */}
-            <div className="phase-bar" onClick={() => setPhaseFilter("EDUCATE")}>
-              <div className="phase-bar-header">
-                <div className="flex items-center space-x-3">
-                  <span className="phase-bar-label">EDUCATE Phase</span>
+                  key={phase}
+                  className="phase-bar"
+                  onClick={() => handleCardClick(phase.toLowerCase())}
+                >
+                  <div className="phase-bar-header">
+                    <span className="phase-bar-label">{phase}</span>
+                    <span className="phase-bar-count">{phaseCount} patients</span>
+                  </div>
+                  <div className={`phase-bar-fill ${phase.toLowerCase()}`}>
+                    <div
+                      className={`phase-bar-progress ${phase.toLowerCase()}`}
+                      style={{ width: `${percentage}%` }}
+                    ></div>
+                  </div>
                 </div>
-                <span className="phase-bar-count">{patients.filter(p => getPhase(p.srs) === "EDUCATE").length} patients</span>
-              </div>
-              <div className="phase-bar-fill educate">
-                <div 
-                  className="phase-bar-progress educate"
-                  style={{ width: `${patients.length > 0 ? (patients.filter(p => getPhase(p.srs) === "EDUCATE").length / patients.length) * 100 : 0}%` }}
-                ></div>
-              </div>
-            </div>
-
-            {/* REBUILD Phase */}
-            <div className="phase-bar" onClick={() => setPhaseFilter("REBUILD")}>
-              <div className="phase-bar-header">
-                <div className="flex items-center space-x-3">
-                  <span className="phase-bar-label">REBUILD Phase</span>
-                </div>
-                <span className="phase-bar-count">{patients.filter(p => getPhase(p.srs) === "REBUILD").length} patients</span>
-              </div>
-              <div className="phase-bar-fill rebuild">
-                <div 
-                  className="phase-bar-progress rebuild"
-                  style={{ width: `${patients.length > 0 ? (patients.filter(p => getPhase(p.srs) === "REBUILD").length / patients.length) * 100 : 0}%` }}
-                ></div>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
 
@@ -393,21 +473,23 @@ function Dashboard() {
           selectedPatients={selectedPatients}
           setSelectedPatients={setSelectedPatients}
           onDeletePatients={handleDeletePatients}
+          customFilter={customFilter}
+          onClearFilter={clearFilter}
         />
+      </main>
 
-        {/* Patient Modal */}
-        {expanded && (
-          <PatientModal
-            patient={patients.find((p) => p.id === expanded)}
-            onClose={() => setExpanded(null)}
-            getPhase={getPhase}
-            needsFollowUp={needsFollowUp}
-            noteInput={noteInput}
-            setNoteInput={setNoteInput}
-            handleAddNote={handleAddNote}
-          />
-        )}
-      </div>
+      {/* Patient Modal */}
+      {expanded && (
+        <PatientModal
+          patient={patients.find((p) => p.id === expanded)}
+          onClose={() => setExpanded(null)}
+          getPhase={getPhase}
+          needsFollowUp={needsFollowUp}
+          noteInput={noteInput}
+          setNoteInput={setNoteInput}
+          handleAddNote={handleAddNote}
+        />
+      )}
     </div>
   );
 }

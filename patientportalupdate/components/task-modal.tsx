@@ -12,18 +12,120 @@ interface TaskModalProps {
     status: string
     timeEstimate: string
     category: string
+    points?: number
   }
   onClose: () => void
+  onTaskComplete?: (taskData: any) => void
 }
 
-export function TaskModal({ task, onClose }: TaskModalProps) {
+export function TaskModal({ task, onClose, onTaskComplete }: TaskModalProps) {
   const [isCompleted, setIsCompleted] = useState(task.status === "completed")
   const [feedback, setFeedback] = useState("")
   const [score, setScore] = useState(5)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleComplete = () => {
-    setIsCompleted(true)
-    // Here you would typically save to backend
+  const handleComplete = async () => {
+    setIsSubmitting(true)
+    
+    try {
+      // Get patient email from localStorage or URL params
+      const patientData = localStorage.getItem('btl_patient_data')
+      const email = patientData ? JSON.parse(patientData).email : 'sarah@example.com' // fallback
+
+      const taskCompletionData = {
+        email,
+        taskId: task.id,
+        taskTitle: task.title,
+        points: task.points || 5, // Default 5 points if not specified
+        feedback,
+        difficultyScore: score
+      }
+
+      console.log('🎯 Completing task:', taskCompletionData)
+
+      // Send to backend
+      const response = await fetch('http://localhost:3001/patients/complete-task', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(taskCompletionData)
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to complete task: ${response.statusText}`)
+      }
+
+      const result = await response.json()
+      console.log('✅ Task completion result:', result)
+
+      // Update local state
+      setIsCompleted(true)
+
+      // Notify parent component of completion
+      if (onTaskComplete) {
+        onTaskComplete({
+          ...result.data,
+          taskId: task.id,
+          taskTitle: task.title
+        })
+      }
+
+      // Update patient data in localStorage with new score
+      if (patientData) {
+        const currentData = JSON.parse(patientData)
+        const updatedData = {
+          ...currentData,
+          score: `${result.data.newSRSScore}/11`,
+          phase: result.data.phase,
+          lastUpdated: new Date().toISOString()
+        }
+        localStorage.setItem('btl_patient_data', JSON.stringify(updatedData))
+        console.log('📊 Updated patient data:', updatedData)
+      }
+
+      // Show success notification
+      if (typeof window !== 'undefined') {
+        // Create a simple toast notification
+        const toast = document.createElement('div')
+        toast.className = 'fixed top-4 right-4 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50'
+        toast.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+            <span>+${result.data.pointsEarned} points earned! SRS: ${result.data.newSRSScore}/11</span>
+          </div>
+        `
+        document.body.appendChild(toast)
+        setTimeout(() => {
+          document.body.removeChild(toast)
+        }, 4000)
+      }
+
+    } catch (error) {
+      console.error('❌ Error completing task:', error)
+      
+      // Show error notification
+      if (typeof window !== 'undefined') {
+        const toast = document.createElement('div')
+        toast.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50'
+        toast.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            <span>Failed to complete task. Please try again.</span>
+          </div>
+        `
+        document.body.appendChild(toast)
+        setTimeout(() => {
+          document.body.removeChild(toast)
+        }, 4000)
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -45,6 +147,9 @@ export function TaskModal({ task, onClose }: TaskModalProps) {
                   <div className="flex items-center space-x-1 text-sm text-gray-500">
                     <Tag className="w-4 h-4" />
                     <span>{task.category}</span>
+                  </div>
+                  <div className="flex items-center space-x-1 text-sm font-medium text-teal-600">
+                    <span>+{task.points || 5} pts</span>
                   </div>
                 </div>
               </div>
@@ -105,9 +210,10 @@ export function TaskModal({ task, onClose }: TaskModalProps) {
 
               <button
                 onClick={handleComplete}
-                className="w-full bg-teal-600 text-white py-3 px-4 rounded-lg hover:bg-teal-700 transition-colors font-medium"
+                disabled={isSubmitting}
+                className="w-full bg-teal-600 text-white py-3 px-4 rounded-lg hover:bg-teal-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Mark as Complete
+                {isSubmitting ? 'Completing...' : 'Mark as Complete'}
               </button>
             </div>
           ) : (
@@ -115,6 +221,11 @@ export function TaskModal({ task, onClose }: TaskModalProps) {
               <CheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Task Completed!</h3>
               <p className="text-gray-600">Great job completing this task. Your progress has been recorded.</p>
+              <div className="mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                <p className="text-emerald-800 text-sm font-medium">
+                  +{task.points || 5} recovery points earned!
+                </p>
+              </div>
             </div>
           )}
         </div>

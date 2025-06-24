@@ -27,6 +27,7 @@ export default function PatientRecoveryDashboard() {
     phase: "REBUILD",
     timestamp: null
   })
+  const [refreshKey, setRefreshKey] = useState(0) // For triggering re-renders
 
   // Load patient data from URL parameters or localStorage on component mount
   useEffect(() => {
@@ -55,29 +56,130 @@ export default function PatientRecoveryDashboard() {
       // Fallback to localStorage if no URL parameters
       const storedData = localStorage.getItem('btl_patient_data')
       console.log('🔍 Raw localStorage data:', storedData)
+      
       if (storedData) {
         const data = JSON.parse(storedData)
-        console.log('🔄 Loading patient data from localStorage:', data)
-        console.log('📊 Setting patient data - Name:', data.name, 'Score:', data.score, 'Phase:', data.phase)
+        console.log('📂 Loading patient data from localStorage:', data)
         setPatientData(data)
       } else {
-        console.log('❌ No patient data found in URL or localStorage')
+        console.log('ℹ️ No stored patient data found, using defaults')
       }
     } catch (error) {
-      console.error('Error loading patient data:', error)
+      console.error('❌ Error loading patient data:', error)
     }
   }, [])
 
-  // Extract numeric score for components that need it
-  const currentScore = parseInt(patientData.score?.split('/')[0] || '7')
-  
-  // Debug: Log current patient data state
-  console.log('🎯 Current patientData state:', patientData)
-  console.log('🔢 Current score:', currentScore)
+  // Function to refresh patient data from backend
+  const refreshPatientData = async () => {
+    try {
+      console.log('🔄 Refreshing patient data from backend...')
+      
+      const response = await fetch(`http://localhost:3001/patients/portal-data/${patientData.email}`)
+      if (response.ok) {
+        const result = await response.json()
+        console.log('📊 Fresh patient data from backend:', result.data)
+        
+        const updatedData = {
+          name: result.data.patient.name,
+          email: result.data.patient.email,
+          score: `${result.data.srsScore}/11`,
+          phase: result.data.phase,
+          recoveryPoints: result.data.recoveryPoints,
+          lastUpdated: result.data.lastUpdated
+        }
+        
+        setPatientData(updatedData)
+        localStorage.setItem('btl_patient_data', JSON.stringify(updatedData))
+        
+        // Trigger re-render of components
+        setRefreshKey(prev => prev + 1)
+        
+        console.log('✅ Patient data refreshed successfully')
+      }
+    } catch (error) {
+      console.error('❌ Error refreshing patient data:', error)
+    }
+  }
 
-  return (
-    <div className="flex min-h-screen bg-gradient-to-br from-btl-50 to-white">
-      <LeftSidebar patientData={patientData} />
+  // Handle task completion
+  const handleTaskComplete = async (taskData: any) => {
+    console.log('🎯 Task completed in dashboard:', taskData)
+    
+    // Update local patient data immediately
+    const updatedData = {
+      ...patientData,
+      score: `${taskData.newSRSScore}/11`,
+      phase: taskData.phase,
+      lastUpdated: new Date().toISOString()
+    }
+    
+    setPatientData(updatedData)
+    localStorage.setItem('btl_patient_data', JSON.stringify(updatedData))
+    
+    // Close the task modal
+    setSelectedTask(null)
+    
+    // Refresh data from backend to ensure sync
+    setTimeout(() => {
+      refreshPatientData()
+    }, 1000)
+    
+    // Record engagement activity
+    try {
+      await fetch('http://localhost:3001/patients/update-engagement', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: patientData.email,
+          activityType: 'task_completion',
+          data: {
+            taskId: taskData.taskId,
+            taskTitle: taskData.taskTitle,
+            pointsEarned: taskData.pointsEarned
+          }
+        })
+      })
+    } catch (error) {
+      console.error('Error recording engagement:', error)
+    }
+  }
+
+  // Record portal visit on mount
+  useEffect(() => {
+    const recordPortalVisit = async () => {
+      try {
+        await fetch('http://localhost:3001/patients/update-engagement', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: patientData.email,
+            activityType: 'portal_visit',
+            data: {
+              timestamp: new Date().toISOString(),
+              page: 'dashboard'
+            }
+          })
+        })
+      } catch (error) {
+        console.error('Error recording portal visit:', error)
+      }
+    }
+
+    if (patientData.email) {
+      recordPortalVisit()
+    }
+  }, [patientData.email])
+
+  // Extract current score number for the wheel
+  const currentScore = parseInt(patientData.score?.split('/')[0] || '7')
+
+      return (
+      <div className="flex min-h-screen bg-gradient-to-br from-btl-50 to-white">
+        <LeftSidebar patientData={patientData} />
 
       <div className="flex-1 flex flex-col">
         <TopHeader
@@ -90,7 +192,11 @@ export default function PatientRecoveryDashboard() {
           <div className="max-w-7xl mx-auto">
             {/* Today's Recovery Tasks - Most Important Section */}
             <div data-section="daily-tasks" className="mb-8">
-              <TodaysTasksSection onTaskClick={setSelectedTask} />
+              <TodaysTasksSection 
+                key={`tasks-${refreshKey}`} // Force re-render when data updates
+                onTaskClick={setSelectedTask} 
+                onTaskComplete={handleTaskComplete}
+              />
             </div>
 
             {/* Score and Weekly Points Side by Side */}
@@ -113,7 +219,7 @@ export default function PatientRecoveryDashboard() {
               </div>
 
               {/* Weekly Points */}
-              <WeeklyPointsSection />
+              <WeeklyPointsSection key={`points-${refreshKey}`} />
             </div>
 
             {/* Recovery Toolkit and Assessments */}
@@ -127,7 +233,13 @@ export default function PatientRecoveryDashboard() {
 
       {/* Modals */}
       {showScoreModal && <ScoreBreakdownModal score={currentScore} onClose={() => setShowScoreModal(false)} />}
-      {selectedTask && <TaskModal task={selectedTask} onClose={() => setSelectedTask(null)} />}
+      {selectedTask && (
+        <TaskModal 
+          task={selectedTask} 
+          onClose={() => setSelectedTask(null)} 
+          onTaskComplete={handleTaskComplete}
+        />
+      )}
       {showChatAssistant && <ChatAssistant onClose={() => setShowChatAssistant(false)} />}
       {selectedToolkit && <ToolkitModal toolkit={selectedToolkit} onClose={() => setSelectedToolkit(null)} />}
       {selectedAssessment && (
