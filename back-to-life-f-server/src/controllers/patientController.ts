@@ -238,6 +238,7 @@ export const submitIntake = async (req: any, res: any) => {
     const { 
       patientName, 
       email, 
+      dob, // Date of Birth
       date, 
       formType, 
       region,
@@ -269,9 +270,9 @@ export const submitIntake = async (req: any, res: any) => {
     let previousData = null;
     
     if (!patient) {
-      console.log('Creating new patient:', patientName, email, date);
+      console.log('Creating new patient:', patientName, email, date, dob);
       // Create new patient
-      const newPatient = await createPatient(patientName, email, new Date(date));
+      const newPatient = await createPatient(patientName, email, new Date(date), dob);
       console.log('Patient created:', newPatient);
       
       // Create patient portal account (with temporary password)

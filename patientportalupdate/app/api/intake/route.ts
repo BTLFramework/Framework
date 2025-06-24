@@ -30,6 +30,7 @@ export async function POST(request: NextRequest) {
         // Patient Information
         patientName: formData.patientName,
         email: formData.email,
+        dob: formData.dob, // Date of Birth
         date: formData.date || new Date().toISOString(),
         formType: formData.formType || "Intake",
         region: formData.region,

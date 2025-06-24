@@ -23,7 +23,8 @@ export default function MultiStepForm() {
   const [formData, setFormData] = useState({
     patientName: "",
     email: "", // Add email field
-    date: "",
+    dob: "", // Date of Birth
+    date: new Date().toISOString().split("T")[0], // Default to today
     formType: "Intake", // "Intake" or "Follow-Up"
     region: "",
     ndi: Array(10).fill(0),
@@ -150,6 +151,12 @@ export default function MultiStepForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validate completion date is not in the future
+    if (new Date(formData.date) > new Date()) {
+      alert("Form completion date cannot be in the future. Please correct the date before submitting.");
+      return;
+    }
+    
     console.log('🚀 Starting form submission...');
     
     // Use already calculated disability percentage from formData
@@ -168,6 +175,7 @@ export default function MultiStepForm() {
     const submissionData = {
       patientName: formData.patientName,
       email: formData.email,
+      dob: formData.dob,
       date: formData.date,
       formType: 'Intake',
       region: formData.region,

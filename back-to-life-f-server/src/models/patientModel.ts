@@ -2,11 +2,12 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const createPatient = async (name: string, email: string, intakeDate: Date) => {
+export const createPatient = async (name: string, email: string, intakeDate: Date, dob?: string) => {
   return await prisma.patient.create({ 
     data: { 
       name, 
       email,
+      dob: dob ? new Date(dob) : null,
       intakeDate 
     } 
   });
