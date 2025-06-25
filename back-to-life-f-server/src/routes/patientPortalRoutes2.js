@@ -155,4 +155,62 @@ router.post('/logout', (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+// Patient data endpoint for portal communication
+router.get('/data/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        
+        // Use centralized Prisma instance with fallback
+        let prisma;
+        try {
+            const db = require('../db');
+            prisma = db.default || db;
+        } catch (error) {
+            const { PrismaClient } = require('@prisma/client');
+            prisma = new PrismaClient();
+        }
+        
+        const patient = yield prisma.patient.findUnique({
+            where: { id: parseInt(id) },
+            include: {
+                srsScores: {
+                    orderBy: { date: 'desc' },
+                    take: 1
+                },
+                portalAccount: true
+            }
+        });
+        
+        if (!patient) {
+            return res.status(404).json({ error: 'Patient not found' });
+        }
+        
+        const latestScore = patient.srsScores[0];
+        
+        res.json({
+            patient: {
+                id: patient.id,
+                name: patient.name,
+                email: patient.email,
+                intakeDate: patient.intakeDate
+            },
+            srsScore: latestScore ? {
+                score: latestScore.srsScore,
+                outOf: 11,
+                phase: latestScore.srsScore >= 8 ? 'REBUILD' : latestScore.srsScore >= 5 ? 'EDUCATE' : 'RESET',
+                clinicianAssessed: latestScore.clinicianAssessed,
+                grocCaptured: latestScore.grocCaptured,
+                date: latestScore.date
+            } : null,
+            portalAccount: patient.portalAccount ? {
+                email: patient.portalAccount.email,
+                createdAt: patient.portalAccount.createdAt
+            } : null
+        });
+    }
+    catch (error) {
+        console.error('Error in patient data route:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+}));
 exports.default = router;

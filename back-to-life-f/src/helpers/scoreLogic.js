@@ -85,7 +85,7 @@ export function computeBaselineSRS(formData, clinicianData = {}) {
   }
 
   // 5. Belief Assessment
-  const beliefs = formData.beliefs || [];
+  const beliefs = Array.isArray(formData.beliefs) ? formData.beliefs : [];
   const hasNegativeBeliefs = beliefs.some(belief => 
     belief && belief.trim() !== "" && belief !== "None of these apply"
   );
@@ -180,8 +180,12 @@ export function computeFollowUpSRS(baselineData, currentData, clinicianData = {}
   }
 
   // 5. Beliefs Improvement
-  const baselineNegBeliefs = baselineData.beliefs ? baselineData.beliefs.filter(b => b && b !== "None of these apply").length : 0;
-  const currentNegBeliefs = currentData.beliefs ? currentData.beliefs.filter(b => b && b !== "None of these apply").length : 0;
+  const baselineNegBeliefs = Array.isArray(baselineData.beliefs) 
+    ? baselineData.beliefs.filter(b => b && b !== "None of these apply").length 
+    : 0;
+  const currentNegBeliefs = Array.isArray(currentData.beliefs) 
+    ? currentData.beliefs.filter(b => b && b !== "None of these apply").length 
+    : 0;
   
   if (baselineNegBeliefs > 0 && currentNegBeliefs === 0) {
     points += followUpRules.beliefs.points;
@@ -255,7 +259,7 @@ export function calculateDisabilityPercentage(ndi, odi, ulfi, lefs, region) {
       }
       break;
       
-    case 'low back':
+    case 'back':
       if (odi && odi.length > 0) {
         totalScore = odi.reduce((sum, score) => sum + (score || 0), 0);
         maxPossibleScore = odi.length * 5; // Each ODI question max is 5

@@ -54,7 +54,7 @@ const submitIntake = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                     disabilityPercentage = Math.round((total / 50) * 100); // NDI out of 50
                 }
                 break;
-            case "Lower Back":
+            case "Back":
                 disabilityIndex = odi;
                 if (odi && Array.isArray(odi)) {
                     const total = odi.reduce((sum, score) => sum + score, 0);
@@ -80,13 +80,23 @@ const submitIntake = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 disabilityPercentage = 50; // Default fallback
         }
 
+        // Ensure beliefs is always an array for scoring
+        let beliefsForScoring = [];
+        if (beliefs) {
+            if (Array.isArray(beliefs)) {
+                beliefsForScoring = beliefs;
+            } else if (typeof beliefs === 'string') {
+                beliefsForScoring = [beliefs];
+            }
+        }
+
         // Calculate SRS Score using your clinical methodology
         const scoreLogic = require('../helpers/scoreLogic');
         const srsResult = scoreLogic.calculateSRS({
             disabilityPercentage,
             vas,
             psfs: psfs || [],
-            beliefs: beliefs || [],
+            beliefs: beliefsForScoring,
             confidence,
             groc: groc || 0,
             formType: formType || "Intake"  // This triggers the correct baseline calculation
@@ -110,6 +120,16 @@ const submitIntake = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             throw new Error('Failed to create or find patient');
         }
 
+        // Ensure beliefs is always an array
+        let beliefsArray = [];
+        if (beliefs) {
+            if (Array.isArray(beliefs)) {
+                beliefsArray = beliefs;
+            } else if (typeof beliefs === 'string') {
+                beliefsArray = [beliefs];
+            }
+        }
+
         // Add SRS score record
         const srsData = {
             date: new Date(date || new Date()),
@@ -118,7 +138,7 @@ const submitIntake = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             disabilityPercentage,
             vas,
             psfs: psfs || [],
-            beliefs: beliefs || [],
+            beliefs: beliefsArray,
             confidence,
             groc: groc || 0,
             srsScore
@@ -159,7 +179,12 @@ const submitIntake = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         res.status(201).json({
             message: 'Intake processed successfully',
             patient,
-            srsScore: srsScoreRecord,
+            srsScore: {
+                ...srsScoreRecord,
+                outOf: 11,
+                clinicianAssessed: false,
+                grocCaptured: false
+            },
             phase: phase.label,
             disabilityPercentage,
             beliefStatus,
@@ -269,6 +294,34 @@ const deletePatient = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.deletePatient = deletePatient;
+
+const updateSRSFlags = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const { clinicianAssessed, grocCaptured } = req.body;
+        
+        const updatedSRS = yield prisma.sRSScore.update({
+            where: { id: parseInt(id) },
+            data: {
+                clinicianAssessed: clinicianAssessed !== undefined ? clinicianAssessed : undefined,
+                grocCaptured: grocCaptured !== undefined ? grocCaptured : undefined
+            }
+        });
+        
+        res.json({
+            message: 'SRS flags updated successfully',
+            srsScore: {
+                ...updatedSRS,
+                outOf: 11
+            }
+        });
+    }
+    catch (err) {
+        console.error('Error updating SRS flags:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+exports.updateSRSFlags = updateSRSFlags;
 // NEW ENDPOINTS FOR PATIENT PORTAL INTEGRATION
 const completeTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

@@ -1,5 +1,6 @@
 import React from "react";
 import { format } from "date-fns";
+import SRSDisplay from "./SRSDisplay";
 
 export default function PatientTable({
   patients,
@@ -307,7 +308,10 @@ export default function PatientTable({
                   {/* Patient Name with More Info */}
                   <td 
                     style={{ padding: '16px 20px', cursor: 'pointer' }}
-                    onClick={() => onRowClick(patient.id)}
+                    onClick={() => {
+                      console.log('🖱️ Clicked patient:', patient.name, 'ID:', patient.id);
+                      onRowClick(patient.id);
+                    }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{ 
@@ -390,9 +394,12 @@ export default function PatientTable({
                   >
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <span style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>
-                          {patient.srsScore}
-                        </span>
+                        <SRSDisplay 
+                          score={patient.srsScore || 0}
+                          clinicianAssessed={patient.clinicianAssessed || false}
+                          grocCaptured={patient.grocCaptured || false}
+                          className="text-sm"
+                        />
                         <span className={`status-${getSRSStatus(patient.srsScore)}`}>
                           {getSRSLabel(patient.srsScore)}
                         </span>

@@ -21,17 +21,43 @@ export default function PatientRecoveryDashboard() {
   const [selectedToolkit, setSelectedToolkit] = useState<any>(null)
   const [selectedAssessment, setSelectedAssessment] = useState<any>(null)
   const [patientData, setPatientData] = useState<any>({
-    name: "Sarah Johnson",
-    email: "sarah@example.com", 
-    score: "7/11",
-    phase: "REBUILD",
+    name: "Test Patient",
+    email: "test@example.com", 
+    score: "6/11",
+    phase: "EDUCATE",
     timestamp: null
   })
   const [refreshKey, setRefreshKey] = useState(0) // For triggering re-renders
 
+  // Function to completely reset portal data
+  const resetPortalData = () => {
+    console.log('🔄 Resetting portal data to defaults...')
+    localStorage.removeItem('btl_patient_data')
+    setPatientData({
+      name: "Test Patient",
+      email: "test@example.com", 
+      score: "6/11",
+      phase: "EDUCATE",
+      timestamp: null
+    })
+    setRefreshKey(prev => prev + 1)
+    console.log('✅ Portal data reset complete')
+  }
+
+
+
   // Load patient data from URL parameters or localStorage on component mount
   useEffect(() => {
     try {
+      // Clear any old cached data on initial load
+      const existingData = localStorage.getItem('btl_patient_data')
+      if (existingData) {
+        const data = JSON.parse(existingData)
+        if (data.email && (data.email.includes('bb@hotmail.com') || data.email.includes('sarah@example.com'))) {
+          console.log('🧹 Clearing old cached data on startup')
+          localStorage.removeItem('btl_patient_data')
+        }
+      }
       // First try to get data from URL parameters
       console.log('🌐 Current URL:', window.location.href)
       console.log('🔍 URL search params:', window.location.search)
@@ -64,12 +90,22 @@ export default function PatientRecoveryDashboard() {
       if (storedData) {
         const data = JSON.parse(storedData)
         console.log('📂 Loading patient data from localStorage:', data)
-        setPatientData(data)
+        
+        // Check if stored data is valid (not old Britny data)
+        if (data.email && data.email.includes('bb@hotmail.com')) {
+          console.log('🧹 Clearing old cached data for bb@hotmail.com')
+          localStorage.removeItem('btl_patient_data')
+          console.log('ℹ️ Using default patient data instead')
+        } else {
+          setPatientData(data)
+        }
       } else {
         console.log('ℹ️ No stored patient data found, using defaults')
       }
     } catch (error) {
       console.error('❌ Error loading patient data:', error)
+      // Clear localStorage on error to prevent corruption
+      localStorage.removeItem('btl_patient_data')
     }
   }, [])
 

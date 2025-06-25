@@ -9,7 +9,7 @@ interface WeeklyPointsSectionProps {
 
 export function WeeklyPointsSection({ patientEmail }: WeeklyPointsSectionProps) {
   const [weeklyData, setWeeklyData] = useState({
-    total: 22,
+    total: 0,
     target: 150,
     breakdown: {
       MOVEMENT: 0,
@@ -18,15 +18,15 @@ export function WeeklyPointsSection({ patientEmail }: WeeklyPointsSectionProps) 
       EDUCATION: 0,
       ADHERENCE: 0
     },
-    streakDays: 3,
-    completionRate: 73
+    streakDays: 0,
+    completionRate: 0
   })
   const [loading, setLoading] = useState(false)
 
   // Fetch real recovery points data
   useEffect(() => {
     const fetchRecoveryPoints = async () => {
-      if (!patientEmail || patientEmail === 'sarah@example.com') {
+      if (!patientEmail || patientEmail === 'test@example.com') {
         console.log('ℹ️ No valid patient email or using default, skipping fetch')
         return
       }

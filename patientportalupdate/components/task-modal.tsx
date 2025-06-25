@@ -30,7 +30,7 @@ export function TaskModal({ task, onClose, onTaskComplete }: TaskModalProps) {
     try {
       // Get patient email from localStorage or URL params
       const patientData = localStorage.getItem('btl_patient_data')
-      const email = patientData ? JSON.parse(patientData).email : 'sarah@example.com' // fallback
+      const email = patientData ? JSON.parse(patientData).email : 'test@example.com' // fallback
 
       const taskCompletionData = {
         email,

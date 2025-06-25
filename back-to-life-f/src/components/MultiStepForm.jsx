@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Stepper from "./Stepper";
 import PhaseFlow from "./PhaseFlow";
-import { calculateSRS, getPhaseByScore } from "../helpers/scoreLogic";
+import SRSDisplay from "./SRSDisplay";
+import { computeBaselineSRS, getPhaseByScore } from "../helpers/scoreLogic";
 
 // Import each step
 import PatientInfo from "./steps/PatientInfo";
@@ -11,6 +12,123 @@ import DailyActivities from "./steps/DailyActivities";
 import Beliefs from "./steps/Beliefs";
 import Confidence from "./steps/Confidence";
 import GROC from "./steps/GROC";
+import ClinicianInput from './steps/ClinicianInput';
+
+// Recovery Score Wheel Component
+const RecoveryScoreWheel = ({ score, maxScore, phase }) => {
+  const [animatedScore, setAnimatedScore] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimatedScore(score);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [score]);
+
+  const percentage = (animatedScore / maxScore) * 100;
+  const circumference = 2 * Math.PI * 90;
+  const strokeDasharray = circumference;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+  const getScoreStatus = () => {
+    if (score >= 9) return { text: "Graduation Ready!", color: "text-emerald-600" };
+    if (score >= 7) return { text: "REBUILD Ready", color: "text-blue-600" };
+    if (score >= 4) return { text: "Making Progress", color: "text-blue-500" };
+    return { text: "Getting Started", color: "text-gray-600" };
+  };
+
+  const status = getScoreStatus();
+
+  return (
+    <div className="flex flex-col items-center">
+      <div className="relative w-64 h-64">
+        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
+          <circle
+            cx="100"
+            cy="100"
+            r="90"
+            stroke="currentColor"
+            strokeWidth="12"
+            fill="none"
+            className="text-gray-200"
+          />
+          <circle
+            cx="100"
+            cy="100"
+            r="90"
+            stroke="url(#gradient)"
+            strokeWidth="12"
+            fill="none"
+            strokeDasharray={strokeDasharray}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+            className="transition-all duration-1000 ease-out"
+          />
+          <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#155e75" />
+              <stop offset="20%" stopColor="#0891b2" />
+              <stop offset="40%" stopColor="#06b6d4" />
+              <stop offset="70%" stopColor="#22d3ee" />
+              <stop offset="100%" stopColor="#67e8f9" />
+            </linearGradient>
+          </defs>
+        </svg>
+
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <div className="text-4xl font-bold text-gray-900 mb-1">{animatedScore}</div>
+          <div className="text-lg text-gray-600 mb-2">/ {maxScore}</div>
+          <div className={`text-sm font-medium ${status.color}`}>{status.text}</div>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-center w-full max-w-xs mt-6 space-x-2">
+        <span className="text-xs text-gray-500">0</span>
+        <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div 
+            className="h-full rounded-full transition-all duration-1000 ease-out"
+            style={{ 
+              width: `${percentage}%`,
+              background: 'linear-gradient(135deg, #155e75 0%, #0891b2 20%, #06b6d4 40%, #22d3ee 70%, #67e8f9 100%)'
+            }}
+          ></div>
+        </div>
+        <span className="text-xs text-gray-500">11</span>
+      </div>
+    </div>
+  );
+};
+
+// Helper functions for phase styling
+const getPhaseStyles = (phase) => {
+  const styles = {
+    "RESET": { 
+      textColor: "text-slate-700",
+      bgColor: "bg-gradient-to-br from-slate-50 to-slate-100",
+      borderColor: "border-slate-300"
+    },
+    "EDUCATE": { 
+      textColor: "text-cyan-700",
+      bgColor: "bg-gradient-to-br from-cyan-50 to-cyan-100",
+      borderColor: "border-cyan-300"
+    },
+    "REBUILD": { 
+      textColor: "text-blue-700",
+      bgColor: "bg-gradient-to-br from-blue-50 to-blue-100",
+      borderColor: "border-blue-300"
+    }
+  };
+  return styles[phase] || styles["RESET"];
+};
+
+const getPhaseDescription = (phase) => {
+  const descriptions = {
+    "RESET": "Calm. Decompress. Stabilize. Evidence-based chiropractic care and targeted decompression techniques restore space for safe, efficient movement.",
+    "EDUCATE": "Retrain. Rebuild Trust. Restore Confidence. We restore trust in movement by rebuilding strong, sustainable patterns — using education, reinforcement, and graded progression.",
+    "REBUILD": "Strengthen. Sustain. Thrive. Functional integration, strength progression, and resilience training — built to last beyond the clinic."
+  };
+  return descriptions[phase] || descriptions["RESET"];
+};
 
 export default function MultiStepForm() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -20,7 +138,8 @@ export default function MultiStepForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionResult, setSubmissionResult] = useState(null);
 
-  const [formData, setFormData] = useState({
+  // Initial form data factory function
+  const getInitialFormData = () => ({
     patientName: "",
     email: "", // Add email field
     dob: "", // Date of Birth
@@ -34,14 +153,16 @@ export default function MultiStepForm() {
     disabilityPercentage: 0,
     vas: 0,
     psfs: [
-      { activity: "Lifting groceries", score: 5 },
-      { activity: "Climbing stairs", score: 3 },
-      { activity: "Playing with kids", score: 7 },
+      { activity: "", score: 0 },
+      { activity: "", score: 0 },
+      { activity: "", score: 0 },
     ],
     beliefs: [],
     confidence: 0,
     groc: 0, // Follow‐up only
   });
+
+  const [formData, setFormData] = useState(getInitialFormData());
 
   // Steps array changes based on formType
   const steps =
@@ -117,7 +238,7 @@ export default function MultiStepForm() {
     if (region === "Neck") {
       const sum = ndi.reduce((a, b) => a + b, 0);
       percentage = (sum / (10 * 5)) * 100;
-    } else if (region === "Low Back") {
+    } else if (region === "Back") {
       const sum = odi.reduce((a, b) => a + b, 0);
       percentage = (sum / (10 * 5)) * 100;
     } else if (region === "Upper Limb") {
@@ -138,6 +259,16 @@ export default function MultiStepForm() {
     formData.ulfi,
     formData.lefs,
   ]);
+
+  // Reset form to initial state
+  const handleReset = () => {
+    if (window.confirm("Are you sure you want to reset the form? All entered data will be lost.")) {
+      setFormData(getInitialFormData());
+      setCurrentStep(0);
+      setShowResult(false);
+      setSubmissionResult(null);
+    }
+  };
 
   // "Next" / "Back"
   const handleNext = () => {
@@ -162,14 +293,21 @@ export default function MultiStepForm() {
     // Use already calculated disability percentage from formData
     const disabilityPercentage = Math.round(formData.disabilityPercentage);
     
-    // Calculate SRS using new baseline logic
-    const srsResult = calculateSRS({
+    // Calculate SRS using centralized baseline logic
+    const srsResult = computeBaselineSRS({
       ...formData,
-      disabilityPercentage,
-      formType: 'Intake'  // Ensure we trigger baseline calculation
+      disabilityPercentage
     });
     
     console.log('📊 SRS Calculation Result:', srsResult);
+    
+    // Store the calculated results in formData for the completion screen
+    setFormData(prev => ({
+      ...prev,
+      srsScore: srsResult.score, // Store the numeric score
+      phase: srsResult.phase,
+      calculatedDisabilityPercentage: disabilityPercentage
+    }));
     
     // Prepare submission data
     const submissionData = {
@@ -221,7 +359,7 @@ export default function MultiStepForm() {
         const patientData = {
           name: result.data.patient.name,
           email: result.data.patient.email,
-          score: `${result.data.srsScore}/11`, // Format as string for portal compatibility
+          score: `${result.data.srsScore}/9`, // Format as string for portal compatibility (baseline scoring)
           phase: result.data.phase,
           timestamp: new Date().toISOString()
         };
@@ -247,145 +385,139 @@ export default function MultiStepForm() {
 
   // If "showResult" is true, display the Recovery Results UI with portal integration
   if (showResult) {
+    // Get the calculated score and phase from the stored form data or default values
+    const displayScore = formData.srsScore || 0;
+    const displayPhase = formData.phase || "RESET";
+    const maxScore = 11; // Always show out of 11 with locked points system
+    
     return (
-      <div className="max-w-4xl mx-auto p-4">
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-2xl font-semibold mb-4">🎉 Intake Complete!</h2>
-
-          {/* Signature Recovery Score */}
-          <div className="mb-8">
-            <span className="text-lg font-medium">
-              Signature Recovery Score™:&nbsp;
-            </span>
-            <span className="text-3xl font-bold text-blue-600">
-              {resultScore}
-            </span>
-            <span className="text-lg">/ 11</span>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50 to-blue-50">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          {/* Header Section */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 shadow-lg back-to-life-gradient">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h1 className="text-3xl font-bold gradient-text mb-2">Signature Recovery Score™ Complete!</h1>
+            <p className="text-gray-600 text-lg">Your personalized recovery score has been calculated</p>
           </div>
 
-          {/* Phase Flow Arrows */}
-          <PhaseFlow resultPhase={resultPhase} />
-
-          {/* Portal Integration Status */}
-          {submissionResult && (
-            <div className={`mt-6 p-4 rounded-lg border-2 ${
-              submissionResult.success 
-                ? 'border-green-500 bg-green-50' 
-                : 'border-red-500 bg-red-50'
-            }`}>
-              <h3 className={`font-bold text-lg mb-2 ${
-                submissionResult.success ? 'text-green-700' : 'text-red-700'
-              }`}>
-                {submissionResult.success 
-                  ? '✅ Patient Portal Integration Successful' 
-                  : '❌ Patient Portal Integration Failed'
-                }
-              </h3>
-              
-              {submissionResult.success ? (
-                <div>
-                  <p className="text-green-700 mb-4">
-                    Your intake form has been processed and your personalized patient portal is ready!
+          <div className="grid lg:grid-cols-2 gap-8 items-start mobile-completion-stack">
+            {/* Left Column - Score Display */}
+            <div className="flex justify-center">
+              <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4">Your Recovery Score</h3>
+                  <SRSDisplay 
+                    score={displayScore} 
+                    clinicianAssessed={false} 
+                    grocCaptured={false}
+                    className="justify-center text-3xl"
+                  />
+                  <p className="text-gray-600 text-sm mt-4">
+                    Intake assessments show 3 locked points until your first clinical visit and follow-up assessment.
                   </p>
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => {
-                        if (submissionResult?.success) {
-                          const patientData = {
-                            name: submissionResult.data.patient.name,
-                            email: submissionResult.data.patient.email,
-                            score: `${submissionResult.data.srsScore}/11`,
-                            phase: submissionResult.data.phase,
-                            timestamp: new Date().toISOString()
-                          };
-                          console.log('🚀 Opening portal with patient data:', patientData);
-                          const params = new URLSearchParams({
-                            patientData: JSON.stringify(patientData)
-                          });
-                          window.open(`http://localhost:3000?${params.toString()}`, '_blank');
-                        }
-                      }}
-                      className="w-full px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg font-semibold hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                    >
-                      🚀 Open Your Patient Portal
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (submissionResult?.success) {
-                          const patientData = {
-                            name: submissionResult.data.patient.name,
-                            email: submissionResult.data.patient.email,
-                            score: `${submissionResult.data.srsScore}/11`,
-                            phase: submissionResult.data.phase,
-                            timestamp: new Date().toISOString()
-                          };
-                          console.log('🚀 Redirecting with patient data:', patientData);
-                          const params = new URLSearchParams({
-                            patientData: JSON.stringify(patientData)
-                          });
-                          const fullUrl = `http://localhost:3000?${params.toString()}`;
-                          console.log('🔗 Generated URL:', fullUrl);
-                          window.location.href = fullUrl;
-                        }
-                      }}
-                      className="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                    >
-                      ➡️ Go to Patient Portal (Same Tab)
-                    </button>
-                    <p className="text-sm text-gray-600 text-center">
-                      Portal URL: <code className="bg-gray-100 px-2 py-1 rounded">http://localhost:3000</code>
-                    </p>
+                </div>
+                <div className="mobile-recovery-wheel">
+                  <RecoveryScoreWheel 
+                    score={displayScore} 
+                    maxScore={maxScore} 
+                    phase={displayPhase} 
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Phase Info & Next Steps */}
+            <div className="space-y-6">
+              {/* Current Phase Card */}
+              <div className="bg-white rounded-2xl shadow-xl p-6">
+                <div className="flex items-center mb-4">
+                  <div className="w-3 h-3 rounded-full back-to-life-gradient mr-3"></div>
+                  <h2 className="text-xl font-bold text-gray-800">Your Recovery Phase</h2>
+                </div>
+                <div className={`p-4 rounded-xl border-2 ${getPhaseStyles(displayPhase).borderColor} ${getPhaseStyles(displayPhase).bgColor}`}>
+                  <h3 className={`text-2xl font-bold ${getPhaseStyles(displayPhase).textColor} mb-2`}>
+                    {displayPhase}
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {getPhaseDescription(displayPhase)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Next Steps Card */}
+              <div className="bg-white rounded-2xl shadow-xl p-6">
+                <div className="flex items-center mb-4">
+                  <div className="w-3 h-3 rounded-full bg-green-500 mr-3"></div>
+                  <h2 className="text-xl font-bold text-gray-800">What Happens Next</h2>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-white text-sm font-bold">1</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">Check Your Email</h4>
+                      <p className="text-gray-600 text-sm">You'll receive your personalized portal login credentials within minutes.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-white text-sm font-bold">2</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">Access Your Portal</h4>
+                      <p className="text-gray-600 text-sm">Log in to view your recovery plan, daily tasks, and track progress.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-white text-sm font-bold">3</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">Book Your Appointment</h4>
+                      <p className="text-gray-600 text-sm">Schedule your first session to begin your personalized treatment plan.</p>
+                    </div>
                   </div>
                 </div>
-              ) : (
-                <div>
-                  <p className="text-red-700 mb-2">
-                    {submissionResult.error || 'Unknown error occurred'}
-                  </p>
-                  {submissionResult.details && (
-                    <p className="text-sm text-red-600">
-                      Details: {submissionResult.details}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+              </div>
 
-          {/* Navigation buttons */}
-          <div className="flex space-x-4 mt-6">
-            <button
-              onClick={() => {
-                setShowResult(false);
-                setCurrentStep(0);
-                setSubmissionResult(null);
-              }}
-              className="flex-1 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-            >
-              ← Back to Form
-            </button>
-            
-            {submissionResult?.success && (
-              <button
-                onClick={() => {
-                  const patientData = {
-                    name: submissionResult.data.patient.name,
-                    email: submissionResult.data.patient.email,
-                    score: `${submissionResult.data.srsScore}/11`,
-                    phase: submissionResult.data.phase,
-                    timestamp: new Date().toISOString()
-                  };
-                                      console.log('🚀 Opening portal (bottom button) with patient data:', patientData);
-                    const params = new URLSearchParams({
-                      patientData: JSON.stringify(patientData)
-                    });
-                    window.open(`http://localhost:3000?${params.toString()}`, '_blank');
-                }}
-                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Open Patient Portal →
-              </button>
-            )}
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <button 
+                  onClick={() => {
+                    if (submissionResult?.success) {
+                      const patientData = {
+                        name: submissionResult.data.patient.name,
+                        email: submissionResult.data.patient.email,
+                        score: `${submissionResult.data.srsScore}/9`,
+                        phase: submissionResult.data.phase,
+                        timestamp: new Date().toISOString()
+                      };
+                      const params = new URLSearchParams({
+                        patientData: JSON.stringify(patientData)
+                      });
+                      window.location.href = `http://localhost:3000?${params.toString()}`;
+                    } else {
+                      window.location.href = 'http://localhost:3000';
+                    }
+                  }}
+                  className="w-full btn-primary-gradient text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:shadow-lg"
+                >
+                  Access Your Patient Portal
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="text-center mt-12 pt-8 border-t border-gray-200">
+            <p className="text-gray-500 text-sm">
+              Questions? Contact us at <a href="mailto:support@backtolife.ca" className="text-blue-600 hover:underline">support@backtolife.ca</a>
+            </p>
           </div>
         </div>
       </div>
@@ -394,73 +526,140 @@ export default function MultiStepForm() {
 
   // Otherwise, render the multi‐step form
   return (
-    <div className="max-w-3xl mx-auto p-4">
-      {/* Stepper Nav */}
-      <Stepper steps={steps} currentStep={currentStep} />
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Render the "active" step component */}
-        {currentStep === 0 && (
-          <PatientInfo formData={formData} onChange={handleChange} />
-        )}
-
-        {currentStep === 1 && (
-          <PainRegion formData={formData} onChange={handleChange} />
-        )}
-
-        {currentStep === 2 && (
-          <PainScale formData={formData} onChange={handleChange} />
-        )}
-
-        {currentStep === 3 && (
-          <DailyActivities formData={formData} onChange={handlePSFSChange} />
-        )}
-
-        {currentStep === 4 && (
-          <Beliefs formData={formData} onChange={handleChange} />
-        )}
-
-        {currentStep === 5 && (
-          <Confidence formData={formData} onChange={handleChange} />
-        )}
-
-        {/* GROC only if "Follow-Up" */}
-        {formData.formType === "Follow-Up" && currentStep === 6 && (
-          <GROC formData={formData} onChange={handleChange} />
-        )}
-
-        {/* Navigation Buttons */}
-        <div className="flex justify-between mt-6">
-          <button
-            type="button"
-            onClick={handleBack}
-            disabled={currentStep === 0}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50"
-          >
-            Back
-          </button>
-
-          {currentStep < steps.length - 1 && (
+    <div className="btl-form-container">
+      <div className="max-w-5xl mx-auto px-4 py-8 md:px-4 md:py-8">
+        {/* Header */}
+        <div className="btl-form-header rounded-t-2xl px-8 py-6 mb-0">
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl md:text-3xl font-bold text-white mb-2">
+                Signature Recovery Score™ Assessment
+              </h1>
+              <p className="text-blue-100 text-lg md:text-lg">
+                Complete your assessment to calculate your personalized recovery score
+              </p>
+            </div>
             <button
               type="button"
-              onClick={handleNext}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              onClick={handleReset}
+              className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2"
             >
-              Next
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Reset</span>
             </button>
-          )}
-
-          {currentStep === steps.length - 1 && (
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-6 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded hover:from-green-600 hover:to-green-700 disabled:opacity-50 font-semibold"
-            >
-              {isSubmitting ? '🔄 Processing...' : '🚀 Submit & See Recovery Phase'}
-            </button>
-          )}
+          </div>
         </div>
-      </form>
+
+        {/* Progress Bar */}
+        <div className="bg-white px-8 py-4 border-b border-gray-100">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-gray-600">
+              Step {currentStep + 1} of {steps.length}
+            </span>
+            <span className="text-sm font-medium text-gray-600">
+              {Math.round(((currentStep + 1) / steps.length) * 100)}% Complete
+            </span>
+          </div>
+          <div className="btl-progress-bar">
+            <div 
+              className="btl-progress-fill"
+              style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+            ></div>
+          </div>
+        </div>
+
+        {/* Stepper */}
+        <div className="btl-stepper px-8 py-4 mobile-stepper-compact">
+          <Stepper steps={steps} currentStep={currentStep} />
+        </div>
+
+        {/* Form Content */}
+        <div className="btl-form-card rounded-b-2xl p-8 mb-8 md:p-8 md:mb-8">
+          <form onSubmit={handleSubmit}>
+            <div className="btl-step-card p-8">
+              {/* Render the "active" step component */}
+              {currentStep === 0 && (
+                <PatientInfo formData={formData} onChange={handleChange} />
+              )}
+
+              {currentStep === 1 && (
+                <PainRegion formData={formData} onChange={handleChange} />
+              )}
+
+              {currentStep === 2 && (
+                <PainScale formData={formData} onChange={handleChange} />
+              )}
+
+              {currentStep === 3 && (
+                <DailyActivities formData={formData} onChange={handlePSFSChange} />
+              )}
+
+              {currentStep === 4 && (
+                <Beliefs formData={formData} onChange={handleChange} />
+              )}
+
+              {currentStep === 5 && (
+                <Confidence formData={formData} onChange={handleChange} />
+              )}
+
+              {/* GROC only if "Follow-Up" */}
+              {formData.formType === "Follow-Up" && currentStep === 6 && (
+                <GROC formData={formData} onChange={handleChange} />
+              )}
+
+              {/* Clinician Input for Intake */}
+              {formData.formType === "Intake" && currentStep === 6 && (
+                <ClinicianInput formData={formData} onChange={handleChange} />
+              )}
+
+              {/* Clinician Input for Follow-Up */}
+              {formData.formType === "Follow-Up" && currentStep === 7 && (
+                <ClinicianInput formData={formData} onChange={handleChange} />
+              )}
+            </div>
+
+            {/* Navigation */}
+            <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-100 mobile-nav-stack">
+              <button
+                type="button"
+                onClick={handleBack}
+                disabled={currentStep === 0}
+                className="btn-secondary-gradient disabled:opacity-50 disabled:cursor-not-allowed touch-target"
+              >
+                ← Back
+              </button>
+              
+              <div className="flex items-center space-x-4 mobile-progress-info">
+                <span className="text-sm text-gray-500">
+                  {currentStep + 1} / {steps.length}
+                </span>
+                
+                {currentStep < steps.length - 1 && (
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    className="btn-primary-gradient touch-target"
+                  >
+                    Next →
+                  </button>
+                )}
+
+                {currentStep === steps.length - 1 && (
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="btn-primary-gradient disabled:opacity-50 touch-target"
+                  >
+                    {isSubmitting ? '🔄 Processing...' : '🚀 Complete Assessment'}
+                  </button>
+                )}
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }

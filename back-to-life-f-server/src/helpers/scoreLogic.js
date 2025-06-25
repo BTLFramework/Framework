@@ -231,7 +231,8 @@ function computeBaselineSRS(formData, clinicianData = {}) {
   }
 
   // 5. Belief Assessment
-  const beliefs = formData.beliefs || [];
+  const beliefs = Array.isArray(formData.beliefs) ? formData.beliefs : 
+                  (formData.beliefs ? [formData.beliefs] : []);
   const hasNegativeBeliefs = beliefs.some(belief => 
     belief && belief.trim() !== "" && belief !== "None of these apply"
   );

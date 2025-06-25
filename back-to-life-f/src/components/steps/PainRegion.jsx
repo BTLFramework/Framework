@@ -25,7 +25,7 @@ export default function PainRegion({ formData, onChange }) {
     if (formData.region === "Neck") {
       const sum = formData.ndi.reduce((acc, v) => acc + v, 0);
       percentage = (sum / (NDI_QUESTIONS.length * 5)) * 100;
-    } else if (formData.region === "Low Back") {
+    } else if (formData.region === "Back") {
       const sum = formData.odi.reduce((acc, v) => acc + v, 0);
       percentage = (sum / (ODI_QUESTIONS.length * 5)) * 100;
     } else if (formData.region === "Upper Limb") {
@@ -50,25 +50,38 @@ export default function PainRegion({ formData, onChange }) {
 
   return (
     <section className="bg-white md:p-8 p-0 rounded space-y-6">
-      <h2 className="text-lg font-semibold mb-2">Pain & Region</h2>
+      <div className="mb-8">
+        <h2 className="btl-section-header">Pain Region & Disability Assessment</h2>
+      </div>
 
-      {/* Region dropdown */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Region of Complaint
-        </label>
+      {/* Region dropdown - Enhanced visibility */}
+      <div className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-2xl border-2 border-transparent bg-clip-padding relative btl-card-hover">
+        {/* Subtle BTL gradient border */}
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-200 via-blue-200 to-cyan-200 rounded-2xl opacity-50 -z-10"></div>
+        
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="w-3 h-3 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600"></div>
+          <label className="btl-label block text-lg font-semibold">
+            Region of Complaint *
+          </label>
+        </div>
+        
         <select
           name="region"
           value={formData.region}
           onChange={onChange}
-          className="mt-1 block w-full border border-2 border-gray-200 rounded-md p-2"
+          className="btl-select w-full text-lg font-medium border-2 border-gray-200 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 transition-all duration-200"
         >
-          <option value="">Select Region</option>
+          <option value="">Select your primary region of complaint</option>
           <option>Neck</option>
-          <option>Low Back</option>
+          <option>Back</option>
           <option>Upper Limb</option>
           <option>Lower Limb</option>
         </select>
+        
+        <p className="text-sm text-gray-600 mt-2 italic">
+          Choose the area where you're experiencing your primary symptoms
+        </p>
       </div>
 
       {/* Conditional: Neck → NDI */}
@@ -105,8 +118,8 @@ export default function PainRegion({ formData, onChange }) {
         </div>
       )}
 
-      {/* Conditional: Low Back → ODI */}
-      {formData.region === "Low Back" && (
+      {/* Conditional: Back → ODI */}
+      {formData.region === "Back" && (
         <div className="space-y-4">
           <h3 className="text-md font-medium mb-2">
             Oswestry Disability Index (ODI)
@@ -210,6 +223,20 @@ export default function PainRegion({ formData, onChange }) {
           </div>
         </div>
       )}
+
+      <div className="mt-6 p-4 bg-cyan-50 border border-cyan-200 rounded-xl">
+        <div className="flex items-start space-x-3">
+          <svg className="w-5 h-5 text-cyan-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <h4 className="font-semibold text-cyan-800 mb-1">Disability Index (NDI / ODI / LEFS)</h4>
+            <p className="text-sm text-cyan-700 leading-relaxed">
+              Evidence shows that standardized disability scores capture real-life limits and track change as rehabilitation progresses.
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

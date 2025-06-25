@@ -15,11 +15,13 @@ const DashboardHeader = ({ onLogout, onRefresh, lastUpdated }) => {
         <div className="header-left">
           <div className="header-logo">
             <div className="logo-gradient">
-              <span className="logo-text">BTL</span>
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
             </div>
             <div className="header-title">
-              <h1 className="gradient-text">Back to Life</h1>
-              <p className="header-subtitle">Clinician Dashboard</p>
+              <h1>Back to Life</h1>
+              <p className="header-subtitle">Clinical Dashboard</p>
             </div>
           </div>
           <div className="dashboard-status">

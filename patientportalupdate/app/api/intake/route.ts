@@ -37,9 +37,9 @@ export async function POST(request: NextRequest) {
         
         // Disability Index Arrays (based on region)
         ndi: formData.region === "Neck" ? formData.ndi : null,
-        odi: formData.region === "Lower Back" ? formData.odi : null,
+        odi: formData.region === "Back" ? formData.odi : null,
         ulfi: formData.region === "Upper Limb" ? formData.ulfi : null,
-        lefs: formData.region === "Lower Extremity" ? formData.lefs : null,
+        lefs: formData.region === "Lower Limb" ? formData.lefs : null,
         
         // Pain and Function Assessment
         vas: formData.vas,

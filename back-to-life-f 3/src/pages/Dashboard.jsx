@@ -478,7 +478,15 @@ function Dashboard() {
           setSortCol={setSortCol}
           sortDir={sortDir}
           setSortDir={setSortDir}
-          onRowClick={setExpanded}
+          onRowClick={(patientId) => {
+            console.log('🎯 Dashboard received click for patient ID:', patientId);
+            console.log('🔍 Patient ID type:', typeof patientId);
+            console.log('🔍 Available patient IDs:', patients.map(p => ({ id: p.id, type: typeof p.id, name: p.name })));
+            const foundPatient = patients.find(p => p.id === patientId);
+            console.log('🔍 Found patient:', foundPatient);
+            console.log('🔄 Setting expanded to:', patientId);
+            setExpanded(patientId);
+          }}
           isFlagged={isFlagged}
           needsFollowUp={needsFollowUp}
           selectedPatients={selectedPatients}
@@ -490,15 +498,25 @@ function Dashboard() {
       </main>
 
       {/* Patient Modal */}
+      {console.log('🎭 Modal rendering check - expanded:', expanded, 'type:', typeof expanded)}
       {expanded && (
-        <PatientModal
-          patient={patients.find((p) => p.id === expanded)}
-          onClose={() => setExpanded(null)}
-          needsFollowUp={needsFollowUp}
-          noteInput={noteInput}
-          setNoteInput={setNoteInput}
-          handleAddNote={handleAddNote}
-        />
+        <>
+          {console.log('🔄 Rendering modal for expanded:', expanded)}
+          {console.log('🔍 All patients:', patients)}
+          {console.log('🔍 Looking for patient with ID:', expanded)}
+          {console.log('🔍 Found patient:', patients.find((p) => p.id === expanded))}
+          <PatientModal
+            patient={patients.find((p) => p.id === expanded)}
+            onClose={() => {
+              console.log('🚪 Closing modal');
+              setExpanded(null);
+            }}
+            needsFollowUp={needsFollowUp}
+            noteInput={noteInput}
+            setNoteInput={setNoteInput}
+            handleAddNote={handleAddNote}
+          />
+        </>
       )}
     </div>
   );

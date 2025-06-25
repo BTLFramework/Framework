@@ -48,6 +48,8 @@ model SRSScore {
   confidence           Int
   groc                 Int
   srsScore             Int
+  clinicianAssessed    Boolean  @default(false) // flips to true after intake visit
+  grocCaptured         Boolean  @default(false) // flips to true at first follow-up
   
   createdAt            DateTime @default(now())
   
