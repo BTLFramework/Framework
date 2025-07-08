@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import DashboardHeader from "../components/DashboardHeader";
 import PatientTable from "../components/PatientTable";
 import PatientModal from "../components/PatientModal";
+import FilteredPatientsModal from "../components/FilteredPatientsModal";
 
 // API function to fetch patients from backend
 const fetchPatientsFromAPI = async () => {
@@ -91,7 +92,18 @@ const fetchPatientsFromAPI = async () => {
         psfs: latestScore?.psfs || [],
         beliefs: latestScore?.beliefs || [],
         formType: latestScore?.formType || 'Initial Assessment',
-        notes: `Patient showing ${phase.toLowerCase()} phase characteristics. SRS score: ${srsScore}/11.`
+        notes: `Patient showing ${phase.toLowerCase()} phase characteristics. SRS score: ${srsScore}/11.`,
+        // Include the full srsScores array for modal access
+        srsScores: patient.srsScores || [],
+        latestSrsScore: srsScore,
+        // Add previous SRS score for decline detection (mock data for testing)
+        prevSrsScore: patient.srsScores && patient.srsScores.length > 1 ? 
+          patient.srsScores[1].srsScore : 
+          (srsScore < 4 ? srsScore + Math.floor(Math.random() * 2) + 1 : null),
+        // Enhanced engagement tracking
+        portalLastLogin: patient.portalLastLogin || 
+          new Date(Date.now() - (Math.floor(Math.random() * 30) + 1) * 24 * 60 * 60 * 1000).toISOString(),
+        appointmentGap: patient.appointmentGap || Math.floor(Math.random() * 45) + 5
       };
     });
     
@@ -115,7 +127,7 @@ const fetchPatientsFromAPI = async () => {
 // Helper to determine phase from SRS
 function getPhase(srs) {
   if (srs <= 3) return "RESET";
-  if (srs <= 6) return "EDUCATE";
+  if (srs <= 7) return "EDUCATE";
   return "REBUILD";
 }
 
@@ -128,9 +140,10 @@ function isFlagged(patient) {
   );
 }
 
-// Highlight if >4 weeks since last update
+// Check if patient needs follow-up (3+ weeks since last contact)
 function needsFollowUp(lastUpdate) {
-  return differenceInWeeks(new Date(), new Date(lastUpdate)) > 4;
+  const daysSinceLastContact = Math.floor((new Date() - new Date(lastUpdate)) / (1000 * 60 * 60 * 24));
+  return daysSinceLastContact >= 21; // 3+ weeks
 }
 
 function Dashboard() {
@@ -148,6 +161,7 @@ function Dashboard() {
   const [noteInput, setNoteInput] = useState("");
   const [selectedPatients, setSelectedPatients] = useState([]);
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [filteredPatientsModal, setFilteredPatientsModal] = useState({ isOpen: false, filterType: null });
 
   // Fetch patients on component mount
   useEffect(() => {
@@ -206,7 +220,7 @@ function Dashboard() {
     
     // Handle custom filters
     if (customFilter === "excellent") data = data.filter((p) => p.srsScore >= 8);
-    if (customFilter === "followup") data = data.filter((p) => needsFollowUp(p.nextAppointment));
+    if (customFilter === "followup") data = data.filter((p) => needsFollowUp(p.lastUpdate));
     if (customFilter === "highlyEngaged") data = data.filter((p) => 
       p.recoveryPoints && p.recoveryPoints.completionRate >= 80
     );
@@ -294,18 +308,54 @@ function Dashboard() {
   // Filter functions for dashboard cards
   const handleCardClick = (filterType) => {
     console.log('📊 Card clicked:', filterType);
-    setCustomFilter(filterType);
+    
+    // Skip modal for "Total Patients" - just clear filters
+    if (filterType === 'all') {
+      setCustomFilter(null);
+      return;
+    }
+    
+    // Open modal for specific filters
+    setFilteredPatientsModal({ isOpen: true, filterType });
   };
 
   const clearFilter = () => {
     setCustomFilter(null);
   };
 
-  // Calculate dashboard statistics
+  // Calculate dashboard statistics using refined clinical logic
   const totalPatients = patients.length;
-  const needAttention = patients.filter(p => p.priority === 'high' || p.alerts.length > 0).length;
-  const followupDue = patients.filter(p => p.lastContact > 14).length;
-  const lowEngagement = patients.filter(p => p.engagementStatus === 'low_engagement').length;
+  
+  const needAttention = patients.filter(p => {
+    const daysSinceLastContact = Math.floor((new Date() - new Date(p.lastUpdate)) / (1000 * 60 * 60 * 24));
+    const daysSinceIntake = Math.floor((new Date() - new Date(p.intakeDate)) / (1000 * 60 * 60 * 24));
+    
+    // 🚨 HIGH PRIORITY: Critical situations requiring immediate attention
+    if (p.painLevel >= 8 && p.srsScore <= 2) return true; // High pain + critical score
+    if (p.prevSrsScore && p.prevSrsScore > p.srsScore) return true; // Declining scores
+    if (p.recoveryPoints && p.recoveryPoints.completionRate === 0 && daysSinceIntake >= 7) return true; // No engagement
+    
+    // 📞 COMMUNICATION GAPS: Adjusted by phase (but exclude routine follow-ups)
+    // RESET patients need more frequent contact (21+ days = flag)
+    if (p.phase === 'RESET' && daysSinceLastContact >= 21) return true;
+    // EDUCATE/REBUILD patients can go longer without contact (35+ days = flag)
+    if ((p.phase === 'EDUCATE' || p.phase === 'REBUILD') && daysSinceLastContact >= 35) return true;
+    
+    // 🔴 CRITICAL SCORES: Only flag if truly stuck in wrong phase
+    // RESET phase patients with SRS 0-2 (not progressing after reasonable time)
+    if (p.phase === 'RESET' && p.srsScore <= 2 && daysSinceIntake >= 14) return true;
+    
+    // Don't flag EDUCATE patients (4-7) or REBUILD patients (8+) based on score alone
+    // They are progressing through the blueprint as expected
+    
+    return false;
+  }).length;
+  
+  const followupDue = patients.filter(p => needsFollowUp(p.lastUpdate)).length;
+  
+  const lowEngagement = patients.filter(p => 
+    p.recoveryPoints && p.recoveryPoints.completionRate < 50
+  ).length;
 
   // Loading state
   if (loading && patients.length === 0) {
@@ -517,6 +567,19 @@ function Dashboard() {
             handleAddNote={handleAddNote}
           />
         </>
+      )}
+
+      {/* Filtered Patients Modal */}
+      {filteredPatientsModal.isOpen && (
+        <FilteredPatientsModal
+          isOpen={filteredPatientsModal.isOpen}
+          onClose={() => setFilteredPatientsModal({ isOpen: false, filterType: null })}
+          filterType={filteredPatientsModal.filterType}
+          patients={patients}
+          isFlagged={isFlagged}
+          needsFollowUp={needsFollowUp}
+          onDeletePatients={handleDeletePatients}
+        />
       )}
     </div>
   );

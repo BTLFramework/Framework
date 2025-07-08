@@ -18,10 +18,19 @@ export function RecoveryScoreWheel({ score, maxScore, phase }: RecoveryScoreWhee
     return () => clearTimeout(timer)
   }, [score])
 
-  const percentage = (animatedScore / maxScore) * 100
+  // Ensure we have valid numeric values
+  const validScore = typeof animatedScore === 'number' && !isNaN(animatedScore) ? animatedScore : 0
+  const validMaxScore = typeof maxScore === 'number' && !isNaN(maxScore) && maxScore > 0 ? maxScore : 11
+  
+  const percentage = (validScore / validMaxScore) * 100
   const circumference = 2 * Math.PI * 90
   const strokeDasharray = circumference
   const strokeDashoffset = circumference - (percentage / 100) * circumference
+  
+  // Ensure strokeDashoffset is a valid number
+  const validStrokeDashoffset = typeof strokeDashoffset === 'number' && !isNaN(strokeDashoffset) 
+    ? strokeDashoffset 
+    : circumference
 
   const getPhaseColor = (currentPhase: string, targetPhase: string) => {
     const phases = ["RESET", "EDUCATE", "REBUILD"]
@@ -35,13 +44,16 @@ export function RecoveryScoreWheel({ score, maxScore, phase }: RecoveryScoreWhee
   }
 
   const getScoreStatus = () => {
-    if (score >= 9) return { text: "Graduation Ready!", color: "text-emerald-600" }
-    if (score >= 7) return { text: "REBUILD Ready", color: "text-btl-600" }
-    if (score >= 4) return { text: "Making Progress", color: "text-btl-500" }
+    if (validScore >= 9) return { text: "Graduation Ready!", color: "text-emerald-600" }
+    if (validScore >= 7) return { text: "REBUILD Ready", color: "text-btl-600" }
+    if (validScore >= 4) return { text: "Making Progress", color: "text-btl-500" }
     return { text: "Getting Started", color: "text-charcoal-600" }
   }
 
   const status = getScoreStatus()
+  
+  // Ensure percentage is valid for progress bar
+  const validPercentage = typeof percentage === 'number' && !isNaN(percentage) ? percentage : 0
 
   const getPhaseInfo = (currentPhase: string) => {
     const phases = {
@@ -98,7 +110,7 @@ export function RecoveryScoreWheel({ score, maxScore, phase }: RecoveryScoreWhee
             strokeWidth="12"
             fill="none"
             strokeDasharray={strokeDasharray}
-            strokeDashoffset={strokeDashoffset}
+            strokeDashoffset={validStrokeDashoffset}
             strokeLinecap="round"
             className="transition-all duration-1000 ease-out"
           />
@@ -116,8 +128,8 @@ export function RecoveryScoreWheel({ score, maxScore, phase }: RecoveryScoreWhee
 
         {/* Score Display */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="text-4xl font-bold text-charcoal-900 mb-1">{animatedScore}</div>
-          <div className="text-lg text-charcoal-600 mb-2">/ {maxScore}</div>
+          <div className="text-4xl font-bold text-charcoal-900 mb-1">{validScore}</div>
+          <div className="text-lg text-charcoal-600 mb-2">/ {validMaxScore}</div>
           <div className={`text-sm font-medium ${status.color}`}>{status.text}</div>
         </div>
       </div>
@@ -152,7 +164,7 @@ export function RecoveryScoreWheel({ score, maxScore, phase }: RecoveryScoreWhee
         <div className="flex-1 h-2 bg-charcoal-200 rounded-full overflow-hidden">
           <div 
             className="h-full back-to-life-gradient rounded-full transition-all duration-1000 ease-out"
-            style={{ width: `${percentage}%` }}
+            style={{ width: `${validPercentage}%` }}
           ></div>
         </div>
         <span className="text-xs text-charcoal-500">11</span>

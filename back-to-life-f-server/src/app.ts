@@ -8,6 +8,7 @@ import janeRoutes from "./routes/janeRoutes";
 import patientRoutes from "./routes/patientRoutes";
 import patientPortalRoutes from "./routes/patientPortalRoutes2";
 const recoveryPointsRoutes = require("./routes/recoveryPointsRoutes");
+const messageRoutes = require("./routes/messageRoutes");
 
 dotenv.config();
 
@@ -108,6 +109,7 @@ app.use("/jane", janeRoutes);
 app.use("/patients", patientRoutes);
 app.use("/api/patient-portal", patientPortalRoutes);
 app.use("/api/recovery-points", recoveryPointsRoutes);
+app.use("/api/messages", messageRoutes);
 
 // Global error handler
 app.use((err: any, req: any, res: any, next: any) => {

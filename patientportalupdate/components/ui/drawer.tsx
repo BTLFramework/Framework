@@ -43,12 +43,12 @@ const DrawerContent = React.forwardRef<
     <DrawerPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background",
+        "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[20px] border bg-gradient-to-br from-slate-50 via-cyan-50 to-blue-50",
         className
       )}
       {...props}
     >
-      <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
+      <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-btl-200" />
       {children}
     </DrawerPrimitive.Content>
   </DrawerPortal>
@@ -60,7 +60,7 @@ const DrawerHeader = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn("grid gap-1.5 p-4 text-center sm:text-left", className)}
+    className={cn("btl-form-header rounded-t-2xl px-8 py-6 text-center sm:text-left", className)}
     {...props}
   />
 )
@@ -84,7 +84,7 @@ const DrawerTitle = React.forwardRef<
   <DrawerPrimitive.Title
     ref={ref}
     className={cn(
-      "text-lg font-semibold leading-none tracking-tight",
+      "text-2xl font-bold text-white mb-2",
       className
     )}
     {...props}
@@ -98,7 +98,7 @@ const DrawerDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DrawerPrimitive.Description
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("text-blue-100 text-lg", className)}
     {...props}
   />
 ))

@@ -27,13 +27,13 @@ try {
 // Simple phase determination function (move to helpers later)
 const getPhaseByScore = (score) => {
     if (score >= 8) return { label: "REBUILD", color: "green" };
-    if (score >= 5) return { label: "EDUCATE", color: "yellow" };
+    if (score >= 4) return { label: "EDUCATE", color: "yellow" };
     return { label: "RESET", color: "red" };
 };
 const submitIntake = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log('📝 Processing intake submission:', req.body);
-        const { patientName, email, date, formType, region, ndi, odi, ulfi, lefs, vas, psfs, beliefs, confidence, groc } = req.body;
+        const { patientName, email, date, formType, region, ndi, odi, tdi, ulfi, lefs, vas, psfs, beliefs, confidence, groc } = req.body;
         
         // Validate required fields
         if (!patientName || !email || !region || vas === undefined || confidence === undefined) {
@@ -54,7 +54,15 @@ const submitIntake = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                     disabilityPercentage = Math.round((total / 50) * 100); // NDI out of 50
                 }
                 break;
+            case "Mid-Back / Thoracic":
+                disabilityIndex = tdi;
+                if (tdi && Array.isArray(tdi)) {
+                    const total = tdi.reduce((sum, score) => sum + score, 0);
+                    disabilityPercentage = Math.round((total / 50) * 100); // TDI out of 50
+                }
+                break;
             case "Back":
+            case "Low Back / SI Joint":
                 disabilityIndex = odi;
                 if (odi && Array.isArray(odi)) {
                     const total = odi.reduce((sum, score) => sum + score, 0);
@@ -62,6 +70,9 @@ const submitIntake = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 }
                 break;
             case "Upper Limb":
+            case "Shoulder":
+            case "Elbow / Forearm":
+            case "Wrist / Hand":
                 disabilityIndex = ulfi;
                 if (ulfi && Array.isArray(ulfi)) {
                     const total = ulfi.reduce((sum, score) => sum + score, 0);
@@ -69,6 +80,9 @@ const submitIntake = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 }
                 break;
             case "Lower Extremity":
+            case "Hip / Groin":
+            case "Knee":
+            case "Ankle / Foot":
                 disabilityIndex = lefs;
                 if (lefs && Array.isArray(lefs)) {
                     const total = lefs.reduce((sum, score) => sum + score, 0);
@@ -99,7 +113,13 @@ const submitIntake = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             beliefs: beliefsForScoring,
             confidence,
             groc: groc || 0,
-            formType: formType || "Intake"  // This triggers the correct baseline calculation
+            formType: formType || "Intake",  // This triggers the correct baseline calculation
+            region,
+            ndi,
+            odi,
+            tdi,
+            ulfi,
+            lefs
         });
 
         // Extract the numeric score from the result object
@@ -130,11 +150,16 @@ const submitIntake = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             }
         }
 
-        // Add SRS score record
+        // Add SRS score record with all disability index data
         const srsData = {
             date: new Date(date || new Date()),
             formType: formType || "Intake",
             region,
+            ndi: ndi || null,
+            odi: odi || null,
+            tdi: tdi || null,
+            ulfi: ulfi || null,
+            lefs: lefs || null,
             disabilityPercentage,
             vas,
             psfs: psfs || [],

@@ -1,9 +1,14 @@
 import React, { useEffect } from "react";
 import {
   NDI_QUESTIONS,
+  TDI_QUESTIONS,
   ODI_QUESTIONS,
   ULFI_QUESTIONS,
   LEFS_QUESTIONS,
+  PAIN_REGIONS,
+  getDisabilityQuestionsForRegion,
+  getDisabilityIndexForRegion,
+  calculateDisabilityPercentage
 } from "../../constants/disabilityQuestions";
 
 /**
@@ -12,41 +17,49 @@ import {
  *   - onChange (function)
  *
  * This step shows:
- *   • Region dropdown
- *   • Depending on region, the appropriate DI questions (NDI/ODI/ULFI/LEFS)
+ *   • Region dropdown with new comprehensive regions
+ *   • Depending on region, the appropriate DI questions (NDI/TDI/ODI/ULFI/LEFS)
  *   • Auto‐calculates the % and displays at the bottom
  */
 export default function PainRegion({ formData, onChange }) {
-  // Compute DI % whenever data changes (could also live in MultiStepForm.useEffect,
-  // but here we show another pattern: local effect that simply writes into formData).
+  // Compute DI % whenever data changes
   useEffect(() => {
+    const disabilityIndex = getDisabilityIndexForRegion(formData.region);
     let percentage = 0;
 
-    if (formData.region === "Neck") {
-      const sum = formData.ndi.reduce((acc, v) => acc + v, 0);
-      percentage = (sum / (NDI_QUESTIONS.length * 5)) * 100;
-    } else if (formData.region === "Back") {
-      const sum = formData.odi.reduce((acc, v) => acc + v, 0);
-      percentage = (sum / (ODI_QUESTIONS.length * 5)) * 100;
-    } else if (formData.region === "Upper Limb") {
-      const sum = formData.ulfi.reduce((acc, v) => acc + v, 0);
-      percentage = (sum / (ULFI_QUESTIONS.length * 4)) * 100;
-    } else if (formData.region === "Lower Limb") {
-      const sum = formData.lefs.reduce((acc, v) => acc + v, 0);
-      percentage = (sum / (LEFS_QUESTIONS.length * 4)) * 100;
+    if (disabilityIndex === "NDI" && formData.ndi) {
+      const sum = formData.ndi.reduce((acc, v) => acc + (v || 0), 0);
+      percentage = calculateDisabilityPercentage(sum, "NDI");
+    } else if (disabilityIndex === "TDI" && formData.tdi) {
+      const sum = formData.tdi.reduce((acc, v) => acc + (v || 0), 0);
+      percentage = calculateDisabilityPercentage(sum, "TDI");
+    } else if (disabilityIndex === "ODI" && formData.odi) {
+      const sum = formData.odi.reduce((acc, v) => acc + (v || 0), 0);
+      percentage = calculateDisabilityPercentage(sum, "ODI");
+    } else if (disabilityIndex === "ULFI" && formData.ulfi) {
+      const sum = formData.ulfi.reduce((acc, v) => acc + (v || 0), 0);
+      percentage = calculateDisabilityPercentage(sum, "ULFI");
+    } else if (disabilityIndex === "LEFS" && formData.lefs) {
+      const sum = formData.lefs.reduce((acc, v) => acc + (v || 0), 0);
+      percentage = calculateDisabilityPercentage(sum, "LEFS");
     }
 
     // Only update if changed
-    if (Math.abs(percentage - formData.disabilityPercentage) > 0.01) {
+    if (Math.abs(percentage - (formData.disabilityPercentage || 0)) > 0.01) {
       onChange({ target: { name: "disabilityPercentage", value: percentage } });
     }
   }, [
     formData.region,
     formData.ndi,
+    formData.tdi,
     formData.odi,
     formData.ulfi,
     formData.lefs,
+    formData.disabilityPercentage
   ]);
+
+  // Get the appropriate disability index for the selected region
+  const currentDisabilityIndex = getDisabilityIndexForRegion(formData.region);
 
   return (
     <section className="bg-white md:p-8 p-0 rounded space-y-6">
@@ -68,16 +81,30 @@ export default function PainRegion({ formData, onChange }) {
         
         <select
           name="region"
-          value={formData.region}
+          value={formData.region || ""}
           onChange={onChange}
           className="btl-select w-full text-lg font-medium border-2 border-gray-200 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 transition-all duration-200"
         >
           <option value="">Select your primary region of complaint</option>
-          <option>Neck</option>
-          <option>Back</option>
-          <option>Upper Limb</option>
-          <option>Lower Limb</option>
+          {PAIN_REGIONS.map((region, index) => (
+            <option key={index} value={region.regionLabel}>
+              {region.regionLabel}
+            </option>
+          ))}
         </select>
+        
+        {formData.region && (
+          <div className="mt-3 p-3 bg-cyan-50 border border-cyan-200 rounded-lg">
+            <p className="text-sm text-cyan-700">
+              <strong>Assessment:</strong> {currentDisabilityIndex} ({PAIN_REGIONS.find(r => r.regionLabel === formData.region)?.description})
+              {currentDisabilityIndex === 'TDI' && (
+                <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                  🆕 Clinic-developed
+                </span>
+              )}
+            </p>
+          </div>
+        )}
         
         <p className="text-sm text-gray-600 mt-2 italic">
           Choose the area where you're experiencing your primary symptoms
@@ -113,13 +140,55 @@ export default function PainRegion({ formData, onChange }) {
             </div>
           ))}
           <div className="mt-2 text-sm font-medium">
-            NDI Score: {formData.disabilityPercentage.toFixed(1)}%
+            NDI Score: {formData.disabilityPercentage?.toFixed(1) || 0}%
           </div>
         </div>
       )}
 
-      {/* Conditional: Back → ODI */}
-      {formData.region === "Back" && (
+      {/* Conditional: Mid-Back / Thoracic → TDI */}
+      {formData.region === "Mid-Back / Thoracic" && (
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2 mb-2">
+            <h3 className="text-md font-medium">
+              Thoracic Disability Index (TDI)
+            </h3>
+            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+              🆕 Clinic-developed
+            </span>
+          </div>
+          <p className="text-sm text-gray-600 mb-4 italic">
+            This assessment was specifically developed for thoracic spine conditions and is currently undergoing validation.
+          </p>
+          {TDI_QUESTIONS.map((q, idx) => (
+            <div key={idx} className="mb-4">
+              <label className="block text-sm text-gray-700 mb-1">
+                {q.label}
+              </label>
+              <div className="space-y-2">
+                {q.options.map((opt, val) => (
+                  <label key={val} className="flex items-start space-x-2">
+                    <input
+                      type="radio"
+                      name={`tdi-${idx}`}
+                      value={val}
+                      checked={formData.tdi[idx] === val}
+                      onChange={onChange}
+                      className="h-4 w-4 text-blue-600 border-2 border-gray-200 mt-1"
+                    />
+                    <span className="text-sm text-gray-700">{opt}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          ))}
+          <div className="mt-2 text-sm font-medium">
+            TDI Score: {formData.disabilityPercentage?.toFixed(1) || 0}%
+          </div>
+        </div>
+      )}
+
+      {/* Conditional: Low Back / SI Joint → ODI */}
+      {formData.region === "Low Back / SI Joint" && (
         <div className="space-y-4">
           <h3 className="text-md font-medium mb-2">
             Oswestry Disability Index (ODI)
@@ -147,13 +216,15 @@ export default function PainRegion({ formData, onChange }) {
             </div>
           ))}
           <div className="mt-2 text-sm font-medium">
-            ODI Score: {formData.disabilityPercentage.toFixed(1)}%
+            ODI Score: {formData.disabilityPercentage?.toFixed(1) || 0}%
           </div>
         </div>
       )}
 
-      {/* Conditional: Upper Limb → ULFI */}
-      {formData.region === "Upper Limb" && (
+      {/* Conditional: Upper Limb regions → ULFI */}
+      {(formData.region === "Shoulder" || 
+        formData.region === "Elbow / Forearm" || 
+        formData.region === "Wrist / Hand") && (
         <div className="space-y-4">
           <h3 className="text-md font-medium mb-2">
             Upper Limb Functional Index (ULFI)
@@ -183,13 +254,15 @@ export default function PainRegion({ formData, onChange }) {
             </div>
           ))}
           <div className="mt-2 text-sm font-medium">
-            ULFI Score: {formData.disabilityPercentage.toFixed(1)}%
+            ULFI Score: {formData.disabilityPercentage?.toFixed(1) || 0}%
           </div>
         </div>
       )}
 
-      {/* Conditional: Lower Limb → LEFS */}
-      {formData.region === "Lower Limb" && (
+      {/* Conditional: Lower Limb regions → LEFS */}
+      {(formData.region === "Hip / Groin" || 
+        formData.region === "Knee" || 
+        formData.region === "Ankle / Foot") && (
         <div className="space-y-4">
           <h3 className="text-md font-medium mb-2">
             Lower Extremity Functional Scale (LEFS)
@@ -219,24 +292,46 @@ export default function PainRegion({ formData, onChange }) {
             </div>
           ))}
           <div className="mt-2 text-sm font-medium">
-            LEFS Score: {formData.disabilityPercentage.toFixed(1)}%
+            LEFS Score: {formData.disabilityPercentage?.toFixed(1) || 0}%
           </div>
         </div>
       )}
 
+      {/* Subtle prompt when no region selected */}
+      {!formData.region && (
+        <div className="text-center py-6">
+          <p className="text-gray-500 text-sm italic">
+            Please select a pain region above to begin the disability assessment
+          </p>
+        </div>
+      )}
+
+      {/* Information section about disability indices */}
+      {formData.region && (
       <div className="mt-6 p-4 bg-cyan-50 border border-cyan-200 rounded-xl">
         <div className="flex items-start space-x-3">
           <svg className="w-5 h-5 text-cyan-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div>
-            <h4 className="font-semibold text-cyan-800 mb-1">Disability Index (NDI / ODI / LEFS)</h4>
+              <h4 className="font-semibold text-cyan-800 mb-1">
+                Disability Index ({currentDisabilityIndex})
+                {currentDisabilityIndex === 'TDI' && (
+                  <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                    Clinic-developed
+                  </span>
+                )}
+              </h4>
             <p className="text-sm text-cyan-700 leading-relaxed">
-              Evidence shows that standardized disability scores capture real-life limits and track change as rehabilitation progresses.
+                {currentDisabilityIndex === 'TDI' 
+                  ? "This thoracic-specific assessment was developed by our clinic to better evaluate mid-back conditions. Evidence shows that standardized disability scores capture real-life limits and track change as rehabilitation progresses."
+                  : "Evidence shows that standardized disability scores capture real-life limits and track change as rehabilitation progresses."
+                }
             </p>
           </div>
         </div>
       </div>
+      )}
     </section>
   );
 }

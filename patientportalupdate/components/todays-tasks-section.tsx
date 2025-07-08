@@ -1,6 +1,8 @@
 "use client"
 
-import { Clock, CheckCircle, Dumbbell, Heart, Brain } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Clock, CheckCircle, Heart, Brain, Target } from "lucide-react"
+import { MovementSessionCard } from "./MovementSessionCard"
 
 interface TodaysTasksSectionProps {
   onTaskClick: (task: any) => void
@@ -8,52 +10,91 @@ interface TodaysTasksSectionProps {
 }
 
 export function TodaysTasksSection({ onTaskClick, onTaskComplete }: TodaysTasksSectionProps) {
+  const [personalizedTasks, setPersonalizedTasks] = useState<any[]>([])
+  const [patientData, setPatientData] = useState<any>(null)
+  const [patientId, setPatientId] = useState<string>("")
+
+  // Load patient data and generate personalized tasks
+  useEffect(() => {
+    const loadPatientData = async () => {
+      try {
+        const response = await fetch(`/api/patients/tasks/${patientId}`)
+        const data = await response.json()
+        
+        setPatientData(data)
+        setPatientId(data.email || "test@example.com")
+        
+      } catch (error) {
+        console.error('Error loading patient data:', error)
+        // Fallback to default data
+        setPatientData({ score: "7", phase: "Educate", region: "Low Back / SI Joint" })
+        setPatientId("test@example.com")
+      }
+    }
+
+    loadPatientData()
+  }, [])
+
+  // Define metallic pill classes
+  const metallicPills = {
+    gold: 'bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-yellow-900 shadow border border-yellow-500',
+    silver: 'bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 text-gray-900 shadow border border-gray-400',
+    bronze: 'bg-gradient-to-r from-[#b08d57] via-[#a97142] to-[#7c5c36] text-white shadow border border-[#a97142]',
+  };
+
+  // Define the remaining three cards (excluding movement-session)
   const tasks = [
     {
-      id: 1,
-      title: "Morning Movement",
-      description: "Complete your daily mobility routine with gentle stretches",
-      icon: Dumbbell,
-      iconBg: "bg-gradient-to-br from-btl-400 to-btl-600",
-      iconColor: "text-white",
-      status: "pending",
-      timeEstimate: "15 min",
-      category: "Exercise",
-      points: 8,
-      badgeClass: "badge-gold"
-    },
-    {
-      id: 2,
+      id: "pain-assessment",
       title: "Pain Assessment",
       description: "Rate your current pain levels and track patterns",
       icon: Heart,
-      iconBg: "bg-gradient-to-br from-rose-400 to-rose-600",
-      iconColor: "text-white", 
-      status: "completed",
-      timeEstimate: "3 min",
-      category: "Assessment",
+      iconBg: "bg-btl-600",
+      iconColor: "text-white",
+      label: `Daily check-in • ${patientData?.phase?.toUpperCase() || 'EDUCATE'} phase`,
       points: 3,
-      badgeClass: "badge-bronze"
+      pointsPill: metallicPills.bronze,
+      time: "3 min",
+      link: "#",
+      linkText: "Begin Session",
+      status: "pending"
     },
     {
-      id: 3,
+      id: "mindfulness-session",
       title: "Mindfulness Session",
       description: "Complete guided breathing exercise for mental wellness",
       icon: Brain,
-      iconBg: "bg-gradient-to-br from-purple-400 to-purple-600",
+      iconBg: "bg-btl-600",
       iconColor: "text-white",
-      status: "pending", 
-      timeEstimate: "10 min",
-      category: "Mental Health",
+      label: `Breathwork • ${patientData?.phase?.toUpperCase() || 'EDUCATE'} phase`,
       points: 5,
-      badgeClass: "badge-silver"
+      pointsPill: metallicPills.silver,
+      time: "10 min",
+      link: "#",
+      linkText: "Begin Session",
+      status: "pending"
+    },
+    {
+      id: "recovery-insights",
+      title: "Recovery Insights",
+      description: "View your risk profile and recovery progress",
+      icon: Target,
+      iconBg: "bg-btl-600",
+      iconColor: "text-white",
+      label: `Progress review • ${patientData?.phase?.toUpperCase() || 'RESET'} phase`,
+      points: 2,
+      pointsPill: metallicPills.bronze,
+      time: "2 min",
+      link: "#",
+      linkText: "Begin Session",
+      status: "pending",
+      textClass: "text-black"
     }
-  ]
+  ];
 
-  const completedTasks = tasks.filter(task => task.status === "completed").length
+  const completedTasks = tasks.filter(task => task.status === "completed").length;
 
   const handleTaskClick = (task: any) => {
-    // Pass the complete task data including points
     onTaskClick({
       ...task,
       onTaskComplete: (taskData: any) => {
@@ -61,62 +102,92 @@ export function TodaysTasksSection({ onTaskClick, onTaskComplete }: TodaysTasksS
         if (onTaskComplete) {
           onTaskComplete(taskData)
         }
-        // You could also update local state here to refresh the UI
-        // For now, we'll rely on the parent component to handle updates
       }
     })
   }
 
+  const handleMovementSessionClick = () => {
+    onTaskClick({
+      id: "movement-session",
+      title: "Movement Session",
+      onTaskComplete: (taskData: any) => {
+        console.log('🎯 Movement session completed in section:', taskData)
+        if (onTaskComplete) {
+          onTaskComplete(taskData)
+        }
+      }
+    })
+  }
+
+  // Helper function to get badge colors
+  const getBadgeColor = (badgeClass: string) => {
+    switch (badgeClass) {
+      case "badge-gold":
+        return "bg-gradient-to-br from-yellow-400 to-yellow-600 text-yellow-950 shadow-md border border-yellow-600"
+      case "badge-silver":
+        return "bg-gradient-to-br from-gray-300 to-gray-500 text-gray-900 shadow-md border border-gray-500"
+      case "badge-bronze":
+        return "bg-gradient-to-br from-orange-400 to-orange-600 text-orange-950 shadow-md border border-orange-600"
+      default:
+        return "bg-gray-100 text-gray-600 border-gray-200"
+    }
+  }
+
+  const getBadgeText = (badgeClass: string, points: number) => {
+    switch (badgeClass) {
+      case "badge-gold":
+        return `🥇 +${points}`
+      case "badge-silver":
+        return `🥈 +${points}`
+      case "badge-bronze":
+        return `🥉 +${points}`
+      default:
+        return `+${points}`
+    }
+  }
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-btl-50 rounded-2xl p-8">
+      <div className="flex items-center justify-between mb-8">
         <h2 className="text-2xl font-bold gradient-text">Today's Recovery Tasks</h2>
-        <div className="flex items-center space-x-2 text-sm text-charcoal-600">
-          <Clock className="w-4 h-4" />
-          <span>{completedTasks} of {tasks.length} completed</span>
+        <div className="flex items-center space-x-3 text-sm">
+          <div className="flex items-center space-x-1">
+            <div className="w-2 h-2 bg-btl-600 rounded-full"></div>
+            <span className="text-btl-600 font-medium">{completedTasks} completed</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <div className="w-2 h-2 bg-btl-200 rounded-full"></div>
+            <span className="text-btl-600/60">{tasks.length + 1 - completedTasks} remaining</span>
+          </div>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <MovementSessionCard 
+          patientId={patientId} 
+          onClick={handleMovementSessionClick} 
+        />
+        
         {tasks.map((task) => (
           <div
             key={task.id}
-            className="card-gradient rounded-xl shadow-lg p-6 border border-btl-200 text-center hover:card-hover-gradient hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer relative"
+            className="flex flex-col items-center bg-white rounded-2xl shadow-lg p-7 border border-btl-100 hover:shadow-xl hover:border-btl-200 transition-all duration-200 cursor-pointer relative group min-h-[340px] min-w-[260px]"
             onClick={() => handleTaskClick(task)}
           >
-            {task.status === "completed" && (
-              <div className="absolute top-4 right-4">
-                <CheckCircle className="w-5 h-5 text-btl-600" />
-              </div>
-            )}
-
-            <div
-              className={`w-16 h-16 ${task.iconBg} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md`}
-            >
+            <div className={`w-14 h-14 ${task.iconBg} rounded-xl flex items-center justify-center mb-4 mt-1 shadow-md`}>
               <task.icon className={`w-8 h-8 ${task.iconColor}`} />
             </div>
-
-            <h3 className="font-bold text-charcoal-900 mb-2 text-lg">{task.title}</h3>
-            <p className="text-charcoal-600 text-sm mb-4">{task.description}</p>
-
-            <div className="flex items-center justify-between text-xs text-charcoal-500 mb-4">
-              <span className="flex items-center">
-                <Clock className="w-3 h-3 mr-1" />
-                {task.timeEstimate}
-              </span>
-              <span className={`px-3 py-1 rounded-full font-bold text-xs ${task.badgeClass} transform hover:scale-105 transition-transform duration-200`}>
-                +{task.points} pts
-              </span>
+            <h3 className={`font-bold text-lg mb-1 text-center text-black`}>{task.title}</h3>
+            <p className={`text-[15px] mb-3 text-center text-black`}>{task.description}</p>
+            <span className="inline-block px-4 py-1 text-xs font-semibold rounded-full bg-btl-100 text-btl-600 mb-3 text-center whitespace-nowrap">{task.label}</span>
+            <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full ${task.pointsPill} mb-2`}>+{task.points} pts</span>
+            <a href={task.link} className="text-btl-600 font-semibold text-sm underline flex items-center gap-1 mb-2 hover:text-btl-700">
+              {task.linkText}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+            </a>
+            <div className="flex items-center justify-center text-xs text-btl-600/70 mt-auto">
+              <Clock className="w-4 h-4 mr-1" />
+              {task.time}
             </div>
-
-            <div className="text-xs text-charcoal-400 uppercase tracking-wider font-medium">
-              {task.category}
-            </div>
-
-            {task.status === "completed" && (
-              <div className="mt-3 text-xs text-emerald-600 font-medium">
-                ✓ Completed Today
-              </div>
-            )}
           </div>
         ))}
       </div>
@@ -131,9 +202,9 @@ export function TodaysTasksSection({ onTaskClick, onTaskComplete }: TodaysTasksS
             <div>
               <h4 className="font-semibold text-charcoal-900">Daily Progress</h4>
               <p className="text-sm text-charcoal-600">
-                {completedTasks === tasks.length 
+                {completedTasks === tasks.length + 1
                   ? "All tasks completed! Great work!" 
-                  : `${tasks.length - completedTasks} tasks remaining`
+                  : `${tasks.length + 1 - completedTasks} tasks remaining`
                 }
               </p>
             </div>
@@ -149,3 +220,4 @@ export function TodaysTasksSection({ onTaskClick, onTaskComplete }: TodaysTasksS
     </div>
   )
 }
+

@@ -2,7 +2,12 @@ import { useState } from "react";
 import SRSDisplay from "./SRSDisplay";
 
 function PatientModal({ patient, onClose }) {
-  console.log('🎭 PatientModal rendering with patient:', patient);
+  console.log('🎭 PatientModal - patient received:', !!patient);
+  if (patient) {
+    console.log('🔍 Patient has srsScores:', !!patient.srsScores, 'length:', patient.srsScores?.length);
+    console.log('🔍 Patient srsScores[0]:', patient.srsScores?.[0]);
+  }
+  
   const [activeTab, setActiveTab] = useState('overview');
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [messageText, setMessageText] = useState('');
@@ -184,6 +189,7 @@ function PatientModal({ patient, onClose }) {
                     score={srsScore}
                     clinicianAssessed={latestScore.clinicianAssessed || false}
                     grocCaptured={latestScore.grocCaptured || false}
+                    variant="compact"
                   />
                   <div style={{ textAlign: 'right' }}>
                     <div 
@@ -483,11 +489,20 @@ function PatientModal({ patient, onClose }) {
               </div>
 
               {/* Ultra Compact Overview */}
-              <div style={{ background: 'white', padding: '8px', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.7rem' }}>
-                  <span><strong>Region:</strong> {latestScore.region || 'N/A'}</span>
-                  <span><strong>SRS:</strong> {srsScore}/{latestScore.outOf || 11}</span>
-                  <span style={{ color: latestScore.clinicianAssessed ? '#059669' : '#d97706' }}>
+              <div style={{ background: 'white', padding: '12px', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.75rem' }}><strong>Region:</strong> {latestScore.region || 'N/A'}</span>
+                  <SRSDisplay 
+                    score={srsScore}
+                    clinicianAssessed={latestScore.clinicianAssessed || false}
+                    grocCaptured={latestScore.grocCaptured || false}
+                    variant="compact"
+                  />
+                  <span style={{ 
+                    fontSize: '0.75rem',
+                    color: latestScore.clinicianAssessed ? '#059669' : '#d97706',
+                    fontWeight: '600'
+                  }}>
                     <strong>Reviewed:</strong> {latestScore.clinicianAssessed ? 'Yes' : 'No'}
                   </span>
                 </div>
@@ -634,8 +649,6 @@ function PatientModal({ patient, onClose }) {
               </div>
             </div>
           )}
-
-
 
           {activeTab === 'notes' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -1197,12 +1210,36 @@ function PatientModal({ patient, onClose }) {
                   Cancel
                 </button>
                 <button 
-                  onClick={() => {
-                    // TODO: Send message to patient portal
-                    alert(`Message sent to ${patient.name}!\n\nSubject: ${messageSubject}\nMessage: ${messageText}`);
+                  onClick={async () => {
+                    try {
+                      const response = await fetch('http://localhost:3001/api/messages/send', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          patientId: patient.id,
+                          subject: messageSubject,
+                          content: messageText,
+                          senderName: 'Dr. Sarah Mitchell', // You can make this dynamic
+                          senderEmail: 'dr.mitchell@clinic.com'
+                        })
+                      });
+
+                      const result = await response.json();
+
+                      if (result.success) {
+                        alert(`✅ Message sent successfully to ${patient.name}!\n\nSubject: ${messageSubject}\n\nThe message will appear in their patient portal.`);
                     setShowMessageModal(false);
                     setMessageText('');
                     setMessageSubject('');
+                      } else {
+                        throw new Error(result.error || 'Failed to send message');
+                      }
+                    } catch (error) {
+                      console.error('Error sending message:', error);
+                      alert(`❌ Failed to send message: ${error.message}\n\nPlease check your connection and try again.`);
+                    }
                   }}
                   disabled={!messageText.trim() || !messageSubject.trim()}
                   style={{

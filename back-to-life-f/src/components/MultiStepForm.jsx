@@ -147,6 +147,7 @@ export default function MultiStepForm() {
     formType: "Intake", // "Intake" or "Follow-Up"
     region: "",
     ndi: Array(10).fill(0),
+    tdi: Array(10).fill(0), // Thoracic Disability Index
     odi: Array(10).fill(0),
     ulfi: Array(25).fill(0),
     lefs: Array(20).fill(0),
@@ -192,6 +193,7 @@ export default function MultiStepForm() {
     // Disability‐index fields look like "ndi-3", etc.
     if (
       name.startsWith("ndi-") ||
+      name.startsWith("tdi-") ||
       name.startsWith("odi-") ||
       name.startsWith("ulfi-") ||
       name.startsWith("lefs-")
@@ -233,18 +235,34 @@ export default function MultiStepForm() {
   // Whenever disability index arrays or region change, recalc %:
   useEffect(() => {
     let percentage = 0;
-    const { region, ndi, odi, ulfi, lefs } = formData;
+    const { region, ndi, tdi, odi, ulfi, lefs } = formData;
 
+    // Use new region mapping
     if (region === "Neck") {
       const sum = ndi.reduce((a, b) => a + b, 0);
       percentage = (sum / (10 * 5)) * 100;
+    } else if (region === "Mid-Back / Thoracic") {
+      const sum = tdi.reduce((a, b) => a + b, 0);
+      percentage = (sum / (10 * 5)) * 100;
+    } else if (region === "Low Back / SI Joint") {
+      const sum = odi.reduce((a, b) => a + b, 0);
+      percentage = (sum / (10 * 5)) * 100;
+    } else if (region === "Shoulder" || region === "Elbow / Forearm" || region === "Wrist / Hand") {
+      const sum = ulfi.reduce((a, b) => a + b, 0);
+      percentage = (sum / (25 * 4)) * 100;
+    } else if (region === "Hip / Groin" || region === "Knee" || region === "Ankle / Foot") {
+      const sum = lefs.reduce((a, b) => a + b, 0);
+      percentage = (sum / (20 * 4)) * 100;
     } else if (region === "Back") {
+      // Backward compatibility
       const sum = odi.reduce((a, b) => a + b, 0);
       percentage = (sum / (10 * 5)) * 100;
     } else if (region === "Upper Limb") {
+      // Backward compatibility
       const sum = ulfi.reduce((a, b) => a + b, 0);
       percentage = (sum / (25 * 4)) * 100;
     } else if (region === "Lower Limb") {
+      // Backward compatibility
       const sum = lefs.reduce((a, b) => a + b, 0);
       percentage = (sum / (20 * 4)) * 100;
     }
@@ -255,6 +273,7 @@ export default function MultiStepForm() {
   }, [
     formData.region,
     formData.ndi,
+    formData.tdi,
     formData.odi,
     formData.ulfi,
     formData.lefs,
@@ -318,6 +337,7 @@ export default function MultiStepForm() {
       formType: 'Intake',
       region: formData.region,
       ndi: formData.ndi,
+      tdi: formData.tdi, // Include TDI data
       odi: formData.odi,
       ulfi: formData.ulfi,
       lefs: formData.lefs,

@@ -36,7 +36,7 @@ export function WeeklyPointsSection({ patientEmail }: WeeklyPointsSectionProps) 
         console.log('🔄 Fetching recovery points for:', patientEmail)
         
         // Get patient data first to get patient ID
-        const patientResponse = await fetch(`http://localhost:3001/patients/portal-data/${patientEmail}`)
+        const patientResponse = await fetch(`/api/patients/portal-data/${patientEmail}`)
         if (!patientResponse.ok) {
           const errorText = await patientResponse.text()
           console.log('❌ Patient not found or API error:', errorText)
@@ -54,7 +54,7 @@ export function WeeklyPointsSection({ patientEmail }: WeeklyPointsSectionProps) 
         console.log('📊 Patient ID:', patientId)
         
         // Get weekly breakdown
-        const weeklyResponse = await fetch(`http://localhost:3001/api/recovery-points/weekly/${patientId}`)
+        const weeklyResponse = await fetch(`/api/recovery-points/weekly/${patientId}`)
         if (!weeklyResponse.ok) {
           throw new Error('Failed to fetch weekly recovery points')
         }
@@ -63,7 +63,7 @@ export function WeeklyPointsSection({ patientEmail }: WeeklyPointsSectionProps) 
         console.log('📈 Weekly points data:', weeklyPoints)
         
         // Get buffer status for additional data
-        const bufferResponse = await fetch(`http://localhost:3001/api/recovery-points/buffer/${patientId}`)
+        const bufferResponse = await fetch(`/api/recovery-points/buffer/${patientId}`)
         const bufferData = bufferResponse.ok ? await bufferResponse.json() : null
         
         // Update state with real data
@@ -87,6 +87,33 @@ export function WeeklyPointsSection({ patientEmail }: WeeklyPointsSectionProps) 
 
     fetchRecoveryPoints()
   }, [patientEmail])
+
+  // Helper function to get badge colors (matching daily tasks)
+  const getBadgeColor = (badgeClass: string) => {
+    switch (badgeClass) {
+      case "badge-gold":
+        return "bg-gradient-to-br from-yellow-400 to-yellow-600 text-yellow-900 shadow-md border border-yellow-500"
+      case "badge-silver":
+        return "bg-gradient-to-br from-gray-300 to-gray-500 text-gray-800 shadow-md border border-gray-400"
+      case "badge-bronze":
+        return "bg-gradient-to-br from-orange-400 to-orange-600 text-orange-900 shadow-md border border-orange-500"
+      default:
+        return "bg-gray-100 text-gray-600 border-gray-200"
+    }
+  }
+
+  const getBadgeText = (badgeClass: string, points: number) => {
+    switch (badgeClass) {
+      case "badge-gold":
+        return `🥇 +${points}`
+      case "badge-silver":
+        return `🥈 +${points}`
+      case "badge-bronze":
+        return `🥉 +${points}`
+      default:
+        return `+${points}`
+    }
+  }
 
   // Calculate progress percentage
   const progressPercentage = Math.min(100, Math.round((weeklyData.total / weeklyData.target) * 100))
@@ -156,8 +183,8 @@ export function WeeklyPointsSection({ patientEmail }: WeeklyPointsSectionProps) 
               <div className="text-charcoal-600 text-xs">{achievement.description}</div>
             </div>
             <div className="text-right flex flex-col items-end space-y-1">
-              <span className={`px-2 py-1 rounded-full font-bold text-xs ${achievement.badgeClass} transform hover:scale-105 transition-transform duration-200`}>
-                +{achievement.points} pts
+              <span className={`px-2 py-1 rounded-full font-bold text-xs ${getBadgeColor(achievement.badgeClass)} transform hover:scale-105 transition-transform duration-200`}>
+                {getBadgeText(achievement.badgeClass, achievement.points)}
               </span>
               <div className="text-xs font-medium text-charcoal-500 group-hover:text-btl-600 transition-colors duration-200">{achievement.progress}%</div>
             </div>

@@ -393,46 +393,46 @@ function calculateSRS(data, previousData = null, clinicianData = {}) {
 }
 
 // Calculate disability percentage from questionnaire responses
-function calculateDisabilityPercentage(ndi, odi, ulfi, lefs, region) {
+function calculateDisabilityPercentage(ndi, odi, tdi, ulfi, lefs, region) {
   let totalScore = 0;
   let maxPossibleScore = 0;
   
   console.log(`🧮 Calculating disability for region: ${region}`);
   
-  switch(region?.toLowerCase()) {
-    case 'neck':
+  const regionLower = region?.toLowerCase();
+  
+  // Handle new region mapping
+  if (regionLower === 'neck') {
       if (ndi && ndi.length > 0) {
         totalScore = ndi.reduce((sum, score) => sum + (score || 0), 0);
         maxPossibleScore = ndi.length * 5; // Each NDI question max is 5
         console.log(`   NDI: ${totalScore}/${maxPossibleScore}`);
       }
-      break;
-      
-    case 'low back':
+  } else if (regionLower === 'mid-back / thoracic' || regionLower === 'thoracic') {
+    if (tdi && tdi.length > 0) {
+      totalScore = tdi.reduce((sum, score) => sum + (score || 0), 0);
+      maxPossibleScore = tdi.length * 5; // Each TDI question max is 5
+      console.log(`   TDI: ${totalScore}/${maxPossibleScore}`);
+    }
+  } else if (regionLower === 'low back / si joint' || regionLower === 'low back') {
       if (odi && odi.length > 0) {
         totalScore = odi.reduce((sum, score) => sum + (score || 0), 0);
         maxPossibleScore = odi.length * 5; // Each ODI question max is 5
         console.log(`   ODI: ${totalScore}/${maxPossibleScore}`);
       }
-      break;
-      
-    case 'upper limb':
+  } else if (regionLower.includes('shoulder') || regionLower.includes('elbow') || regionLower.includes('wrist') || regionLower.includes('hand') || regionLower === 'upper limb') {
       if (ulfi && ulfi.length > 0) {
         totalScore = ulfi.reduce((sum, score) => sum + (score || 0), 0);
         maxPossibleScore = ulfi.length * 4; // Each ULFI question max is 4
         console.log(`   ULFI: ${totalScore}/${maxPossibleScore}`);
       }
-      break;
-      
-    case 'lower limb':
+  } else if (regionLower.includes('hip') || regionLower.includes('knee') || regionLower.includes('ankle') || regionLower.includes('foot') || regionLower === 'lower limb') {
       if (lefs && lefs.length > 0) {
         totalScore = lefs.reduce((sum, score) => sum + (score || 0), 0);
         maxPossibleScore = lefs.length * 4; // Each LEFS question max is 4
         console.log(`   LEFS: ${totalScore}/${maxPossibleScore}`);
       }
-      break;
-      
-    default:
+  } else {
       console.log(`   ⚠️ Unknown region: ${region}, defaulting to 0% disability`);
       return 0;
   }

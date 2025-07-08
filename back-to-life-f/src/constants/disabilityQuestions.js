@@ -112,6 +112,120 @@ export const NDI_QUESTIONS = [
   },
 ];
 
+// TDI (Thoracic Disability Index) - NEW
+export const TDI_QUESTIONS = [
+  {
+    label: "Pain Intensity",
+    options: [
+      "I have no pain at the moment.",
+      "The pain is very mild at the moment.",
+      "The pain is moderate at the moment.",
+      "The pain is fairly severe at the moment.",
+      "The pain is very severe at the moment.",
+      "The pain is the worst imaginable at the moment.",
+    ],
+  },
+  {
+    label: "Personal Care (Washing, Dressing, etc.)",
+    options: [
+      "I can look after myself normally without causing extra pain.",
+      "I can look after myself normally but it causes extra pain.",
+      "It is painful to look after myself and I am slow and careful.",
+      "I need some help but manage most of my personal care.",
+      "I need help every day in most aspects of self care.",
+      "I do not get dressed, wash with difficulty and stay in bed.",
+    ],
+  },
+  {
+    label: "Lifting",
+    options: [
+      "I can lift heavy weights without extra pain.",
+      "I can lift heavy weights but it gives extra pain.",
+      "Pain prevents me from lifting heavy weights but I can manage light to medium weights.",
+      "Pain prevents me from lifting heavy weights but I can manage light weights if they are conveniently positioned.",
+      "I can only lift very light weights.",
+      "I cannot lift or carry anything at all.",
+    ],
+  },
+  {
+    label: "Walking",
+    options: [
+      "Pain does not prevent me walking any distance.",
+      "Pain prevents me walking more than 1 mile.",
+      "Pain prevents me walking more than 1/2 mile.",
+      "Pain prevents me walking more than 1/4 mile.",
+      "I can only walk using a stick or crutches.",
+      "I am in bed most of the time and have to crawl to the toilet.",
+    ],
+  },
+  {
+    label: "Sitting",
+    options: [
+      "I can sit in any chair as long as I like.",
+      "I can only sit in my favorite chair as long as I like.",
+      "Pain prevents me sitting more than 1 hour.",
+      "Pain prevents me sitting more than 1/2 hour.",
+      "Pain prevents me sitting more than 10 minutes.",
+      "Pain prevents me from sitting at all.",
+    ],
+  },
+  {
+    label: "Standing",
+    options: [
+      "I can stand as long as I want without extra pain.",
+      "I can stand as long as I want but it gives me extra pain.",
+      "Pain prevents me from standing for more than 1 hour.",
+      "Pain prevents me from standing for more than 30 minutes.",
+      "Pain prevents me from standing for more than 10 minutes.",
+      "Pain prevents me from standing at all.",
+    ],
+  },
+  {
+    label: "Sleeping",
+    options: [
+      "Pain does not prevent me from sleeping well.",
+      "I can sleep well only by using tablets.",
+      "Even when I take tablets I have less than 6 hours sleep.",
+      "Even when I take tablets I have less than 4 hours sleep.",
+      "Even when I take tablets I have less than 2 hours sleep.",
+      "Pain prevents me from sleeping at all.",
+    ],
+  },
+  {
+    label: "Work Activities (includes housework)",
+    options: [
+      "My normal work activities do not cause pain.",
+      "My normal work activities increase my pain but I can still perform all that is required of me.",
+      "I can perform most of my work activities but pain prevents me from performing more physically stressful activities.",
+      "Pain prevents me from doing anything but light duties.",
+      "Pain prevents me from doing even light duties.",
+      "I cannot perform any work activities at all.",
+    ],
+  },
+  {
+    label: "Recreation",
+    options: [
+      "I am able to engage in all my recreation activities with no pain.",
+      "I am able to engage in all my recreation activities with some pain.",
+      "I am able to engage in most, but not all of my usual recreation activities because of pain.",
+      "I am able to engage in a few of my usual recreation activities because of pain.",
+      "I can hardly do any recreation activities because of pain.",
+      "I cannot do any recreation activities at all.",
+    ],
+  },
+  {
+    label: "Breathing and Coughing",
+    options: [
+      "I can breathe deeply and cough without pain.",
+      "I can breathe deeply and cough with slight pain.",
+      "Deep breathing and coughing cause moderate pain.",
+      "Deep breathing and coughing cause severe pain.",
+      "I avoid deep breathing and coughing because of severe pain.",
+      "I have constant difficulty breathing due to pain.",
+    ],
+  },
+];
+
 // ODI (10 items, each with 6 options) – same pattern
 export const ODI_QUESTIONS = [
   { label: "Pain Intensity", options: [...NDI_QUESTIONS[0].options] },
@@ -242,3 +356,131 @@ export const LEFS_QUESTIONS = [
   "Going up or down three flights of stairs.",
   "Performing usual movements in sports that require agility (e.g., lunging, jumping).",
 ];
+
+// Pain Region Configuration
+export const PAIN_REGIONS = [
+  {
+    regionLabel: "Neck",
+    mappedCategory: "Neck",
+    disabilityIndex: "NDI",
+    indexWeight: 0.20,
+    description: "Cervical spine and neck-related pain"
+  },
+  {
+    regionLabel: "Mid-Back / Thoracic",
+    mappedCategory: "Back",
+    disabilityIndex: "TDI",
+    indexWeight: 0.15,
+    description: "Thoracic spine and mid-back pain"
+  },
+  {
+    regionLabel: "Low Back / SI Joint",
+    mappedCategory: "Back",
+    disabilityIndex: "ODI",
+    indexWeight: 0.20,
+    description: "Lumbar spine and sacroiliac joint pain"
+  },
+  {
+    regionLabel: "Shoulder",
+    mappedCategory: "Upper Limb",
+    disabilityIndex: "ULFI",
+    indexWeight: 0.20,
+    description: "Shoulder joint and surrounding structures"
+  },
+  {
+    regionLabel: "Elbow / Forearm",
+    mappedCategory: "Upper Limb",
+    disabilityIndex: "ULFI",
+    indexWeight: 0.20,
+    description: "Elbow joint and forearm pain"
+  },
+  {
+    regionLabel: "Wrist / Hand",
+    mappedCategory: "Upper Limb",
+    disabilityIndex: "ULFI",
+    indexWeight: 0.20,
+    description: "Wrist, hand, and finger pain"
+  },
+  {
+    regionLabel: "Hip / Groin",
+    mappedCategory: "Lower Limb",
+    disabilityIndex: "LEFS",
+    indexWeight: 0.20,
+    description: "Hip joint and groin area pain"
+  },
+  {
+    regionLabel: "Knee",
+    mappedCategory: "Lower Limb",
+    disabilityIndex: "LEFS",
+    indexWeight: 0.20,
+    description: "Knee joint and surrounding structures"
+  },
+  {
+    regionLabel: "Ankle / Foot",
+    mappedCategory: "Lower Limb",
+    disabilityIndex: "LEFS",
+    indexWeight: 0.20,
+    description: "Ankle, foot, and toe pain"
+  }
+];
+
+// Disability Index Configuration
+export const DISABILITY_INDICES = {
+  NDI: {
+    name: "Neck Disability Index",
+    abbreviation: "NDI",
+    maxScore: 50,
+    sections: 10,
+    questions: NDI_QUESTIONS
+  },
+  TDI: {
+    name: "Thoracic Disability Index",
+    abbreviation: "TDI",
+    maxScore: 50,
+    sections: 10,
+    questions: TDI_QUESTIONS,
+    note: "Clinic-developed index"
+  },
+  ODI: {
+    name: "Oswestry Disability Index",
+    abbreviation: "ODI",
+    maxScore: 50,
+    sections: 10,
+    questions: ODI_QUESTIONS
+  },
+  ULFI: {
+    name: "Upper Limb Functional Index",
+    abbreviation: "ULFI",
+    maxScore: 80,
+    sections: 20,
+    questions: ULFI_QUESTIONS
+  },
+  LEFS: {
+    name: "Lower Extremity Functional Scale",
+    abbreviation: "LEFS",
+    maxScore: 80,
+    sections: 20,
+    questions: LEFS_QUESTIONS
+  }
+};
+
+// Helper functions
+export const getDisabilityQuestionsForRegion = (regionLabel) => {
+  const region = PAIN_REGIONS.find(r => r.regionLabel === regionLabel);
+  if (!region) return null;
+  
+  const indexConfig = DISABILITY_INDICES[region.disabilityIndex];
+  return indexConfig ? indexConfig.questions : null;
+};
+
+export const getDisabilityIndexForRegion = (regionLabel) => {
+  const region = PAIN_REGIONS.find(r => r.regionLabel === regionLabel);
+  return region ? region.disabilityIndex : null;
+};
+
+export const calculateDisabilityPercentage = (score, indexType) => {
+  const indexConfig = DISABILITY_INDICES[indexType];
+  if (!indexConfig) return 0;
+  
+  return Math.round((score / indexConfig.maxScore) * 100);
+};

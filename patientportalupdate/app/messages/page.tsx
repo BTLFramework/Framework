@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ArrowLeft, Send, Search, Phone, Video, MoreVertical } from "lucide-react"
 import { useRouter } from "next/navigation"
 
@@ -8,6 +8,12 @@ export default function MessagesPage() {
   const router = useRouter()
   const [selectedConversation, setSelectedConversation] = useState(1)
   const [newMessage, setNewMessage] = useState("")
+  const [messages, setMessages] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  // This should be dynamic - get from patient context/auth
+  const patientId = 1; // TODO: Get from authentication context
 
   const conversations = [
     {
@@ -15,83 +21,133 @@ export default function MessagesPage() {
       name: "Dr. Sarah Mitchell",
       role: "Physical Therapist",
       avatar: "/placeholder.svg?height=40&width=40",
-      lastMessage: "How are you feeling after yesterday's session?",
-      timestamp: "2 hours ago",
-      unread: 2,
-      online: true,
-    },
-    {
-      id: 2,
-      name: "Recovery Support Team",
-      role: "Support Team",
-      avatar: "/placeholder.svg?height=40&width=40",
-      lastMessage: "Your weekly progress report is ready",
-      timestamp: "1 day ago",
+      lastMessage: "Loading...",
+      timestamp: "Loading...",
       unread: 0,
-      online: false,
-    },
-    {
-      id: 3,
-      name: "Dr. James Wilson",
-      role: "Physician",
-      avatar: "/placeholder.svg?height=40&width=40",
-      lastMessage: "Let's schedule your follow-up appointment",
-      timestamp: "3 days ago",
-      unread: 1,
-      online: false,
+      online: true,
     },
   ]
 
-  const messages = [
+  // Fetch messages from API
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch(`http://localhost:3001/api/messages/patient/${patientId}`)
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch messages')
+        }
+
+        const result = await response.json()
+        
+        if (result.success) {
+          // Format messages for display
+          const formattedMessages = result.messages.map(msg => ({
+            id: msg.id,
+            senderId: msg.senderType === 'CLINICIAN' ? 1 : 'me',
+            senderName: msg.senderName,
+            content: msg.content,
+            subject: msg.subject,
+            timestamp: new Date(msg.timestamp).toLocaleTimeString('en-US', { 
+              hour: 'numeric', 
+              minute: '2-digit',
+              hour12: true 
+            }),
+            isOwn: msg.senderType === 'PATIENT',
+            isRead: msg.isRead
+          }))
+          
+          setMessages(formattedMessages)
+          
+          // Update conversation with latest message
+          if (formattedMessages.length > 0) {
+            const latestMessage = formattedMessages[0]
+            conversations[0].lastMessage = latestMessage.content
+            conversations[0].timestamp = latestMessage.timestamp
+            conversations[0].unread = formattedMessages.filter(m => !m.isRead && !m.isOwn).length
+          }
+
+          // Mark messages as read when patient views them
+          const markAsRead = async () => {
+            try {
+              await fetch(`http://localhost:3001/api/messages/patient/${patientId}/mark-read`, {
+                method: 'PATCH'
+              })
+            } catch (error) {
+              console.error('Error marking messages as read:', error)
+            }
+          }
+
+          // Mark as read after a short delay (so user can see the messages first)
+          setTimeout(markAsRead, 2000)
+        } else {
+          throw new Error(result.error || 'Failed to fetch messages')
+        }
+      } catch (err) {
+        console.error('Error fetching messages:', err)
+        setError(err.message)
+        // Fallback to sample messages if API fails
+        setMessages([
     {
       id: 1,
       senderId: 1,
       senderName: "Dr. Sarah Mitchell",
-      content: "Hi Sarah! How are you feeling after yesterday's session?",
+            content: "Welcome to your patient portal! I'll be sending you updates and check-ins here.",
       timestamp: "2:30 PM",
       isOwn: false,
-    },
-    {
-      id: 2,
-      senderId: "me",
-      senderName: "You",
-      content: "Much better! The exercises you showed me really helped with the stiffness.",
-      timestamp: "2:45 PM",
-      isOwn: true,
-    },
-    {
-      id: 3,
-      senderId: 1,
-      senderName: "Dr. Sarah Mitchell",
-      content:
-        "That's wonderful to hear! Keep up with the morning routine we discussed. How's your pain level today on a scale of 1-10?",
-      timestamp: "2:47 PM",
-      isOwn: false,
-    },
-    {
-      id: 4,
-      senderId: "me",
-      senderName: "You",
-      content: "I'd say it's about a 3-4 today, which is much better than last week when it was around 7.",
-      timestamp: "3:15 PM",
-      isOwn: true,
-    },
-    {
-      id: 5,
-      senderId: 1,
-      senderName: "Dr. Sarah Mitchell",
-      content:
-        "Excellent progress! I'll update your recovery score. Don't forget to complete your weekly assessment by Friday.",
-      timestamp: "3:20 PM",
-      isOwn: false,
-    },
-  ]
+          }
+        ])
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      // Here you would typically send the message to your backend
-      console.log("Sending message:", newMessage)
+    fetchMessages()
+  }, [patientId])
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim()) return
+
+    try {
+      const response = await fetch('http://localhost:3001/api/messages/reply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          patientId: patientId,
+          content: newMessage,
+          senderName: 'Sarah Johnson', // TODO: Get from patient context
+          subject: 'Reply from patient'
+        })
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        // Add the new message to the list
+        const newMsg = {
+          id: result.data.id,
+          senderId: 'me',
+          senderName: 'You',
+          content: newMessage,
+          timestamp: new Date().toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit',
+            hour12: true 
+          }),
+      isOwn: true,
+        }
+        
+        setMessages(prev => [newMsg, ...prev])
       setNewMessage("")
+      } else {
+        throw new Error(result.error || 'Failed to send message')
+      }
+    } catch (error) {
+      console.error('Error sending message:', error)
+      alert('Failed to send message. Please try again.')
     }
   }
 
@@ -196,20 +252,37 @@ export default function MessagesPage() {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message) => (
+            {loading ? (
+              <div className="flex justify-center items-center h-full">
+                <div className="text-gray-500">Loading messages...</div>
+              </div>
+            ) : error ? (
+              <div className="flex justify-center items-center h-full">
+                <div className="text-red-500">Error loading messages: {error}</div>
+              </div>
+            ) : messages.length === 0 ? (
+              <div className="flex justify-center items-center h-full">
+                <div className="text-gray-500">No messages yet. Your care team will send updates here.</div>
+              </div>
+            ) : (
+              messages.map((message) => (
               <div key={message.id} className={`flex ${message.isOwn ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                     message.isOwn ? "bg-teal-600 text-white" : "bg-white border border-gray-200 text-gray-900"
                   }`}
                 >
+                    {message.subject && !message.isOwn && (
+                      <p className="text-xs font-semibold mb-1 opacity-75">{message.subject}</p>
+                    )}
                   <p className="text-sm">{message.content}</p>
                   <p className={`text-xs mt-1 ${message.isOwn ? "text-teal-100" : "text-gray-500"}`}>
                     {message.timestamp}
                   </p>
                 </div>
               </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* Message Input */}

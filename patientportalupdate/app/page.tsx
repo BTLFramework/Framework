@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { LeftSidebar } from "@/components/left-sidebar"
 import { TopHeader } from "@/components/top-header"
 import { RecoveryScoreWheel } from "@/components/recovery-score-wheel"
@@ -13,8 +13,12 @@ import { TaskModal } from "@/components/task-modal"
 import { ChatAssistant } from "@/components/chat-assistant"
 import { ToolkitModal } from "@/components/toolkit-modal"
 import { AssessmentModal } from "@/components/assessment-modal"
+import { MovementSessionDialog } from "@/components/MovementSessionDialog"
+import { PainAssessmentDialog } from "@/components/PainAssessmentDialog"
+import { MindfulnessSessionDialog } from "@/components/MindfulnessSessionDialog"
+import { RecoveryInsightsDialog } from "@/components/RecoveryInsightsDialog"
 
-export default function PatientRecoveryDashboard() {
+const PatientRecoveryDashboard: React.FC = () => {
   const [showScoreModal, setShowScoreModal] = useState(false)
   const [selectedTask, setSelectedTask] = useState<any>(null)
   const [showChatAssistant, setShowChatAssistant] = useState(false)
@@ -28,6 +32,10 @@ export default function PatientRecoveryDashboard() {
     timestamp: null
   })
   const [refreshKey, setRefreshKey] = useState(0) // For triggering re-renders
+  const [showMovementDialog, setShowMovementDialog] = useState(false)
+  const [showPainDialog, setShowPainDialog] = useState(false)
+  const [showMindfulnessDialog, setShowMindfulnessDialog] = useState(false)
+  const [showInsightsDialog, setShowInsightsDialog] = useState(false)
 
   // Function to completely reset portal data
   const resetPortalData = () => {
@@ -43,8 +51,6 @@ export default function PatientRecoveryDashboard() {
     setRefreshKey(prev => prev + 1)
     console.log('✅ Portal data reset complete')
   }
-
-
 
   // Load patient data from URL parameters or localStorage on component mount
   useEffect(() => {
@@ -161,7 +167,9 @@ export default function PatientRecoveryDashboard() {
     
     // Refresh data from backend to ensure sync
     setTimeout(() => {
-      refreshPatientData()
+      refreshPatientData().catch(error => {
+        console.error('Error in delayed refresh:', error);
+      });
     }, 1000)
     
     // Record engagement activity
@@ -216,18 +224,45 @@ export default function PatientRecoveryDashboard() {
 
   // Extract current score number for the wheel
   const currentScore = (() => {
+    try {
     if (typeof patientData.score === 'number') {
-      return patientData.score;
+        return isNaN(patientData.score) ? 7 : patientData.score;
     }
     if (typeof patientData.score === 'string') {
-      return parseInt(patientData.score.split('/')[0] || '7');
+        const scoreStr = patientData.score.split('/')[0] || '7';
+        const parsed = parseInt(scoreStr);
+        return isNaN(parsed) ? 7 : parsed;
     }
     return 7; // Default fallback
+    } catch (error) {
+      console.error('Error parsing score:', error);
+      return 7; // Safe fallback
+    }
   })()
 
-      return (
-      <div className="flex min-h-screen bg-gradient-to-br from-btl-50 to-white">
-        <LeftSidebar patientData={patientData} />
+  // Handler for opening the correct dialog based on card id
+  const handleTaskDialogOpen = (task: any) => {
+    switch (task.id) {
+      case "movement-session":
+        setShowMovementDialog(true);
+        break;
+      case "pain-assessment":
+        setShowPainDialog(true);
+        break;
+      case "mindfulness-session":
+        setShowMindfulnessDialog(true);
+        break;
+      case "recovery-insights":
+        setShowInsightsDialog(true);
+        break;
+      default:
+        setSelectedTask(task); // fallback for any other tasks
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen bg-gradient-to-br from-btl-50 to-white">
+      <LeftSidebar patientData={patientData} />
 
       <div className="flex-1 flex flex-col">
         <TopHeader
@@ -242,7 +277,7 @@ export default function PatientRecoveryDashboard() {
             <div data-section="daily-tasks" className="mb-8">
               <TodaysTasksSection 
                 key={`tasks-${refreshKey}`} // Force re-render when data updates
-                onTaskClick={setSelectedTask} 
+                onTaskClick={handleTaskDialogOpen} 
                 onTaskComplete={handleTaskComplete}
               />
             </div>
@@ -281,6 +316,12 @@ export default function PatientRecoveryDashboard() {
 
       {/* Modals */}
       {showScoreModal && <ScoreBreakdownModal score={currentScore} onClose={() => setShowScoreModal(false)} />}
+      {/* Dialog modals for each recovery task */}
+      <MovementSessionDialog open={showMovementDialog} onClose={() => setShowMovementDialog(false)} patientId={patientData.email} />
+      <PainAssessmentDialog open={showPainDialog} onClose={() => setShowPainDialog(false)} patientId={patientData.email} />
+      <MindfulnessSessionDialog open={showMindfulnessDialog} onClose={() => setShowMindfulnessDialog(false)} patientId={patientData.email} />
+      <RecoveryInsightsDialog open={showInsightsDialog} onClose={() => setShowInsightsDialog(false)} patientId={patientData.email} />
+      {/* Fallback for any other tasks (legacy) */}
       {selectedTask && (
         <TaskModal 
           task={selectedTask} 
@@ -296,3 +337,5 @@ export default function PatientRecoveryDashboard() {
     </div>
   )
 }
+
+export default PatientRecoveryDashboard

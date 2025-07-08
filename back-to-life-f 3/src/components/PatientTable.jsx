@@ -30,28 +30,46 @@ export default function PatientTable({
     }
   };
 
-  const getSRSStatus = (srs) => {
-    if (srs >= 8) return "excellent";
-    if (srs >= 5) return "good";
-    return "monitor";
-  };
-
-  const getSRSLabel = (srs) => {
-    if (srs >= 8) return "Excellent";
-    if (srs >= 5) return "Good";
-    return "Monitor";
-  };
-
   const getPriorityAlert = (patient) => {
-    if (patient.painLevel >= 8 && patient.srsScore <= 3) {
-      return { type: "high-priority", label: "High Priority", icon: "🚨" };
+    const daysSinceLastContact = getDaysSinceLastContact(patient.lastUpdate);
+    const daysSinceIntake = Math.floor((new Date() - new Date(patient.intakeDate)) / (1000 * 60 * 60 * 24));
+    
+    // 🚨 CRITICAL: High Priority - Multiple Risk Factors
+    if (patient.painLevel >= 8 && patient.srsScore <= 2) {
+      return { type: "high-priority", label: "High Priority", icon: "" };
     }
-    if (needsFollowUp(patient.lastUpdate)) {
-      return { type: "follow-up", label: "Follow-up Due", icon: "📅" };
+    
+    // 🔻 DECLINING: SRS Score Drop (Most Important Clinical Indicator)
+    if (patient.prevSrsScore && patient.prevSrsScore > patient.srsScore) {
+      const scoreDrop = patient.prevSrsScore - patient.srsScore;
+      if (scoreDrop >= 2) {
+        return { type: "declining-severe", label: "Severe Decline", icon: "" };
+      } else {
+        return { type: "declining", label: "Score Declining", icon: "" };
+      }
     }
+    
+    // 📱 DISENGAGEMENT: Portal Inactivity
+    if (patient.recoveryPoints && patient.recoveryPoints.completionRate === 0 && daysSinceIntake >= 7) {
+      return { type: "disengaged", label: "No Engagement", icon: "" };
+    }
+    
+    // 📅 FOLLOW-UP DUE: No follow-up for 3+ weeks (21+ days)
+    if (daysSinceLastContact >= 21) {
+      return { type: "follow-up-due", label: "No Follow-up 3+ Weeks", icon: "" };
+    }
+    
+    // 🔴 CRITICAL: Very Low SRS (Static Risk)
+    if (patient.srsScore <= 2) {
+      return { type: "critical", label: "Critical Score", icon: "" };
+    }
+    
+    // ⚠️ MONITOR: Low SRS (Baseline Monitoring)
     if (patient.srsScore <= 4) {
-      return { type: "medium-priority", label: "Monitor", icon: "⚠️" };
+      return { type: "medium-priority", label: "Monitor", icon: "" };
     }
+    
+    // ✅ No alerts for good scores with good engagement
     return null;
   };
 
@@ -392,19 +410,13 @@ export default function PatientTable({
                     style={{ padding: '16px 20px', cursor: 'pointer' }}
                     onClick={() => onRowClick(patient.id)}
                   >
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <SRSDisplay 
-                          score={patient.srsScore || 0}
-                          clinicianAssessed={patient.clinicianAssessed || false}
-                          grocCaptured={patient.grocCaptured || false}
-                          className="text-sm"
-                        />
-                        <span className={`status-${getSRSStatus(patient.srsScore)}`}>
-                          {getSRSLabel(patient.srsScore)}
-                        </span>
-                      </div>
-                    </div>
+                    <SRSDisplay 
+                      score={patient.srsScore || 0}
+                      clinicianAssessed={patient.clinicianAssessed || false}
+                      grocCaptured={patient.grocCaptured || false}
+                      variant="table"
+                      className="text-sm"
+                    />
                   </td>
 
                   {/* Consolidated Engagement */}
@@ -515,12 +527,16 @@ export default function PatientTable({
             <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Excellent (8+)</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '12px', height: '12px', background: '#d97706', borderRadius: '50%' }}></div>
+            <div style={{ width: '12px', height: '12px', background: '#0891b2', borderRadius: '50%' }}></div>
             <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Good (5-7)</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '12px', height: '12px', background: '#d97706', borderRadius: '50%' }}></div>
+            <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Monitor (3-4)</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{ width: '12px', height: '12px', background: '#dc2626', borderRadius: '50%' }}></div>
-            <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Monitor (&lt;5)</span>
+            <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Critical (0-2)</span>
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 // SRS Configuration - Single Source of Truth
 // This file centralizes all scoring rules and phase cutoffs
 
-// Baseline (Intake) Scoring Rules - Range: 0-9 points
+// Baseline (Intake) Scoring Rules - Range: 0-11 points
 export const intakeRules = {
   pain: {
     // VAS 0-10: ≤2 → +1 point
@@ -107,7 +107,7 @@ export function getPhase(score) {
 
 // Score Ranges
 export const scoreRanges = {
-  baseline: { min: 0, max: 9 },
+  baseline: { min: 0, max: 11 },
   followup: { min: 0, max: 11 }
 };
 

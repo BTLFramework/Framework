@@ -29,31 +29,51 @@ model Patient {
   portalAccount PatientPortal?
   recoveryPoints RecoveryPoint[]
   srsBuffers   SRSBuffer?
+  messages     Message[]   // Messages to this patient
   
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @default(now()) @updatedAt
 }
 
 model SRSScore {
-  id                   Int      @id @default(autoincrement())
-  patientId            Int
-  patient              Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  date                 DateTime
-  formType             String
-  region               String
-  disabilityPercentage Int
-  vas                  Int
-  psfs                 Json
-  beliefs              String[] @default([])
-  confidence           Int
-  groc                 Int
-  srsScore             Int
-  clinicianAssessed    Boolean  @default(false) // flips to true after intake visit
-  grocCaptured         Boolean  @default(false) // flips to true at first follow-up
+  id                  Int      @id @default(autoincrement())
+  patientId           Int
+  date                DateTime
+  formType            String   // "Intake" or "Follow-Up"
+  region              String
   
-  createdAt            DateTime @default(now())
+  // Disability Index data
+  ndi                 Json?    // Neck Disability Index
+  tdi                 Json?    // Thoracic Disability Index (new)
+  odi                 Json?    // Oswestry Disability Index
+  ulfi                Json?    // Upper Limb Functional Index
+  lefs                Json?    // Lower Extremity Functional Scale
+  disabilityPercentage Float?
   
-  @@index([patientId, date])
+  // Pain and Function
+  vas                 Int      // Visual Analog Scale (0-10)
+  psfs                Json     // Patient-Specific Functional Scale
+  
+  // Cognitive Assessment
+  beliefs             Json?    // Limiting beliefs (changed to optional JSON)
+  confidence          Int      // Confidence level (0-10)
+  
+  // Follow-up specific
+  groc                Int?     // Global Rating of Change
+  
+  // Calculated values
+  srsScore            Int      // Signature Recovery Score (0-11)
+  beliefStatus        String?  // Status of limiting beliefs
+  
+  // Clinical verification flags
+  recoveryMilestone   Boolean? @default(false)
+  clinicalProgressVerified Boolean? @default(false)
+  clinicianAssessed   Boolean? @default(false)
+  grocCaptured        Boolean? @default(false)
+  
+  patient             Patient  @relation(fields: [patientId], references: [id])
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @default(now()) @updatedAt
 }
 
 model PatientPortal {
@@ -127,4 +147,31 @@ enum SRSDomain {
   VAS  
   CONFIDENCE
   BELIEFS
+}
+
+// Messages between clinicians and patients
+model Message {
+  id          Int      @id @default(autoincrement())
+  patientId   Int
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  // Message content
+  subject     String
+  content     String
+  senderType  SenderType // CLINICIAN or PATIENT
+  senderName  String     // Name of the sender
+  senderEmail String?    // Email of the sender (optional)
+  
+  // Message status
+  isRead      Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([patientId, createdAt])
+}
+
+enum SenderType {
+  CLINICIAN
+  PATIENT
 }

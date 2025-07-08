@@ -44,7 +44,7 @@ export function TaskModal({ task, onClose, onTaskComplete }: TaskModalProps) {
       console.log('🎯 Completing task:', taskCompletionData)
 
       // Send to backend
-      const response = await fetch('http://localhost:3001/patients/complete-task', {
+      const response = await fetch('/api/patients/complete-task', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

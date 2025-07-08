@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Home, Target, Heart, Wrench, FileText, MessageCircle, ChevronRight } from "lucide-react"
+import { Home, Target, Heart, Wrench, FileText, MessageCircle, ChevronRight, Clock } from "lucide-react"
 
 const navigationItems = [
   { name: "Home", icon: Home, href: "/", active: true },
+  { name: "Today's Tasks", icon: Clock, href: "/todays-tasks" },
   { name: "Recovery Score", icon: Target, href: "/recovery-score" },
   { name: "Recovery Points", icon: Heart, href: "/recovery-points" },
   { name: "Recovery Tools", icon: Wrench, href: "/recovery-tools" },
@@ -20,9 +21,53 @@ interface LeftSidebarProps {
 export function LeftSidebar({ patientData }: LeftSidebarProps) {
   const router = useRouter()
   const [activeItem, setActiveItem] = useState("Home")
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  // This should be dynamic - get from patient context/auth
+  const patientId = 1; // TODO: Get from authentication context
+
+  // Fetch unread message count
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const response = await fetch(`/api/messages/patient/${patientId}`)
+        
+        if (response.ok) {
+          const result = await response.json()
+          
+          if (result.success) {
+            // Count unread messages that are from clinicians (not patient's own messages)
+            const unreadMessages = result.messages.filter(
+              (msg: any) => !msg.isRead && msg.senderType === 'CLINICIAN'
+            )
+            setUnreadCount(unreadMessages.length)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching unread message count:', error)
+        // Silently fail - don't show error to user for notification badge
+      }
+    }
+
+    fetchUnreadCount()
+    
+    // Poll for new messages every 30 seconds
+    const interval = setInterval(fetchUnreadCount, 30000)
+    
+    return () => clearInterval(interval)
+  }, [patientId])
 
   const handleNavigation = (item: any) => {
     setActiveItem(item.name)
+    
+    // If navigating to messages, reset unread count after a short delay
+    // (gives time for the page to load and mark messages as read)
+    if (item.name === "Messages") {
+      setTimeout(() => {
+        setUnreadCount(0)
+      }, 1000)
+    }
+    
     router.push(item.href)
   }
 
@@ -52,12 +97,26 @@ export function LeftSidebar({ patientData }: LeftSidebarProps) {
                 }`}
               >
                 <div className="flex items-center space-x-3">
+                  <div className="relative">
                   <item.icon
                     className={`w-5 h-5 transition-colors ${
                       activeItem === item.name ? "text-btl-600" : "text-gray-500 group-hover:text-gray-700"
                     }`}
                   />
+                    {/* Notification badge for Messages */}
+                    {item.name === "Messages" && unreadCount > 0 && (
+                      <div className="absolute -top-2 -right-2 min-w-[18px] h-[18px] bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white shadow-lg animate-pulse">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </div>
+                    )}
+                  </div>
                   <span className="font-medium">{item.name}</span>
+                  {/* Additional badge next to text for Messages */}
+                  {item.name === "Messages" && unreadCount > 0 && (
+                    <div className="ml-auto mr-2 min-w-[20px] h-[20px] bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-sm animate-pulse">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </div>
+                  )}
                 </div>
                 {activeItem === item.name && <ChevronRight className="w-4 h-4 text-btl-600 animate-pulse" />}
               </button>

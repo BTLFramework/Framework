@@ -244,17 +244,53 @@ export function phaseFromSRS(score) {
 }
 
 // Calculate disability percentage from questionnaire responses
-export function calculateDisabilityPercentage(ndi, odi, ulfi, lefs, region) {
+export function calculateDisabilityPercentage(ndi, odi, tdi, ulfi, lefs, region) {
   let totalScore = 0;
   let maxPossibleScore = 0;
   
   console.log(`🧮 Calculating disability for region: ${region}`);
   
-  switch(region?.toLowerCase()) {
-    case 'neck':
+  // Handle new region mapping
+  const regionLower = region?.toLowerCase();
+  
+  // Check for specific region labels first
+  if (regionLower === 'neck') {
       if (ndi && ndi.length > 0) {
         totalScore = ndi.reduce((sum, score) => sum + (score || 0), 0);
         maxPossibleScore = ndi.length * 5; // Each NDI question max is 5
+      console.log(`   NDI: ${totalScore}/${maxPossibleScore}`);
+    }
+  } else if (regionLower === 'mid-back / thoracic' || regionLower === 'thoracic') {
+    if (tdi && tdi.length > 0) {
+      totalScore = tdi.reduce((sum, score) => sum + (score || 0), 0);
+      maxPossibleScore = tdi.length * 5; // Each TDI question max is 5
+      console.log(`   TDI: ${totalScore}/${maxPossibleScore}`);
+    }
+  } else if (regionLower === 'low back / si joint' || regionLower === 'back') {
+    if (odi && odi.length > 0) {
+      totalScore = odi.reduce((sum, score) => sum + (score || 0), 0);
+      maxPossibleScore = odi.length * 5; // Each ODI question max is 5
+      console.log(`   ODI: ${totalScore}/${maxPossibleScore}`);
+    }
+  } else if (regionLower.includes('shoulder') || regionLower.includes('elbow') || regionLower.includes('wrist') || regionLower.includes('hand') || regionLower === 'upper limb') {
+    if (ulfi && ulfi.length > 0) {
+      totalScore = ulfi.reduce((sum, score) => sum + (score || 0), 0);
+      maxPossibleScore = ulfi.length * 4; // Each ULFI question max is 4
+      console.log(`   ULFI: ${totalScore}/${maxPossibleScore}`);
+    }
+  } else if (regionLower.includes('hip') || regionLower.includes('knee') || regionLower.includes('ankle') || regionLower.includes('foot') || regionLower === 'lower limb') {
+    if (lefs && lefs.length > 0) {
+      totalScore = lefs.reduce((sum, score) => sum + (score || 0), 0);
+      maxPossibleScore = lefs.length * 4; // Each LEFS question max is 4
+      console.log(`   LEFS: ${totalScore}/${maxPossibleScore}`);
+    }
+  } else {
+    // Fallback to old logic for backward compatibility
+    switch(regionLower) {
+      case 'neck':
+        if (ndi && ndi.length > 0) {
+          totalScore = ndi.reduce((sum, score) => sum + (score || 0), 0);
+          maxPossibleScore = ndi.length * 5;
         console.log(`   NDI: ${totalScore}/${maxPossibleScore}`);
       }
       break;
@@ -262,7 +298,7 @@ export function calculateDisabilityPercentage(ndi, odi, ulfi, lefs, region) {
     case 'back':
       if (odi && odi.length > 0) {
         totalScore = odi.reduce((sum, score) => sum + (score || 0), 0);
-        maxPossibleScore = odi.length * 5; // Each ODI question max is 5
+          maxPossibleScore = odi.length * 5;
         console.log(`   ODI: ${totalScore}/${maxPossibleScore}`);
       }
       break;
@@ -270,7 +306,7 @@ export function calculateDisabilityPercentage(ndi, odi, ulfi, lefs, region) {
     case 'upper limb':
       if (ulfi && ulfi.length > 0) {
         totalScore = ulfi.reduce((sum, score) => sum + (score || 0), 0);
-        maxPossibleScore = ulfi.length * 4; // Each ULFI question max is 4
+          maxPossibleScore = ulfi.length * 4;
         console.log(`   ULFI: ${totalScore}/${maxPossibleScore}`);
       }
       break;
@@ -278,7 +314,7 @@ export function calculateDisabilityPercentage(ndi, odi, ulfi, lefs, region) {
     case 'lower limb':
       if (lefs && lefs.length > 0) {
         totalScore = lefs.reduce((sum, score) => sum + (score || 0), 0);
-        maxPossibleScore = lefs.length * 4; // Each LEFS question max is 4
+          maxPossibleScore = lefs.length * 4;
         console.log(`   LEFS: ${totalScore}/${maxPossibleScore}`);
       }
       break;
@@ -286,6 +322,7 @@ export function calculateDisabilityPercentage(ndi, odi, ulfi, lefs, region) {
     default:
       console.log(`   ⚠️ Unknown region: ${region}, defaulting to 0% disability`);
       return 0;
+    }
   }
   
   if (maxPossibleScore === 0) {
