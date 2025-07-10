@@ -14,9 +14,9 @@ import { ChatAssistant } from "@/components/chat-assistant"
 import { ToolkitModal } from "@/components/toolkit-modal"
 import { AssessmentModal } from "@/components/assessment-modal"
 import { MovementSessionDialog } from "@/components/MovementSessionDialog"
-import { PainAssessmentDialog } from "@/components/PainAssessmentDialog"
+import { PainStressCheckDialog } from "@/components/PainStressCheckDialog"
 import { MindfulnessSessionDialog } from "@/components/MindfulnessSessionDialog"
-import { RecoveryInsightsDialog } from "@/components/RecoveryInsightsDialog"
+import { RecoveryInsightDialog } from "@/components/RecoveryInsightDialog"
 
 const PatientRecoveryDashboard: React.FC = () => {
   const [showScoreModal, setShowScoreModal] = useState(false)
@@ -25,10 +25,10 @@ const PatientRecoveryDashboard: React.FC = () => {
   const [selectedToolkit, setSelectedToolkit] = useState<any>(null)
   const [selectedAssessment, setSelectedAssessment] = useState<any>(null)
   const [patientData, setPatientData] = useState<any>({
-    name: "Test Patient",
-    email: "test@example.com", 
-    score: "6/11",
-    phase: "EDUCATE",
+    name: "Test Patient Back",
+    email: "testback@example.com", 
+    score: "2/11",
+    phase: "RESET",
     timestamp: null
   })
   const [refreshKey, setRefreshKey] = useState(0) // For triggering re-renders
@@ -36,16 +36,17 @@ const PatientRecoveryDashboard: React.FC = () => {
   const [showPainDialog, setShowPainDialog] = useState(false)
   const [showMindfulnessDialog, setShowMindfulnessDialog] = useState(false)
   const [showInsightsDialog, setShowInsightsDialog] = useState(false)
+  const [tasksData, setTasksData] = useState<any>(null)
 
   // Function to completely reset portal data
   const resetPortalData = () => {
     console.log('🔄 Resetting portal data to defaults...')
     localStorage.removeItem('btl_patient_data')
     setPatientData({
-      name: "Test Patient",
-      email: "test@example.com", 
-      score: "6/11",
-      phase: "EDUCATE",
+      name: "Test Patient Back",
+      email: "testback@example.com", 
+      score: "2/11",
+      phase: "RESET",
       timestamp: null
     })
     setRefreshKey(prev => prev + 1)
@@ -59,7 +60,7 @@ const PatientRecoveryDashboard: React.FC = () => {
       const existingData = localStorage.getItem('btl_patient_data')
       if (existingData) {
         const data = JSON.parse(existingData)
-        if (data.email && (data.email.includes('bb@hotmail.com') || data.email.includes('sarah@example.com'))) {
+        if (data.email && (data.email.includes('bb@hotmail.com') || data.email.includes('sarah@example.com') || data.email.includes('amorea@123.com') || data.email.includes('bb@123.com'))) {
           console.log('🧹 Clearing old cached data on startup')
           localStorage.removeItem('btl_patient_data')
         }
@@ -97,9 +98,9 @@ const PatientRecoveryDashboard: React.FC = () => {
         const data = JSON.parse(storedData)
         console.log('📂 Loading patient data from localStorage:', data)
         
-        // Check if stored data is valid (not old Britny data)
-        if (data.email && data.email.includes('bb@hotmail.com')) {
-          console.log('🧹 Clearing old cached data for bb@hotmail.com')
+        // Check if stored data is valid (not old data)
+        if (data.email && (data.email.includes('bb@hotmail.com') || data.email.includes('amorea@123.com') || data.email.includes('bb@123.com'))) {
+          console.log('🧹 Clearing old cached data for invalid email:', data.email)
           localStorage.removeItem('btl_patient_data')
           console.log('ℹ️ Using default patient data instead')
         } else {
@@ -165,6 +166,9 @@ const PatientRecoveryDashboard: React.FC = () => {
     // Close the task modal
     setSelectedTask(null)
     
+    // Immediately trigger refresh of components
+    setRefreshKey(prev => prev + 1)
+    
     // Refresh data from backend to ensure sync
     setTimeout(() => {
       refreshPatientData().catch(error => {
@@ -222,6 +226,31 @@ const PatientRecoveryDashboard: React.FC = () => {
     }
   }, [patientData.email])
 
+  // Listen for custom events from Movement Session Dialog
+  useEffect(() => {
+    const handleOpenRecoveryScore = () => {
+      setShowScoreModal(true)
+    }
+
+    const handleOpenExerciseVideos = (event: any) => {
+      // Open the toolkit modal with exercise videos
+      setSelectedToolkit({
+        title: "Exercise Videos",
+        description: "Comprehensive exercise library with video demonstrations",
+        category: "videos",
+        count: 50
+      });
+    }
+
+    window.addEventListener('openRecoveryScore', handleOpenRecoveryScore)
+    window.addEventListener('openExerciseVideos', handleOpenExerciseVideos)
+
+    return () => {
+      window.removeEventListener('openRecoveryScore', handleOpenRecoveryScore)
+      window.removeEventListener('openExerciseVideos', handleOpenExerciseVideos)
+    }
+  }, [])
+
   // Extract current score number for the wheel
   const currentScore = (() => {
     try {
@@ -242,6 +271,8 @@ const PatientRecoveryDashboard: React.FC = () => {
 
   // Handler for opening the correct dialog based on card id
   const handleTaskDialogOpen = (task: any) => {
+    console.log('🎯 Task clicked:', task)
+    
     switch (task.id) {
       case "movement-session":
         setShowMovementDialog(true);
@@ -258,7 +289,10 @@ const PatientRecoveryDashboard: React.FC = () => {
       default:
         setSelectedTask(task); // fallback for any other tasks
     }
-  };
+  }
+
+    // Tasks data is handled by TodaysTasksSection component
+    // No need to fetch separately here
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-btl-50 to-white">
@@ -302,7 +336,7 @@ const PatientRecoveryDashboard: React.FC = () => {
               </div>
 
               {/* Weekly Points */}
-              <WeeklyPointsSection key={`points-${refreshKey}`} patientEmail={patientData.email} />
+              <WeeklyPointsSection key={`points-${refreshKey}`} patientEmail={patientData.email} refreshKey={refreshKey} />
             </div>
 
             {/* Recovery Toolkit and Assessments */}
@@ -317,10 +351,47 @@ const PatientRecoveryDashboard: React.FC = () => {
       {/* Modals */}
       {showScoreModal && <ScoreBreakdownModal score={currentScore} onClose={() => setShowScoreModal(false)} />}
       {/* Dialog modals for each recovery task */}
-      <MovementSessionDialog open={showMovementDialog} onClose={() => setShowMovementDialog(false)} patientId={patientData.email} />
-      <PainAssessmentDialog open={showPainDialog} onClose={() => setShowPainDialog(false)} patientId={patientData.email} />
-      <MindfulnessSessionDialog open={showMindfulnessDialog} onClose={() => setShowMindfulnessDialog(false)} patientId={patientData.email} />
-      <RecoveryInsightsDialog open={showInsightsDialog} onClose={() => setShowInsightsDialog(false)} patientId={patientData.email} />
+      <MovementSessionDialog 
+        open={showMovementDialog} 
+        onClose={() => setShowMovementDialog(false)} 
+        patientId={patientData.email}
+        onTaskComplete={handleTaskComplete}
+      />
+      <PainStressCheckDialog
+        open={showPainDialog}
+        onOpenChange={setShowPainDialog}
+        onComplete={(data: any) => {
+          console.log('Pain & stress check-in completed:', data)
+          setShowPainDialog(false)
+          refreshPatientData()
+        }}
+        onTaskComplete={handleTaskComplete}
+      />
+      <MindfulnessSessionDialog
+        open={showMindfulnessDialog}
+        onOpenChange={setShowMindfulnessDialog}
+        onComplete={(points: number) => {
+          console.log('Mindfulness completed, points:', points)
+          setShowMindfulnessDialog(false)
+          refreshPatientData()
+        }}
+        tracks={tasksData?.tasks?.mindfulness?.tracks || {}}
+        defaultTrack={tasksData?.tasks?.mindfulness?.defaultTrack || 'breathwork'}
+      />
+      <RecoveryInsightDialog
+        open={showInsightsDialog}
+        onOpenChange={setShowInsightsDialog}
+        onComplete={(points: number) => {
+          console.log('Recovery insight completed, points:', points)
+          setShowInsightsDialog(false)
+          refreshPatientData()
+        }}
+        snapshot={tasksData?.tasks?.recoveryInsight?.snapshot || { pain: 5, stress: 5, risk: 'low' }}
+        painDelta={tasksData?.painDelta || 0}
+        stressDelta={tasksData?.stressDelta || 0}
+        showActionPrompt={tasksData?.tasks?.recoveryInsight?.showActionPrompt || false}
+        actionPrompt={tasksData?.tasks?.recoveryInsight?.actionPrompt}
+      />
       {/* Fallback for any other tasks (legacy) */}
       {selectedTask && (
         <TaskModal 

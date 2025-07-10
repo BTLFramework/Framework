@@ -260,12 +260,12 @@ export function ExerciseModal({ isOpen, onClose, onComplete, patientId }: Exerci
                         <div className="flex items-center space-x-4 mt-2">
                           <div className="flex items-center space-x-1 text-gray-500">
                             <Clock className="w-4 h-4" />
-                            <span className="text-sm">{exercise.duration}</span>
+                            <span className="text-sm px-2 py-0.5 rounded-full bg-gray-100">{exercise.duration}</span>
                           </div>
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(exercise.difficulty)}`}>
                             {exercise.difficulty}
                           </span>
-                          <span className="text-sm text-btl-600 font-medium">+{exercise.points} pts</span>
+                          <span className="text-sm text-btl-600 font-medium px-2 py-0.5 rounded-full bg-btl-100">+{exercise.points} pts</span>
                         </div>
                       </div>
                     </div>
@@ -285,7 +285,7 @@ export function ExerciseModal({ isOpen, onClose, onComplete, patientId }: Exerci
                       phase: patientData.phase,
                       completedAt: new Date().toISOString()
                     })}
-                    className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-lg"
+                    className="px-8 py-3 bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors font-medium text-lg"
                   >
                     Complete Session ({exercises.reduce((sum, ex) => sum + ex.points, 0)} points)
                   </button>
@@ -299,14 +299,14 @@ export function ExerciseModal({ isOpen, onClose, onComplete, patientId }: Exerci
               {!showVideo ? (
                 <div className="mb-6">
                   <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl p-8 text-center">
-                    <div className="w-20 h-20 mx-auto mb-4 bg-btl-600 rounded-full flex items-center justify-center">
+                    <div className="w-20 h-20 mx-auto mb-4 bg-btl-600 rounded-full flex items-center justify-center border-2 border-btl-600">
                       <Play className="w-8 h-8 text-white ml-1" />
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Exercise Demonstration</h3>
                     <p className="text-gray-600 mb-4">Watch the video to see proper form and technique</p>
                     <button
                       onClick={() => setShowVideo(true)}
-                      className="bg-btl-600 text-white px-6 py-3 rounded-lg hover:bg-btl-700 transition-colors font-medium"
+                      className="bg-btl-600 text-white px-6 py-3 rounded-full hover:bg-btl-700 transition-colors font-medium"
                     >
                       Watch Video
                     </button>
@@ -316,12 +316,14 @@ export function ExerciseModal({ isOpen, onClose, onComplete, patientId }: Exerci
                 <div className="mb-6">
                   <div className="bg-gray-900 rounded-xl aspect-video flex items-center justify-center">
                     <div className="text-center text-white">
-                      <Play className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                      <div className="w-16 h-16 mx-auto mb-4 bg-btl-600 rounded-full flex items-center justify-center border-2 border-btl-600 opacity-50">
+                        <Play className="w-8 h-8 text-white ml-1" />
+                      </div>
                       <p className="text-lg">{currentExerciseData.name}</p>
                       <p className="text-sm opacity-75">Video ID: {currentExerciseData.videoId}</p>
                       <button
                         onClick={() => setShowVideo(false)}
-                        className="mt-4 text-sm text-btl-300 hover:text-white"
+                        className="mt-4 text-sm text-btl-300 hover:text-white px-3 py-1 rounded-full bg-black/50"
                       >
                         Hide Video
                       </button>
@@ -367,26 +369,26 @@ export function ExerciseModal({ isOpen, onClose, onComplete, patientId }: Exerci
                 <button
                   onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
                   disabled={currentStep === 0}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed rounded-full"
                 >
                   Previous Step
                 </button>
                 
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-gray-500 px-3 py-1 rounded-full bg-gray-100">
                   Step {currentStep + 1} of {currentExerciseData.instructions.length}
                 </div>
 
                 {currentStep < currentExerciseData.instructions.length - 1 ? (
                   <button
                     onClick={() => setCurrentStep(currentStep + 1)}
-                    className="px-4 py-2 bg-btl-600 text-white rounded-lg hover:bg-btl-700 transition-colors"
+                    className="px-4 py-2 bg-btl-600 text-white rounded-full hover:bg-btl-700 transition-colors"
                   >
                     Next Step
                   </button>
                 ) : (
                   <button
                     onClick={handleCompleteExercise}
-                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                    className="px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors font-medium"
                   >
                     Complete Exercise (+{currentExerciseData.points} pts)
                   </button>

@@ -15,11 +15,18 @@ interface ExerciseDetailsModalProps {
   open: boolean;
   onClose: () => void;
   onComplete?: (exerciseId: string) => void;
+  onVideoWatched?: (exerciseId: string) => void;
   isCompleted?: boolean;
 }
 
-export function ExerciseDetailsModal({ exercise, open, onClose, onComplete, isCompleted }: ExerciseDetailsModalProps) {
+export function ExerciseDetailsModal({ exercise, open, onClose, onComplete, onVideoWatched, isCompleted }: ExerciseDetailsModalProps) {
   if (!exercise) return null;
+
+  const handleVideoWatched = () => {
+    if (exercise?.id && onVideoWatched) {
+      onVideoWatched(exercise.id);
+    }
+  };
 
   return (
     <AssessmentDialog open={open} onOpenChange={onClose}>
@@ -33,10 +40,10 @@ export function ExerciseDetailsModal({ exercise, open, onClose, onComplete, isCo
             {exercise.description}
           </AssessmentDialogDescription>
           <div className="flex items-center gap-4 mt-4 text-btl-100">
-            <span>Duration: {exercise.duration}</span>
-            <span>Focus: {exercise.focus}</span>
-            <span>Difficulty: {exercise.difficulty}</span>
-            <span>Points: +{exercise.points}</span>
+            <span className="px-2 py-1 rounded-full bg-btl-100 text-btl-700">Duration: {exercise.duration}</span>
+            <span className="px-2 py-1 rounded-full bg-btl-100 text-btl-700">Focus: {exercise.focus}</span>
+            <span className="px-2 py-1 rounded-full bg-btl-100 text-btl-700">Difficulty: {exercise.difficulty}</span>
+            <span className="px-2 py-1 rounded-full bg-btl-100 text-btl-700">Points: +{exercise.points}</span>
           </div>
         </AssessmentDialogHeader>
         
@@ -45,7 +52,15 @@ export function ExerciseDetailsModal({ exercise, open, onClose, onComplete, isCo
             <div className="mb-6 aspect-video rounded-xl overflow-hidden bg-gray-100">
               {/* TODO: Implement video player */}
               <div className="w-full h-full flex items-center justify-center text-gray-400">
-                Video demonstration coming soon
+                <div className="text-center">
+                  <div className="mb-4">Video demonstration coming soon</div>
+                  <button
+                    onClick={handleVideoWatched}
+                    className="px-4 py-2 bg-btl-600 text-white rounded-full hover:bg-btl-700 transition-colors"
+                  >
+                    Mark Video as Watched
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -61,7 +76,7 @@ export function ExerciseDetailsModal({ exercise, open, onClose, onComplete, isCo
                   <ol className="space-y-2">
                     {exercise.instructions.map((instruction: string, i: number) => (
                       <li key={i} className="flex text-sm text-cyan-700">
-                        <span className="mr-2 text-cyan-500">{i + 1}.</span>
+                        <span className="mr-2 text-cyan-500 px-2 py-0.5 rounded-full bg-cyan-100">{i + 1}.</span>
                         <span>{instruction}</span>
                       </li>
                     ))}
@@ -75,14 +90,14 @@ export function ExerciseDetailsModal({ exercise, open, onClose, onComplete, isCo
         <AssessmentDialogFooter>
           <button
             onClick={onClose}
-            className="w-full sm:w-auto px-8 py-3 rounded-xl font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+            className="w-full sm:w-auto px-8 py-3 rounded-full font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
           >
             Close
           </button>
           {onComplete && !isCompleted && (
             <button
               onClick={() => onComplete(exercise.id || '')}
-              className="w-full sm:w-auto px-8 py-3 rounded-xl font-semibold bg-btl-600 text-white hover:bg-btl-700 transition-colors"
+              className="w-full sm:w-auto px-8 py-3 rounded-full font-semibold bg-btl-600 text-white hover:bg-btl-700 transition-colors"
             >
               Mark as Complete
             </button>
@@ -90,7 +105,7 @@ export function ExerciseDetailsModal({ exercise, open, onClose, onComplete, isCo
           {isCompleted && (
             <button
               onClick={() => onComplete?.(exercise.id || '')}
-              className="w-full sm:w-auto px-8 py-3 rounded-xl font-semibold bg-gray-600 text-white hover:bg-gray-700 transition-colors"
+              className="w-full sm:w-auto px-8 py-3 rounded-full font-semibold bg-gray-600 text-white hover:bg-gray-700 transition-colors"
             >
               Mark as Incomplete
             </button>

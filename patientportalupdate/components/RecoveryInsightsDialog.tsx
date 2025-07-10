@@ -26,6 +26,54 @@ export function RecoveryInsightsDialog({ open, onClose, patientId }: RecoveryIns
   const viewedInsights = insights.filter(insight => insight.viewed).length;
   const totalInsights = insights.length;
 
+  // Only show skeleton while data is truly undefined
+  if (patientData === undefined) {
+    return (
+      <AssessmentDialog open={open} onOpenChange={onClose}>
+        <AssessmentDialogContent>
+          <AssessmentDialogHeader>
+            <AssessmentDialogTitle className="flex items-center gap-2">
+              <LineChart className="w-8 h-8 text-white" />
+              Recovery Insights
+            </AssessmentDialogTitle>
+          </AssessmentDialogHeader>
+          <AssessmentDialogBody>
+            <div className="animate-pulse flex flex-col items-center py-16">
+              <div className="w-14 h-14 bg-btl-200 rounded-xl mb-4 mt-1"></div>
+              <div className="h-6 bg-btl-200 rounded mb-1 w-32"></div>
+              <div className="h-4 bg-btl-200 rounded mb-3 w-48"></div>
+              <div className="h-5 bg-btl-200 rounded mb-3 w-24"></div>
+              <div className="h-5 bg-btl-200 rounded mb-2 w-16"></div>
+              <div className="h-4 bg-btl-200 rounded mb-2 w-20"></div>
+              <div className="h-4 bg-btl-200 rounded mt-auto w-16"></div>
+            </div>
+          </AssessmentDialogBody>
+        </AssessmentDialogContent>
+      </AssessmentDialog>
+    );
+  }
+
+  if (patientError) {
+    return (
+      <AssessmentDialog open={open} onOpenChange={onClose}>
+        <AssessmentDialogContent>
+          <AssessmentDialogHeader>
+            <AssessmentDialogTitle className="flex items-center gap-2">
+              <LineChart className="w-8 h-8 text-white" />
+              Recovery Insights
+            </AssessmentDialogTitle>
+          </AssessmentDialogHeader>
+          <AssessmentDialogBody>
+            <div className="text-center text-red-500 py-8">
+              <AlertCircle className="w-8 h-8 mx-auto mb-2" />
+              Error loading patient data.
+            </div>
+          </AssessmentDialogBody>
+        </AssessmentDialogContent>
+      </AssessmentDialog>
+    );
+  }
+
   return (
     <AssessmentDialog open={open} onOpenChange={onClose}>
       <AssessmentDialogContent>
@@ -42,26 +90,10 @@ export function RecoveryInsightsDialog({ open, onClose, patientId }: RecoveryIns
             totalSteps={totalInsights} 
           />
         </AssessmentDialogHeader>
-        
         <AssessmentDialogBody>
-          {patientLoading && (
-            <div className="text-center text-btl-600 py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-btl-600 mx-auto mb-4"></div>
-              Loading patient data...
-            </div>
-          )}
-          
-          {patientError && (
-            <div className="text-center text-red-500 py-8">
-              <AlertCircle className="w-8 h-8 mx-auto mb-2" />
-              Error loading patient data.
-            </div>
-          )}
-          
-          {!patientLoading && !patientError && insights.length === 0 && (
+          {insights.length === 0 && (
             <div className="text-center text-btl-600">No recovery insights available yet.</div>
           )}
-          
           {insights.length > 0 && (
             <div className="space-y-4">
               {insights.map((insight: RecoveryInsight, idx: number) => (
@@ -130,7 +162,6 @@ export function RecoveryInsightsDialog({ open, onClose, patientId }: RecoveryIns
             </div>
           )}
         </AssessmentDialogBody>
-
         <AssessmentDialogFooter>
           <button
             onClick={onClose}

@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Home, Target, Heart, Wrench, FileText, MessageCircle, ChevronRight, Clock } from "lucide-react"
+import { Home, Target, Heart, Wrench, FileText, MessageCircle, ChevronRight, Clock, ClipboardList } from "lucide-react"
 
 const navigationItems = [
   { name: "Home", icon: Home, href: "/", active: true },
+  { name: "Intake Form", icon: ClipboardList, href: "/intake" },
   { name: "Today's Tasks", icon: Clock, href: "/todays-tasks" },
   { name: "Recovery Score", icon: Target, href: "/recovery-score" },
   { name: "Recovery Points", icon: Heart, href: "/recovery-points" },
@@ -23,11 +24,16 @@ export function LeftSidebar({ patientData }: LeftSidebarProps) {
   const [activeItem, setActiveItem] = useState("Home")
   const [unreadCount, setUnreadCount] = useState(0)
 
-  // This should be dynamic - get from patient context/auth
-  const patientId = 1; // TODO: Get from authentication context
+  // Get patient ID from patientData prop
+  const patientId = patientData?.id || 1; // Fallback to 1 if no patient data
 
   // Fetch unread message count
   useEffect(() => {
+    // Only fetch if we have a valid patient ID
+    if (!patientId || patientId === 1) {
+      return; // Don't fetch for invalid patient ID
+    }
+
     const fetchUnreadCount = async () => {
       try {
         const response = await fetch(`/api/messages/patient/${patientId}`)
@@ -51,8 +57,8 @@ export function LeftSidebar({ patientData }: LeftSidebarProps) {
 
     fetchUnreadCount()
     
-    // Poll for new messages every 30 seconds
-    const interval = setInterval(fetchUnreadCount, 30000)
+    // Poll for new messages every 60 seconds (reduced frequency)
+    const interval = setInterval(fetchUnreadCount, 60000)
     
     return () => clearInterval(interval)
   }, [patientId])

@@ -1,21 +1,23 @@
-import { Heart, AlertCircle } from "lucide-react";
+import { Heart, Award, PartyPopper } from "lucide-react";
 import { useState } from "react";
 import { usePatientRecoveryData } from "@/hooks/usePatientData";
+import { addRecoveryPoints } from "@/lib/recoveryPointsApi";
 import {
   AssessmentDialog,
   AssessmentDialogContent,
   AssessmentDialogHeader,
   AssessmentDialogTitle,
   AssessmentDialogDescription,
-  AssessmentDialogProgress,
   AssessmentDialogBody,
   AssessmentDialogFooter,
 } from "@/components/ui/assessment-dialog";
+import { SkeletonCard } from "./SkeletonCard";
 
 interface PainAssessmentDialogProps {
   open: boolean;
   onClose: () => void;
   patientId: string;
+  onTaskComplete?: (taskData: any) => void;
 }
 
 interface PainAssessment {
@@ -25,173 +27,307 @@ interface PainAssessment {
   notes: string;
 }
 
-export function PainAssessmentDialog({ open, onClose, patientId }: PainAssessmentDialogProps) {
-  const { data: patientData, error: patientError, isLoading: patientLoading } = usePatientRecoveryData(patientId);
+const PAIN_TYPES = [
+  "Sharp",
+  "Dull",
+  "Throbbing",
+  "Burning",
+  "Aching",
+  "Stabbing",
+  "Other"
+];
+
+const metallicPills = {
+  bronze: 'bg-gradient-to-br from-[#b08d57] via-[#a97142] to-[#7c5c36] text-white shadow border border-[#a97142] rounded-full',
+};
+
+export function PainAssessmentDialog({ open, onClose, patientId, onTaskComplete }: PainAssessmentDialogProps) {
+  const { data: patientData, error: patientError } = usePatientRecoveryData(patientId, 'pain', open);
   const [assessment, setAssessment] = useState<PainAssessment>({
     level: 0,
     location: "",
     type: "",
     notes: ""
   });
+  const [showCelebration, setShowCelebration] = useState(false);
 
-  const steps = ["Pain Level", "Location", "Type", "Notes"];
-  const currentStep = assessment.level > 0 ? 1 : 0;
-  const completedSteps = [
-    assessment.level > 0,
-    !!assessment.location,
-    !!assessment.type,
-    !!assessment.notes
-  ].filter(Boolean).length;
+  const canSubmit =
+    assessment.level > 0 &&
+    assessment.location.trim().length > 0 &&
+    assessment.type.trim().length > 0;
+
+  const handleChange = (field: keyof PainAssessment, value: string | number) => {
+    setAssessment((a) => ({ ...a, [field]: value }));
+  };
+
+  const handleSubmit = async () => {
+    console.log('Complete Assessment clicked!');
+    
+    try {
+      // Get patient ID from email first
+      const patientResponse = await fetch(`/api/patients/portal-data/${patientId}`)
+      if (!patientResponse.ok) {
+        throw new Error('Failed to get patient data')
+      }
+      const patientData = await patientResponse.json()
+      const numericPatientId = patientData.data.patient.id
+      
+      // Add recovery points for the completed assessment
+      const result = await addRecoveryPoints(
+        numericPatientId.toString(),
+        'LIFESTYLE',
+        'Pain assessment completed',
+        3
+      );
+      
+      if (result.success) {
+        console.log('✅ Recovery points added successfully:', result.pointsAdded);
+        // Show celebration with actual points earned
+        setShowCelebration(true);
+        
+        // Call parent's task completion handler to trigger refresh
+        if (onTaskComplete) {
+          onTaskComplete({
+            taskId: 'pain-assessment',
+            taskTitle: 'Pain Assessment',
+            pointsEarned: 3,
+            assessmentData: assessment
+          });
+        }
+        
+        // Close the dialog after a short delay to show celebration
+        setTimeout(() => {
+          onClose();
+        }, 2000);
+      } else {
+        console.error('❌ Failed to add recovery points:', result.error);
+        // Still show celebration but log the error
+        setShowCelebration(true);
+        
+        // Still call parent's task completion handler
+        if (onTaskComplete) {
+          onTaskComplete({
+            taskId: 'pain-assessment',
+            taskTitle: 'Pain Assessment',
+            pointsEarned: 3,
+            assessmentData: assessment
+          });
+        }
+        
+        // Close the dialog after a short delay
+        setTimeout(() => {
+          onClose();
+        }, 2000);
+      }
+    } catch (error) {
+      console.error('❌ Error completing assessment:', error);
+      // Still show celebration
+      setShowCelebration(true);
+      
+      // Still call parent's task completion handler
+      if (onTaskComplete) {
+        onTaskComplete({
+          taskId: 'pain-assessment',
+          taskTitle: 'Pain Assessment',
+          pointsEarned: 3,
+          assessmentData: assessment
+        });
+      }
+      
+      // Close the dialog after a short delay
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+    }
+  };
+
+  if (!open) return null;
+  if (patientData === undefined) {
+    return (
+      <AssessmentDialog open={open} onOpenChange={onClose}>
+        <AssessmentDialogContent className="max-w-3xl h-[90vh] flex flex-col rounded-2xl shadow-2xl bg-white p-0 overflow-hidden">
+          <div className="bg-gradient-to-br from-btl-900 via-btl-700 to-btl-100 px-8 pt-8 pb-4 border-b border-white/40">
+            <div className="flex items-center gap-8">
+              <Heart className="w-12 h-12 text-white opacity-90" />
+              <h2 className="text-3xl font-bold text-white">Pain Assessment</h2>
+            </div>
+            <p className="mt-2 text-btl-100 text-sm">
+              Please complete your daily pain assessment to help us track your recovery.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center gap-4 text-white/90 text-base">
+              <div className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5">
+                <span>Assessment</span>
+              </div>
+              <div className={`flex items-center gap-2 px-4 py-1.5 font-bold text-sm ${metallicPills.bronze}`}>
+                +20 pts
+              </div>
+            </div>
+          </div>
+          <AssessmentDialogBody className="flex-1 p-6 pt-0 overflow-y-auto" style={{ maxHeight: '600px' }}>
+            <SkeletonCard title="Pain Assessment" icon={<Heart className="w-8 h-8 text-btl-400" />} />
+          </AssessmentDialogBody>
+        </AssessmentDialogContent>
+      </AssessmentDialog>
+    );
+  }
+  if (patientError) {
+    return (
+      <AssessmentDialog open={open} onOpenChange={onClose}>
+        <AssessmentDialogContent className="max-w-3xl h-[90vh] flex flex-col rounded-2xl shadow-2xl bg-white p-0 overflow-hidden">
+          <div className="bg-gradient-to-br from-btl-900 via-btl-700 to-btl-100 px-8 pt-8 pb-4 border-b border-white/40">
+            <div className="flex items-center gap-8">
+              <Heart className="w-12 h-12 text-white opacity-90" />
+              <h2 className="text-3xl font-bold text-white">Pain Assessment</h2>
+            </div>
+            <p className="mt-2 text-btl-100 text-sm">
+              Please complete your daily pain assessment to help us track your recovery.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center gap-4 text-white/90 text-base">
+              <div className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5">
+                <span>Assessment</span>
+              </div>
+              <div className={`flex items-center gap-2 px-4 py-1.5 font-bold text-sm ${metallicPills.bronze}`}>
+                +20 pts
+              </div>
+            </div>
+          </div>
+          <AssessmentDialogBody className="flex-1 p-6 pt-0 overflow-y-auto" style={{ maxHeight: '600px' }}>
+            <div className="text-center text-red-500 py-8">Error loading patient data.</div>
+          </AssessmentDialogBody>
+        </AssessmentDialogContent>
+      </AssessmentDialog>
+    );
+  }
 
   return (
     <AssessmentDialog open={open} onOpenChange={onClose}>
-      <AssessmentDialogContent>
-        <AssessmentDialogHeader>
-          <AssessmentDialogTitle className="flex items-center gap-2">
-            <Heart className="w-8 h-8 text-white" />
-            Pain Assessment
-          </AssessmentDialogTitle>
-          <AssessmentDialogDescription>
-            Track your pain levels and symptoms to help us understand your recovery progress.
-          </AssessmentDialogDescription>
-          <AssessmentDialogProgress 
-            step={completedSteps} 
-            totalSteps={steps.length} 
-          />
-        </AssessmentDialogHeader>
-        
-        <AssessmentDialogBody>
-          {patientLoading && (
-            <div className="text-center text-btl-600 py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-btl-600 mx-auto mb-4"></div>
-              Loading patient data...
+      <AssessmentDialogContent className="max-w-3xl h-[90vh] flex flex-col rounded-2xl shadow-2xl bg-white p-0 overflow-hidden">
+        <div className="bg-gradient-to-br from-btl-900 via-btl-700 to-btl-100 px-8 pt-8 pb-4 border-b border-white/40">
+          <div className="flex items-center gap-8">
+            <Heart className="w-12 h-12 text-white opacity-90" />
+            <h2 className="text-3xl font-bold text-white">Pain Assessment</h2>
+          </div>
+          <p className="mt-2 text-btl-100 text-sm">
+            Please complete your daily pain assessment to help us track your recovery.
+          </p>
+          <div className="mt-6 flex flex-wrap items-center gap-4 text-white/90 text-base">
+            <div className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5">
+              <span>Assessment</span>
             </div>
-          )}
-          
-          {patientError && (
-            <div className="text-center text-red-500 py-8">
-              <AlertCircle className="w-8 h-8 mx-auto mb-2" />
-              Error loading patient data.
+            <div className={`flex items-center gap-2 px-4 py-1.5 font-bold text-sm ${metallicPills.bronze}`}>
+              +20 pts
             </div>
-          )}
-          
-          {!patientLoading && !patientError && (
-            <div className="space-y-4">
-              {/* Pain Level */}
-              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 rounded-full bg-gradient-to-r from-teal-500 to-cyan-600"></div>
-                    <h3 className="text-lg font-semibold text-gray-900">Pain Level</h3>
-                  </div>
-                  <div className="text-sm font-medium text-btl-600">+5 pts</div>
-                </div>
-                <p className="text-gray-600 mb-4">Rate your current pain level from 0 (no pain) to 10 (worst pain).</p>
-                <div className="space-y-4">
-                  <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    value={assessment.level}
-                    onChange={(e) => setAssessment({ ...assessment, level: parseInt(e.target.value) })}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-btl-600"
-                  />
-                  <div className="flex justify-between text-sm text-gray-500">
-                    <span>No Pain (0)</span>
-                    <span>Moderate (5)</span>
-                    <span>Severe (10)</span>
-                  </div>
-                  <div className="text-center text-2xl font-bold text-btl-600">
-                    {assessment.level}
-                  </div>
-                </div>
+          </div>
+        </div>
+        <AssessmentDialogBody className="flex-1 p-6 pt-0 overflow-y-auto" style={{ maxHeight: '600px' }}>
+          <div className="flex flex-col gap-6 max-w-xl mx-auto w-full">
+            {/* Pain Level */}
+            <div className="bg-white rounded-xl shadow border border-btl-100 p-6 flex flex-col gap-2">
+              <label className="font-semibold text-btl-700 text-lg mb-2 block">How would you rate your pain right now?</label>
+              <input
+                type="range"
+                min={0}
+                max={10}
+                value={assessment.level}
+                onChange={e => handleChange("level", Number(e.target.value))}
+                className="w-full accent-btl-600"
+              />
+              <div className="flex justify-between w-full text-xs text-btl-600">
+                <span>0</span>
+                <span>5</span>
+                <span>10</span>
               </div>
-
-              {/* Pain Location */}
-              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 rounded-full bg-gradient-to-r from-teal-500 to-cyan-600"></div>
-                    <h3 className="text-lg font-semibold text-gray-900">Pain Location</h3>
-                  </div>
-                  <div className="text-sm font-medium text-btl-600">+5 pts</div>
-                </div>
-                <p className="text-gray-600 mb-4">Select the area where you're experiencing pain.</p>
-                <select
-                  value={assessment.location}
-                  onChange={(e) => setAssessment({ ...assessment, location: e.target.value })}
-                  className="w-full p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-btl-500"
-                >
-                  <option value="">Select location...</option>
-                  <option value="neck">Neck</option>
-                  <option value="shoulder">Shoulder</option>
-                  <option value="back">Back</option>
-                  <option value="hip">Hip</option>
-                  <option value="knee">Knee</option>
-                  <option value="ankle">Ankle</option>
-                </select>
-              </div>
-
-              {/* Pain Type */}
-              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 rounded-full bg-gradient-to-r from-teal-500 to-cyan-600"></div>
-                    <h3 className="text-lg font-semibold text-gray-900">Pain Type</h3>
-                  </div>
-                  <div className="text-sm font-medium text-btl-600">+5 pts</div>
-                </div>
-                <p className="text-gray-600 mb-4">Describe the type of pain you're experiencing.</p>
-                <select
-                  value={assessment.type}
-                  onChange={(e) => setAssessment({ ...assessment, type: e.target.value })}
-                  className="w-full p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-btl-500"
-                >
-                  <option value="">Select type...</option>
-                  <option value="sharp">Sharp</option>
-                  <option value="dull">Dull</option>
-                  <option value="aching">Aching</option>
-                  <option value="burning">Burning</option>
-                  <option value="throbbing">Throbbing</option>
-                  <option value="stabbing">Stabbing</option>
-                </select>
-              </div>
-
-              {/* Additional Notes */}
-              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 rounded-full bg-gradient-to-r from-teal-500 to-cyan-600"></div>
-                    <h3 className="text-lg font-semibold text-gray-900">Additional Notes</h3>
-                  </div>
-                  <div className="text-sm font-medium text-btl-600">+5 pts</div>
-                </div>
-                <p className="text-gray-600 mb-4">Add any additional details about your pain or symptoms.</p>
-                <textarea
-                  value={assessment.notes}
-                  onChange={(e) => setAssessment({ ...assessment, notes: e.target.value })}
-                  placeholder="Describe when the pain occurs, what makes it better or worse..."
-                  className="w-full h-32 p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-btl-500 resize-none"
-                />
-              </div>
+              <div className="text-btl-700 font-bold text-2xl mt-2 text-center">{assessment.level}</div>
             </div>
-          )}
+            {/* Location */}
+            <div className="bg-white rounded-xl shadow border border-btl-100 p-6 flex flex-col gap-2">
+              <label className="font-semibold text-btl-700 text-lg mb-2 block">Where is your pain located?</label>
+              <input
+                type="text"
+                value={assessment.location}
+                onChange={e => handleChange("location", e.target.value)}
+                className="rounded-lg border border-btl-200 px-3 py-2 focus:outline-btl-600 w-full"
+                placeholder="e.g. Lower back, neck, etc."
+              />
+            </div>
+            {/* Type */}
+            <div className="bg-white rounded-xl shadow border border-btl-100 p-6 flex flex-col gap-2">
+              <label className="font-semibold text-btl-700 text-lg mb-2 block">What type of pain is it?</label>
+              <select
+                value={assessment.type}
+                onChange={e => handleChange("type", e.target.value)}
+                className="rounded-lg border border-btl-200 px-3 py-2 focus:outline-btl-600 w-full"
+              >
+                <option value="">Select type</option>
+                {PAIN_TYPES.map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+            {/* Notes */}
+            <div className="bg-white rounded-xl shadow border border-btl-100 p-6 flex flex-col gap-2">
+              <label className="font-semibold text-btl-700 text-lg mb-2 block">Any notes or details?</label>
+              <textarea
+                value={assessment.notes}
+                onChange={e => handleChange("notes", e.target.value)}
+                className="rounded-lg border border-btl-200 px-3 py-2 focus:outline-btl-600 w-full min-h-[80px]"
+                placeholder="Optional"
+              />
+            </div>
+          </div>
         </AssessmentDialogBody>
 
-        <AssessmentDialogFooter>
-          <button
-            onClick={onClose}
-            className="w-full sm:w-auto px-8 py-3 rounded-xl font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={() => {/* TODO: Implement assessment submission */}}
-            className="w-full sm:w-auto px-8 py-3 rounded-xl font-semibold bg-btl-600 text-white hover:bg-btl-700 transition-colors"
-            disabled={completedSteps < steps.length}
-          >
-            Submit Assessment
-          </button>
+        {/* Celebration Message - moved outside scrollable area */}
+        {showCelebration && (
+          <div className="px-6 py-4 bg-yellow-50 border-t border-yellow-200">
+            <div className="flex items-center justify-center">
+              <div
+                className="flex items-center justify-center px-5 py-3 rounded-xl bg-yellow-100 border-2 border-yellow-300 shadow-lg animate-pulse"
+                style={{
+                  borderColor: '#FFC700',
+                  boxShadow: '0 4px 16px 0 rgba(255,199,0,0.20)',
+                }}
+              >
+                <Award className="w-8 h-8 mr-3" style={{ color: '#FFC700' }} />
+                <span
+                  className="font-extrabold text-xl tracking-wide text-blue-800"
+                  style={{
+                    color: '#155fa0',
+                  }}
+                >
+                  +3 Recovery Points Earned! 🎉
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <AssessmentDialogFooter className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-3">
+              <div className={`px-4 py-2 font-medium text-sm ${metallicPills.bronze}`}>
+                Total: 3 pts
+              </div>
+            </div>
+            <button
+              onClick={handleSubmit}
+              className={`px-6 py-2 rounded-full font-medium transition-colors ${
+                canSubmit
+                  ? 'bg-green-500 text-white hover:bg-green-600'
+                  : 'bg-btl-600 text-white hover:bg-btl-700'
+              }`}
+              disabled={!canSubmit}
+            >
+              {canSubmit ? (
+                <div className="flex items-center gap-2">
+                  <Award className="w-4 h-4" />
+                  Complete Assessment
+                </div>
+              ) : (
+                'Complete Assessment'
+              )}
+            </button>
+          </div>
         </AssessmentDialogFooter>
       </AssessmentDialogContent>
     </AssessmentDialog>

@@ -2,17 +2,23 @@
 
 import { useState, useEffect } from "react"
 import { ArrowLeft, FileText, Search, Play, Download, BookOpen, Dumbbell, Target, Clock } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { usePatientRecoveryData } from "@/hooks/usePatientData"
 import { useExercises } from "@/hooks/useExercises"
 import { exercises as allExercises } from "@/lib/exerciseLibrary"
+import { ExerciseVideoModal } from "@/components/exercise-video-modal"
 
 export default function RecoveryToolsPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [activeCategory, setActiveCategory] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedExercise, setSelectedExercise] = useState<any>(null)
   const [patientId, setPatientId] = useState<string>("")
+
+  // Get URL parameters for filtering
+  const phaseFilter = searchParams.get('phase')
+  const regionFilter = searchParams.get('region')
 
   // Fetch patient data via SWR
   const { data: patientData, error: patientError, isLoading: patientLoading } = usePatientRecoveryData(patientId, "patient", !!patientId)
@@ -37,6 +43,26 @@ export default function RecoveryToolsPage() {
 
     loadPatientData()
   }, [])
+
+  // Set initial category based on URL parameters
+  useEffect(() => {
+    if (phaseFilter || regionFilter) {
+      setActiveCategory("videos")
+    }
+  }, [phaseFilter, regionFilter])
+
+  // Group exercises by region for better organization
+  const groupExercisesByRegion = (exercises: any[]) => {
+    const grouped: { [key: string]: any[] } = {}
+    exercises.forEach(exercise => {
+      const region = (exercise as any).region || (exercise as any).exerciseData?.region || 'Other'
+      if (!grouped[region]) {
+        grouped[region] = []
+      }
+      grouped[region].push(exercise)
+    })
+    return grouped
+  }
 
   const categories = [
     { id: "all", name: "All Tools", count: 24 + patientExercises.length + allExercises.length },
@@ -119,6 +145,7 @@ export default function RecoveryToolsPage() {
     difficulty: exercise.difficulty,
     points: exercise.points,
     phase: exercise.phase,
+    region: exercise.region,
     type: "exercise",
     exerciseData: exercise
   }))
@@ -132,8 +159,8 @@ export default function RecoveryToolsPage() {
     duration: exercise.duration,
     difficulty: exercise.difficulty,
     phase: exercise.phase,
-    srsRange: "4-7", // Default range since we don't have SRS in new library
     region: exercise.region,
+    srsRange: "4-7", // Default range since we don't have SRS in new library
     thumbnail: "/placeholder.svg?height=120&width=200",
     type: "video",
     exerciseData: exercise
@@ -147,8 +174,18 @@ export default function RecoveryToolsPage() {
     const matchesSearch =
       tool.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       tool.description.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesCategory && matchesSearch
+    
+    // Apply URL parameter filters
+    const matchesPhase = !phaseFilter || (tool as any).phase === phaseFilter
+    const matchesRegion = !regionFilter || (tool as any).region === regionFilter
+    
+    return matchesCategory && matchesSearch && matchesPhase && matchesRegion
   })
+
+  // Group filtered tools by region for exercise videos
+  const groupedExerciseVideos = groupExercisesByRegion(
+    filteredTools.filter(tool => tool.category === "videos" && (tool as any).exerciseData)
+  )
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -177,15 +214,21 @@ export default function RecoveryToolsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-teal-50">
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center space-x-4">
-          <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Recovery Tools</h1>
-            <p className="text-gray-600">Videos, guides, and tools to support your recovery</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-6 py-4">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.back()}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </button>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Recovery Tools</h1>
+              <p className="text-gray-600">Videos, guides, and tools to support your recovery</p>
+            </div>
           </div>
         </div>
       </div>
@@ -223,6 +266,30 @@ export default function RecoveryToolsPage() {
             </div>
           </div>
 
+          {/* Filter Status */}
+          {(phaseFilter || regionFilter) && (
+            <div className="bg-gradient-to-r from-btl-50 to-white rounded-xl shadow-lg p-6 border border-btl-200 mb-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Filtered Results</h3>
+                  <p className="text-gray-600">
+                    {phaseFilter && `Phase: ${phaseFilter}`}
+                    {phaseFilter && regionFilter && " • "}
+                    {regionFilter && `Region: ${regionFilter}`}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    router.push('/recovery-tools')
+                  }}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Patient Summary */}
           {patientLoading ? (
             <div className="bg-gradient-to-r from-btl-50 to-white rounded-xl shadow-lg p-6 border border-btl-200 mb-6">
@@ -255,119 +322,172 @@ export default function RecoveryToolsPage() {
           ) : null}
 
           {/* Tools Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTools.map((tool) => {
-              const IconComponent = getIcon(tool.type)
-              return (
-                <div
-                  key={tool.id}
-                  className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
-                >
-                  {/* Exercise vs Regular Tool Rendering */}
-                  {tool.type === "exercise" ? (
-                    <>
-                      {/* Exercise Header */}
-                      <div className="relative bg-gradient-to-br from-btl-50 to-btl-100 p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center space-x-2">
-                            <div className="bg-btl-600 rounded-full p-2">
-                              <Dumbbell className="w-4 h-4 text-white" />
+          {activeCategory === "videos" ? (
+            // Grouped Exercise Videos by Region
+            <div className="space-y-8">
+              {Object.entries(groupedExerciseVideos).map(([region, exercises]) => (
+                <div key={region} className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                  <div className="bg-gradient-to-r from-btl-50 to-btl-100 px-6 py-4 border-b border-btl-200">
+                    <h3 className="text-xl font-semibold text-gray-900">{region}</h3>
+                    <p className="text-gray-600 text-sm">{Array.isArray(exercises) ? exercises.length : 0} exercises available</p>
+                  </div>
+                  <div className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {Array.isArray(exercises) && exercises.length > 0 ? (
+                        exercises.map((tool) => (
+                          <div
+                            key={tool.id}
+                            className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
+                          >
+                            <div className="relative">
+                              <img
+                                src={(tool as any).thumbnail || "/placeholder.svg"}
+                                alt={tool.title}
+                                className="w-full h-32 object-cover"
+                              />
+                              <div className="absolute top-2 right-2">
+                                <div className="bg-white bg-opacity-90 rounded-full p-2 border-2 border-teal-600">
+                                  <Play className="w-4 h-4 text-teal-600" />
+                                </div>
+                              </div>
+                              <div className="absolute top-2 left-2">
+                                <span className="text-xs bg-btl-600 text-white px-2 py-1 rounded-full font-medium">
+                                  {(tool as any).phase} Phase
+                                </span>
+                              </div>
                             </div>
-                            <span className="text-xs font-medium text-btl-700 bg-btl-200 px-2 py-1 rounded-full">
-                              {(tool as any).phase} Phase
-                            </span>
-                          </div>
-                          <div className="text-right">
-                            <div className="flex items-center space-x-1 text-btl-600">
-                              <Target className="w-3 h-3" />
-                              <span className="text-xs font-medium">+{(tool as any).points} pts</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-center py-4">
-                          <div className="w-12 h-12 mx-auto bg-btl-600 rounded-full flex items-center justify-center mb-2">
-                            <Play className="w-6 h-6 text-white ml-0.5" />
-                          </div>
-                          <p className="text-xs text-btl-600 font-medium">Personalized Exercise</p>
-                        </div>
-                      </div>
 
-                      {/* Exercise Content */}
-                      <div className="p-4">
-                        <h3 className="font-semibold text-gray-900 mb-2">{tool.title}</h3>
-                        <p className="text-gray-600 text-sm mb-3 line-clamp-2">{tool.description}</p>
+                            <div className="p-4">
+                              <h3 className="font-semibold text-gray-900 mb-2">{tool.title}</h3>
+                              <p className="text-gray-600 text-sm mb-3 line-clamp-2">{tool.description}</p>
 
-                        <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-                          <div className="flex items-center space-x-1">
-                            <Clock className="w-3 h-3" />
-                            <span>{tool.duration}</span>
-                          </div>
-                          <span className="bg-btl-100 text-btl-700 px-2 py-1 rounded-full font-medium">
-                            {tool.difficulty}
-                          </span>
-                        </div>
+                              <div className="mb-3 p-2 bg-gray-50 rounded-xl text-xs">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-600 px-2 py-0.5 rounded-full bg-gray-200">SRS: {(tool as any).srsRange}</span>
+                                  <span className="text-gray-600 px-2 py-0.5 rounded-full bg-gray-200">{(tool as any).region}</span>
+                                </div>
+                              </div>
 
-                        <button 
-                          onClick={() => setSelectedExercise(tool)}
-                          className="w-full bg-gradient-to-r from-btl-600 to-btl-700 text-white py-2 px-4 rounded-lg hover:from-btl-700 hover:to-btl-800 transition-all duration-200 font-medium"
-                        >
-                          Start Exercise
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {/* Regular Tool Rendering */}
-                      <div className="relative">
-                        <img
-                          src={(tool as any).thumbnail || "/placeholder.svg"}
-                          alt={tool.title}
-                          className="w-full h-32 object-cover"
-                        />
-                        <div className="absolute top-2 right-2">
-                          <div className="bg-white bg-opacity-90 rounded-full p-2">
-                            <IconComponent className="w-4 h-4 text-teal-600" />
-                          </div>
-                        </div>
-                        {/* Exercise Video Badge */}
-                        {tool.category === "videos" && (tool as any).exerciseData && (
-                          <div className="absolute top-2 left-2">
-                            <span className="text-xs bg-btl-600 text-white px-2 py-1 rounded-full font-medium">
-                              {(tool as any).phase} Phase
-                            </span>
-                          </div>
-                        )}
-                      </div>
+                              <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
+                                <span className="px-2 py-0.5 rounded-full bg-gray-100">{tool.duration}</span>
+                                <span className="bg-gray-100 px-2 py-1 rounded-full">{tool.difficulty}</span>
+                              </div>
 
-                      <div className="p-4">
-                        <h3 className="font-semibold text-gray-900 mb-2">{tool.title}</h3>
-                        <p className="text-gray-600 text-sm mb-3 line-clamp-2">{tool.description}</p>
-
-                        {/* Exercise Video Details */}
-                        {tool.category === "videos" && (tool as any).exerciseData && (
-                          <div className="mb-3 p-2 bg-gray-50 rounded-lg text-xs">
-                            <div className="flex justify-between items-center">
-                              <span className="text-gray-600">SRS: {(tool as any).srsRange}</span>
-                              <span className="text-gray-600">{(tool as any).region}</span>
+                              <button 
+                                onClick={() => setSelectedExercise(tool.exerciseData || tool)}
+                                className="w-full bg-gradient-to-r from-btl-600 to-btl-700 text-white py-2 px-4 rounded-xl hover:from-btl-700 hover:to-btl-800 transition-all duration-200 font-medium"
+                              >
+                                Watch Video
+                              </button>
                             </div>
                           </div>
-                        )}
-
-                        <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-                          <span>{tool.duration || (tool as any).pages || (tool as any).features}</span>
-                          <span className="bg-gray-100 px-2 py-1 rounded-full">{tool.difficulty}</span>
-                        </div>
-
-                        <button className="w-full bg-gradient-to-r from-teal-600 to-teal-700 text-white py-2 px-4 rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all duration-200 font-medium">
-                          {getActionText(tool.type)}
-                        </button>
-                      </div>
-                    </>
-                  )}
+                        ))
+                      ) : (
+                        <div className="col-span-full text-center text-gray-500 py-8">No exercises found for this region.</div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              )
-            })}
-          </div>
+              ))}
+            </div>
+          ) : (
+            // Regular Grid Layout for other categories
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredTools.map((tool) => {
+                const IconComponent = getIcon(tool.type)
+                return (
+                  <div
+                    key={tool.id}
+                    className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
+                  >
+                    {/* Exercise vs Regular Tool Rendering */}
+                    {tool.type === "exercise" ? (
+                      <>
+                        {/* Exercise Header */}
+                        <div className="relative bg-gradient-to-br from-btl-50 to-btl-100 p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center space-x-2">
+                              <div className="bg-btl-600 rounded-full p-2">
+                                <Dumbbell className="w-4 h-4 text-white" />
+                              </div>
+                                                           <span className="text-xs font-medium text-btl-700 bg-btl-200 px-2 py-1 rounded-full">
+                               {(tool as any).phase} Phase
+                             </span>
+                           </div>
+                           <div className="text-right">
+                             <div className="flex items-center space-x-1 text-btl-600">
+                               <Target className="w-3 h-3" />
+                               <span className="text-xs font-medium">+{(tool as any).points} pts</span>
+                             </div>
+                            </div>
+                          </div>
+                          <div className="text-center py-4">
+                            <div className="w-12 h-12 mx-auto bg-btl-600 rounded-full flex items-center justify-center mb-2 border-2 border-btl-600">
+                              <Play className="w-6 h-6 text-white ml-0.5" />
+                            </div>
+                            <p className="text-xs text-btl-600 font-medium">Personalized Exercise</p>
+                          </div>
+                        </div>
+
+                        {/* Exercise Content */}
+                        <div className="p-4">
+                          <h3 className="font-semibold text-gray-900 mb-2">{tool.title}</h3>
+                          <p className="text-gray-600 text-sm mb-3 line-clamp-2">{tool.description}</p>
+
+                          <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
+                            <div className="flex items-center space-x-1">
+                              <Clock className="w-3 h-3" />
+                              <span>{tool.duration}</span>
+                            </div>
+                            <span className="bg-btl-100 text-btl-700 px-2 py-1 rounded-full font-medium">
+                              {tool.difficulty}
+                            </span>
+                          </div>
+
+                          <button 
+                            onClick={() => setSelectedExercise(tool)}
+                            className="w-full bg-gradient-to-r from-btl-600 to-btl-700 text-white py-2 px-4 rounded-xl hover:from-btl-700 hover:to-btl-800 transition-all duration-200 font-medium"
+                          >
+                            Start Exercise
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {/* Regular Tool Rendering */}
+                        <div className="relative">
+                          <img
+                            src={(tool as any).thumbnail || "/placeholder.svg"}
+                            alt={tool.title}
+                            className="w-full h-32 object-cover"
+                          />
+                          <div className="absolute top-2 right-2">
+                            <div className="bg-white bg-opacity-90 rounded-full p-2 border-2 border-teal-600">
+                              <IconComponent className="w-4 h-4 text-teal-600" />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-4">
+                          <h3 className="font-semibold text-gray-900 mb-2">{tool.title}</h3>
+                          <p className="text-gray-600 text-sm mb-3 line-clamp-2">{tool.description}</p>
+
+                                                     <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
+                             <span className="px-2 py-0.5 rounded-full bg-gray-100">{tool.duration || (tool as any).pages || (tool as any).features}</span>
+                             <span className="bg-gray-100 px-2 py-1 rounded-full">{tool.difficulty}</span>
+                           </div>
+
+                          <button className="w-full bg-gradient-to-r from-teal-600 to-teal-700 text-white py-2 px-4 rounded-xl hover:from-teal-700 hover:to-teal-800 transition-all duration-200 font-medium">
+                            {getActionText(tool.type)}
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
 
           {filteredTools.length === 0 && (
             <div className="text-center py-12">
@@ -380,6 +500,13 @@ export default function RecoveryToolsPage() {
           )}
         </div>
       </div>
+
+      {/* Exercise Video Modal */}
+      <ExerciseVideoModal
+        exercise={selectedExercise}
+        open={!!selectedExercise}
+        onClose={() => setSelectedExercise(null)}
+      />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { Video, FileText, HelpCircle, Eye, ArrowRight } from "lucide-react"
+import { exercises as allExercises } from "@/lib/exerciseLibrary"
 
 interface RecoveryToolkitSectionProps {
   onToolkitClick: (toolkit: any) => void
@@ -14,7 +15,7 @@ export function RecoveryToolkitSection({ onToolkitClick }: RecoveryToolkitSectio
       icon: Video,
       iconBg: "bg-gradient-to-br from-btl-100 to-btl-200",
       iconColor: "text-btl-600",
-      count: 12,
+      count: allExercises.length,
       category: "videos",
     },
     {

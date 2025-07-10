@@ -1,5 +1,4 @@
-import { usePatientRecoveryData } from "@/hooks/usePatientData";
-import { useExercises } from "@/hooks/useExercises";
+import { useAssignedExercises } from "@/hooks/useAssignedExercises";
 import { Dumbbell, Clock } from "lucide-react";
 
 interface MovementSessionCardProps {
@@ -8,17 +7,11 @@ interface MovementSessionCardProps {
 }
 
 export function MovementSessionCard({ patientId, onClick }: MovementSessionCardProps) {
-  // Fetch patient data first
-  const { data: patientData, error: patientError, isLoading: patientLoading } = usePatientRecoveryData(patientId, "patient", true);
+  // Fetch assigned exercises from backend
+  const { data: exerciseData, error: exerciseError, loading: exerciseLoading } = useAssignedExercises(patientId);
   
-  // Once we have patient data, get exercises
-  const exercises = patientData ? useExercises(patientData.region, patientData.phase) : [];
-  
-  // Calculate total points
-  const totalPoints = exercises.reduce((sum, ex) => sum + ex.points, 0);
-  
-  // Handle loading state
-  if (patientLoading) {
+  // Show skeleton *only* while we have no data yet
+  if (exerciseData === undefined) {
     return (
       <div className="flex flex-col items-center bg-white rounded-2xl shadow-lg p-7 border border-btl-100 min-h-[340px] min-w-[260px] animate-pulse">
         <div className="w-14 h-14 bg-btl-200 rounded-xl mb-4 mt-1"></div>
@@ -33,7 +26,7 @@ export function MovementSessionCard({ patientId, onClick }: MovementSessionCardP
   }
   
   // Handle error state
-  if (patientError) {
+  if (exerciseError) {
     return (
       <div className="flex flex-col items-center bg-white rounded-2xl shadow-lg p-7 border border-red-200 min-h-[340px] min-w-[260px]">
         <div className="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center mb-4 mt-1">
@@ -54,8 +47,12 @@ export function MovementSessionCard({ patientId, onClick }: MovementSessionCardP
       </div>
     );
   }
+
+  const exercises = exerciseData?.exercises || [];
+  const totalPoints = exerciseData?.totalPoints || 0;
+  const phase = exerciseData?.phase || 'EDUCATE';
   
-  // Define metallic pill classes
+  // Define metallic pill classes for Movement Session (gold theme)
   const metallicPills = {
     gold: 'bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-yellow-900 shadow border border-yellow-500',
     silver: 'bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 text-gray-900 shadow border border-gray-400',
@@ -64,8 +61,8 @@ export function MovementSessionCard({ patientId, onClick }: MovementSessionCardP
   
   // Determine points pill color based on total points
   const getPointsPill = (points: number) => {
-    if (points >= 20) return metallicPills.gold;
-    if (points >= 15) return metallicPills.silver;
+    if (points >= 10) return metallicPills.gold;
+    if (points >= 7) return metallicPills.silver;
     return metallicPills.bronze;
   };
   
@@ -89,7 +86,7 @@ export function MovementSessionCard({ patientId, onClick }: MovementSessionCardP
         {exercises.length} exercises personalized for your recovery
       </p>
       <span className="inline-block px-4 py-1 text-xs font-semibold rounded-full bg-btl-100 text-btl-600 mb-3 text-center whitespace-nowrap">
-        {exercises.length} exercises • {patientData?.phase?.toUpperCase() || 'EDUCATE'} phase
+        {exercises.length} exercises • {phase.toUpperCase()} phase
       </span>
       <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full ${getPointsPill(totalPoints)} mb-2`}>
         +{totalPoints} pts

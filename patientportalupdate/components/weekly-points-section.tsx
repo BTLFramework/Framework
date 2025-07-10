@@ -1,13 +1,15 @@
 "use client"
 
-import { Flame, Zap, Trophy, Star } from "lucide-react"
-import { useState, useEffect } from "react"
+import { Star, Flame, Zap, Trophy } from "lucide-react";
+import { Medal } from "lucide-react";
+import { useState, useEffect } from "react";
 
 interface WeeklyPointsSectionProps {
   patientEmail?: string
+  refreshKey?: number
 }
 
-export function WeeklyPointsSection({ patientEmail }: WeeklyPointsSectionProps) {
+export function WeeklyPointsSection({ patientEmail, refreshKey }: WeeklyPointsSectionProps) {
   const [weeklyData, setWeeklyData] = useState({
     total: 0,
     target: 150,
@@ -86,46 +88,31 @@ export function WeeklyPointsSection({ patientEmail }: WeeklyPointsSectionProps) 
     }
 
     fetchRecoveryPoints()
-  }, [patientEmail])
+  }, [patientEmail, refreshKey]) // Add refreshKey to dependencies
 
-  // Helper function to get badge colors (matching daily tasks)
+  // Helper function to get badge colors (matching movement session header gradient)
   const getBadgeColor = (badgeClass: string) => {
-    switch (badgeClass) {
-      case "badge-gold":
-        return "bg-gradient-to-br from-yellow-400 to-yellow-600 text-yellow-900 shadow-md border border-yellow-500"
-      case "badge-silver":
-        return "bg-gradient-to-br from-gray-300 to-gray-500 text-gray-800 shadow-md border border-gray-400"
-      case "badge-bronze":
-        return "bg-gradient-to-br from-orange-400 to-orange-600 text-orange-900 shadow-md border border-orange-500"
-      default:
-        return "bg-gray-100 text-gray-600 border-gray-200"
-    }
+    // All pills use the same ombre blue gradient now
+    return "bg-gradient-to-br from-btl-900 via-btl-700 to-btl-100 text-white shadow-md border border-btl-600";
   }
 
   const getBadgeText = (badgeClass: string, points: number) => {
-    switch (badgeClass) {
-      case "badge-gold":
-        return `🥇 +${points}`
-      case "badge-silver":
-        return `🥈 +${points}`
-      case "badge-bronze":
-        return `🥉 +${points}`
-      default:
-        return `+${points}`
-    }
+    // No emoji, just the points
+    return `+${points}`;
   }
 
   // Calculate progress percentage
   const progressPercentage = Math.min(100, Math.round((weeklyData.total / weeklyData.target) * 100))
+  const metallicGold = "#B8860B"; // Deeper, more visible gold
   const achievements = [
     {
       icon: Flame,
       title: "Daily Streak",
       description: `${weeklyData.streakDays} days`,
-      points: weeklyData.streakDays >= 7 ? 5 : weeklyData.streakDays >= 3 ? 3 : 1,
-      badgeClass: weeklyData.streakDays >= 7 ? "badge-gold" : weeklyData.streakDays >= 3 ? "badge-silver" : "badge-bronze",
-      iconColor: weeklyData.streakDays >= 7 ? "text-yellow-600" : weeklyData.streakDays >= 3 ? "text-gray-500" : "text-amber-700",
-      progress: Math.min(100, (weeklyData.streakDays / 7) * 100),
+      points: weeklyData.streakDays >= 7 ? 5 : weeklyData.streakDays >= 3 ? 3 : weeklyData.streakDays >= 1 ? 1 : 0,
+      badgeClass: weeklyData.streakDays >= 7 ? "badge-gold" : weeklyData.streakDays >= 3 ? "badge-silver" : weeklyData.streakDays >= 1 ? "badge-bronze" : "badge-none",
+      iconColor: metallicGold,
+      progress: Math.round((weeklyData.streakDays / 7) * 100), // Rounded percentage
     },
     {
       icon: Zap,
@@ -133,8 +120,8 @@ export function WeeklyPointsSection({ patientEmail }: WeeklyPointsSectionProps) 
       description: `${weeklyData.breakdown.MOVEMENT}/60 pts`,
       points: Math.floor(weeklyData.breakdown.MOVEMENT / 20),
       badgeClass: weeklyData.breakdown.MOVEMENT >= 50 ? "badge-gold" : weeklyData.breakdown.MOVEMENT >= 30 ? "badge-silver" : "badge-bronze",
-      iconColor: weeklyData.breakdown.MOVEMENT >= 50 ? "text-yellow-600" : weeklyData.breakdown.MOVEMENT >= 30 ? "text-gray-500" : "text-amber-700",
-      progress: Math.min(100, (weeklyData.breakdown.MOVEMENT / 60) * 100),
+      iconColor: metallicGold,
+      progress: Math.round((weeklyData.breakdown.MOVEMENT / 60) * 100), // Rounded percentage
     },
     {
       icon: Trophy,
@@ -142,8 +129,8 @@ export function WeeklyPointsSection({ patientEmail }: WeeklyPointsSectionProps) 
       description: `${weeklyData.total}/${weeklyData.target} pts`,
       points: Math.floor(weeklyData.total / 50),
       badgeClass: weeklyData.total >= 120 ? "badge-gold" : weeklyData.total >= 75 ? "badge-silver" : "badge-bronze",
-      iconColor: weeklyData.total >= 120 ? "text-yellow-600" : weeklyData.total >= 75 ? "text-gray-500" : "text-amber-700",
-      progress: progressPercentage,
+      iconColor: metallicGold,
+      progress: progressPercentage, // Already rounded above
     },
   ]
 
@@ -175,18 +162,19 @@ export function WeeklyPointsSection({ patientEmail }: WeeklyPointsSectionProps) 
             key={index}
             className="flex items-center space-x-3 p-3 rounded-lg border border-gray-200 bg-white transition-all duration-200 hover:shadow-md hover:border-btl-300 hover:bg-btl-50 group"
           >
-            <div className="p-2 bg-gray-50 rounded-lg shadow-sm group-hover:bg-btl-100 transition-all duration-200">
-              <achievement.icon className={`w-4 h-4 ${achievement.iconColor} group-hover:scale-105 transition-transform duration-200`} />
-            </div>
+            {/* Remove the gray background box and shadow from the icon */}
+            <achievement.icon className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" style={{ color: metallicGold }} />
             <div className="flex-1">
               <div className="font-semibold text-charcoal-900 text-sm group-hover:text-btl-700 transition-colors duration-200">{achievement.title}</div>
               <div className="text-charcoal-600 text-xs">{achievement.description}</div>
             </div>
             <div className="text-right flex flex-col items-end space-y-1">
-              <span className={`px-2 py-1 rounded-full font-bold text-xs ${getBadgeColor(achievement.badgeClass)} transform hover:scale-105 transition-transform duration-200`}>
+              <span className={`px-4 py-1 rounded-full font-bold text-xs ${getBadgeColor(achievement.badgeClass)} transform hover:scale-105 transition-transform duration-200`}>
                 {getBadgeText(achievement.badgeClass, achievement.points)}
               </span>
-              <div className="text-xs font-medium text-charcoal-500 group-hover:text-btl-600 transition-colors duration-200">{achievement.progress}%</div>
+              <div className="text-xs font-medium text-charcoal-500 group-hover:text-btl-600 transition-colors duration-200">
+                {achievement.progress > 0 ? `${achievement.progress}%` : '0%'}
+              </div>
             </div>
           </div>
         ))}
@@ -208,6 +196,25 @@ export function WeeklyPointsSection({ patientEmail }: WeeklyPointsSectionProps) 
         </p>
         <p className="text-btl-100 text-xs mt-1">Click to view your tasks</p>
       </button>
+
+      {/* Achievement Level Explanations */}
+      <div className="mt-6 pt-4 border-t border-gray-200">
+        <h3 className="text-sm font-semibold text-gray-700 mb-3">Achievement Levels</h3>
+        <div className="space-y-2 text-xs text-gray-600">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 shadow border border-yellow-500 flex-shrink-0"></div>
+            <span className="flex-1"><strong>Gold:</strong> 7+ days (50+ pts, 120+ weekly)</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 shadow border border-gray-400 flex-shrink-0"></div>
+            <span className="flex-1"><strong>Silver:</strong> 3–6 days (30–49 pts, 75–119 weekly)</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-r from-[#b08d57] via-[#a97142] to-[#7c5c36] shadow border border-[#a97142] flex-shrink-0"></div>
+            <span className="flex-1"><strong>Bronze:</strong> 1–2 days (1–29 pts, 1–74 weekly)</span>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

@@ -2,11 +2,11 @@ import { NextResponse } from 'next/server';
 
 export async function GET(
   request: Request,
-  { params }: { params: { email: string } }
+  { params }: { params: Promise<{ email: string }> }
 ) {
   try {
     const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
-    const { email } = params;
+    const { email } = await params;
 
     const response = await fetch(`${backendUrl}/patients/portal-data/${email}`);
     const data = await response.json();
