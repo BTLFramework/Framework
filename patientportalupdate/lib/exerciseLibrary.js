@@ -54,6 +54,178 @@ export const exercises = [
     videoId: "prone-t-isometric",
     points: 4
   },
+
+  // ---------- THORACIC / MID-BACK EXERCISES ----------
+  
+  // RESET Phase Thoracic
+  {
+    id: "THORACIC_RESET_SUPINE_DECOMPRESSION_BREATHING",
+    region: "Mid-Back / Thoracic",
+    phase: "Reset",
+    name: "Supine Decompression Breathing",
+    focus: "posterior rib expansion",
+    description: "Foundational breath control with posterior rib expansion",
+    duration: "5-8 minutes",
+    difficulty: "Beginner",
+    instructions: [
+      "Lie on your back with knees bent and feet flat",
+      "Bring toes together and heels apart",
+      "Place hands lightly on your lower ribs",
+      "Inhale through the nose 'into your jacket pockets'",
+      "Exhale gently through pursed lips"
+    ],
+    videoId: "supine-decompression-breathing",
+    points: 3
+  },
+  {
+    id: "THORACIC_RESET_PRONE_DECOMPRESSION_BREATHING",
+    region: "Mid-Back / Thoracic",
+    phase: "Reset",
+    name: "Prone Decompression Breathing",
+    focus: "tactile posterior rib opening",
+    description: "Tactile posterior rib opening with scapular depression reset",
+    duration: "5-8 minutes",
+    difficulty: "Beginner",
+    instructions: [
+      "Lie facedown with forehead supported",
+      "Arms extended overhead, palms together",
+      "Inhale into your mid-back, feeling space under shoulder blades",
+      "Exhale fully, letting ribs settle into the mat"
+    ],
+    videoId: "prone-decompression-breathing",
+    points: 3
+  },
+  {
+    id: "THORACIC_RESET_WALL_ANGEL_DECOMPRESSION",
+    region: "Mid-Back / Thoracic",
+    phase: "Reset",
+    name: "Wall Angel + Decompression Breathing",
+    focus: "scapular mobility",
+    description: "Sync breath with scapular mobility and thoracic alignment",
+    duration: "8-12 minutes",
+    difficulty: "Beginner",
+    instructions: [
+      "Stand with head, shoulder blades, and tailbone against wall",
+      "Feet ~6\" away from wall",
+      "Inhale as you slide arms from 'W' into 'Y'",
+      "Exhale as you lower arms, keeping ribs glued to wall"
+    ],
+    videoId: "wall-angel-decompression",
+    points: 4
+  },
+
+  // EDUCATE Phase Thoracic
+  {
+    id: "THORACIC_EDUCATE_ANCHORED_WALL_GLIDE",
+    region: "Mid-Back / Thoracic",
+    phase: "Educate",
+    name: "Anchored Thoracic Wall Glide",
+    focus: "pure thoracic motion",
+    description: "Train pure thoracic motion free from lumbar compensation",
+    duration: "8-12 minutes",
+    difficulty: "Intermediate",
+    instructions: [
+      "Stand with back to wall, heels lightly anchored",
+      "Pelvis neutral position",
+      "Exhale and draw ribs toward the wall",
+      "Inhale and relax slightly, allowing gentle glide"
+    ],
+    videoId: "anchored-thoracic-wall-glide",
+    points: 3
+  },
+  {
+    id: "THORACIC_EDUCATE_HALF_KNEELING_CROSS_REACH",
+    region: "Mid-Back / Thoracic",
+    phase: "Educate",
+    name: "Half-Kneeling Cross-Reach",
+    focus: "transverse-plane thoracic rotation",
+    description: "Integrate transverse-plane thoracic rotation with trunk stability",
+    duration: "10-15 minutes",
+    difficulty: "Intermediate",
+    instructions: [
+      "Half-kneel (front foot flat, back knee down)",
+      "Reach opposite arm across midline and then up",
+      "Rotate through your ribs, not your hips",
+      "Return under control, breathing throughout"
+    ],
+    videoId: "half-kneeling-cross-reach",
+    points: 4
+  },
+  {
+    id: "THORACIC_EDUCATE_WALL_90_90_BREATHING",
+    region: "Mid-Back / Thoracic",
+    phase: "Educate",
+    name: "Wall 90/90 Breathing with Serratus Reach",
+    focus: "posterior rib expansion",
+    description: "Blend posterior rib expansion with serratus activation",
+    duration: "10-15 minutes",
+    difficulty: "Intermediate",
+    instructions: [
+      "Lie on your back with feet on wall, hips/knees at 90°",
+      "Inhale, press heels into wall and feel ribs expand",
+      "Exhale, lift arms toward ceiling",
+      "Protract shoulder blades on exhale"
+    ],
+    videoId: "wall-90-90-breathing",
+    points: 4
+  },
+
+  // REBUILD Phase Thoracic
+  {
+    id: "THORACIC_REBUILD_PRONE_T_ISOMETRIC",
+    region: "Mid-Back / Thoracic",
+    phase: "Rebuild",
+    name: "Prone T Isometric Hold",
+    focus: "thoracic extensor endurance",
+    description: "Build thoracic extensor endurance and scapular stability",
+    duration: "12-18 minutes",
+    difficulty: "Advanced",
+    instructions: [
+      "Lie prone in a 'T' with arms at shoulder height",
+      "Gently squeeze shoulder blades down and back",
+      "Don't lift chest off ground",
+      "Hold and breathe normally"
+    ],
+    videoId: "prone-t-isometric",
+    points: 3
+  },
+  {
+    id: "THORACIC_REBUILD_WEIGHTED_CARRIES_TALL_SPINE",
+    region: "Mid-Back / Thoracic",
+    phase: "Rebuild",
+    name: "Weighted Carries with Tall Spine",
+    focus: "thoracic control under load",
+    description: "Challenge thoracic control under load and reinforce upright posture",
+    duration: "15-20 minutes",
+    difficulty: "Advanced",
+    instructions: [
+      "Hold dumbbells by your sides (farmer's or suitcase style)",
+      "Walk tall: head over hips, ribs down, shoulders back",
+      "Imagine a string pulling your head up",
+      "Brace low belly—don't flare ribs"
+    ],
+    videoId: "weighted-carries-tall-spine",
+    points: 4
+  },
+  {
+    id: "THORACIC_REBUILD_SINGLE_ARM_ROW_REACH",
+    region: "Mid-Back / Thoracic",
+    phase: "Rebuild",
+    name: "Single-Arm Row with Controlled Reach",
+    focus: "eccentric scapular control",
+    description: "Develop eccentric scapular control and thoracic stability under dynamic load",
+    duration: "15-20 minutes",
+    difficulty: "Advanced",
+    instructions: [
+      "Anchor a band or cable at waist height",
+      "Row back with one arm",
+      "Slowly reach forward on the eccentric",
+      "Let scapula glide, maintain core and rib stacking"
+    ],
+    videoId: "single-arm-row-reach",
+    points: 4
+  },
+
   {
     id: "BACK_RESET_STANDING_DECOMPRESSION_BREATH",
     region: "Low Back / SI Joint",

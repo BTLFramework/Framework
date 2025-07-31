@@ -1,6 +1,6 @@
 "use client"
 
-import { Video, FileText, HelpCircle, Eye, ArrowRight } from "lucide-react"
+import { Video, FileText, Wrench, Eye, ArrowRight } from "lucide-react"
 import { exercises as allExercises } from "@/lib/exerciseLibrary"
 
 interface RecoveryToolkitSectionProps {
@@ -24,16 +24,16 @@ export function RecoveryToolkitSection({ onToolkitClick }: RecoveryToolkitSectio
       icon: FileText,
       iconBg: "bg-gradient-to-br from-btl-50 to-btl-200",
       iconColor: "text-btl-700",
-      count: 8,
+      count: 49,
       category: "guides",
     },
     {
       title: "Support Tools",
-      description: "Get help when needed",
-      icon: HelpCircle,
+      description: "Recovery support utilities",
+      icon: Wrench,
       iconBg: "bg-gradient-to-br from-btl-100 to-btl-300",
       iconColor: "text-btl-600",
-      count: 6,
+      count: 4,
       category: "tools",
     },
   ]

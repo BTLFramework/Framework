@@ -44,10 +44,10 @@ export function RecoveryScoreWheel({ score, maxScore, phase }: RecoveryScoreWhee
   }
 
   const getScoreStatus = () => {
-    if (validScore >= 9) return { text: "Graduation Ready!", color: "text-emerald-600" }
-    if (validScore >= 7) return { text: "REBUILD Ready", color: "text-btl-600" }
-    if (validScore >= 4) return { text: "Making Progress", color: "text-btl-500" }
-    return { text: "Getting Started", color: "text-charcoal-600" }
+    if (validScore >= 9) return { text: "GRADUATION READY!", color: "text-emerald-600" }
+    if (validScore >= 7) return { text: "REBUILD READY", color: "text-btl-600" }
+    if (validScore >= 4) return { text: "MAKING PROGRESS", color: "text-btl-500" }
+    return { text: "ENTERING RESET", color: "text-btl-700" }
   }
 
   const status = getScoreStatus()
@@ -86,6 +86,43 @@ export function RecoveryScoreWheel({ score, maxScore, phase }: RecoveryScoreWhee
   }
 
   const currentPhaseInfo = getPhaseInfo(phase)
+
+  const getPhaseProgressInfo = () => {
+    const phases = ["RESET", "EDUCATE", "REBUILD"]
+    const currentIndex = phases.indexOf(phase)
+
+    if (currentIndex === 0) {
+      // RESET: 0-4 points to complete
+      const phaseProgress = Math.min(validScore, 4)
+      return {
+        label: "RESET COMPLETE",
+        min: 0,
+        max: 4,
+        current: phaseProgress,
+        percentage: (phaseProgress / 4) * 100
+      }
+    } else if (currentIndex === 1) {
+      // EDUCATE: 4-7 points to complete (show as 0-3 progress)
+      const phaseProgress = Math.min(Math.max(validScore - 4, 0), 3)
+      return {
+        label: "EDUCATE COMPLETE", 
+        min: 0,
+        max: 3,
+        current: phaseProgress,
+        percentage: (phaseProgress / 3) * 100
+      }
+    } else {
+      // REBUILD: 7-11 points to complete (show as 0-4 progress)
+      const phaseProgress = Math.min(Math.max(validScore - 7, 0), 4)
+      return {
+        label: "REBUILD COMPLETE",
+        min: 0,
+        max: 4,
+        current: phaseProgress,
+        percentage: (phaseProgress / 4) * 100
+      }
+    }
+  }
 
   return (
     <div className="flex flex-col items-center">
@@ -128,9 +165,39 @@ export function RecoveryScoreWheel({ score, maxScore, phase }: RecoveryScoreWhee
 
         {/* Score Display */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="text-4xl font-bold text-charcoal-900 mb-1">{validScore}</div>
-          <div className="text-lg text-charcoal-600 mb-2">/ {validMaxScore}</div>
-          <div className={`text-sm font-medium ${status.color}`}>{status.text}</div>
+          <div className="flex items-baseline justify-center space-x-1 mb-2">
+            <div className="text-5xl font-bold text-charcoal-900">{validScore}</div>
+            <div className="text-3xl text-charcoal-600">/ {validMaxScore}</div>
+          </div>
+          <div className={`text-base font-bold ${status.color} mb-3`}>{status.text}</div>
+        </div>
+      </div>
+
+      {/* Phase Milestone Progress Bar - Below Wheel */}
+      <div className="flex flex-col items-center mt-4 w-full max-w-xs">
+        {/* Phase Milestone Label */}
+        <div className="text-xs text-charcoal-500 mb-2 text-center uppercase tracking-wide">
+          {getPhaseProgressInfo().label}
+        </div>
+        
+        {/* Progress Bar */}
+        <div className="flex items-center justify-center w-full space-x-2">
+          <span className="text-xs text-charcoal-400">{getPhaseProgressInfo().min}</span>
+          <div className="flex-1 h-2 bg-charcoal-200 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-btl-500 to-btl-600 rounded-full transition-all duration-1000 ease-out"
+              style={{ 
+                width: `${getPhaseProgressInfo().percentage}%`,
+                transitionDelay: '0.5s'
+              }}
+            />
+          </div>
+          <span className="text-xs text-charcoal-400">{getPhaseProgressInfo().max}</span>
+        </div>
+        
+        {/* Progress Text */}
+        <div className="text-xs text-charcoal-500 mt-2 text-center">
+          {getPhaseProgressInfo().current} of {getPhaseProgressInfo().max} points
         </div>
       </div>
 
@@ -149,26 +216,11 @@ export function RecoveryScoreWheel({ score, maxScore, phase }: RecoveryScoreWhee
             {currentPhaseInfo.description}
           </p>
           
-          {/* Phase Progress Dots */}
-          <div className="flex justify-center items-center mt-4 space-x-2">
-            <div className={`w-2 h-2 rounded-full ${phase === "RESET" ? "bg-btl-600" : "bg-charcoal-300"}`}></div>
-            <div className={`w-2 h-2 rounded-full ${phase === "EDUCATE" ? "bg-btl-600" : "bg-charcoal-300"}`}></div>
-            <div className={`w-2 h-2 rounded-full ${phase === "REBUILD" ? "bg-btl-600" : "bg-charcoal-300"}`}></div>
-          </div>
+          {/* Removed Phase Progress Dots for cleaner design */}
         </div>
       </div>
 
-      {/* Clean Progress Indicator */}
-      <div className="flex items-center justify-center w-full max-w-xs mt-4 space-x-2">
-        <span className="text-xs text-charcoal-500">0</span>
-        <div className="flex-1 h-2 bg-charcoal-200 rounded-full overflow-hidden">
-          <div 
-            className="h-full back-to-life-gradient rounded-full transition-all duration-1000 ease-out"
-            style={{ width: `${validPercentage}%` }}
-          ></div>
-        </div>
-        <span className="text-xs text-charcoal-500">11</span>
-      </div>
+      {/* Removed external progress bar - now integrated inside the wheel */}
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Dumbbell, AlertCircle, Play, Check, Target, Activity, Gauge, Award, PartyPopper } from "lucide-react";
+import { Dumbbell, AlertCircle, Play, Check, Target, Activity, Award, PartyPopper } from "lucide-react";
 import { useAssignedExercises } from "@/hooks/useAssignedExercises";
 import type { Exercise } from "@/types/exercise";
 import { ExerciseDetailsModal } from "@/components/exercise-details-modal";
@@ -15,6 +15,7 @@ import {
   AssessmentDialogBody,
   AssessmentDialogFooter,
 } from "@/components/ui/assessment-dialog";
+import { SRSRecoveryWheelIcon } from "./ui/SRSRecoveryWheelIcon";
 
 interface MovementSessionDialogProps {
   open: boolean;
@@ -32,7 +33,7 @@ function scoreToPhase(score: number) {
 
 // Helper for metallic pill classes (for celebration, etc.)
 const metallicPills = {
-  gold: 'bg-gradient-to-br from-btl-900 via-btl-700 to-btl-100 text-white shadow border border-btl-600 rounded-full',
+  gold: 'bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-yellow-900 shadow border border-yellow-500 rounded-full',
   silver: 'bg-gradient-to-br from-btl-800 via-btl-600 to-btl-200 text-white shadow border border-btl-500 rounded-full',
   bronze: 'bg-gradient-to-br from-btl-700 via-btl-500 to-btl-300 text-white shadow border border-btl-400 rounded-full',
 };
@@ -122,39 +123,36 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
             <p className="mt-2 text-btl-100 text-sm">
               Your personalized exercise routine for today. Complete these exercises to improve strength and mobility.
             </p>
-            <div className="mt-6 flex flex-wrap items-center gap-4 text-white/90 text-base">
+            <div className="mt-6 flex flex-wrap items-center gap-4 text-white/90 text-sm">
               <div
-                className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5 transition-all duration-200 hover:bg-white/25 hover:border-white/50 hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60 group"
+                className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-2 transition-all duration-200 hover:bg-white/25 hover:border-white/50 hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60 group"
                 tabIndex={0}
                 role="button"
                 title={`Click to view all ${phaseLabel} phase exercises`}
                 onClick={handlePhaseClick}
               >
                 <Target className="w-5 h-5 stroke-2 group-hover:scale-110 transition-transform duration-200" />
-                <span>{phaseLabel} Phase</span>
-                <span className="text-xs opacity-70 group-hover:opacity-100 transition-opacity">→</span>
+                <span className="whitespace-nowrap">{phaseLabel} Phase</span>
               </div>
               <div
-                className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5 transition-all duration-200 hover:bg-white/25 hover:border-white/50 hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60 group"
+                className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-2 transition-all duration-200 hover:bg-white/25 hover:border-white/50 hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60 group"
                 tabIndex={0}
                 role="button"
                 title={`Click to view all ${regionLabel} exercises`}
                 onClick={handleRegionClick}
               >
                 <Activity className="w-5 h-5 stroke-2 group-hover:scale-110 transition-transform duration-200" />
-                <span>{regionLabel} Focus</span>
-                <span className="text-xs opacity-70 group-hover:opacity-100 transition-opacity">→</span>
+                <span className="whitespace-nowrap">{regionLabel} Focus</span>
               </div>
               <div
-                className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5 transition-all duration-200 hover:bg-white/25 hover:border-white/50 hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60 group"
+                className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-2 transition-all duration-200 hover:bg-white/25 hover:border-white/50 hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60 group"
                 tabIndex={0}
                 role="button"
                 title="Click to view your Recovery Score details"
                 onClick={handleSRSClick}
               >
-                <Gauge className="w-5 h-5 stroke-2 group-hover:scale-110 transition-transform duration-200" />
-                <span>SRS: {exerciseData?.srsScore || 0}</span>
-                <span className="text-xs opacity-70 group-hover:opacity-100 transition-opacity">→</span>
+                <SRSRecoveryWheelIcon className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
+                <span className="whitespace-nowrap">SRS: {exerciseData?.srsScore || 0}</span>
               </div>
             </div>
           </div>
@@ -322,6 +320,26 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                       
                       if (result.success) {
                         console.log('✅ Recovery points added successfully:', result.pointsAdded);
+                        
+                        // Record task completion to backend
+                        try {
+                          await fetch('/api/recovery-points/task-completion', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              patientId: numericPatientId,
+                              taskType: 'MOVEMENT',
+                              sessionDuration: null,
+                              pointsEarned: totalPoints
+                            }),
+                          });
+                          console.log('✅ Task completion recorded for movement session');
+                        } catch (taskError) {
+                          console.error('❌ Failed to record task completion:', taskError);
+                        }
+                        
                         // Show celebration with actual points earned
                         setShowCelebration(true);
                         
@@ -342,6 +360,26 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                         }, 2000);
                       } else {
                         console.error('❌ Failed to add recovery points:', result.error);
+                        
+                        // Still record task completion to backend even if RP failed
+                        try {
+                          await fetch('/api/recovery-points/task-completion', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              patientId: numericPatientId,
+                              taskType: 'MOVEMENT',
+                              sessionDuration: null,
+                              pointsEarned: totalPoints
+                            }),
+                          });
+                          console.log('✅ Task completion recorded for movement session (despite RP failure)');
+                        } catch (taskError) {
+                          console.error('❌ Failed to record task completion:', taskError);
+                        }
+                        
                         // Still show celebration but log the error
                         setShowCelebration(true);
                         

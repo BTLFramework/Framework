@@ -6,7 +6,6 @@ import { Home, Target, Heart, Wrench, FileText, MessageCircle, ChevronRight, Clo
 
 const navigationItems = [
   { name: "Home", icon: Home, href: "/", active: true },
-  { name: "Intake Form", icon: ClipboardList, href: "/intake" },
   { name: "Today's Tasks", icon: Clock, href: "/todays-tasks" },
   { name: "Recovery Score", icon: Target, href: "/recovery-score" },
   { name: "Recovery Points", icon: Heart, href: "/recovery-points" },

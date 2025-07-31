@@ -1,0 +1,40 @@
+{
+  "slides": [
+    {
+      "id": 1,
+      "title": "Sleep Debt Impact",
+      "content": "Sleeping less than 6 hours increases pain sensitivity by approximately 20%",
+      "image": "/insight/sleep-slide-1.png",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#1e40af"
+    },
+    {
+      "id": 2,
+      "title": "Recovery Connection",
+      "content": "Quality sleep is essential for tissue repair and recovery processes",
+      "image": "/insight/sleep-slide-2.png",
+      "backgroundColor": "#fef3c7",
+      "textColor": "#92400e"
+    },
+    {
+      "id": 3,
+      "title": "Pain Amplification",
+      "content": "Sleep deprivation amplifies pain signals in the brain and nervous system",
+      "image": "/insight/sleep-slide-3.png",
+      "backgroundColor": "#fce7f3",
+      "textColor": "#be185d"
+    },
+    {
+      "id": 4,
+      "title": "Sleep Hygiene Tips",
+      "content": "Establish a consistent sleep schedule and create a relaxing bedtime routine",
+      "image": "/insight/sleep-slide-4.png",
+      "backgroundColor": "#dcfce7",
+      "textColor": "#166534"
+    }
+  ],
+  "autoplay": true,
+  "interval": 4000,
+  "showDots": true,
+  "showArrows": true
+} 

@@ -97,7 +97,7 @@ const Messages = () => {
           patientId: selectedConversation.id,
           subject: 'Reply from clinician', // Default subject for replies
           content: newMessage,
-          senderName: 'Dr. Sarah Mitchell', // TODO: Get from auth context
+          senderName: 'Clinician', // TODO: Get from authenticated user context
           senderEmail: 'dr.mitchell@clinic.com'
         })
       });

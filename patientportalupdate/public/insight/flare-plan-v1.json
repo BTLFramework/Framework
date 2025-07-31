@@ -1,0 +1,134 @@
+{
+  "type": "form",
+  "title": "Flare Up Plan",
+  "subtitle": "Build your personalized flare up plan to stay in control when symptoms spike.",
+  "description": "Create your personalized plan for managing pain flares and staying calm during difficult moments.",
+  "sections": [
+    {
+      "title": "Step 1: Identify Your Early Warning Signs",
+      "description": "What are the first signs that a pain flare might be coming?",
+      "fields": [
+        {
+          "type": "checkbox",
+          "label": "Physical warning signs",
+          "options": [
+            "Increased muscle tension",
+            "Changes in breathing pattern",
+            "Feeling more sensitive to touch",
+            "Fatigue or tiredness",
+            "Changes in sleep pattern"
+          ]
+        },
+        {
+          "type": "checkbox", 
+          "label": "Emotional warning signs",
+          "options": [
+            "Feeling irritable or short-tempered",
+            "Increased anxiety or worry",
+            "Feeling overwhelmed",
+            "Loss of motivation",
+            "Feeling isolated or withdrawn"
+          ]
+        },
+        {
+          "type": "text",
+          "label": "Other early warning signs you've noticed:",
+          "placeholder": "Describe any other signs that tell you a flare might be coming..."
+        }
+      ]
+    },
+    {
+      "title": "Step 2: Your Calm-Down Strategies",
+      "description": "What helps you feel calmer and more in control?",
+      "fields": [
+        {
+          "type": "checkbox",
+          "label": "Breathing techniques",
+          "options": [
+            "Deep belly breathing (4-7-8)",
+            "Box breathing (4-4-4-4)",
+            "Progressive muscle relaxation",
+            "Mindful breathing"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "label": "Movement strategies",
+          "options": [
+            "Gentle stretching",
+            "Walking slowly",
+            "Tai chi or qigong",
+            "Yoga poses",
+            "Pacing activities"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "label": "Mental strategies",
+          "options": [
+            "Positive self-talk",
+            "Distraction techniques",
+            "Mindfulness meditation",
+            "Visualization",
+            "Counting backwards from 100"
+          ]
+        },
+        {
+          "type": "text",
+          "label": "Other strategies that help you:",
+          "placeholder": "What else helps you feel calmer?"
+        }
+      ]
+    },
+    {
+      "title": "Step 3: Your Support Network",
+      "description": "Who can you reach out to when you need support?",
+      "fields": [
+        {
+          "type": "text",
+          "label": "Primary support person:",
+          "placeholder": "Name and relationship"
+        },
+        {
+          "type": "text", 
+          "label": "Secondary support person:",
+          "placeholder": "Name and relationship"
+        },
+        {
+          "type": "text",
+          "label": "Healthcare provider:",
+          "placeholder": "Name and contact info"
+        },
+        {
+          "type": "text",
+          "label": "What specific help do you need from each person?",
+          "placeholder": "Describe how each person can best support you..."
+        }
+      ]
+    },
+    {
+      "title": "Step 4: Your Action Plan",
+      "description": "Put it all together - what will you do when you notice early warning signs?",
+      "fields": [
+        {
+          "type": "textarea",
+          "label": "My flare plan:",
+          "placeholder": "When I notice [early warning sign], I will [specific action]...",
+          "rows": 4
+        },
+        {
+          "type": "text",
+          "label": "How will you know your plan is working?",
+          "placeholder": "What positive changes will you look for?"
+        },
+        {
+          "type": "text",
+          "label": "When will you review and update this plan?",
+          "placeholder": "e.g., weekly, monthly, after each flare"
+        }
+      ]
+    }
+  ],
+  "submitText": "Save My Flare Plan",
+  "successMessage": "Your personalized flare plan has been saved! Review it regularly and update as needed."
+} 

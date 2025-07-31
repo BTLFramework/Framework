@@ -36,7 +36,7 @@ export function PainAssessmentCard({ patientId, onClick, isOpen = false }: PainA
   const painData = (data as any)?.pain || {};
   const lastAssessment = painData.lastAssessment;
   const phase = painData.phase || 'EDUCATE';
-  const points = 3;
+  const points = 3; // Form submitted on time - matches backend config
 
   // Pills styling (bronze for pain)
   const pillClass = 'bg-gradient-to-r from-[#b08d57] via-[#a97142] to-[#7c5c36] text-white shadow border border-[#a97142]';

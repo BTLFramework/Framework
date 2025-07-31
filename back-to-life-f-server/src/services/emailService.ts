@@ -7,14 +7,45 @@ const emailTemplates = JSON.parse(
   fs.readFileSync(path.join(__dirname, '../../config/emailTemplates.json'), 'utf8')
 );
 
-// Create transporter (for development, using Gmail)
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER || 'your-email@gmail.com',
-    pass: process.env.EMAIL_PASS || 'your-app-password'
+// Create transporter - supports multiple email providers
+const createTransporter = () => {
+  const emailProvider = process.env.EMAIL_PROVIDER || 'gmail';
+  
+  switch (emailProvider) {
+    case 'wix':
+      return nodemailer.createTransport({
+        host: process.env.EMAIL_HOST || 'smtp.wix.com',
+        port: parseInt(process.env.EMAIL_PORT || '587'),
+        secure: false, // true for 465, false for other ports
+        auth: {
+          user: process.env.EMAIL_USER || 'noreply@backtolifeyeg.com',
+          pass: process.env.EMAIL_PASS || ''
+        }
+      });
+    
+    case 'gmail':
+      return nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER || 'your-email@gmail.com',
+          pass: process.env.EMAIL_PASS || 'your-app-password'
+        }
+      });
+    
+    default:
+      return nodemailer.createTransport({
+        host: process.env.EMAIL_HOST || 'smtp.wix.com',
+        port: parseInt(process.env.EMAIL_PORT || '587'),
+        secure: false,
+        auth: {
+          user: process.env.EMAIL_USER || 'noreply@backtolifeyeg.com',
+          pass: process.env.EMAIL_PASS || ''
+        }
+      });
   }
-});
+};
+
+const transporter = createTransporter();
 
 export interface EmailData {
   firstName: string;
@@ -34,7 +65,7 @@ export const sendWelcomeEmail = async (emailData: EmailData): Promise<boolean> =
       .replace('{{setupLink}}', emailData.setupLink);
 
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@backtolife.com',
+      from: process.env.EMAIL_FROM || process.env.EMAIL_USER || 'spencerbarberchiro@gmail.com',
       to: emailData.email,
       subject: subject,
       text: body,
@@ -42,10 +73,10 @@ export const sendWelcomeEmail = async (emailData: EmailData): Promise<boolean> =
     };
 
     await transporter.sendMail(mailOptions);
-    console.log(`Welcome email sent to ${emailData.email}`);
+    console.log(`✅ Welcome email sent to ${emailData.email}`);
     return true;
   } catch (error) {
-    console.error('Error sending welcome email:', error);
+    console.error('❌ Error sending welcome email:', error);
     return false;
   }
 };

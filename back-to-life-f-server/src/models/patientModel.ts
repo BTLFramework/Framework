@@ -28,8 +28,7 @@ export const findPatientByEmail = async (email: string) => {
     where: { email },
     include: {
       srsScores: {
-        orderBy: { date: "desc" },
-        take: 1,
+        orderBy: { date: "asc" }, // Return all scores, oldest to newest
       },
       portalAccount: true
     }
@@ -163,4 +162,111 @@ export const deletePatient = async (patientId: number) => {
   return await prisma.patient.delete({
     where: { id: patientId },
   });
+}; 
+
+// Get assigned exercises for movement session by email
+export const getAssignedExercisesByEmail = async (email: string) => {
+  console.log(`🔍 Looking for patient with email: ${email}`);
+  
+  // Find patient by email
+  const patient = await findPatientByEmail(email);
+  if (!patient) {
+    console.log(`❌ No patient found for email: ${email}`);
+    return null;
+  }
+  
+  console.log(`✅ Found patient: ${patient.name} (ID: ${patient.id})`);
+  console.log(`📊 SRS Scores:`, patient.srsScores);
+
+  // Get latest SRS score to determine phase
+  const srsScores = patient.srsScores || [];
+  const latestSRS = srsScores.length > 0 ? srsScores[srsScores.length - 1] : null;
+  const srsScore = latestSRS?.srsScore || 0;
+  
+  console.log(`📈 Latest SRS Score: ${srsScore}`);
+
+  // Determine phase based on SRS score
+  let phase = "Reset";
+  if (srsScore >= 8) phase = "Rebuild";
+  else if (srsScore >= 4) phase = "Educate";
+  
+  console.log(`🎯 Determined Phase: ${phase}`);
+
+  // Get region from latest assessment or default
+  const region = latestSRS?.region || "Neck";
+  console.log(`📍 Region: ${region}`);
+
+  // Import exercise library
+  const { exercises } = require('../../config/exerciseConfig');
+  console.log(`📚 Total exercises in config: ${exercises.length}`);
+
+  // Filter exercises by region and phase
+  let availableExercises = exercises.filter((ex: any) => 
+    ex.region === region && ex.phase === phase
+  );
+  console.log(`🎯 Exercises for ${region} + ${phase}: ${availableExercises.length}`);
+
+  // If not enough exercises in current phase, get from other phases
+  if (availableExercises.length < 3) {
+    const phases = ["Reset", "Educate", "Rebuild"];
+    for (const otherPhase of phases) {
+      if (otherPhase !== phase) {
+        const additionalExercises = exercises.filter((ex: any) => 
+          ex.region === region && ex.phase === otherPhase
+        );
+        availableExercises = [...availableExercises, ...additionalExercises];
+        if (availableExercises.length >= 3) break;
+      }
+    }
+  }
+
+  // Select exactly 3 exercises, prioritizing those that sum to 10 points
+  let bestCombination = null;
+  let bestScore = Infinity;
+  for (let i = 0; i < availableExercises.length - 2; i++) {
+    for (let j = i + 1; j < availableExercises.length - 1; j++) {
+      for (let k = j + 1; k < availableExercises.length; k++) {
+        const combo = [
+          availableExercises[i],
+          availableExercises[j],
+          availableExercises[k]
+        ];
+        const totalPoints = combo.reduce((sum: number, ex: any) => sum + ex.points, 0);
+        const difference = Math.abs(totalPoints - 10);
+        if (difference < bestScore) {
+          bestScore = difference;
+          bestCombination = combo;
+        }
+      }
+    }
+  }
+  // If no combination found, take first 3 exercises
+  if (!bestCombination && availableExercises.length >= 3) {
+    bestCombination = availableExercises.slice(0, 3);
+  }
+  // If still not enough exercises, pad with placeholder
+  while (bestCombination && bestCombination.length < 3) {
+    bestCombination.push({
+      id: `placeholder_${bestCombination.length}`,
+      name: "Additional exercise",
+      description: "Exercise to be assigned",
+      duration: "5-10 minutes",
+      difficulty: "Beginner",
+      points: 3,
+      instructions: ["Exercise details coming soon"],
+      videoId: "placeholder"
+    });
+  }
+  const totalPoints = bestCombination ? bestCombination.reduce((sum: number, ex: any) => sum + ex.points, 0) : 0;
+  
+  console.log(`🏋️ Final exercise count: ${bestCombination ? bestCombination.length : 0}`);
+  console.log(`💯 Total points: ${totalPoints}`);
+  
+  return {
+    exercises: bestCombination || [],
+    totalPoints,
+    region,
+    phase,
+    srsScore
+  };
 }; 

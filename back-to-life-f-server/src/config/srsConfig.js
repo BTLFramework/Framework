@@ -31,10 +31,18 @@ export const intakeRules = {
     description: "Confidence"
   },
   
-  beliefs: {
-    // No negative beliefs → +1
+  fearAvoidance: {
+    // TSK-11 raw score ≤22 → +1 point (low fear-avoidance)
+    threshold: 22,
     points: 1,
-    description: "No negative beliefs"
+    description: "Low fear-avoidance (TSK-11 ≤22)"
+  },
+  
+  painBeliefs: {
+    // PCS-4 total score ≤6 → +1 point (low catastrophizing)
+    threshold: 6,
+    points: 1,
+    description: "Low pain catastrophizing (PCS-4 ≤6)"
   },
   
   clinician: {

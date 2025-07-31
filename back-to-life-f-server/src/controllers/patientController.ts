@@ -10,65 +10,268 @@ import { PrismaClient } from "@prisma/client";
 import { sendWelcomeEmailDev } from "../services/emailService";
 import { generateSetupLink } from "../services/jwtService";
 
+// TSK-11 calculation function
+const calculateTSK11Score = (tsk11Data: any) => {
+  if (!tsk11Data || typeof tsk11Data !== 'object') {
+    return null;
+  }
+  
+  let totalScore = 0;
+  let validResponses = 0;
+  
+  // TSK-11 items with reverse-scored items (4, 8, 9)
+  for (let i = 1; i <= 11; i++) {
+    const response = tsk11Data[i];
+    if (response !== undefined && response >= 0 && response <= 4) {
+      let itemScore = response;
+      
+      // Reverse score items 4, 8, 9 (1→4, 2→3, 3→2, 4→1)
+      if (i === 4 || i === 8 || i === 9) {
+        itemScore = 5 - response;
+      }
+      
+      totalScore += itemScore;
+      validResponses++;
+    }
+  }
+  
+  return validResponses === 11 ? totalScore : null;
+};
+
 const prisma = new PrismaClient();
 
-// Enhanced SRS calculation function
+// Import standardized SRS configuration
+const { intakeRules, followUpRules, getPhase } = require('../config/srsConfig.js');
+
+// Standardized SRS calculation function using centralized configuration
 const calculateSRS = (formData: any, previousData?: any) => {
-  let score = 0;
+  console.log('🔢 Backend: Starting standardized SRS calculation');
+  console.log('📊 Form data:', formData);
+  console.log('📊 Previous data:', previousData);
   
-  // For initial intake, we establish baseline - no points awarded yet
+  // For initial intake, use standardized baseline calculation
   if (!previousData) {
-    return 0; // Initial intake establishes baseline only
+    return computeBaselineSRS(formData);
   }
   
-  // VAS reduction ≥ 2 points (+1 point)
-  if (previousData.vas - Number(formData.vas) >= 2) {
-    score += 1;
-  }
+  // For follow-up, use standardized follow-up calculation
+  return computeFollowUpSRS(previousData, formData);
+};
+
+// Baseline (Intake) SRS Calculation - Range: 0-11 points
+const computeBaselineSRS = (formData: any) => {
+  console.log('🔢 Backend: Starting Baseline SRS Calculation');
   
-  // PSFS improvement ≥ 4 points combined (+2 points)
-  const prevPSFSSum = previousData.psfs.reduce((sum: number, item: any) => sum + (item.score || 0), 0);
-  const currPSFSSum = formData.psfs.reduce((sum: number, item: any) => sum + (item.score || 0), 0);
-  if (currPSFSSum - prevPSFSSum >= 4) {
-    score += 2;
+  let points = 0;
+  const breakdown: string[] = [];
+
+  // 1. Pain Assessment (VAS ≤2 → +1 point)
+  const vas = parseInt(formData.vas) || 0;
+  if (vas <= intakeRules.pain.threshold) {
+    points += intakeRules.pain.points;
+    breakdown.push(`✅ ${intakeRules.pain.description} (${vas}): +${intakeRules.pain.points} point`);
+  } else {
+    breakdown.push(`❌ Pain (VAS ${vas} > ${intakeRules.pain.threshold}): +0 points`);
   }
-  
-  // Disability Index improvement ≥ 10% (+1 point)
-  if (previousData.disabilityPercentage - formData.disabilityPercentage >= 10) {
-    score += 1;
+
+  // 2. Disability Assessment (≤20% → +1 point)
+  const disabilityPercentage = formData.disabilityPercentage || 0;
+  if (disabilityPercentage <= intakeRules.disability.threshold) {
+    points += intakeRules.disability.points;
+    breakdown.push(`✅ ${intakeRules.disability.description} (${disabilityPercentage}%): +${intakeRules.disability.points} point`);
+  } else {
+    breakdown.push(`❌ Disability (${disabilityPercentage}% > ${intakeRules.disability.threshold}%): +0 points`);
   }
-  
-  // Confidence increase ≥ 3 points (+2 points)
-  if (Number(formData.confidence) - previousData.confidence >= 3) {
-    score += 2;
+
+  // 3. Task Function (PSFS Average: ≥7→ +2, 4-6.9→ +1)
+  if (formData.psfs && formData.psfs.length > 0) {
+    const psfaScores = formData.psfs.map((item: any) => item.score || 0);
+    const avgPSFS = psfaScores.reduce((sum: number, score: number) => sum + score, 0) / psfaScores.length;
+    
+    if (avgPSFS >= intakeRules.function.excellent.threshold) {
+      points += intakeRules.function.excellent.points;
+      breakdown.push(`✅ ${intakeRules.function.description} (avg ${avgPSFS.toFixed(1)} ≥ ${intakeRules.function.excellent.threshold}): +${intakeRules.function.excellent.points} points`);
+    } else if (avgPSFS >= intakeRules.function.good.threshold) {
+      points += intakeRules.function.good.points;
+      breakdown.push(`✅ ${intakeRules.function.description} (avg ${avgPSFS.toFixed(1)} ≥ ${intakeRules.function.good.threshold}): +${intakeRules.function.good.points} point`);
+    } else {
+      breakdown.push(`❌ ${intakeRules.function.description} (avg ${avgPSFS.toFixed(1)} < ${intakeRules.function.good.threshold}): +0 points`);
+    }
+  } else {
+    breakdown.push(`❌ ${intakeRules.function.description} (no data): +0 points`);
   }
-  
-  // Beliefs resolved - "None of these apply" (+1 point)
-  if (formData.beliefs.includes("None of these apply")) {
-    score += 1;
+
+  // 4. Confidence Assessment (≥8→ +2, 5-7→ +1)
+  const confidence = parseInt(formData.confidence) || 0;
+  if (confidence >= intakeRules.confidence.high.threshold) {
+    points += intakeRules.confidence.high.points;
+    breakdown.push(`✅ ${intakeRules.confidence.description} (${confidence} ≥ ${intakeRules.confidence.high.threshold}): +${intakeRules.confidence.high.points} points`);
+  } else if (confidence >= intakeRules.confidence.moderate.threshold) {
+    points += intakeRules.confidence.moderate.points;
+    breakdown.push(`✅ ${intakeRules.confidence.description} (${confidence} ≥ ${intakeRules.confidence.moderate.threshold}): +${intakeRules.confidence.moderate.points} point`);
+  } else {
+    breakdown.push(`❌ ${intakeRules.confidence.description} (${confidence} < ${intakeRules.confidence.moderate.threshold}): +0 points`);
   }
-  
-  // GROC ≥ +5 (Follow-up only) (+1 point)
-  if (formData.formType === "Follow-Up" && Number(formData.groc) >= 5) {
-    score += 1;
+
+  // 5. Fear-Avoidance Assessment (TSK-11 ≤22 → +1 point)
+  const tsk11RawScore = calculateTSK11Score(formData.tsk11);
+  if (tsk11RawScore !== null) {
+    if (tsk11RawScore <= intakeRules.fearAvoidance.threshold) {
+      points += intakeRules.fearAvoidance.points;
+      breakdown.push(`✅ ${intakeRules.fearAvoidance.description} (${tsk11RawScore}): +${intakeRules.fearAvoidance.points} point`);
+    } else {
+      breakdown.push(`❌ Fear-Avoidance (TSK-11 ${tsk11RawScore} > ${intakeRules.fearAvoidance.threshold}): +0 points`);
+    }
+  } else {
+    breakdown.push(`❌ Fear-Avoidance (TSK-11 incomplete): +0 points`);
   }
+
+  // 6. Pain Beliefs Assessment (PCS-4 ≤6 → +1 point)
+  const calculatePCS4Score = (pcs4Data: any) => {
+    if (!pcs4Data || typeof pcs4Data !== 'object') return null;
+    
+    let totalScore = 0;
+    let answeredCount = 0;
+    
+    for (let i = 1; i <= 4; i++) {
+      const response = pcs4Data[i];
+      if (response !== undefined && response >= 0 && response <= 4) {
+        totalScore += response;
+        answeredCount++;
+      }
+    }
+    
+    return answeredCount === 4 ? totalScore : null;
+  };
   
-  // Recovery Milestone (manual clinical assessment) (+1 point)
+  const pcs4TotalScore = calculatePCS4Score(formData.pcs4);
+  if (pcs4TotalScore !== null) {
+    if (pcs4TotalScore <= intakeRules.painBeliefs.threshold) {
+      points += intakeRules.painBeliefs.points;
+      breakdown.push(`✅ ${intakeRules.painBeliefs.description} (${pcs4TotalScore}): +${intakeRules.painBeliefs.points} point`);
+    } else {
+      breakdown.push(`❌ Pain Beliefs (PCS-4 ${pcs4TotalScore} > ${intakeRules.painBeliefs.threshold}): +0 points`);
+    }
+  } else {
+    breakdown.push(`❌ Pain Beliefs (PCS-4 incomplete): +0 points`);
+  }
+
+  // 7. Clinician Assessments
   if (formData.recoveryMilestone) {
-    score += 1;
+    points += intakeRules.clinician.milestone.points;
+    breakdown.push(`✅ ${intakeRules.clinician.milestone.description}: +${intakeRules.clinician.milestone.points} point`);
+  } else {
+    breakdown.push(`❌ ${intakeRules.clinician.milestone.description} (not met): +0 points`);
   }
-  
-  // Clinical Progress Verified (+1 point)
+
   if (formData.clinicalProgressVerified) {
-    score += 1;
+    points += intakeRules.clinician.progress.points;
+    breakdown.push(`✅ ${intakeRules.clinician.progress.description}: +${intakeRules.clinician.progress.points} point`);
+  } else {
+    breakdown.push(`❌ ${intakeRules.clinician.progress.description} (not verified): +0 points`);
   }
+
+  console.log('📋 SRS Calculation Breakdown:');
+  breakdown.forEach(item => console.log(`   ${item}`));
+  console.log(`🎯 Final Baseline SRS Score: ${points}/11`);
+
+  return points;
+};
+
+// Follow-up SRS Calculation - Range: 0-11 points
+const computeFollowUpSRS = (baselineData: any, currentData: any) => {
+  console.log('🔢 Backend: Starting Follow-up SRS Calculation');
   
-  // Cap at 11
-  return Math.min(score, 11);
+  let points = 0;
+  const breakdown: string[] = [];
+
+  // 1. Pain Improvement (VAS decrease ≥2 → +1)
+  const vasImprovement = baselineData.vas - Number(currentData.vas);
+  if (vasImprovement >= followUpRules.pain.improvement) {
+    points += followUpRules.pain.points;
+    breakdown.push(`✅ ${followUpRules.pain.description} (${baselineData.vas} → ${currentData.vas}): +${followUpRules.pain.points} point`);
+  } else {
+    breakdown.push(`❌ Pain (change ${vasImprovement}): +0 points`);
+  }
+
+  // 2. Function Improvement (PSFS increase ≥4 → +2)
+  if (baselineData.psfs && currentData.psfs) {
+    const baselineSum = baselineData.psfs.reduce((sum: number, item: any) => sum + (item.score || 0), 0);
+    const currentSum = currentData.psfs.reduce((sum: number, item: any) => sum + (item.score || 0), 0);
+    const functionImprovement = currentSum - baselineSum;
+    
+    if (functionImprovement >= followUpRules.function.improvement) {
+      points += followUpRules.function.points;
+      breakdown.push(`✅ ${followUpRules.function.description} (${baselineSum} → ${currentSum}): +${followUpRules.function.points} points`);
+    } else {
+      breakdown.push(`❌ Function (change +${functionImprovement}): +0 points`);
+    }
+  } else {
+    breakdown.push(`❌ Function (no data): +0 points`);
+  }
+
+  // 3. Disability Improvement (decrease ≥10% → +1)
+  const disabilityImprovement = baselineData.disabilityPercentage - currentData.disabilityPercentage;
+  if (disabilityImprovement >= followUpRules.disability.improvement) {
+    points += followUpRules.disability.points;
+    breakdown.push(`✅ ${followUpRules.disability.description} (${baselineData.disabilityPercentage}% → ${currentData.disabilityPercentage}%): +${followUpRules.disability.points} point`);
+  } else {
+    breakdown.push(`❌ Disability (change ${disabilityImprovement}%): +0 points`);
+  }
+
+  // 4. Confidence Improvement (increase ≥3 → +2)
+  const confidenceImprovement = Number(currentData.confidence) - baselineData.confidence;
+  if (confidenceImprovement >= followUpRules.confidence.improvement) {
+    points += followUpRules.confidence.points;
+    breakdown.push(`✅ ${followUpRules.confidence.description} (${baselineData.confidence} → ${currentData.confidence}): +${followUpRules.confidence.points} points`);
+  } else {
+    breakdown.push(`❌ Confidence (change +${confidenceImprovement}): +0 points`);
+  }
+
+  // 5. Beliefs Improvement (all cleared → +1)
+  const baselineNegBeliefs = baselineData.beliefs ? baselineData.beliefs.filter((b: string) => b && b !== "None of these apply").length : 0;
+  const currentNegBeliefs = currentData.beliefs ? currentData.beliefs.filter((b: string) => b && b !== "None of these apply").length : 0;
+  
+  if (baselineNegBeliefs > 0 && currentNegBeliefs === 0) {
+    points += followUpRules.beliefs.points;
+    breakdown.push(`✅ ${followUpRules.beliefs.description} (${baselineNegBeliefs} → 0): +${followUpRules.beliefs.points} point`);
+  } else {
+    breakdown.push(`❌ Beliefs (${baselineNegBeliefs} → ${currentNegBeliefs}): +0 points`);
+  }
+
+  // 6. GROC Assessment (≥+5 → +1)
+  const groc = Number(currentData.groc) || 0;
+  if (groc >= followUpRules.groc.threshold) {
+    points += followUpRules.groc.points;
+    breakdown.push(`✅ ${followUpRules.groc.description} (${groc}): +${followUpRules.groc.points} point`);
+  } else {
+    breakdown.push(`❌ GROC (${groc}): +0 points`);
+  }
+
+  // 7. Clinician Assessments
+  if (currentData.recoveryMilestone) {
+    points += followUpRules.clinician.milestone.points;
+    breakdown.push(`✅ ${followUpRules.clinician.milestone.description}: +${followUpRules.clinician.milestone.points} point`);
+  } else {
+    breakdown.push(`❌ ${followUpRules.clinician.milestone.description} (not met): +0 points`);
+  }
+
+  if (currentData.clinicalProgressVerified) {
+    points += followUpRules.clinician.progress.points;
+    breakdown.push(`✅ ${followUpRules.clinician.progress.description}: +${followUpRules.clinician.progress.points} point`);
+  } else {
+    breakdown.push(`❌ ${followUpRules.clinician.progress.description} (not verified): +0 points`);
+  }
+
+  console.log('📋 Follow-up SRS Calculation Breakdown:');
+  breakdown.forEach(item => console.log(`   ${item}`));
+  console.log(`🎯 Final Follow-up SRS Score: ${points}/11`);
+
+  return points;
 };
 
 // Enhanced phase determination function
-const getPhaseByScore = (score: number) => {
+export const getPhaseByScore = (score: number) => {
   if (score <= 3) return { label: "RESET", color: "blue" };
   if (score <= 6) return { label: "EDUCATE", color: "amber" };
   return { label: "REBUILD", color: "emerald" };
@@ -76,7 +279,7 @@ const getPhaseByScore = (score: number) => {
 
 // Calculate disability percentage based on region and scores
 const calculateDisabilityPercentage = (formData: any) => {
-  const { region, ndi, odi, ulfi, lefs } = formData;
+  const { region, ndi, tdi, odi, ulfi, lefs } = formData;
   
   let totalScore = 0;
   let maxScore = 0;
@@ -84,7 +287,10 @@ const calculateDisabilityPercentage = (formData: any) => {
   if (region === "Neck" && ndi) {
     totalScore = ndi.reduce((sum: number, score: number) => sum + score, 0);
     maxScore = ndi.length * 5; // NDI: 0-5 scale, 10 questions
-  } else if (region === "Lower Back" && odi) {
+  } else if (region === "Mid-Back / Thoracic" && tdi) {
+    totalScore = tdi.reduce((sum: number, score: number) => sum + score, 0);
+    maxScore = tdi.length * 5; // TDI: 0-5 scale, 10 questions
+  } else if (region === "Low Back / SI Joint" && odi) {
     totalScore = odi.reduce((sum: number, score: number) => sum + score, 0);
     maxScore = odi.length * 5; // ODI: 0-5 scale, 10 questions
   } else if (region === "Upper Limb" && ulfi) {
@@ -110,7 +316,7 @@ const determineBeliefStatus = (beliefs: string[]) => {
 };
 
 // Get comprehensive recovery points data for patient
-const getPatientRecoveryPointsData = async (patientId: number) => {
+export const getPatientRecoveryPointsData = async (patientId: number) => {
   const recoveryPointsService = require('../services/recoveryPointsService');
   
   try {
@@ -244,6 +450,7 @@ export const submitIntake = async (req: any, res: any) => {
       region,
       // Disability Index Arrays
       ndi,
+      tdi, // Add TDI
       odi, 
       ulfi,
       lefs,
@@ -251,6 +458,8 @@ export const submitIntake = async (req: any, res: any) => {
       vas, 
       psfs, 
       // Cognitive Assessment
+      pcs4,
+      tsk11,
       beliefs, 
       confidence, 
       // Follow-up specific
@@ -262,7 +471,7 @@ export const submitIntake = async (req: any, res: any) => {
     
     // Calculate disability percentage
     const disabilityPercentage = calculateDisabilityPercentage({
-      region, ndi, odi, ulfi, lefs
+      region, ndi, tdi, odi, ulfi, lefs
     });
     
     // Check if patient already exists
@@ -299,9 +508,22 @@ export const submitIntake = async (req: any, res: any) => {
     
     // Calculate SRS score
     const srsScore = calculateSRS({
-      vas, psfs, disabilityPercentage, confidence, beliefs, groc, formType,
+      vas, psfs, pcs4, tsk11, disabilityPercentage, confidence, beliefs, groc, formType,
       recoveryMilestone, clinicalProgressVerified
     }, previousData);
+    
+    console.log('🔢 SRS Score calculated:', srsScore, 'Type:', typeof srsScore);
+    
+    // NEW: Calculate continuous SRS components (0-100 scale)
+    const continuousSRS = calculateContinuousSRS({
+      vas, psfs, pcs4, tsk11, disabilityPercentage
+    });
+    
+    // NEW: Store assessment results
+    await storeAssessmentResults(patient.id, { pcs4, tsk11 });
+    
+    // NEW: Update or create SRSDaily record
+    await updateSRSDaily(patient.id, continuousSRS);
     
     // Prepare comprehensive SRS data
     const srsData = {
@@ -310,6 +532,7 @@ export const submitIntake = async (req: any, res: any) => {
       region,
       // Disability Index data
       ndi: ndi || null,
+      tdi: tdi || null, // Add TDI
       odi: odi || null,
       ulfi: ulfi || null,
       lefs: lefs || null,
@@ -318,6 +541,8 @@ export const submitIntake = async (req: any, res: any) => {
       vas: Number(vas),
       psfs: psfs || [],
       // Cognitive Assessment
+      pcs4: pcs4 || null,
+      tsk11: tsk11 || null,
       beliefs: beliefs || [],
       confidence: Number(confidence),
       // Follow-up specific
@@ -342,7 +567,7 @@ export const submitIntake = async (req: any, res: any) => {
     const baseUrl = process.env.PATIENT_PORTAL_URL || 'http://localhost:3000';
     const setupLink = generateSetupLink(email, patient.id, baseUrl);
     
-    // Send welcome email (using dev mode for now)
+    // Send welcome email (using dev mode for development)
     const emailSent = await sendWelcomeEmailDev({
       firstName,
       email,
@@ -357,6 +582,7 @@ export const submitIntake = async (req: any, res: any) => {
       phase: phase.label,
       disabilityPercentage,
       beliefStatus: srsData.beliefStatus,
+      continuousSRS, // NEW: Include continuous SRS
       emailSent,
       setupLink: process.env.NODE_ENV === 'development' ? setupLink : undefined,
       message: `${formType || 'Intake'} assessment processed successfully. Patient ${formType === 'Follow-Up' ? 'progress updated' : 'enrolled'} in Back to Life program.`
@@ -367,6 +593,149 @@ export const submitIntake = async (req: any, res: any) => {
       success: false,
       error: (err as Error).message 
     });
+  }
+};
+
+// NEW: Calculate continuous SRS (0-100 scale)
+const calculateContinuousSRS = (formData: any) => {
+  console.log('🔢 Calculating continuous SRS (0-100 scale)');
+  
+  // 1. Pain component (0-100): VAS 0-10 → 0-100 (inverted)
+  const pain = Math.max(0, 100 - (formData.vas * 10));
+  
+  // 2. Function component (0-100): PSFS average 0-10 → 0-100
+  let functionScore = 0;
+  if (formData.psfs && formData.psfs.length > 0) {
+    const avgPSFS = formData.psfs.reduce((sum: number, item: any) => sum + (item.score || 0), 0) / formData.psfs.length;
+    functionScore = Math.min(100, avgPSFS * 10);
+  }
+  
+  // 3. Psychological load (0-100): PCS-4 + stress component
+  let psychLoad = 0;
+  if (formData.pcs4) {
+    const pcs4Score = calculatePCS4ScoreFromData(formData.pcs4);
+    if (pcs4Score !== null) {
+      // PCS-4: 0-16 → 0-100 (higher = more catastrophizing = higher psych load)
+      psychLoad = Math.min(100, (pcs4Score / 16) * 100);
+    }
+  }
+  
+  // 4. Fear-avoidance (0-100): TSK-11 raw → normalized
+  let fa = 0;
+  if (formData.tsk11) {
+    const tsk11Raw = calculateTSK11Score(formData.tsk11);
+    if (tsk11Raw !== null) {
+      // Use the tskRawToFa function from computeFaScore
+      fa = ((tsk11Raw - 11) / 33) * 100;
+    }
+  }
+  
+  // Calculate continuous SRS: 4-way average
+  const continuousSRS = (pain + functionScore + (100 - psychLoad) + (100 - fa)) / 4;
+  
+  console.log('📊 Continuous SRS Components:');
+  console.log(`   Pain: ${pain.toFixed(1)}/100`);
+  console.log(`   Function: ${functionScore.toFixed(1)}/100`);
+  console.log(`   Psych Load: ${psychLoad.toFixed(1)}/100 (inverted: ${(100 - psychLoad).toFixed(1)})`);
+  console.log(`   Fear-Avoidance: ${fa.toFixed(1)}/100 (inverted: ${(100 - fa).toFixed(1)})`);
+  console.log(`   Final Continuous SRS: ${continuousSRS.toFixed(1)}/100`);
+  
+  return {
+    pain,
+    function: functionScore,
+    psychLoad,
+    fa,
+    continuousSRS: Math.round(continuousSRS)
+  };
+};
+
+// Helper function to calculate PCS-4 score
+const calculatePCS4ScoreFromData = (pcs4Data: any) => {
+  if (!pcs4Data || typeof pcs4Data !== 'object') return null;
+  
+  let totalScore = 0;
+  let answeredCount = 0;
+  
+  for (let i = 1; i <= 4; i++) {
+    const response = pcs4Data[i];
+    if (response !== undefined && response >= 0 && response <= 4) {
+      totalScore += response;
+      answeredCount++;
+    }
+  }
+  
+  return answeredCount === 4 ? totalScore : null;
+};
+
+// NEW: Store assessment results
+const storeAssessmentResults = async (patientId: number, assessments: any) => {
+  try {
+    // Store PCS-4 score
+    if (assessments.pcs4) {
+      const pcs4Score = calculatePCS4ScoreFromData(assessments.pcs4);
+      if (pcs4Score !== null) {
+        await prisma.assessmentResult.create({
+          data: {
+            patientId,
+            name: 'PCS4',
+            score: pcs4Score
+          }
+        });
+        console.log(`📊 Stored PCS-4 score: ${pcs4Score}`);
+      }
+    }
+    
+    // Store TSK-11 score
+    if (assessments.tsk11) {
+      const tsk11Score = calculateTSK11Score(assessments.tsk11);
+      if (tsk11Score !== null) {
+        await prisma.assessmentResult.create({
+          data: {
+            patientId,
+            name: 'TSK11',
+            score: tsk11Score
+          }
+        });
+        console.log(`📊 Stored TSK-11 score: ${tsk11Score}`);
+      }
+    }
+  } catch (error) {
+    console.error('Error storing assessment results:', error);
+  }
+};
+
+// NEW: Update SRSDaily record
+const updateSRSDaily = async (patientId: number, continuousSRS: any) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    await prisma.sRSDaily.upsert({
+      where: {
+        patientId_date: {
+          patientId,
+          date: today
+        }
+      },
+      update: {
+        pain: continuousSRS.pain,
+        function: continuousSRS.function,
+        psychLoad: continuousSRS.psychLoad,
+        fa: continuousSRS.fa
+      },
+      create: {
+        patientId,
+        date: today,
+        pain: continuousSRS.pain,
+        function: continuousSRS.function,
+        psychLoad: continuousSRS.psychLoad,
+        fa: continuousSRS.fa
+      }
+    });
+    
+    console.log(`📊 Updated SRSDaily for patient ${patientId}:`, continuousSRS);
+  } catch (error) {
+    console.error('Error updating SRSDaily:', error);
   }
 };
 
@@ -411,6 +780,9 @@ export const getAllPatientsWithScores = async (_req: any, res: any) => {
         odi: latestScore?.odi || null,
         ulfi: latestScore?.ulfi || null,
         lefs: latestScore?.lefs || null,
+        // Cognitive assessments
+        pcs4: latestScore?.pcs4 || null,
+        tsk11: latestScore?.tsk11 || null,
         lastUpdate: latestScore?.date || patient.createdAt,
         notes: [], // Clinical notes would come from a separate table
         // Real recovery points data from database

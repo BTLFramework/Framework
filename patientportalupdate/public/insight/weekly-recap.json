@@ -1,0 +1,149 @@
+{
+  "type": "form",
+  "title": "Weekly Insight Recap & Reflection",
+  "subtitle": "Review your week's learning and progress",
+  "description": "Take a moment to reflect on what you've learned this week and how it's helping your recovery journey.",
+  "sections": [
+    {
+      "title": "Week 1 Insights Review",
+      "description": "Let's review what you learned this week:",
+      "fields": [
+        {
+          "type": "checkbox",
+          "label": "Which insights resonated most with you?",
+          "options": [
+            "Danger vs. safety signals - Understanding how your brain processes pain",
+            "How cortisol slows healing - The impact of stress on recovery",
+            "Sleep debt + pain sensitivity - How sleep affects pain perception",
+            "Jess's success story - Real patient motivation and hope",
+            "Motion is Lotion - How gentle movement helps",
+            "Flare Up Plan - Building your personal calm-down strategy"
+          ]
+        },
+        {
+          "type": "text",
+          "label": "What was your biggest 'aha moment' this week?",
+          "placeholder": "What insight or concept really clicked for you?"
+        },
+        {
+          "type": "textarea",
+          "label": "How has this week's learning changed your perspective on pain?",
+          "placeholder": "Describe any shifts in how you think about or approach your pain...",
+          "rows": 3
+        }
+      ]
+    },
+    {
+      "title": "Your Progress This Week",
+      "description": "Celebrate your wins and identify areas for growth:",
+      "fields": [
+        {
+          "type": "rating",
+          "label": "How would you rate your overall pain management this week?",
+          "scale": 10,
+          "labels": {
+            "1": "Very challenging",
+            "5": "Moderate",
+            "10": "Excellent"
+          }
+        },
+        {
+          "type": "text",
+          "label": "What went well this week?",
+          "placeholder": "What strategies or insights helped you the most?"
+        },
+        {
+          "type": "text",
+          "label": "What was challenging this week?",
+          "placeholder": "What situations or symptoms were most difficult?"
+        },
+        {
+          "type": "text",
+          "label": "What would you like to improve next week?",
+          "placeholder": "What specific goals or changes would you like to focus on?"
+        }
+      ]
+    },
+    {
+      "title": "Applying Your Learning",
+      "description": "How are you putting these insights into practice?",
+      "fields": [
+        {
+          "type": "checkbox",
+          "label": "Which strategies did you try this week?",
+          "options": [
+            "Practiced breathing techniques when stressed",
+            "Used gentle movement to reduce pain",
+            "Applied safety signal concepts",
+            "Improved sleep habits",
+            "Used positive self-talk",
+            "Reached out to support network",
+            "Paced activities more mindfully"
+          ]
+        },
+        {
+          "type": "text",
+          "label": "What was the most effective strategy you tried?",
+          "placeholder": "Which approach gave you the best results?"
+        },
+        {
+          "type": "textarea",
+          "label": "Describe a specific situation where you applied this week's learning:",
+          "placeholder": "Tell us about a time when you used one of the insights or strategies...",
+          "rows": 3
+        }
+      ]
+    },
+    {
+      "title": "Looking Ahead",
+      "description": "Set intentions for the coming week:",
+      "fields": [
+        {
+          "type": "text",
+          "label": "My main goal for next week:",
+          "placeholder": "What's your primary focus for the coming week?"
+        },
+        {
+          "type": "text",
+          "label": "One new strategy I want to try:",
+          "placeholder": "What's something new you'd like to experiment with?"
+        },
+        {
+          "type": "text",
+          "label": "How will I measure my progress?",
+          "placeholder": "What will success look like for you next week?"
+        },
+        {
+          "type": "textarea",
+          "label": "My commitment to myself:",
+          "placeholder": "Write a personal commitment statement for your recovery journey...",
+          "rows": 2
+        }
+      ]
+    },
+    {
+      "title": "Gratitude & Reflection",
+      "description": "End your week with gratitude and positive reflection:",
+      "fields": [
+        {
+          "type": "text",
+          "label": "What are you grateful for this week?",
+          "placeholder": "Big or small, what brought you joy or comfort?"
+        },
+        {
+          "type": "text",
+          "label": "What are you proud of accomplishing?",
+          "placeholder": "Celebrate your wins, no matter how small!"
+        },
+        {
+          "type": "textarea",
+          "label": "Final thoughts on your recovery journey this week:",
+          "placeholder": "Any other reflections, insights, or observations...",
+          "rows": 2
+        }
+      ]
+    }
+  ],
+  "submitText": "Complete Weekly Recap",
+  "successMessage": "Great job completing your weekly reflection! This self-awareness is a powerful tool in your recovery journey."
+} 

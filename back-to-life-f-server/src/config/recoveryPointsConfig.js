@@ -4,7 +4,7 @@
 // Daily Actions Configuration
 export const rpActions = {
   MOVEMENT: [
-    { action: 'Exercise video completed', points: 3, description: 'Complete assigned exercise video' },
+    { action: 'Exercise video completed', points: 3, description: 'Complete assigned exercise video (per exercise)' },
     { action: 'Walk ≥3000 steps', points: 3, description: 'Achieve daily step goal' },
     { action: 'Stretching routine', points: 2, description: 'Complete stretching routine' },
     { action: 'Physical activity logged', points: 2, description: 'Log any physical activity' }
@@ -18,14 +18,14 @@ export const rpActions = {
   ],
   
   MINDSET: [
-    { action: '5-min mindfulness', points: 2, description: 'Complete mindfulness exercise' },
+    { action: '5-min mindfulness', points: 5, description: 'Complete mindfulness exercise' },
     { action: 'Journaling prompt', points: 2, description: 'Complete daily journal entry' },
     { action: 'Gratitude practice', points: 1, description: 'Write 3 things you\'re grateful for' },
     { action: 'Positive affirmation', points: 1, description: 'Practice positive self-talk' }
   ],
   
   EDUCATION: [
-    { action: 'Watch micro-lesson', points: 3, description: 'Complete educational video' },
+    { action: 'Watch micro-lesson', points: 5, description: 'Complete educational video (Recovery Insights)' },
     { action: 'Quiz ≥80% correct', points: 3, description: 'Pass knowledge quiz' },
     { action: 'Read article', points: 2, description: 'Read educational content' },
     { action: 'Complete module', points: 4, description: 'Finish learning module' }
@@ -33,7 +33,7 @@ export const rpActions = {
   
   ADHERENCE: [
     { action: 'Clinic visit attended', points: 5, description: 'Attend scheduled appointment' },
-    { action: 'Form submitted on time', points: 5, description: 'Submit assessment on time' },
+    { action: 'Form submitted on time', points: 3, description: 'Submit assessment on time (Pain Assessment)' },
     { action: 'Medication compliance', points: 3, description: 'Take prescribed medication' },
     { action: 'Home exercise compliance', points: 3, description: 'Complete home exercise program' }
   ]

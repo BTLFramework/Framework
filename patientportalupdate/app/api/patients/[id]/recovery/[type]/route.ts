@@ -18,6 +18,7 @@ export async function GET(req: NextRequest, context: { params: { id: string, typ
       // Return patient data for components that need region/phase
       return NextResponse.json(patientData);
     }
+    case 'recovery-insights':
     case 'insight':
     case 'insights': {
       return NextResponse.json({

@@ -13,9 +13,11 @@ interface TaskCardProps {
     category: string
   }
   onClick: () => void
+  iconBg?: string
+  iconColor?: string
 }
 
-export function TaskCard({ task, onClick }: TaskCardProps) {
+export function TaskCard({ task, onClick, iconBg, iconColor }: TaskCardProps) {
   const getStatusIcon = () => {
     switch (task.status) {
       case "completed":
@@ -44,8 +46,8 @@ export function TaskCard({ task, onClick }: TaskCardProps) {
       className={`p-4 rounded-xl border transition-all duration-200 cursor-pointer ${getStatusColor()}`}
     >
       <div className="flex items-start justify-between mb-3">
-        <div className="p-2 bg-teal-100 rounded-lg">
-          <task.icon className="w-5 h-5 text-teal-600" />
+        <div className={`p-2 rounded-lg ${iconBg ? iconBg : 'bg-teal-100'}`}>
+          <task.icon className={`w-5 h-5 ${iconColor ? iconColor : 'text-teal-600'}`} />
         </div>
         {getStatusIcon()}
       </div>

@@ -1,7 +1,6 @@
-import { Target, Clock } from "lucide-react";
+import { BarChart3, Clock } from "lucide-react";
 import { usePatientRecoveryData } from "@/hooks/usePatientData";
 import { SkeletonCard } from "./SkeletonCard";
-import { useState, useEffect } from "react";
 
 interface RecoveryInsightsCardProps {
   patientId: string;
@@ -10,18 +9,18 @@ interface RecoveryInsightsCardProps {
 }
 
 export function RecoveryInsightsCard({ patientId, onClick, isOpen = false }: RecoveryInsightsCardProps) {
-  const { data, error, isLoading } = usePatientRecoveryData(patientId, 'insights', isOpen);
+  const { data, error, isLoading } = usePatientRecoveryData(patientId, 'recovery-insights', isOpen);
 
-  // Show skeleton only when data is undefined (matching MovementSessionCard logic)
+  // Show skeleton only when data is undefined (matching MindfulnessSessionCard logic)
   if (data === undefined) {
-    return <SkeletonCard title="Recovery Insights" icon={<Target className="w-8 h-8 text-btl-400" />} />;
+    return <SkeletonCard title="Recovery Insights" icon={<BarChart3 className="w-8 h-8 text-btl-400" />} />;
   }
 
   if (error) {
     return (
       <div className="flex flex-col items-center bg-white rounded-2xl shadow-lg p-7 border border-red-200 min-h-[340px] min-w-[260px]">
         <div className="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center mb-4 mt-1">
-          <Target className="w-8 h-8 text-red-600" />
+          <BarChart3 className="w-8 h-8 text-red-600" />
         </div>
         <h3 className="font-bold text-lg mb-1 text-center text-red-700">Recovery Insights</h3>
         <p className="text-[15px] mb-3 text-center text-red-600">Unable to load insights data</p>
@@ -34,12 +33,13 @@ export function RecoveryInsightsCard({ patientId, onClick, isOpen = false }: Rec
     );
   }
 
-  const insightsData = (data as any)?.insights || {};
-  const availableInsights = insightsData.availableInsights || 0;
-  const phase = insightsData.phase || 'RESET';
-  const points = 2;
-  // Pills styling (bronze for insights)
-  const pillClass = 'bg-gradient-to-r from-[#b08d57] via-[#a97142] to-[#7c5c36] text-white shadow border border-[#a97142]';
+  const recoveryData = (data as any)?.recoveryInsights || {};
+  const phase = recoveryData.phase || 'EDUCATE';
+  const srsScore = recoveryData.srsScore || 0;
+  const availableInsights = recoveryData.availableInsights || 7;
+  const points = 5;
+  // Pills styling (silver for recovery insights - 5 points)
+  const pillClass = 'bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500 text-white shadow border border-gray-400';
 
   return (
     <div
@@ -47,20 +47,20 @@ export function RecoveryInsightsCard({ patientId, onClick, isOpen = false }: Rec
       onClick={onClick}
     >
       <div className="w-14 h-14 bg-btl-600 rounded-xl flex items-center justify-center mb-4 mt-1 shadow-md">
-        <Target className="w-8 h-8 text-white" />
+        <BarChart3 className="w-8 h-8 text-white" />
       </div>
       <h3 className="font-bold text-lg mb-1 text-center text-black">Recovery Insights</h3>
       <p className="text-[15px] mb-3 text-center text-black">
-        {availableInsights > 0 ? `View your ${availableInsights} new insights` : "View your risk profile and recovery progress"}
+        View your risk profile and recovery progress
       </p>
       <span className="inline-block px-4 py-1 text-xs font-semibold rounded-full bg-btl-100 text-btl-600 mb-3 text-center whitespace-nowrap">
-        {availableInsights > 0 ? `${availableInsights} new insights` : "Progress review"} • {phase.toUpperCase()} phase
+        1 of {availableInsights} insights available • {phase.toUpperCase()} phase
       </span>
       <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full ${pillClass} mb-2`}>
         +{points} pts
       </span>
       <div className="text-btl-600 font-semibold text-sm underline flex items-center gap-1 mb-2 hover:text-btl-700">
-        {availableInsights > 0 ? "View New Insights" : "View Insights"}
+        View Insights
         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
         </svg>

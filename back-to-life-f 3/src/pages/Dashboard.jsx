@@ -9,10 +9,6 @@ import FilteredPatientsModal from "../components/FilteredPatientsModal";
 // API function to fetch patients from backend
 const fetchPatientsFromAPI = async () => {
   try {
-    console.log('🔄 Fetching patients data from backend...');
-    console.log('🔗 API URL:', 'http://localhost:3001/patients');
-    console.log('⏰ Timestamp:', new Date().toISOString());
-    
     // Create timeout controller for better browser compatibility
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
@@ -27,9 +23,6 @@ const fetchPatientsFromAPI = async () => {
     
     clearTimeout(timeoutId);
     
-    console.log('📡 Response status:', response.status);
-    console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
-    
     if (!response.ok) {
       const errorText = await response.text();
       console.error('❌ API Error Response:', errorText);
@@ -37,24 +30,16 @@ const fetchPatientsFromAPI = async () => {
     }
     
     const data = await response.json();
-    console.log('📊 RAW API Response:', data);
-    console.log('📊 Number of patients received:', data.length);
-    console.log('📊 First patient sample:', data[0]);
     
     // Transform backend data to match frontend expectations
-    console.log('🔄 Starting data transformation...');
     const transformedPatients = data.map((patient, index) => {
-      console.log(`👤 Processing patient ${index + 1}:`, patient.name);
-      console.log(`👤 Full patient object:`, patient);
-      const latestScore = patient.srsScores?.[0];
-      const srsScore = patient.latestSrsScore || latestScore?.srsScore || 0;
-      console.log(`  📊 SRS Score: ${srsScore}`);
+      // Use SRS score directly from API response
+      const srsScore = patient.srs || 0;
       
-      // Use phase from backend - check both possible locations
-      const phase = patient.phase?.label || patient.phase || 'RESET';
-      console.log(`  🔄 Phase: ${phase}`);
+      // Use phase from backend
+      const phase = patient.phase || 'RESET';
       
-      // Use real recovery points data from backend (start new patients at 0)
+      // Use real recovery points data from backend
       const recoveryPoints = patient.recoveryPoints || {
         weeklyPoints: 0,
         trend: 'stable',
@@ -62,48 +47,38 @@ const fetchPatientsFromAPI = async () => {
         completionRate: 0
       };
       
+      // Calculate days since intake to determine if engagement assessment is appropriate
+      const daysSinceIntake = Math.floor((new Date() - new Date(patient.intakeDate)) / (1000 * 60 * 60 * 24));
+      
       const engagementStatus = patient.engagement || 
-        (recoveryPoints.completionRate >= 80 ? 'highly_engaged' :
+        (daysSinceIntake < 7 ? 'new_patient' : // Don't assess engagement for first week
+         recoveryPoints.completionRate >= 80 ? 'highly_engaged' :
          recoveryPoints.completionRate >= 60 ? 'engaged' :
          recoveryPoints.completionRate >= 40 ? 'moderate' : 'low_engagement');
       
       return {
-        id: patient.id,
-        name: patient.name,
-        email: patient.email,
+        // Spread all original API fields first
+        ...patient,
+        // Add transformed/computed fields on top
         patientId: `BTL-${String(patient.id).padStart(4, '0')}`,
         intakeDate: new Date(patient.intakeDate).toLocaleDateString(),
         phase,
         srsScore,
-        groc: latestScore?.groc || 0,
-        painLevel: latestScore?.vas || 0,
-        confidence: latestScore?.confidence || 0,
+        painLevel: patient.painScore || 0,
+        vas: patient.painScore || 0,
+        disabilityPercentage: patient.disabilityIndex || 0,
         recoveryPoints,
         engagementStatus,
-        lastContact: Math.floor(Math.random() * 30) + 1, // Days ago - TODO: get from backend
-        lastUpdate: new Date(Date.now() - (Math.floor(Math.random() * 30) + 1) * 24 * 60 * 60 * 1000).toISOString(), // Convert days ago to actual date
-        nextAppointment: patient.nextAppointment || new Date(Date.now() + Math.random() * 14 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        lastContact: patient.lastContact || 0,
+        lastUpdate: patient.lastUpdate || patient.intakeDate,
+        nextAppointment: patient.nextAppointment || 'Not scheduled',
         priority: srsScore < 4 ? 'high' : srsScore < 7 ? 'medium' : 'low',
         alerts: srsScore < 4 ? ['Low SRS Score'] : [],
-        // Additional patient details for modal
-        region: latestScore?.region || 'General',
-        disabilityPercentage: latestScore?.disabilityPercentage || 0,
-        vas: latestScore?.vas || 0,
-        psfs: latestScore?.psfs || [],
-        beliefs: latestScore?.beliefs || [],
-        formType: latestScore?.formType || 'Initial Assessment',
         notes: `Patient showing ${phase.toLowerCase()} phase characteristics. SRS score: ${srsScore}/11.`,
-        // Include the full srsScores array for modal access
-        srsScores: patient.srsScores || [],
         latestSrsScore: srsScore,
-        // Add previous SRS score for decline detection (mock data for testing)
-        prevSrsScore: patient.srsScores && patient.srsScores.length > 1 ? 
-          patient.srsScores[1].srsScore : 
-          (srsScore < 4 ? srsScore + Math.floor(Math.random() * 2) + 1 : null),
-        // Enhanced engagement tracking
-        portalLastLogin: patient.portalLastLogin || 
-          new Date(Date.now() - (Math.floor(Math.random() * 30) + 1) * 24 * 60 * 60 * 1000).toISOString(),
-        appointmentGap: patient.appointmentGap || Math.floor(Math.random() * 45) + 5
+        prevSrsScore: patient.prevSrs || null,
+        portalLastLogin: patient.portalLastLogin || null,
+        appointmentGap: patient.appointmentGap || 0
       };
     });
     
@@ -185,23 +160,22 @@ function Dashboard() {
     loadPatients();
   }, []);
 
-  // Set up real-time refresh every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      console.log('🔄 Auto-refreshing patient data...');
-      fetchPatientsFromAPI()
-        .then(fetchedPatients => {
-          setPatients(fetchedPatients);
-          setLastUpdated(new Date());
-        })
-        .catch(err => {
-          console.error('❌ Error refreshing patient data:', err);
-          setError(err.message);
-        });
-    }, 30000); // Refresh every 30 seconds
+      // Set up real-time refresh every 30 seconds
+    useEffect(() => {
+      const interval = setInterval(() => {
+        fetchPatientsFromAPI()
+          .then(fetchedPatients => {
+            setPatients(fetchedPatients);
+            setLastUpdated(new Date());
+          })
+          .catch(err => {
+            console.error('❌ Error refreshing patient data:', err);
+            setError(err.message);
+          });
+      }, 30000); // Refresh every 30 seconds
 
-    return () => clearInterval(interval);
-  }, []);
+      return () => clearInterval(interval);
+    }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -224,9 +198,10 @@ function Dashboard() {
     if (customFilter === "highlyEngaged") data = data.filter((p) => 
       p.recoveryPoints && p.recoveryPoints.completionRate >= 80
     );
-    if (customFilter === "lowEngagement") data = data.filter((p) => 
-      p.recoveryPoints && p.recoveryPoints.completionRate < 50
-    );
+    if (customFilter === "lowEngagement") data = data.filter((p) => {
+      const daysSinceIntake = Math.floor((new Date() - new Date(p.intakeDate)) / (1000 * 60 * 60 * 24));
+      return p.recoveryPoints && p.recoveryPoints.completionRate < 50 && daysSinceIntake >= 7;
+    });
 
     // Sort
     data.sort((a, b) => {
@@ -270,8 +245,29 @@ function Dashboard() {
 
   const handleDeletePatients = async (patientIds) => {
     try {
-      // Here you would make API calls to delete from backend
-      // For now, just remove from local state
+      console.log('🗑️ Deleting patients:', patientIds);
+      
+      // Delete each patient from the backend
+      const deletePromises = patientIds.map(async (patientId) => {
+        const response = await fetch(`http://localhost:3001/patients/${patientId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`Failed to delete patient ${patientId}: ${errorData.message || response.statusText}`);
+        }
+        
+        return response.json();
+      });
+      
+      // Wait for all deletions to complete
+      await Promise.all(deletePromises);
+      
+      // Remove deleted patients from local state
       setPatients(patients.filter(p => !patientIds.includes(p.id)));
       
       // If any deleted patients were selected, clear selection
@@ -282,16 +278,16 @@ function Dashboard() {
         setExpanded(null);
       }
       
-      console.log(`Deleted ${patientIds.length} patients:`, patientIds);
+      console.log('✅ Successfully deleted patients:', patientIds);
+      
     } catch (error) {
-      console.error('Error deleting patients:', error);
-      alert('Failed to delete patients. Please try again.');
+      console.error('❌ Error deleting patients:', error);
+      alert(`Failed to delete patients: ${error.message}`);
     }
   };
 
   // Manual refresh function
   const handleRefresh = () => {
-    console.log('🔄 Manual refresh triggered');
     setLoading(true);
     fetchPatientsFromAPI()
       .then(fetchedPatients => {
@@ -307,8 +303,6 @@ function Dashboard() {
 
   // Filter functions for dashboard cards
   const handleCardClick = (filterType) => {
-    console.log('📊 Card clicked:', filterType);
-    
     // Skip modal for "Total Patients" - just clear filters
     if (filterType === 'all') {
       setCustomFilter(null);
@@ -353,9 +347,10 @@ function Dashboard() {
   
   const followupDue = patients.filter(p => needsFollowUp(p.lastUpdate)).length;
   
-  const lowEngagement = patients.filter(p => 
-    p.recoveryPoints && p.recoveryPoints.completionRate < 50
-  ).length;
+  const lowEngagement = patients.filter(p => {
+    const daysSinceIntake = Math.floor((new Date() - new Date(p.intakeDate)) / (1000 * 60 * 60 * 24));
+    return p.recoveryPoints && p.recoveryPoints.completionRate < 50 && daysSinceIntake >= 7;
+  }).length;
 
   // Loading state
   if (loading && patients.length === 0) {
@@ -529,12 +524,6 @@ function Dashboard() {
           sortDir={sortDir}
           setSortDir={setSortDir}
           onRowClick={(patientId) => {
-            console.log('🎯 Dashboard received click for patient ID:', patientId);
-            console.log('🔍 Patient ID type:', typeof patientId);
-            console.log('🔍 Available patient IDs:', patients.map(p => ({ id: p.id, type: typeof p.id, name: p.name })));
-            const foundPatient = patients.find(p => p.id === patientId);
-            console.log('🔍 Found patient:', foundPatient);
-            console.log('🔄 Setting expanded to:', patientId);
             setExpanded(patientId);
           }}
           isFlagged={isFlagged}
@@ -548,17 +537,11 @@ function Dashboard() {
       </main>
 
       {/* Patient Modal */}
-      {console.log('🎭 Modal rendering check - expanded:', expanded, 'type:', typeof expanded)}
       {expanded && (
         <>
-          {console.log('🔄 Rendering modal for expanded:', expanded)}
-          {console.log('🔍 All patients:', patients)}
-          {console.log('🔍 Looking for patient with ID:', expanded)}
-          {console.log('🔍 Found patient:', patients.find((p) => p.id === expanded))}
           <PatientModal
             patient={patients.find((p) => p.id === expanded)}
             onClose={() => {
-              console.log('🚪 Closing modal');
               setExpanded(null);
             }}
             needsFollowUp={needsFollowUp}

@@ -18,14 +18,14 @@ export const rpActions = {
   ],
   
   MINDSET: [
-    { action: '5-min mindfulness', points: 2, description: 'Complete mindfulness exercise', icon: '🧠' },
+    { action: '5-min mindfulness', points: 5, description: 'Complete mindfulness exercise', icon: '🧠' },
     { action: 'Journaling prompt', points: 2, description: 'Complete daily journal entry', icon: '📝' },
     { action: 'Gratitude practice', points: 1, description: 'Write 3 things you\'re grateful for', icon: '🙏' },
     { action: 'Positive affirmation', points: 1, description: 'Practice positive self-talk', icon: '💭' }
   ],
   
   EDUCATION: [
-    { action: 'Watch micro-lesson', points: 3, description: 'Complete educational video', icon: '📹' },
+    { action: 'Watch micro-lesson', points: 5, description: 'Complete educational video', icon: '📹' },
     { action: 'Quiz ≥80% correct', points: 3, description: 'Pass knowledge quiz', icon: '🧩' },
     { action: 'Read article', points: 2, description: 'Read educational content', icon: '📚' },
     { action: 'Complete module', points: 4, description: 'Finish learning module', icon: '🎓' }
@@ -33,7 +33,7 @@ export const rpActions = {
   
   ADHERENCE: [
     { action: 'Clinic visit attended', points: 5, description: 'Attend scheduled appointment', icon: '🏥' },
-    { action: 'Form submitted on time', points: 5, description: 'Submit assessment on time', icon: '📋' },
+    { action: 'Form submitted on time', points: 3, description: 'Submit assessment on time', icon: '📋' },
     { action: 'Medication compliance', points: 3, description: 'Take prescribed medication', icon: '💊' },
     { action: 'Home exercise compliance', points: 3, description: 'Complete home exercise program', icon: '🏠' }
   ]

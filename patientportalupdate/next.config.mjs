@@ -7,7 +7,9 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,
+    unoptimized: false,
+    domains: ['localhost'],
+    formats: ['image/webp', 'image/avif'],
   },
   // Disable React strict mode in development to reduce WebSocket reconnections
   reactStrictMode: false,

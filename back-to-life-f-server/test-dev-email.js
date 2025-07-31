@@ -1,0 +1,1 @@
+const { sendWelcomeEmailDev } = require("./src/services/emailService"); sendWelcomeEmailDev({firstName: "Spencer", email: "spencerbarber@me.com", phase: "RESET", setupLink: "http://localhost:3000/setup?token=test"}).then(result => console.log("Dev email result:", result)).catch(err => console.error("Error:", err.message));

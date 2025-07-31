@@ -1,6 +1,6 @@
 "use client"
 
-import { Star, Flame, Zap, Trophy } from "lucide-react";
+import { Star, Flame, Zap, Trophy, TrendingUp } from "lucide-react";
 import { Medal } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -28,8 +28,8 @@ export function WeeklyPointsSection({ patientEmail, refreshKey }: WeeklyPointsSe
   // Fetch real recovery points data
   useEffect(() => {
     const fetchRecoveryPoints = async () => {
-      if (!patientEmail || patientEmail === 'test@example.com') {
-        console.log('ℹ️ No valid patient email or using default, skipping fetch')
+      if (!patientEmail) {
+        console.log('ℹ️ No valid patient email, skipping fetch')
         return
       }
       
@@ -90,6 +90,66 @@ export function WeeklyPointsSection({ patientEmail, refreshKey }: WeeklyPointsSe
     fetchRecoveryPoints()
   }, [patientEmail, refreshKey]) // Add refreshKey to dependencies
 
+  // Real task completion data from backend
+  const [taskCompletionData, setTaskCompletionData] = useState<Record<string, Record<string, number>>>({
+    thisWeek: {
+      MOVEMENT: 0,
+      PAIN_ASSESSMENT: 0,
+      MINDFULNESS: 0,
+      RECOVERY_INSIGHTS: 0
+    },
+    lastWeek: {
+      MOVEMENT: 0,
+      PAIN_ASSESSMENT: 0,
+      MINDFULNESS: 0,
+      RECOVERY_INSIGHTS: 0
+    }
+  })
+
+  // Fetch real task completion data
+  useEffect(() => {
+    const fetchTaskStats = async () => {
+      if (!patientEmail) {
+        console.log('ℹ️ No valid patient email, skipping task stats fetch')
+        return
+      }
+      
+      try {
+        console.log('🔄 Fetching task completion stats for:', patientEmail)
+        
+        // Get patient data first to get patient ID
+        const patientResponse = await fetch(`/api/patients/portal-data/${patientEmail}`)
+        if (!patientResponse.ok) {
+          console.log('❌ Patient not found, skipping task stats fetch')
+          return
+        }
+        
+        const patientResult = await patientResponse.json()
+        const patientDbId = patientResult.data.patient.id
+        
+        // Get task completion statistics
+        const taskStatsResponse = await fetch(`/api/recovery-points/task-stats/${patientDbId}`)
+        if (taskStatsResponse.ok) {
+          const taskStatsData = await taskStatsResponse.json()
+          console.log('📊 Task completion stats:', taskStatsData.data)
+          
+          setTaskCompletionData({
+            thisWeek: taskStatsData.data.thisWeek,
+            lastWeek: taskStatsData.data.lastWeek
+          })
+        } else {
+          console.log('⚠️ Could not fetch task stats, using default data')
+        }
+        
+      } catch (error) {
+        console.error('❌ Error fetching task completion stats:', error)
+        // Keep default values on error
+      }
+    }
+
+    fetchTaskStats()
+  }, [patientEmail, refreshKey])
+
   // Helper function to get badge colors (matching movement session header gradient)
   const getBadgeColor = (badgeClass: string) => {
     // All pills use the same ombre blue gradient now
@@ -100,6 +160,60 @@ export function WeeklyPointsSection({ patientEmail, refreshKey }: WeeklyPointsSe
     // No emoji, just the points
     return `+${points}`;
   }
+
+  // Task bucket icons and names
+  const taskBucketInfo: Record<string, { icon: string; name: string }> = {
+    MOVEMENT: { icon: '🏋️', name: 'Movement' },
+    PAIN_ASSESSMENT: { icon: '📝', name: 'Pain Assessment' },
+    MINDFULNESS: { icon: '🧘', name: 'Mindfulness' },
+    RECOVERY_INSIGHTS: { icon: '💡', name: 'Recovery Insights' }
+  }
+
+  // Calculate task completion deltas
+  const calculateTaskDeltas = () => {
+    const buckets = ['MOVEMENT', 'PAIN_ASSESSMENT', 'MINDFULNESS', 'RECOVERY_INSIGHTS']
+    const deltas = buckets.map(bucket => ({
+      bucket,
+      thisWeek: taskCompletionData.thisWeek[bucket] || 0,
+      lastWeek: taskCompletionData.lastWeek[bucket] || 0,
+      delta: (taskCompletionData.thisWeek[bucket] || 0) - (taskCompletionData.lastWeek[bucket] || 0)
+    }))
+
+    // Find the bucket with the highest positive delta
+    const bestTaskImprovement = deltas
+      .filter(item => item.delta > 0)
+      .sort((a, b) => b.delta - a.delta)[0]
+
+    return { bestTaskImprovement, allDeltas: deltas }
+  }
+
+  const { bestTaskImprovement } = calculateTaskDeltas()
+
+  // Determine the achievement content based on task completion data
+  const getBiggestWinContent = () => {
+    if (!bestTaskImprovement) {
+      return {
+        title: "Biggest Win This Week",
+        description: "Let's log a Mindfulness or Movement session to spark a win!",
+        points: 0,
+        badgeClass: "badge-none",
+        progress: 0,
+        showProgress: false
+      }
+    }
+
+    const bucketInfo = taskBucketInfo[bestTaskImprovement.bucket]
+    return {
+      title: "Biggest Win This Week",
+      description: `${bucketInfo.icon} ${bucketInfo.name} up by ${bestTaskImprovement.delta} sessions`,
+      points: Math.min(5, bestTaskImprovement.delta + 1), // 1 point per session improvement, max 5
+      badgeClass: bestTaskImprovement.delta >= 3 ? "badge-gold" : bestTaskImprovement.delta >= 2 ? "badge-silver" : "badge-bronze",
+      progress: Math.min(100, bestTaskImprovement.thisWeek * 20), // Progress based on this week's sessions
+      showProgress: true
+    }
+  }
+
+  const biggestWinData = getBiggestWinContent()
 
   // Calculate progress percentage
   const progressPercentage = Math.min(100, Math.round((weeklyData.total / weeklyData.target) * 100))
@@ -124,13 +238,14 @@ export function WeeklyPointsSection({ patientEmail, refreshKey }: WeeklyPointsSe
       progress: Math.round((weeklyData.breakdown.MOVEMENT / 60) * 100), // Rounded percentage
     },
     {
-      icon: Trophy,
-      title: "Weekly Progress",
-      description: `${weeklyData.total}/${weeklyData.target} pts`,
-      points: Math.floor(weeklyData.total / 50),
-      badgeClass: weeklyData.total >= 120 ? "badge-gold" : weeklyData.total >= 75 ? "badge-silver" : "badge-bronze",
+      icon: TrendingUp,
+      title: biggestWinData.title,
+      description: biggestWinData.description,
+      points: biggestWinData.points,
+      badgeClass: biggestWinData.badgeClass,
       iconColor: metallicGold,
-      progress: progressPercentage, // Already rounded above
+      progress: biggestWinData.progress,
+      showProgress: biggestWinData.showProgress,
     },
   ]
 
@@ -160,28 +275,27 @@ export function WeeklyPointsSection({ patientEmail, refreshKey }: WeeklyPointsSe
         {achievements.map((achievement, index) => (
           <div
             key={index}
-            className="flex items-center space-x-3 p-3 rounded-lg border border-gray-200 bg-white transition-all duration-200 hover:shadow-md hover:border-btl-300 hover:bg-btl-50 group"
+            className="flex items-center space-x-3 p-3 rounded-xl border border-gray-200 bg-white"
           >
-            {/* Remove the gray background box and shadow from the icon */}
-            <achievement.icon className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" style={{ color: metallicGold }} />
+            <achievement.icon className="w-5 h-5" style={{ color: metallicGold }} />
             <div className="flex-1">
-              <div className="font-semibold text-charcoal-900 text-sm group-hover:text-btl-700 transition-colors duration-200">{achievement.title}</div>
-              <div className="text-charcoal-600 text-xs">{achievement.description}</div>
+              <div className="font-semibold text-charcoal-900 text-sm">{achievement.title}</div>
+              <div className="text-charcoal-600 text-xs px-3 py-1 rounded-full bg-gray-100 inline-block">{achievement.description}</div>
             </div>
             <div className="text-right flex flex-col items-end space-y-1">
-              <span className={`px-4 py-1 rounded-full font-bold text-xs ${getBadgeColor(achievement.badgeClass)} transform hover:scale-105 transition-transform duration-200`}>
+              <span className={`px-4 py-1 rounded-full font-bold text-xs ${getBadgeColor(achievement.badgeClass)}`}>
                 {getBadgeText(achievement.badgeClass, achievement.points)}
               </span>
-              <div className="text-xs font-medium text-charcoal-500 group-hover:text-btl-600 transition-colors duration-200">
-                {achievement.progress > 0 ? `${achievement.progress}%` : '0%'}
-              </div>
+              {achievement.showProgress && (
+                <div className="text-xs font-medium text-charcoal-500 bg-gray-100 px-3 py-1 rounded-full inline-block">{achievement.progress > 0 ? `${achievement.progress}%` : '0%'}</div>
+              )}
             </div>
           </div>
         ))}
       </div>
 
       <button 
-        className="mt-4 w-full p-4 bg-gradient-to-r from-btl-500 to-btl-600 hover:from-btl-600 hover:to-btl-700 rounded-lg border border-btl-300 transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] cursor-pointer"
+        className="mt-4 w-full p-4 bg-gradient-to-r from-btl-500 to-btl-600 hover:from-btl-600 hover:to-btl-700 rounded-xl border border-btl-300 transition-all duration-200 hover:shadow-lg transform hover:scale-[1.02] cursor-pointer"
         onClick={() => {
           // Scroll to daily tasks section
           const tasksSection = document.querySelector('[data-section="daily-tasks"]');
@@ -203,15 +317,15 @@ export function WeeklyPointsSection({ patientEmail, refreshKey }: WeeklyPointsSe
         <div className="space-y-2 text-xs text-gray-600">
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-full bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 shadow border border-yellow-500 flex-shrink-0"></div>
-            <span className="flex-1"><strong>Gold:</strong> 7+ days (50+ pts, 120+ weekly)</span>
+            <span className="flex-1"><strong>Gold:</strong> 7+ days streak <span className='text-gray-400'>(or 50+ movement pts, or 120+ total weekly pts)</span></span>
           </div>
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-full bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 shadow border border-gray-400 flex-shrink-0"></div>
-            <span className="flex-1"><strong>Silver:</strong> 3–6 days (30–49 pts, 75–119 weekly)</span>
+            <span className="flex-1"><strong>Silver:</strong> 3–6 days streak <span className='text-gray-400'>(or 30–49 movement pts, or 75–119 total weekly pts)</span></span>
           </div>
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-full bg-gradient-to-r from-[#b08d57] via-[#a97142] to-[#7c5c36] shadow border border-[#a97142] flex-shrink-0"></div>
-            <span className="flex-1"><strong>Bronze:</strong> 1–2 days (1–29 pts, 1–74 weekly)</span>
+            <span className="flex-1"><strong>Bronze:</strong> 1–2 days streak <span className='text-gray-400'>(or 1–29 movement pts, or 1–74 total weekly pts)</span></span>
           </div>
         </div>
       </div>

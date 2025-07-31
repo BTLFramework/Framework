@@ -74,22 +74,19 @@ export default function PatientTable({
   };
 
   const getNextAppointment = (patient) => {
-    // Mock next appointment data - in real app this would come from backend
-    const appointments = [
-      { patientId: 1, date: "2024-01-15", time: "10:00 AM", type: "Follow-up" },
-      { patientId: 2, date: "2024-01-18", time: "2:30 PM", type: "Assessment" },
-      { patientId: 3, date: "2024-01-20", time: "9:15 AM", type: "Treatment" },
-      { patientId: 4, date: "2024-01-22", time: "11:00 AM", type: "Review" },
-      { patientId: 5, date: "2024-01-25", time: "3:00 PM", type: "Follow-up" },
-    ];
-    
-    const appointment = appointments.find(apt => apt.patientId === patient.id);
-    return appointment || null;
+    // TODO: Get appointment data from backend when available
+    return patient.nextAppointment || null;
   };
 
-  const getEngagementStatus = (recoveryPoints) => {
+  const getEngagementStatus = (recoveryPoints, intakeDate) => {
     // Handle case where recoveryPoints might be undefined or null
     if (!recoveryPoints) return "unknown";
+    
+    // Calculate days since intake to determine if engagement assessment is appropriate
+    const daysSinceIntake = Math.floor((new Date() - new Date(intakeDate)) / (1000 * 60 * 60 * 24));
+    
+    // Don't assess engagement for first week
+    if (daysSinceIntake < 7) return "new_patient";
     
     const { completionRate = 0, trend = "stable", streakDays = 0 } = recoveryPoints;
     
@@ -105,6 +102,7 @@ export default function PatientTable({
       case "engaged": return "Engaged";
       case "moderate": return "Moderate";
       case "low-engagement": return "Low Engagement";
+      case "new_patient": return "New Patient";
       case "unknown": return "No Data";
       default: return "Unknown";
     }
@@ -300,7 +298,7 @@ export default function PatientTable({
               const priorityAlert = getPriorityAlert(patient);
               const nextAppointment = getNextAppointment(patient);
               const daysSinceContact = getDaysSinceLastContact(patient.lastUpdate);
-              const engagementStatus = getEngagementStatus(patient.recoveryPoints);
+              const engagementStatus = getEngagementStatus(patient.recoveryPoints, patient.intakeDate);
               
               return (
                 <tr
@@ -327,7 +325,6 @@ export default function PatientTable({
                   <td 
                     style={{ padding: '16px 20px', cursor: 'pointer' }}
                     onClick={() => {
-                      console.log('🖱️ Clicked patient:', patient.name, 'ID:', patient.id);
                       onRowClick(patient.id);
                     }}
                   >

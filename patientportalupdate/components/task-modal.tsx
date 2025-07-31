@@ -2,6 +2,10 @@
 
 import { X, Clock, Tag, CheckCircle } from "lucide-react"
 import { useState } from "react"
+import { classifyTier, Mood } from "@/utils/assessment";
+import { tierContent } from "@/content/assessmentResponses";
+import ResultModal from "./ResultModal";
+import { useAuth } from "@/hooks/useAuth";
 
 interface TaskModalProps {
   task: {
@@ -13,24 +17,30 @@ interface TaskModalProps {
     timeEstimate: string
     category: string
     points?: number
+    pain?: number
+    stress?: number
+    mood?: string
   }
   onClose: () => void
   onTaskComplete?: (taskData: any) => void
 }
 
 export function TaskModal({ task, onClose, onTaskComplete }: TaskModalProps) {
+  const { patient } = useAuth();
   const [isCompleted, setIsCompleted] = useState(task.status === "completed")
   const [feedback, setFeedback] = useState("")
   const [score, setScore] = useState(5)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  // Add state for tier and escalate
+  const [tier, setTier] = useState<number | undefined>(undefined);
+  const [escalate, setEscalate] = useState(false);
 
   const handleComplete = async () => {
     setIsSubmitting(true)
     
     try {
-      // Get patient email from localStorage or URL params
-      const patientData = localStorage.getItem('btl_patient_data')
-      const email = patientData ? JSON.parse(patientData).email : 'test@example.com' // fallback
+      // Get patient email from auth context
+      const email = patient?.email || ''
 
       const taskCompletionData = {
         email,
@@ -62,6 +72,22 @@ export function TaskModal({ task, onClose, onTaskComplete }: TaskModalProps) {
       // Update local state
       setIsCompleted(true)
 
+      // Assume task.pain, task.stress, task.mood are available (if not, adjust as needed)
+      if (typeof task.pain === 'number' && typeof task.stress === 'number' && task.mood) {
+        const computedTier = classifyTier({
+          pain: task.pain as 0|1|2|3,
+          stress: task.stress as 0|1|2|3,
+          mood: task.mood as Mood
+        });
+        setTier(computedTier);
+        // If result.data.escalate is available, set escalate
+        if (result.data && typeof result.data.escalate === 'boolean') {
+          setEscalate(result.data.escalate);
+        } else {
+          setEscalate(false);
+        }
+      }
+
       // Notify parent component of completion
       if (onTaskComplete) {
         onTaskComplete({
@@ -71,18 +97,7 @@ export function TaskModal({ task, onClose, onTaskComplete }: TaskModalProps) {
         })
       }
 
-      // Update patient data in localStorage with new score
-      if (patientData) {
-        const currentData = JSON.parse(patientData)
-        const updatedData = {
-          ...currentData,
-          score: `${result.data.newSRSScore}/11`,
-          phase: result.data.phase,
-          lastUpdated: new Date().toISOString()
-        }
-        localStorage.setItem('btl_patient_data', JSON.stringify(updatedData))
-        console.log('📊 Updated patient data:', updatedData)
-      }
+      // Note: Patient data is now managed by auth context, not localStorage
 
       // Show success notification
       if (typeof window !== 'undefined') {
@@ -155,7 +170,7 @@ export function TaskModal({ task, onClose, onTaskComplete }: TaskModalProps) {
               </div>
             </div>
             <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <X className="w-5 h-5 text-gray-500" />
+              <X className="w-5 h-5 text-white" />
             </button>
           </div>
         </div>
@@ -217,16 +232,26 @@ export function TaskModal({ task, onClose, onTaskComplete }: TaskModalProps) {
               </button>
             </div>
           ) : (
-            <div className="text-center py-8">
-              <CheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Task Completed!</h3>
-              <p className="text-gray-600">Great job completing this task. Your progress has been recorded.</p>
-              <div className="mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-                <p className="text-emerald-800 text-sm font-medium">
-                  +{task.points || 5} recovery points earned!
-                </p>
+            // NEW LOGIC: Show ResultModal for tiered feedback
+            tier !== undefined ? (
+              <ResultModal
+                message={tierContent[tier as keyof typeof tierContent].message}
+                label={tierContent[tier as keyof typeof tierContent].cta.label}
+                route={tierContent[tier as keyof typeof tierContent].cta.route}
+                onClose={onClose}
+              />
+            ) : (
+              <div className="text-center py-8">
+                <CheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Task Completed!</h3>
+                <p className="text-gray-600">Great job completing this task. Your progress has been recorded.</p>
+                <div className="mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                  <p className="text-emerald-800 text-sm font-medium">
+                    +{task.points || 5} recovery points earned!
+                  </p>
+                </div>
               </div>
-            </div>
+            )
           )}
         </div>
       </div>

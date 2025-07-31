@@ -1,25 +1,46 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { ArrowLeft, Send, Search, Phone, Video, MoreVertical } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { ArrowLeft, Send, Search, Phone, Video, MoreVertical, MessageCircle } from "lucide-react"
+import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
+
+interface Message {
+  id: number
+  senderId: number | string
+  senderName: string
+  content: string
+  subject?: string
+  timestamp: string
+  isOwn: boolean
+  isRead?: boolean
+}
 
 export default function MessagesPage() {
   const router = useRouter()
+  const { patient, isAuthenticated } = useAuth()
   const [selectedConversation, setSelectedConversation] = useState(1)
   const [newMessage, setNewMessage] = useState("")
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
+  
+  // Ref for auto-scrolling to bottom
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // This should be dynamic - get from patient context/auth
-  const patientId = 1; // TODO: Get from authentication context
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
+
+  // Get patient ID from auth context
+  const patientId = patient?.id || 1; // Fallback to 1 if not authenticated
 
   const conversations = [
     {
       id: 1,
-      name: "Dr. Sarah Mitchell",
-      role: "Physical Therapist",
+      name: "Dr. Spencer Barber",
+      role: "Primary Healthcare Provider",
       avatar: "/placeholder.svg?height=40&width=40",
       lastMessage: "Loading...",
       timestamp: "Loading...",
@@ -33,7 +54,7 @@ export default function MessagesPage() {
     const fetchMessages = async () => {
       try {
         setLoading(true)
-        const response = await fetch(`http://localhost:3001/api/messages/patient/${patientId}`)
+        const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:3001'}/api/messages/patient/${patientId}`)
         
         if (!response.ok) {
           throw new Error('Failed to fetch messages')
@@ -43,7 +64,7 @@ export default function MessagesPage() {
         
         if (result.success) {
           // Format messages for display
-          const formattedMessages = result.messages.map(msg => ({
+          const formattedMessages = result.messages.map((msg: any) => ({
             id: msg.id,
             senderId: msg.senderType === 'CLINICIAN' ? 1 : 'me',
             senderName: msg.senderName,
@@ -65,13 +86,13 @@ export default function MessagesPage() {
             const latestMessage = formattedMessages[0]
             conversations[0].lastMessage = latestMessage.content
             conversations[0].timestamp = latestMessage.timestamp
-            conversations[0].unread = formattedMessages.filter(m => !m.isRead && !m.isOwn).length
+            conversations[0].unread = formattedMessages.filter((m: Message) => !m.isRead && !m.isOwn).length
           }
 
           // Mark messages as read when patient views them
           const markAsRead = async () => {
             try {
-              await fetch(`http://localhost:3001/api/messages/patient/${patientId}/mark-read`, {
+              await fetch(`${process.env.BACKEND_URL || 'http://localhost:3001'}/api/messages/patient/${patientId}/mark-read`, {
                 method: 'PATCH'
               })
             } catch (error) {
@@ -84,15 +105,15 @@ export default function MessagesPage() {
         } else {
           throw new Error(result.error || 'Failed to fetch messages')
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error fetching messages:', err)
-        setError(err.message)
+        setError(err.message || 'An error occurred')
         // Fallback to sample messages if API fails
         setMessages([
     {
       id: 1,
       senderId: 1,
-      senderName: "Dr. Sarah Mitchell",
+      senderName: "Dr. Spencer Barber",
             content: "Welcome to your patient portal! I'll be sending you updates and check-ins here.",
       timestamp: "2:30 PM",
       isOwn: false,
@@ -110,7 +131,7 @@ export default function MessagesPage() {
     if (!newMessage.trim()) return
 
     try {
-      const response = await fetch('http://localhost:3001/api/messages/reply', {
+      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:3001'}/api/messages/reply`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -118,7 +139,7 @@ export default function MessagesPage() {
         body: JSON.stringify({
           patientId: patientId,
           content: newMessage,
-          senderName: 'Sarah Johnson', // TODO: Get from patient context
+          senderName: patient?.name || 'Patient', // Get from patient context
           subject: 'Reply from patient'
         })
       })
@@ -154,29 +175,38 @@ export default function MessagesPage() {
   const selectedConv = conversations.find((c) => c.id === selectedConversation)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-teal-50">
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-btl-50 via-white to-btl-100">
+      {/* Header with BTL gradient - Matching other sections */}
+      <div className="bg-gradient-to-r from-btl-900 via-btl-700 to-btl-600 text-white px-6 py-6 shadow-lg">
+        <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </button>
+            <div className="p-3 rounded-2xl">
+              <MessageCircle className="w-10 h-10 text-white opacity-90" />
+            </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
-            <p className="text-gray-600">Communicate with your care team</p>
+              <h1 className="text-3xl font-bold">Messages</h1>
+              <p className="text-btl-100 mt-1">Communicate with your care team</p>
+            </div>
           </div>
+          <button 
+            onClick={() => router.back()} 
+            className="p-3 hover:bg-white/20 rounded-xl transition-all duration-200 hover:scale-105"
+          >
+            <ArrowLeft className="w-6 h-6 text-white" />
+          </button>
         </div>
       </div>
 
-      <div className="flex h-[calc(100vh-120px)]">
+              <div className="flex h-[calc(100vh-140px)]">
         {/* Conversations List */}
-        <div className="w-1/3 bg-white border-r border-gray-200">
-          <div className="p-4 border-b border-gray-200">
+        <div className="w-1/3 bg-white border-r border-charcoal-200">
+          <div className="p-4 border-b border-charcoal-200">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-charcoal-400 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search conversations..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                className="w-full pl-10 pr-4 py-2 border border-charcoal-200 rounded-xl focus:ring-2 focus:ring-btl-500 focus:border-btl-500 transition-all duration-200"
               />
             </div>
           </div>
@@ -186,31 +216,31 @@ export default function MessagesPage() {
               <div
                 key={conversation.id}
                 onClick={() => setSelectedConversation(conversation.id)}
-                className={`p-4 border-b border-gray-100 cursor-pointer transition-colors ${
-                  selectedConversation === conversation.id ? "bg-teal-50 border-teal-200" : "hover:bg-gray-50"
+                className={`p-4 mx-3 my-2 border border-transparent cursor-pointer transition-all duration-200 rounded-xl ${
+                  selectedConversation === conversation.id 
+                    ? "bg-btl-50 border-btl-200 shadow-md" 
+                    : "hover:bg-charcoal-50 hover:border-charcoal-200"
                 }`}
               >
                 <div className="flex items-center space-x-3">
                   <div className="relative">
-                    <img
-                      src={conversation.avatar || "/placeholder.svg"}
-                      alt={conversation.name}
-                      className="w-10 h-10 rounded-full"
-                    />
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-btl-500 to-btl-600 flex items-center justify-center text-white font-semibold shadow-sm">
+                      {conversation.name.split(' ').map(n => n[0]).join('')}
+                    </div>
                     {conversation.online && (
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-medium text-gray-900 truncate">{conversation.name}</h3>
-                      <span className="text-xs text-gray-500">{conversation.timestamp}</span>
+                      <h3 className="font-semibold text-charcoal-900 truncate">{conversation.name}</h3>
+                      <span className="text-xs text-charcoal-500">{conversation.timestamp}</span>
                     </div>
-                    <p className="text-sm text-gray-600 truncate">{conversation.role}</p>
-                    <p className="text-sm text-gray-500 truncate mt-1">{conversation.lastMessage}</p>
+                    <p className="text-sm text-btl-600 font-medium truncate">{conversation.role}</p>
+                    <p className="text-sm text-charcoal-600 truncate mt-1">{conversation.lastMessage}</p>
                   </div>
                   {conversation.unread > 0 && (
-                    <div className="w-5 h-5 bg-teal-600 text-white text-xs rounded-full flex items-center justify-center">
+                    <div className="w-6 h-6 bg-btl-600 text-white text-xs rounded-full flex items-center justify-center font-semibold shadow-sm">
                       {conversation.unread}
                     </div>
                   )}
@@ -223,82 +253,97 @@ export default function MessagesPage() {
         {/* Chat Area */}
         <div className="flex-1 flex flex-col">
           {/* Chat Header */}
-          <div className="bg-white border-b border-gray-200 p-4">
+          <div className="bg-white border-b border-charcoal-200 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <img
-                  src={selectedConv?.avatar || "/placeholder.svg"}
-                  alt={selectedConv?.name}
-                  className="w-10 h-10 rounded-full"
-                />
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-btl-500 to-btl-600 flex items-center justify-center text-white font-semibold shadow-sm">
+                  {selectedConv?.name.split(' ').map(n => n[0]).join('')}
+                </div>
                 <div>
-                  <h3 className="font-medium text-gray-900">{selectedConv?.name}</h3>
-                  <p className="text-sm text-gray-600">{selectedConv?.role}</p>
+                  <h3 className="font-semibold text-charcoal-900">{selectedConv?.name}</h3>
+                  <p className="text-sm text-btl-600 font-medium">{selectedConv?.role}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-2">
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                  <Phone className="w-5 h-5 text-gray-600" />
+                <button className="p-2 hover:bg-btl-50 rounded-xl transition-all duration-200 border border-transparent hover:border-btl-200">
+                  <Phone className="w-5 h-5 text-charcoal-600" />
                 </button>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                  <Video className="w-5 h-5 text-gray-600" />
+                <button className="p-2 hover:bg-btl-50 rounded-xl transition-all duration-200 border border-transparent hover:border-btl-200">
+                  <Video className="w-5 h-5 text-charcoal-600" />
                 </button>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                  <MoreVertical className="w-5 h-5 text-gray-600" />
+                <button className="p-2 hover:bg-btl-50 rounded-xl transition-all duration-200 border border-transparent hover:border-btl-200">
+                  <MoreVertical className="w-5 h-5 text-charcoal-600" />
                 </button>
               </div>
             </div>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-br from-btl-50/30 to-white">
             {loading ? (
               <div className="flex justify-center items-center h-full">
-                <div className="text-gray-500">Loading messages...</div>
+                <div className="text-charcoal-500 flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-btl-500 border-t-transparent rounded-full animate-spin"></div>
+                  <span>Loading messages...</span>
+                </div>
               </div>
             ) : error ? (
               <div className="flex justify-center items-center h-full">
-                <div className="text-red-500">Error loading messages: {error}</div>
+                <div className="text-red-500 bg-red-50 p-4 rounded-lg border border-red-200">
+                  Error loading messages: {error}
+                </div>
               </div>
             ) : messages.length === 0 ? (
               <div className="flex justify-center items-center h-full">
-                <div className="text-gray-500">No messages yet. Your care team will send updates here.</div>
+                <div className="bg-white border-2 border-dashed border-btl-200 rounded-2xl p-8 max-w-md mx-auto text-center shadow-sm">
+                  <div className="w-16 h-16 bg-gradient-to-br from-btl-100 to-btl-200 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                    <MessageCircle className="w-8 h-8 text-btl-500" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-charcoal-900 mb-2">No messages yet</h3>
+                  <p className="text-charcoal-600 text-sm leading-relaxed">Your care team will send updates here</p>
+                  <div className="mt-4 p-3 bg-btl-50 rounded-xl border border-btl-100">
+                    <p className="text-xs text-btl-700 font-medium">Messages from Dr. Spencer Barber and your care team will appear here</p>
+                  </div>
+                </div>
               </div>
             ) : (
               messages.map((message) => (
               <div key={message.id} className={`flex ${message.isOwn ? "justify-end" : "justify-start"}`}>
                 <div
-                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                    message.isOwn ? "bg-teal-600 text-white" : "bg-white border border-gray-200 text-gray-900"
+                  className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-md ${
+                    message.isOwn 
+                      ? "btn-primary-gradient text-white" 
+                      : "bg-white border border-charcoal-200 text-charcoal-900"
                   }`}
                 >
                     {message.subject && !message.isOwn && (
                       <p className="text-xs font-semibold mb-1 opacity-75">{message.subject}</p>
                     )}
-                  <p className="text-sm">{message.content}</p>
-                  <p className={`text-xs mt-1 ${message.isOwn ? "text-teal-100" : "text-gray-500"}`}>
+                  <p className="text-sm leading-relaxed">{message.content}</p>
+                  <p className={`text-xs mt-2 ${message.isOwn ? "text-btl-100" : "text-charcoal-500"}`}>
                     {message.timestamp}
                   </p>
                 </div>
               </div>
               ))
             )}
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Message Input */}
-          <div className="bg-white border-t border-gray-200 p-4">
-            <div className="flex space-x-2">
+          <div className="bg-white border-t border-charcoal-200 p-4">
+            <div className="flex space-x-3">
               <input
                 type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                 placeholder="Type your message..."
-                className="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                className="flex-1 p-3 border border-charcoal-200 rounded-xl focus:ring-2 focus:ring-btl-500 focus:border-btl-500 transition-all duration-200"
               />
               <button
                 onClick={handleSendMessage}
-                className="p-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+                className="p-3 btn-primary-gradient text-white rounded-xl hover:shadow-lg transition-all duration-200 transform hover:scale-105"
               >
                 <Send className="w-5 h-5" />
               </button>

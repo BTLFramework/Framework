@@ -14,6 +14,8 @@ interface IntakeFormData {
   confidence: number
   psfs: Array<{ activity: string; score: number }>
   beliefs: string[]
+  pcs4: { [key: string]: number }
+  tsk7: { [key: string]: number }
   ndi?: number[]
   odi?: number[]
   ulfi?: number[]
@@ -42,6 +44,70 @@ const beliefOptions = [
   "None of these apply"
 ]
 
+const pcs4Questions = [
+  {
+    id: "pcs1",
+    question: "I worry that my pain will never get better",
+    category: "Rumination"
+  },
+  {
+    id: "pcs2", 
+    question: "I feel I can't go on",
+    category: "Magnification"
+  },
+  {
+    id: "pcs3",
+    question: "It's terrible and I think it's never going to get any better",
+    category: "Helplessness"
+  },
+  {
+    id: "pcs4",
+    question: "It's really quite bad and I think it's never going to get any better",
+    category: "Helplessness"
+  }
+]
+
+const tsk7Questions = [
+  {
+    id: "tsk1",
+    question: "I avoid certain movements because I worry they'll make my pain worse",
+    category: "Fear of Movement"
+  },
+  {
+    id: "tsk2",
+    question: "I feel safe being physically active, even if I feel a little discomfort",
+    category: "Movement Confidence",
+    reverseScored: true
+  },
+  {
+    id: "tsk3",
+    question: "I worry that doing too much could delay my recovery",
+    category: "Recovery Concerns"
+  },
+  {
+    id: "tsk4",
+    question: "I think my body is fragile and needs to be protected",
+    category: "Body Confidence"
+  },
+  {
+    id: "tsk5",
+    question: "If something hurts, I assume it's causing damage",
+    category: "Pain Interpretation"
+  },
+  {
+    id: "tsk6",
+    question: "Just because something hurts doesn't mean it's harmful",
+    category: "Pain Understanding",
+    reverseScored: true
+  },
+  {
+    id: "tsk7",
+    question: "I'm confident in my body's ability to handle movement",
+    category: "Body Confidence",
+    reverseScored: true
+  }
+]
+
 const regionOptions = [
   { value: "Neck", label: "Neck" },
   { value: "Back", label: "Back" },
@@ -62,10 +128,12 @@ export default function IntakeFormPage() {
     vas: 5,
     confidence: 5,
     psfs: defaultPSFS,
-    beliefs: []
+    beliefs: [],
+    pcs4: {},
+    tsk7: {}
   })
 
-  const totalSteps = 4
+  const totalSteps = 8
 
   const handleInputChange = (field: keyof IntakeFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -86,6 +154,20 @@ export default function IntakeFormPage() {
     }))
   }
 
+  const handlePCS4Change = (questionId: string, value: number) => {
+    setFormData(prev => ({
+      ...prev,
+      pcs4: { ...prev.pcs4, [questionId]: value }
+    }))
+  }
+
+  const handleTSK7Change = (questionId: string, value: number) => {
+    setFormData(prev => ({
+      ...prev,
+      tsk7: { ...prev.tsk7, [questionId]: value }
+    }))
+  }
+
   const canProceed = () => {
     switch (currentStep) {
       case 1:
@@ -95,7 +177,15 @@ export default function IntakeFormPage() {
       case 3:
         return formData.psfs.some(psf => psf.score > 0)
       case 4:
+        return formData.confidence >= 0 && formData.confidence <= 10
+      case 5:
         return true // Beliefs are optional
+      case 6:
+        return Object.keys(formData.pcs4).length === pcs4Questions.length
+              case 7:
+          return Object.keys(formData.tsk7).length === tsk7Questions.length
+      case 8:
+        return true // Final step
       default:
         return false
     }
@@ -244,29 +334,6 @@ export default function IntakeFormPage() {
               <span>Worst Pain</span>
             </div>
           </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Confidence Level (0-10)
-            </label>
-            <div className="flex items-center space-x-4">
-              <input
-                type="range"
-                min="0"
-                max="10"
-                value={formData.confidence}
-                onChange={(e) => handleInputChange('confidence', parseInt(e.target.value))}
-                className="flex-1"
-              />
-              <span className="text-lg font-semibold text-gray-900 min-w-[3rem]">
-                {formData.confidence}/10
-              </span>
-            </div>
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>Not Confident</span>
-              <span>Very Confident</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -308,6 +375,39 @@ export default function IntakeFormPage() {
   const renderStep4 = () => (
     <div className="space-y-6">
       <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Confidence Assessment</h3>
+        <p className="text-gray-600 mb-4">
+          How confident are you that you will be able to return to the activities that are important to you?
+        </p>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Confidence Level (0-10) *
+          </label>
+          <div className="flex items-center space-x-4">
+            <input
+              type="range"
+              min="0"
+              max="10"
+              value={formData.confidence}
+              onChange={(e) => handleInputChange('confidence', parseInt(e.target.value))}
+              className="flex-1"
+            />
+            <span className="text-lg font-semibold text-gray-900 min-w-[3rem]">
+              {formData.confidence}/10
+            </span>
+          </div>
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>Not at all Confident</span>
+            <span>Completely Confident</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderStep5 = () => (
+    <div className="space-y-6">
+      <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Beliefs Assessment</h3>
         <p className="text-gray-600 mb-4">
           Please select any beliefs that apply to you regarding your pain and recovery. This helps us understand your mindset and provide better support.
@@ -329,12 +429,104 @@ export default function IntakeFormPage() {
     </div>
   )
 
+  const renderStep6 = () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Pain Beliefs</h3>
+        <p className="text-gray-600 mb-4">
+          Please rate how much you agree with each statement about your pain.
+        </p>
+        <div className="space-y-6">
+          {pcs4Questions.map((question) => (
+            <div key={question.id} className="border border-gray-200 rounded-lg p-4">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                {question.question}
+              </label>
+              <div className="flex items-center space-x-4">
+                <input
+                  type="range"
+                  min="0"
+                  max="4"
+                  value={formData.pcs4[question.id] || 0}
+                  onChange={(e) => handlePCS4Change(question.id, parseInt(e.target.value))}
+                  className="flex-1"
+                />
+                <span className="text-lg font-semibold text-gray-900 min-w-[3rem]">
+                  {formData.pcs4[question.id] || 0}/4
+                </span>
+              </div>
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>0 Not at all</span>
+                <span>1 Slightly</span>
+                <span>2 Moderately</span>
+                <span>3 Very much</span>
+                <span>4 Completely</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderStep7 = () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Fear of Movement</h3>
+        <p className="text-gray-600 mb-4">
+          Please rate how much you agree with each statement about movement and activity.
+        </p>
+        <div className="space-y-6">
+          {tsk7Questions.map((question: any) => (
+            <div key={question.id} className="border border-gray-200 rounded-lg p-4">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                {question.question}
+              </label>
+              <div className="flex items-center space-x-4">
+                <input
+                  type="range"
+                  min="1"
+                  max="4"
+                  value={formData.tsk7[question.id] || 1}
+                  onChange={(e) => handleTSK7Change(question.id, parseInt(e.target.value))}
+                  className="flex-1"
+                />
+                <span className="text-lg font-semibold text-gray-900 min-w-[3rem]">
+                  {formData.tsk7[question.id] || 1}/4
+                </span>
+              </div>
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>1 Strongly Disagree</span>
+                <span>2 Disagree</span>
+                <span>3 Agree</span>
+                <span>4 Strongly Agree</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+
   const renderStep = () => {
     switch (currentStep) {
       case 1: return renderStep1()
       case 2: return renderStep2()
       case 3: return renderStep3()
       case 4: return renderStep4()
+      case 5: return renderStep5()
+      case 6: return renderStep6()
+      case 7: return renderStep7()
+      case 8: return (
+        <div className="space-y-6">
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Complete Assessment</h3>
+            <p className="text-gray-600 mb-4">
+              You've completed all sections of your intake assessment. Click the button below to submit your responses and begin your recovery journey.
+            </p>
+          </div>
+        </div>
+      )
       default: return null
     }
   }

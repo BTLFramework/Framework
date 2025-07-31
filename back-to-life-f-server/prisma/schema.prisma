@@ -30,9 +30,45 @@ model Patient {
   recoveryPoints RecoveryPoint[]
   srsBuffers   SRSBuffer?
   messages     Message[]   // Messages to this patient
+  mindfulnessLogs MindfulnessLog[] // Daily mindfulness tracking
+  srsDaily     SRSDaily[]  // NEW: Daily SRS tracking
+  assessmentResults AssessmentResult[] // NEW: Assessment results
+  taskCompletions TaskCompletion[] // NEW: Task completions
   
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @default(now()) @updatedAt
+}
+
+// NEW: Daily SRS tracking for continuous 0-100 scale
+model SRSDaily {
+  id         String   @id @default(uuid())
+  patientId  Int
+  date       DateTime @default(now())
+  
+  pain       Float    // Pain intensity 0-100
+  function   Float    // Function score 0-100
+  psychLoad  Float    // Psychological load (stress + PCS-4) 0-100
+  fa         Float?   // NEW: Fear-avoidance 0-100
+  
+  patient    Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  @@unique([patientId, date])
+  @@index([patientId, date])
+  @@index([date])
+}
+
+// NEW: Assessment results storage
+model AssessmentResult {
+  id        String   @id @default(uuid())
+  patientId Int
+  name      String   // 'PCS4', 'TSK11', etc.
+  score     Int
+  createdAt DateTime @default(now())
+  
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  @@index([patientId])
+  @@index([patientId, name, createdAt])
 }
 
 model SRSScore {
@@ -55,6 +91,8 @@ model SRSScore {
   psfs                Json     // Patient-Specific Functional Scale
   
   // Cognitive Assessment
+  pcs4                Json?    // Pain Catastrophizing Scale (4 items)
+  tsk11               Json?    // Tampa Scale for Kinesiophobia (11 items)
   beliefs             Json?    // Limiting beliefs (changed to optional JSON)
   confidence          Int      // Confidence level (0-10)
   
@@ -174,4 +212,42 @@ model Message {
 enum SenderType {
   CLINICIAN
   PATIENT
+}
+
+// Mindfulness daily tracking
+model MindfulnessLog {
+  id        Int      @id @default(autoincrement())
+  patientId Int
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  date      DateTime @default(now())
+  practice  String   // Type of mindfulness practice (breathwork, nsdr, etc.)
+  mood      String?  // Optional mood rating
+  
+  @@unique([patientId, date])
+  @@index([patientId, date])
+}
+
+// Task Completion tracking for "Biggest Win This Week"
+model TaskCompletion {
+  id        Int      @id @default(autoincrement())
+  patientId Int
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  
+  // Task details
+  taskType  TaskType // Type of task completed
+  completedAt DateTime @default(now())
+  
+  // Optional metadata
+  sessionDuration Int? // Duration in minutes
+  pointsEarned   Int? // Points earned for this completion
+  
+  @@index([patientId, taskType, completedAt])
+  @@index([completedAt])
+}
+
+enum TaskType {
+  MOVEMENT
+  PAIN_ASSESSMENT
+  MINDFULNESS
+  RECOVERY_INSIGHTS
 }

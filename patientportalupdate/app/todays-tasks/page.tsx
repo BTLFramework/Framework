@@ -5,14 +5,16 @@ import { TodaysTasksSection } from "@/components/todays-tasks-section"
 import { MovementSessionDialog } from "@/components/MovementSessionDialog"
 import { PainAssessmentDialog } from "@/components/PainAssessmentDialog"
 import { MindfulnessSessionDialog } from "@/components/MindfulnessSessionDialog"
-import { RecoveryInsightsDialog } from "@/components/RecoveryInsightsDialog"
+import { RecoveryInsightDialog } from "@/components/RecoveryInsightDialog"
 import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/hooks/useAuth"
 
 // Force dynamic rendering to prevent build-time issues
 export const dynamic = 'force-dynamic'
 
 export default function TodaysTasksPage() {
   const { toast } = useToast()
+  const { patient, isAuthenticated } = useAuth()
   const [completedTasks, setCompletedTasks] = useState<any[]>([])
   
   // Drawer states
@@ -21,8 +23,8 @@ export default function TodaysTasksPage() {
   const [mindfulnessDrawerOpen, setMindfulnessDrawerOpen] = useState(false)
   const [insightsDrawerOpen, setInsightsDrawerOpen] = useState(false)
   
-  // Patient ID - in real app this would come from auth context
-  const [patientId] = useState("testback@example.com")
+  // Get patient ID from auth context
+  const patientId = patient?.email || ""
 
   const handleTaskClick = (task: any) => {
     console.log('🎯 Task clicked:', task)
@@ -96,28 +98,25 @@ export default function TodaysTasksPage() {
       <MindfulnessSessionDialog
         open={mindfulnessDrawerOpen}
         onOpenChange={setMindfulnessDrawerOpen}
-        onComplete={(points) => {
-          handleTaskComplete({ id: 'mindfulness-session', pointsEarned: points });
+        patientId={patientId}
+        onComplete={(data) => {
+          handleTaskComplete({ id: 'mindfulness-session', pointsEarned: data.pointsEarned });
         }}
-        tracks={{
-          "breathing-basics": {
-            title: "Breathing Basics",
-            video: "/videos/breathing-basics.mp4",
-            default: true
-          },
-          "body-scan": {
-            title: "Body Scan",
-            video: "/videos/body-scan.mp4",
-            default: false
-          }
-        }}
-        defaultTrack="breathing-basics"
+        onTaskComplete={handleTaskComplete}
       />
       
-      <RecoveryInsightsDialog
+      <RecoveryInsightDialog
         open={insightsDrawerOpen}
-        onClose={() => setInsightsDrawerOpen(false)}
+        onOpenChange={setInsightsDrawerOpen}
         patientId={patientId}
+        onComplete={(data) => {
+          handleTaskComplete({ id: 'recovery-insights', pointsEarned: data.pointsEarned });
+        }}
+        onTaskComplete={handleTaskComplete}
+        snapshot={{ pain: 5, stress: 5, risk: 'low' }}
+        painDelta={0}
+        stressDelta={0}
+        showActionPrompt={false}
       />
     </div>
   )

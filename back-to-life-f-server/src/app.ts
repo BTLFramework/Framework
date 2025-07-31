@@ -9,6 +9,9 @@ import patientRoutes from "./routes/patientRoutes";
 import patientPortalRoutes from "./routes/patientPortalRoutes2";
 const recoveryPointsRoutes = require("./routes/recoveryPointsRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+// Use require for getAssignedExercisesByEmail to avoid import issues
+const { getAssignedExercisesByEmail } = require("./models/patientModel");
+import { Request, Response } from "express";
 
 dotenv.config();
 
@@ -110,6 +113,20 @@ app.use("/patients", patientRoutes);
 app.use("/api/patient-portal", patientPortalRoutes);
 app.use("/api/recovery-points", recoveryPointsRoutes);
 app.use("/api/messages", messageRoutes);
+
+// Direct route for assigned exercises (for Next.js API proxy compatibility)
+app.get("/api/patient-portal/exercises/:email", async (req: any, res: any) => {
+  try {
+    const { email } = req.params;
+    const data = await getAssignedExercisesByEmail(email);
+    if (!data) {
+      return res.status(404).json({ error: "No exercises found for this patient" });
+    }
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch assigned exercises" });
+  }
+});
 
 // Global error handler
 app.use((err: any, req: any, res: any, next: any) => {

@@ -48,9 +48,10 @@ export default function FilteredPatientsModal({
         return patients.filter(p => needsFollowUp(p.lastUpdate));
       
       case 'low_engagement':
-        return patients.filter(p => 
-          p.recoveryPoints && p.recoveryPoints.completionRate < 50
-        );
+        return patients.filter(p => {
+          const daysSinceIntake = Math.floor((new Date() - new Date(p.intakeDate)) / (1000 * 60 * 60 * 24));
+          return p.recoveryPoints && p.recoveryPoints.completionRate < 50 && daysSinceIntake >= 7;
+        });
       
       default:
         return patients;
@@ -74,7 +75,6 @@ export default function FilteredPatientsModal({
     if (!noteInput.trim()) return;
     
     // In a real app, this would make an API call to save the note
-    console.log(`Adding note to patient ${id}: ${noteInput}`);
     setNoteInput("");
   };
 
@@ -205,7 +205,6 @@ export default function FilteredPatientsModal({
                 sortDir="desc"
                 setSortDir={() => {}}
                 onRowClick={(patientId) => {
-                  console.log('🎯 Modal patient clicked:', patientId);
                   setExpanded(patientId);
                 }}
                 isFlagged={isFlagged}

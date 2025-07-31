@@ -157,8 +157,6 @@ export default function MultiStepForm() {
     setResultPhase(phaseObj);
     
     try {
-      console.log('🔄 Submitting intake form to dual portal system...', formData);
-
       // Add email if not provided
       const submissionData = {
         ...formData,
@@ -166,8 +164,6 @@ export default function MultiStepForm() {
       };
 
       // Submit to patient portal API (which forwards to backend)
-      console.log('🔄 Submitting to patient portal...', submissionData);
-      
       const response = await fetch('http://localhost:3000/api/intake', {
         method: 'POST',
         headers: {
@@ -177,7 +173,6 @@ export default function MultiStepForm() {
       });
 
       const result = await response.json();
-      console.log('✅ Patient portal response:', result);
       
       // Store patient data for portal access
       if (result.success) {
@@ -188,7 +183,6 @@ export default function MultiStepForm() {
           phase: result.data.phase,
           timestamp: new Date().toISOString()
         };
-        console.log('💾 Storing patient data for redirect:', patientData);
         localStorage.setItem('btl_patient_data', JSON.stringify(patientData));
       }
       

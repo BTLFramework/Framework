@@ -230,22 +230,76 @@ function computeBaselineSRS(formData, clinicianData = {}) {
     breakdown.push(`❌ ${intakeRules.confidence.description} (${confidence} < ${intakeRules.confidence.moderate.threshold}): +0 points`);
   }
 
-  // 5. Belief Assessment
-  const beliefs = Array.isArray(formData.beliefs) ? formData.beliefs : 
-                  (formData.beliefs ? [formData.beliefs] : []);
-  const hasNegativeBeliefs = beliefs.some(belief => 
-    belief && belief.trim() !== "" && belief !== "None of these apply"
-  );
+  // 5. Fear-Avoidance Assessment (TSK-11)
+  const calculateTSK11Score = (tsk11Data) => {
+    if (!tsk11Data || typeof tsk11Data !== 'object') return null;
+    
+    let rawScore = 0;
+    let answeredCount = 0;
+    
+    // TSK-11 items with reverse-scored items (4, 8, 9)
+    const reverseScoredItems = [4, 8, 9];
+    
+    for (let i = 1; i <= 11; i++) {
+      const response = tsk11Data[i];
+      if (response && response >= 1 && response <= 4) {
+        answeredCount++;
+        if (reverseScoredItems.includes(i)) {
+          rawScore += (5 - response); // Reverse score: 1→4, 2→3, 3→2, 4→1
+        } else {
+          rawScore += response;
+        }
+      }
+    }
+    
+    return answeredCount === 11 ? rawScore : null;
+  };
   
-  if (!hasNegativeBeliefs || beliefs.length === 0) {
-    points += intakeRules.beliefs.points;
-    breakdown.push(`✅ ${intakeRules.beliefs.description}: +${intakeRules.beliefs.points} point`);
+  const tsk11RawScore = calculateTSK11Score(formData.tsk11);
+  
+  if (tsk11RawScore !== null) {
+    if (tsk11RawScore <= intakeRules.fearAvoidance.threshold) {
+      points += intakeRules.fearAvoidance.points;
+      breakdown.push(`✅ ${intakeRules.fearAvoidance.description} (${tsk11RawScore}): +${intakeRules.fearAvoidance.points} point`);
+    } else {
+      breakdown.push(`❌ Fear-Avoidance (TSK-11 ${tsk11RawScore} > ${intakeRules.fearAvoidance.threshold}): +0 points`);
+    }
   } else {
-    breakdown.push(`❌ Beliefs (negative beliefs present): +0 points`);
-    breakdown.push(`   Negative beliefs: ${beliefs.join(', ')}`);
+    breakdown.push(`❌ Fear-Avoidance (TSK-11 incomplete): +0 points`);
   }
 
-  // 6. Clinician Assessments
+  // 6. Pain Beliefs Assessment (PCS-4)
+  const calculatePCS4Score = (pcs4Data) => {
+    if (!pcs4Data || typeof pcs4Data !== 'object') return null;
+    
+    let totalScore = 0;
+    let answeredCount = 0;
+    
+    for (let i = 1; i <= 4; i++) {
+      const response = pcs4Data[i];
+      if (response !== undefined && response >= 0 && response <= 4) {
+        totalScore += response;
+        answeredCount++;
+      }
+    }
+    
+    return answeredCount === 4 ? totalScore : null;
+  };
+  
+  const pcs4TotalScore = calculatePCS4Score(formData.pcs4);
+  
+  if (pcs4TotalScore !== null) {
+    if (pcs4TotalScore <= intakeRules.painBeliefs.threshold) {
+      points += intakeRules.painBeliefs.points;
+      breakdown.push(`✅ ${intakeRules.painBeliefs.description} (${pcs4TotalScore}): +${intakeRules.painBeliefs.points} point`);
+    } else {
+      breakdown.push(`❌ Pain Beliefs (PCS-4 ${pcs4TotalScore} > ${intakeRules.painBeliefs.threshold}): +0 points`);
+    }
+  } else {
+    breakdown.push(`❌ Pain Beliefs (PCS-4 incomplete): +0 points`);
+  }
+
+  // 7. Clinician Assessments
   if (clinicianData.milestoneMet) {
     points += intakeRules.clinician.milestone.points;
     breakdown.push(`✅ ${intakeRules.clinician.milestone.description}: +${intakeRules.clinician.milestone.points} point`);

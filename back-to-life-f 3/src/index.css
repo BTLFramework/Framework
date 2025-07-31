@@ -395,9 +395,9 @@
   overflow: hidden;
 }
 
-.phase-bar-fill.reset { background: linear-gradient(90deg, #e0f2fe 0%, #b3e5fc 100%); }
-.phase-bar-fill.educate { background: linear-gradient(90deg, #fff8e1 0%, #ffecb3 100%); }
-.phase-bar-fill.rebuild { background: linear-gradient(90deg, #e8f5e8 0%, #c8e6c9 100%); }
+.phase-bar-fill.reset { background: linear-gradient(90deg, #f0f9ff 0%, #e0f2fe 100%); }
+.phase-bar-fill.educate { background: linear-gradient(90deg, #e0f2fe 0%, #b3e5fc 100%); }
+.phase-bar-fill.rebuild { background: linear-gradient(90deg, #b3e5fc 0%, #81d4fa 100%); }
 
 .phase-bar-progress {
   height: 100%;
@@ -428,13 +428,13 @@
 }
 
 .phase-bar-progress.reset { 
-  background: linear-gradient(90deg, #0277bd 0%, #03a9f4 100%);
+  background: linear-gradient(90deg, #155e75 0%, #0891b2 100%);
 }
 .phase-bar-progress.educate { 
-  background: linear-gradient(90deg, #ef6c00 0%, #ff9800 100%);
+  background: linear-gradient(90deg, #0891b2 0%, #06b6d4 100%);
 }
 .phase-bar-progress.rebuild { 
-  background: linear-gradient(90deg, #2e7d32 0%, #4caf50 100%);
+  background: linear-gradient(90deg, #06b6d4 0%, #22d3ee 100%);
 }
 
 /* BTL Dashboard Header */
@@ -751,21 +751,21 @@
 }
 
 .phase-badge.reset { 
-  background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
-  color: #0277bd;
-  border-color: #81d4fa;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  color: #475569;
+  border-color: #64748b;
 }
 
 .phase-badge.educate { 
-  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
-  color: #ef6c00;
-  border-color: #ffcc02;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #d97706;
+  border-color: #d97706;
 }
 
 .phase-badge.rebuild { 
-  background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
-  color: #2e7d32;
-  border-color: #81c784;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  color: #059669;
+  border-color: #059669;
 }
 
 /* BTL Confidence Bar */

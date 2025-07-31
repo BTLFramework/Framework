@@ -17,40 +17,83 @@ import { MovementSessionDialog } from "@/components/MovementSessionDialog"
 import { PainStressCheckDialog } from "@/components/PainStressCheckDialog"
 import { MindfulnessSessionDialog } from "@/components/MindfulnessSessionDialog"
 import { RecoveryInsightDialog } from "@/components/RecoveryInsightDialog"
+import { useAuth } from "@/hooks/useAuth"
+import { LoginForm } from "@/components/LoginForm"
 
 const PatientRecoveryDashboard: React.FC = () => {
+  // Use proper authentication
+  const { patient, loading: authLoading, isAuthenticated } = useAuth()
+  
+  console.log('🎯 Dashboard render state:', { patient, authLoading, isAuthenticated })
+  
   const [showScoreModal, setShowScoreModal] = useState(false)
   const [selectedTask, setSelectedTask] = useState<any>(null)
   const [showChatAssistant, setShowChatAssistant] = useState(false)
   const [selectedToolkit, setSelectedToolkit] = useState<any>(null)
   const [selectedAssessment, setSelectedAssessment] = useState<any>(null)
-  const [patientData, setPatientData] = useState<any>({
-    name: "Test Patient Back",
-    email: "testback@example.com", 
-    score: "2/11",
-    phase: "RESET",
-    timestamp: null
-  })
   const [refreshKey, setRefreshKey] = useState(0) // For triggering re-renders
   const [showMovementDialog, setShowMovementDialog] = useState(false)
   const [showPainDialog, setShowPainDialog] = useState(false)
   const [showMindfulnessDialog, setShowMindfulnessDialog] = useState(false)
   const [showInsightsDialog, setShowInsightsDialog] = useState(false)
   const [tasksData, setTasksData] = useState<any>(null)
+  const [currentSnapshot, setCurrentSnapshot] = useState({ pain: 5, stress: 5, risk: 'low' })
+  const [amyIntakeData, setAmyIntakeData] = useState<any>(null) // Store Amy's real intake data
+  const [loading, setLoading] = useState(true) // New state for loading
 
   // Function to completely reset portal data
   const resetPortalData = () => {
     console.log('🔄 Resetting portal data to defaults...')
     localStorage.removeItem('btl_patient_data')
-    setPatientData({
-      name: "Test Patient Back",
-      email: "testback@example.com", 
-      score: "2/11",
-      phase: "RESET",
-      timestamp: null
-    })
-    setRefreshKey(prev => prev + 1)
-    console.log('✅ Portal data reset complete')
+    // This function is no longer needed as patient data is managed by useAuth
+  }
+
+  // Function to fetch current pain/stress snapshot
+  const fetchCurrentSnapshot = async () => {
+    if (!patient?.email) return
+
+    try {
+      // Get baseline data
+      const portalResponse = await fetch(`${process.env.BACKEND_URL || 'http://localhost:3001'}/patients/portal-data/${patient.email}`)
+      if (!portalResponse.ok) return
+
+      const portalData = await portalResponse.json()
+      const baselineVAS = portalData.data.vas || 5
+      
+      // Get current daily data
+      const dailyResponse = await fetch(`${process.env.BACKEND_URL || 'http://localhost:3001'}/patients/daily-data/${patient.email}`)
+      let currentPain = baselineVAS
+      let currentStress = 2 // Default stress level
+      
+      if (dailyResponse.ok) {
+        const dailyData = await dailyResponse.json()
+        if (dailyData.success && dailyData.data) {
+          // Convert 0-100 scale back to 0-10
+          currentPain = Math.round((dailyData.data.pain / 100) * 10)
+          currentStress = Math.round((dailyData.data.psychLoad / 100) * 10)
+        }
+      }
+
+      // Determine risk level based on pain and stress
+      let riskLevel = 'low'
+      if (currentPain >= 7 || currentStress >= 7) {
+        riskLevel = 'high'
+      } else if (currentPain >= 5 || currentStress >= 5) {
+        riskLevel = 'moderate'
+      }
+
+      const newSnapshot = {
+        pain: currentPain,
+        stress: currentStress,
+        risk: riskLevel
+      }
+
+      setCurrentSnapshot(newSnapshot)
+      console.log('📊 Updated recovery snapshot:', newSnapshot)
+
+    } catch (error) {
+      console.error('❌ Error fetching snapshot data:', error)
+    }
   }
 
   // Load patient data from URL parameters or localStorage on component mount
@@ -61,140 +104,125 @@ const PatientRecoveryDashboard: React.FC = () => {
       if (existingData) {
         const data = JSON.parse(existingData)
         if (data.email && (data.email.includes('bb@hotmail.com') || data.email.includes('sarah@example.com') || data.email.includes('amorea@123.com') || data.email.includes('bb@123.com'))) {
-          console.log('🧹 Clearing old cached data on startup')
           localStorage.removeItem('btl_patient_data')
         }
       }
       // First try to get data from URL parameters
-      console.log('🌐 Current URL:', window.location.href)
-      console.log('🔍 URL search params:', window.location.search)
       const urlParams = new URLSearchParams(window.location.search)
       const urlPatientData = urlParams.get('patientData')
-      console.log('📝 Raw patientData param:', urlPatientData)
-      
       if (urlPatientData) {
         const data = JSON.parse(urlPatientData)
-        console.log('🔄 Loading patient data from URL:', data)
-        console.log('📊 Setting patient data - Name:', data.name, 'Score:', data.score, 'Phase:', data.phase)
-        
-        // Clear any existing localStorage to ensure fresh start for new patient
         localStorage.removeItem('btl_patient_data')
-        
-        setPatientData(data)
-        
-        // Store new patient data in localStorage for future visits
-        localStorage.setItem('btl_patient_data', JSON.stringify(data))
-        
-        // Clean up URL to remove the parameters
+        // This block is no longer needed as patient data is managed by useAuth
+        // setPatientData(data)
+        // localStorage.setItem('btl_patient_data', JSON.stringify(data))
         window.history.replaceState({}, document.title, window.location.pathname)
         return
       }
-      
       // Fallback to localStorage if no URL parameters
       const storedData = localStorage.getItem('btl_patient_data')
-      console.log('🔍 Raw localStorage data:', storedData)
-      
       if (storedData) {
         const data = JSON.parse(storedData)
-        console.log('📂 Loading patient data from localStorage:', data)
-        
-        // Check if stored data is valid (not old data)
         if (data.email && (data.email.includes('bb@hotmail.com') || data.email.includes('amorea@123.com') || data.email.includes('bb@123.com'))) {
-          console.log('🧹 Clearing old cached data for invalid email:', data.email)
           localStorage.removeItem('btl_patient_data')
-          console.log('ℹ️ Using default patient data instead')
         } else {
-          setPatientData(data)
+          // This block is no longer needed as patient data is managed by useAuth
+          // setPatientData(data)
         }
-      } else {
-        console.log('ℹ️ No stored patient data found, using defaults')
       }
     } catch (error) {
-      console.error('❌ Error loading patient data:', error)
-      // Clear localStorage on error to prevent corruption
       localStorage.removeItem('btl_patient_data')
     }
   }, [])
 
+  // Fetch current snapshot when patient data changes
+  useEffect(() => {
+    if (patient?.email) {
+      fetchCurrentSnapshot()
+    }
+  }, [patient])
+
   // Function to refresh patient data from backend
   const refreshPatientData = async () => {
+    if (!patient?.email) {
+      console.log('ℹ️ No patient email available for refresh')
+      return
+    }
+
     try {
+      setLoading(true)
       console.log('🔄 Refreshing patient data from backend...')
       
-      const response = await fetch(`http://localhost:3001/patients/portal-data/${patientData.email}`)
+      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:3001'}/patients/portal-data/${patient.email}`)
       if (response.ok) {
         const result = await response.json()
-        console.log('📊 Fresh patient data from backend:', result.data)
         
-        const updatedData = {
-          name: result.data.patient.name,
-          email: result.data.patient.email,
-          score: `${result.data.srsScore}/11`,
-          phase: result.data.phase,
-          recoveryPoints: result.data.recoveryPoints,
-          lastUpdated: result.data.lastUpdated
+        if (result.success && result.data) {
+          const updatedData = {
+            ...patient,
+            ...result.data.patient,
+            score: `${result.data.srsScore?.srsScore || 7}/11`,
+            phase: result.data.srsScore?.phase || 'RESET',
+            lastUpdated: new Date().toISOString()
+          }
+          
+          // Patient data is now managed by useAuth, so we don't need to update it here
+          console.log('✅ Patient data refreshed:', updatedData)
         }
-        
-        setPatientData(updatedData)
-        localStorage.setItem('btl_patient_data', JSON.stringify(updatedData))
-        
-        // Trigger re-render of components
-        setRefreshKey(prev => prev + 1)
-        
-        console.log('✅ Patient data refreshed successfully')
       }
     } catch (error) {
       console.error('❌ Error refreshing patient data:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
-  // Handle task completion
+  // Function to handle task completion
   const handleTaskComplete = async (taskData: any) => {
-    console.log('🎯 Task completed in dashboard:', taskData)
-    
-    // Update local patient data immediately
-    const updatedData = {
-      ...patientData,
-      score: `${taskData.newSRSScore}/11`,
-      phase: taskData.phase,
-      lastUpdated: new Date().toISOString()
+    if (!patient?.email) {
+      console.log('ℹ️ No patient email available for task completion')
+      return
     }
+
+    console.log('🎯 Task completed:', taskData)
     
-    setPatientData(updatedData)
-    localStorage.setItem('btl_patient_data', JSON.stringify(updatedData))
-    
-    // Close the task modal
-    setSelectedTask(null)
-    
-    // Immediately trigger refresh of components
-    setRefreshKey(prev => prev + 1)
-    
-    // Refresh data from backend to ensure sync
-    setTimeout(() => {
-      refreshPatientData().catch(error => {
-        console.error('Error in delayed refresh:', error);
-      });
-    }, 1000)
-    
-    // Record engagement activity
     try {
-      await fetch('http://localhost:3001/patients/update-engagement', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: patientData.email,
-          activityType: 'task_completion',
-          data: {
-            taskId: taskData.taskId,
-            taskTitle: taskData.taskTitle,
-            pointsEarned: taskData.pointsEarned
-          }
+      // Update local patient data immediately (but don't persist since useAuth manages it)
+      const updatedData = {
+        ...patient,
+        score: `${taskData.newSRSScore}/11`,
+        phase: taskData.phase,
+        lastUpdated: new Date().toISOString()
+      }
+      
+      console.log('📊 Updated patient data locally:', updatedData)
+      
+      // Trigger refresh
+      setRefreshKey(prev => prev + 1)
+      
+      // Optional: Record activity in backend
+      try {
+        await fetch(`${process.env.BACKEND_URL || 'http://localhost:3001'}/patients/activity`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: patient.email,
+            activityType: 'task_completion',
+            data: {
+              taskType: taskData.taskType,
+              newSRSScore: taskData.newSRSScore,
+              phase: taskData.phase
+            }
+          })
         })
-      })
+      } catch (activityError) {
+        console.log('ℹ️ Could not record activity (non-critical):', activityError)
+      }
+      
     } catch (error) {
-      console.error('Error recording engagement:', error)
+      console.error('❌ Error handling task completion:', error)
     }
   }
 
@@ -202,13 +230,13 @@ const PatientRecoveryDashboard: React.FC = () => {
   useEffect(() => {
     const recordPortalVisit = async () => {
       try {
-        await fetch('http://localhost:3001/patients/update-engagement', {
+        await fetch(`${process.env.BACKEND_URL || 'http://localhost:3001'}/patients/update-engagement`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            email: patientData.email,
+            email: patient?.email, // Use patient data directly
             activityType: 'portal_visit',
             data: {
               timestamp: new Date().toISOString(),
@@ -221,14 +249,16 @@ const PatientRecoveryDashboard: React.FC = () => {
       }
     }
 
-    if (patientData.email) {
+    if (patient?.email) {
       recordPortalVisit()
     }
-  }, [patientData.email])
+  }, [patient?.email])
 
   // Listen for custom events from Movement Session Dialog
   useEffect(() => {
-    const handleOpenRecoveryScore = () => {
+    const handleOpenRecoveryScore = async () => {
+      // Fetch patient's real intake data before opening the modal
+      await fetchPatientIntakeData()
       setShowScoreModal(true)
     }
 
@@ -254,15 +284,16 @@ const PatientRecoveryDashboard: React.FC = () => {
   // Extract current score number for the wheel
   const currentScore = (() => {
     try {
-    if (typeof patientData.score === 'number') {
-        return isNaN(patientData.score) ? 7 : patientData.score;
-    }
-    if (typeof patientData.score === 'string') {
-        const scoreStr = patientData.score.split('/')[0] || '7';
+      if (!patient) return 7; // Safety check
+      if (typeof patient.score === 'number') {
+        return isNaN(patient.score) ? 7 : patient.score;
+      }
+      if (typeof patient.score === 'string') {
+        const scoreStr = patient.score.split('/')[0] || '7';
         const parsed = parseInt(scoreStr);
         return isNaN(parsed) ? 7 : parsed;
-    }
-    return 7; // Default fallback
+      }
+      return 7; // Default fallback
     } catch (error) {
       console.error('Error parsing score:', error);
       return 7; // Safe fallback
@@ -272,21 +303,33 @@ const PatientRecoveryDashboard: React.FC = () => {
   // Handler for opening the correct dialog based on card id
   const handleTaskDialogOpen = (task: any) => {
     console.log('🎯 Task clicked:', task)
+    console.log('🎯 Task ID:', task.id)
+    console.log('🎯 Current dialog states:', { 
+      showMovementDialog, 
+      showPainDialog, 
+      showMindfulnessDialog, 
+      showInsightsDialog 
+    })
     
     switch (task.id) {
       case "movement-session":
+        console.log('🎯 Opening movement dialog')
         setShowMovementDialog(true);
         break;
       case "pain-assessment":
+        console.log('🎯 Opening pain dialog')
         setShowPainDialog(true);
         break;
       case "mindfulness-session":
+        console.log('🎯 Opening mindfulness dialog')
         setShowMindfulnessDialog(true);
         break;
       case "recovery-insights":
+        console.log('🎯 Opening insights dialog')
         setShowInsightsDialog(true);
         break;
       default:
+        console.log('🎯 No matching task ID, using fallback')
         setSelectedTask(task); // fallback for any other tasks
     }
   }
@@ -294,104 +337,219 @@ const PatientRecoveryDashboard: React.FC = () => {
     // Tasks data is handled by TodaysTasksSection component
     // No need to fetch separately here
 
-  return (
-    <div className="flex min-h-screen bg-gradient-to-br from-btl-50 to-white">
-      <LeftSidebar patientData={patientData} />
+  // Function to fetch current patient's real intake data for SRS breakdown
+  const fetchPatientIntakeData = async () => {
+    try {
+      if (!patient?.email) {
+        console.log('⚠️ No patient email available, using sample data')
+        setAmyIntakeData({
+          vas: 3,
+          disability: 15,
+          psfs: 7.0,
+          confidence: 6,
+          negativeBeliefs: 'no',
+          pcs4: 5,
+          tsk11: 18,
+          milestoneAchieved: 'no',
+          objectiveProgress: 'no'
+        })
+        return
+      }
 
-      <div className="flex-1 flex flex-col">
-        <TopHeader
-          patientData={patientData}
+      console.log('🔍 Fetching patient intake data for SRS breakdown...')
+      
+      // Fetch current patient's portal data which includes intake information
+      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:3001'}/patients/portal-data/${patient.email}`)
+      if (response.ok) {
+        const result = await response.json()
+        console.log('📊 Patient portal data:', result.data)
+        
+        // Extract intake data from the portal response
+        const intakeData = {
+          vas: result.data.vas || 3,
+          disability: result.data.disability || 15,
+          psfs: result.data.psfs || 7.0,
+          confidence: result.data.confidence || 6,
+          negativeBeliefs: result.data.negativeBeliefs || 'no',
+          pcs4: result.data.pcs4 || 5,
+          tsk11: result.data.tsk11 || 18,
+          milestoneAchieved: result.data.milestoneAchieved || 'no',
+          objectiveProgress: result.data.objectiveProgress || 'no'
+        }
+        
+        setAmyIntakeData(intakeData)
+        console.log('✅ Patient intake data loaded for SRS breakdown:', intakeData)
+      } else {
+        console.log('⚠️ Could not fetch patient data, using sample data')
+        // Fallback to sample data if fetch fails
+        setAmyIntakeData({
+          vas: 3,
+          disability: 15,
+          psfs: 7.0,
+          confidence: 6,
+          negativeBeliefs: 'no',
+          pcs4: 5,
+          tsk11: 18,
+          milestoneAchieved: 'no',
+          objectiveProgress: 'no'
+        })
+      }
+    } catch (error) {
+      console.error('❌ Error fetching patient intake data:', error)
+      // Fallback to sample data on error
+      setAmyIntakeData({
+        vas: 3,
+        disability: 15,
+        psfs: 7.0,
+        confidence: 6,
+        negativeBeliefs: 'no',
+        pcs4: 5,
+        tsk11: 18,
+        milestoneAchieved: 'no',
+        objectiveProgress: 'no'
+      })
+    }
+  }
+
+  // Show loading state while authenticating
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-btl-50 to-btl-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-btl-600 mx-auto mb-4"></div>
+          <p className="text-btl-600">Loading your dashboard...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Redirect to login page if not authenticated
+  if (!authLoading && (!isAuthenticated || !patient)) {
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login'
+      return null
+    }
+    return null
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-btl-50 to-btl-100 flex">
+      <div className="fixed inset-y-0 left-0 z-50">
+        <LeftSidebar patientData={patient} />
+      </div>
+      
+      {/* Main Content */}
+      <div className="flex-1 pl-64 flex flex-col min-h-screen">
+        <TopHeader 
+          patientData={patient || { name: 'Loading...', email: '' }}
           onChatAssistant={() => setShowChatAssistant(true)}
           onBookAppointment={() => window.open("/book-appointment", "_blank")}
         />
-
-        <main className="flex-1 p-6">
-          <div className="max-w-7xl mx-auto">
-            {/* Today's Recovery Tasks - Most Important Section */}
-            <div data-section="daily-tasks" className="mb-8">
-              <TodaysTasksSection 
-                key={`tasks-${refreshKey}`} // Force re-render when data updates
-                onTaskClick={handleTaskDialogOpen} 
-                onTaskComplete={handleTaskComplete}
-              />
-            </div>
-
-            {/* Score and Weekly Points Side by Side */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              {/* Recovery Score with Wheel */}
-              <div className="card-gradient rounded-xl shadow-lg p-6 border border-btl-200 hover:card-hover-gradient hover:shadow-xl transition-all duration-300">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h2 className="text-xl font-semibold gradient-text">Signature Recovery Score™</h2>
-                    <p className="text-charcoal-600 text-sm mt-1">Your personalized recovery metric</p>
-                  </div>
-                  <button
-                    onClick={() => setShowScoreModal(true)}
-                    className="text-btl-600 hover:text-btl-700 text-sm font-medium hover:bg-btl-50 px-3 py-1 rounded-lg transition-all duration-200"
-                  >
-                    View Breakdown
-                  </button>
-                </div>
-                <RecoveryScoreWheel score={currentScore} maxScore={11} phase={patientData.phase} />
+        
+        {/* Pass authenticated patient data to components */}
+        {patient && (
+          <TodaysTasksSection 
+            onTaskClick={handleTaskDialogOpen} 
+            onTaskComplete={(taskData) => {
+              console.log('Task completed:', taskData)
+              setRefreshKey(prev => prev + 1)
+            }}
+            refreshKey={refreshKey}
+          />
+        )}
+        
+        {/* Score and Weekly Points Side by Side */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Recovery Score with Wheel */}
+          <div className="card-gradient rounded-xl shadow-lg p-6 border border-btl-200 hover:card-hover-gradient hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-semibold gradient-text">Signature Recovery Score™</h2>
+                <p className="text-charcoal-600 text-sm mt-1">Your personalized recovery metric</p>
               </div>
-
-              {/* Weekly Points */}
-              <WeeklyPointsSection key={`points-${refreshKey}`} patientEmail={patientData.email} refreshKey={refreshKey} />
+              <button
+                onClick={async () => {
+                  await fetchPatientIntakeData()
+                  setShowScoreModal(true)
+                }}
+                className="text-btl-600 hover:text-btl-700 text-sm font-medium hover:bg-btl-50 px-3 py-1 rounded-lg transition-all duration-200"
+              >
+                View Breakdown
+              </button>
             </div>
-
-            {/* Recovery Toolkit and Assessments */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-              <RecoveryToolkitSection onToolkitClick={setSelectedToolkit} />
-              <AssessmentsSection onAssessmentClick={setSelectedAssessment} />
-            </div>
+            <RecoveryScoreWheel score={currentScore} maxScore={11} phase={patient?.phase || patient?.currentPhase || 'RESET'} />
           </div>
-        </main>
+
+          {/* Weekly Points */}
+          {patient && (
+            <WeeklyPointsSection key={`points-${refreshKey}`} patientEmail={patient.email} refreshKey={refreshKey} />
+          )}
+        </div>
+
+        {/* Recovery Toolkit and Assessments */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+          <RecoveryToolkitSection onToolkitClick={setSelectedToolkit} />
+          <AssessmentsSection onAssessmentClick={setSelectedAssessment} />
+        </div>
       </div>
 
       {/* Modals */}
-      {showScoreModal && <ScoreBreakdownModal score={currentScore} onClose={() => setShowScoreModal(false)} />}
       {/* Dialog modals for each recovery task */}
-      <MovementSessionDialog 
-        open={showMovementDialog} 
-        onClose={() => setShowMovementDialog(false)} 
-        patientId={patientData.email}
-        onTaskComplete={handleTaskComplete}
-      />
-      <PainStressCheckDialog
-        open={showPainDialog}
-        onOpenChange={setShowPainDialog}
-        onComplete={(data: any) => {
-          console.log('Pain & stress check-in completed:', data)
-          setShowPainDialog(false)
-          refreshPatientData()
-        }}
-        onTaskComplete={handleTaskComplete}
-      />
-      <MindfulnessSessionDialog
-        open={showMindfulnessDialog}
-        onOpenChange={setShowMindfulnessDialog}
-        onComplete={(points: number) => {
-          console.log('Mindfulness completed, points:', points)
-          setShowMindfulnessDialog(false)
-          refreshPatientData()
-        }}
-        tracks={tasksData?.tasks?.mindfulness?.tracks || {}}
-        defaultTrack={tasksData?.tasks?.mindfulness?.defaultTrack || 'breathwork'}
-      />
-      <RecoveryInsightDialog
-        open={showInsightsDialog}
-        onOpenChange={setShowInsightsDialog}
-        onComplete={(points: number) => {
-          console.log('Recovery insight completed, points:', points)
-          setShowInsightsDialog(false)
-          refreshPatientData()
-        }}
-        snapshot={tasksData?.tasks?.recoveryInsight?.snapshot || { pain: 5, stress: 5, risk: 'low' }}
-        painDelta={tasksData?.painDelta || 0}
-        stressDelta={tasksData?.stressDelta || 0}
-        showActionPrompt={tasksData?.tasks?.recoveryInsight?.showActionPrompt || false}
-        actionPrompt={tasksData?.tasks?.recoveryInsight?.actionPrompt}
-      />
+      {patient && (
+        <>
+          {console.log('🎯 Rendering MovementSessionDialog, open:', showMovementDialog)}
+          <MovementSessionDialog 
+            open={showMovementDialog} 
+            onClose={() => setShowMovementDialog(false)} 
+            patientId={patient.email}
+            onTaskComplete={handleTaskComplete}
+          />
+        </>
+      )}
+              {patient && (
+          <PainStressCheckDialog
+            open={showPainDialog}
+            onOpenChange={setShowPainDialog}
+            patientId={patient.email}
+            onComplete={(data: any) => {
+              console.log('Pain & stress check-in completed:', data)
+              setShowPainDialog(false)
+              refreshPatientData()
+            }}
+            onTaskComplete={handleTaskComplete}
+          />
+        )}
+              {patient && (
+          <MindfulnessSessionDialog
+            open={showMindfulnessDialog}
+            onOpenChange={setShowMindfulnessDialog}
+            patientId={patient.email}
+            onComplete={(data: any) => {
+              console.log('Mindfulness completed:', data)
+              setShowMindfulnessDialog(false)
+              refreshPatientData()
+            }}
+            onTaskComplete={handleTaskComplete}
+          />
+        )}
+              {patient && (
+          <RecoveryInsightDialog
+            open={showInsightsDialog}
+            onOpenChange={setShowInsightsDialog}
+            patientId={patient.email}
+            onComplete={(data: any) => {
+              console.log('Recovery insight completed:', data)
+              setShowInsightsDialog(false)
+              refreshPatientData()
+            }}
+            onTaskComplete={handleTaskComplete}
+            snapshot={currentSnapshot}
+            painDelta={0}
+            stressDelta={0}
+            showActionPrompt={false}
+            actionPrompt={{ title: "", action: "", buttonText: "" }}
+          />
+        )}
       {/* Fallback for any other tasks (legacy) */}
       {selectedTask && (
         <TaskModal 
@@ -404,6 +562,13 @@ const PatientRecoveryDashboard: React.FC = () => {
       {selectedToolkit && <ToolkitModal toolkit={selectedToolkit} onClose={() => setSelectedToolkit(null)} />}
       {selectedAssessment && (
         <AssessmentModal assessment={selectedAssessment} onClose={() => setSelectedAssessment(null)} />
+      )}
+      {showScoreModal && (
+        <ScoreBreakdownModal 
+          score={currentScore} 
+          onClose={() => setShowScoreModal(false)}
+          intakeData={amyIntakeData} // Pass Amy's real intake data
+        />
       )}
     </div>
   )

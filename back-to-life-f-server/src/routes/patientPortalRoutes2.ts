@@ -61,6 +61,41 @@ router.post('/set-password', async (req: any, res: any) => {
   }
 });
 
+// Test route to see which file is being used
+router.get('/test-route', (req: any, res: any) => {
+  res.json({ message: 'TypeScript file is being used' });
+});
+
+// Create account for patient portal (after intake completion)
+router.post('/create-account', async (req: any, res: any) => {
+  try {
+    const { email, password, patientName } = req.body;
+    
+    if (!email || !password || !patientName) {
+      return res.status(400).json({ error: 'Email, password, and patient name are required' });
+    }
+    
+    // Find existing patient portal account (created during intake)
+    const patientPortal = await findPatientPortalByEmail(email);
+    
+    if (!patientPortal) {
+      return res.status(404).json({ error: 'Patient portal account not found. Please complete your intake form first.' });
+    }
+    
+    // Update the password (replacing the temporary one)
+    await updatePatientPortalPassword(email, password);
+    
+    res.json({ 
+      message: 'Account created successfully',
+      email: email,
+      patientName: patientName
+    });
+  } catch (error) {
+    console.error('Create account error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Patient login
 router.post('/login', async (req: any, res: any) => {
   try {
@@ -174,10 +209,120 @@ router.get('/test-profile', async (req: any, res: any) => {
   }
 });
 
+// Get assigned exercises for movement session
+router.get('/exercises/:email', async (req: any, res: any) => {
+  try {
+    const { email } = req.params;
+    // Import patient model functions
+    const { findPatientByEmail, getLatestSRSScore } = require('../models/patientModel');
+    // Find patient by email
+    const patient = await findPatientByEmail(email);
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+    // Get latest SRS score to determine phase
+    const latestSRS = await getLatestSRSScore(patient.id);
+    const srsScore = latestSRS?.srsScore || 0;
+    // Determine phase based on SRS score
+    let phase;
+    if (srsScore <= 3) phase = "Reset";
+    else if (srsScore <= 6) phase = "Educate";
+    else phase = "Rebuild";
+    // Get region from latest assessment or default
+    const region = latestSRS?.region || "Neck";
+    // Import exercise library
+    const { exercises } = require('../../config/exerciseConfig');
+    // Filter exercises by region and phase
+    let availableExercises = exercises.filter((ex: any) => 
+      ex.region === region && ex.phase === phase
+    );
+    // If not enough exercises in current phase, get from other phases
+    if (availableExercises.length < 3) {
+      const phases = ["Reset", "Educate", "Rebuild"];
+      for (const otherPhase of phases) {
+        if (otherPhase !== phase) {
+          const additionalExercises = exercises.filter((ex: any) => 
+            ex.region === region && ex.phase === otherPhase
+          );
+          availableExercises = [...availableExercises, ...additionalExercises];
+          if (availableExercises.length >= 3) break;
+        }
+      }
+    }
+    // Select exactly 3 exercises, prioritizing those that sum to 10 points
+    let bestCombination = null;
+    let bestScore = Infinity;
+    for (let i = 0; i < availableExercises.length - 2; i++) {
+      for (let j = i + 1; j < availableExercises.length - 1; j++) {
+        for (let k = j + 1; k < availableExercises.length; k++) {
+          const combo = [
+            availableExercises[i],
+            availableExercises[j],
+            availableExercises[k]
+          ];
+          const totalPoints = combo.reduce((sum: any, ex: any) => sum + ex.points, 0);
+          const difference = Math.abs(totalPoints - 10);
+          if (difference < bestScore) {
+            bestScore = difference;
+            bestCombination = combo;
+          }
+        }
+      }
+    }
+    // If no combination found, take first 3 exercises
+    if (!bestCombination && availableExercises.length >= 3) {
+      bestCombination = availableExercises.slice(0, 3);
+    }
+    // If still not enough exercises, pad with placeholder
+    while (bestCombination && bestCombination.length < 3) {
+      bestCombination.push({
+        id: `placeholder_${bestCombination.length}`,
+        name: "Additional exercise",
+        description: "Exercise to be assigned",
+        duration: "5-10 minutes",
+        difficulty: "Beginner",
+        points: 3,
+        instructions: ["Exercise details coming soon"],
+        videoId: "placeholder"
+      });
+    }
+    const totalPoints = bestCombination ? bestCombination.reduce((sum: any, ex: any) => sum + ex.points, 0) : 0;
+    res.json({
+      success: true,
+      data: {
+        exercises: bestCombination || [],
+        totalPoints,
+        region,
+        phase,
+        srsScore
+      }
+    });
+  } catch (error) {
+    console.error('Error getting assigned exercises:', error);
+    res.status(500).json({ error: 'Failed to get assigned exercises' });
+  }
+});
+
 // Patient logout
 router.post('/logout', (req: any, res: any) => {
   res.clearCookie('patientToken', { path: '/' });
   res.json({ message: 'Logged out' });
+});
+
+// Get all SRS scores for a patient by ID
+router.get('/patients/:id/srs-scores', async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+    const { findPatientById } = require('../models/patientModel');
+    const patient = await findPatientById(Number(id));
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+    return res.json({ success: true, data: patient.srsScores || [] });
+  } catch (error) {
+    console.error('Error fetching SRS scores:', error);
+    return res.status(500).json({ error: 'Failed to fetch SRS scores' });
+  }
 });
 
 export default router; 

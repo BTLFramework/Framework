@@ -11,7 +11,7 @@ interface MindfulnessSessionCardProps {
 export function MindfulnessSessionCard({ patientId, onClick, isOpen = false }: MindfulnessSessionCardProps) {
   const { data, error, isLoading } = usePatientRecoveryData(patientId, 'mindfulness', isOpen);
 
-  // Show skeleton only when data is undefined (matching MovementSessionCard logic)
+  // Show skeleton only when data is undefined (matching PainAssessmentCard logic)
   if (data === undefined) {
     return <SkeletonCard title="Mindfulness Session" icon={<Brain className="w-8 h-8 text-btl-400" />} />;
   }

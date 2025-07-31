@@ -41,8 +41,8 @@ const AssessmentDialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-full p-2 text-white opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-btl-500 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-btl-100 data-[state=open]:text-btl-500">
-        <X className="h-6 w-6" />
+      <DialogPrimitive.Close className="absolute right-4 top-4 p-2 rounded-full text-white hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/60">
+        <X className="w-6 h-6" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>

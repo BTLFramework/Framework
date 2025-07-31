@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Dumbbell, AlertCircle, Play, Check, Target, Activity, Gauge, Award, PartyPopper, X } from "lucide-react";
+import { Dumbbell, AlertCircle, Play, Check, Target, Activity, Gauge, Award, PartyPopper, X, Clock } from "lucide-react";
 import type { Exercise } from "@/types/exercise";
 import {
   AssessmentDialog,
@@ -58,47 +58,59 @@ export function ExerciseVideoModal({ exercise, open, onClose }: ExerciseVideoMod
             <div className="flex items-center gap-8">
               <Dumbbell className="w-12 h-12 text-white opacity-90" />
               <div>
-                <h2 className="text-3xl font-bold text-white">Exercise Video</h2>
+                <h2 className="text-3xl font-bold text-white">{exercise.title ? exercise.title.replace(/\bdecompression\b/i, 'Decompression') : 'Standing Decompression Breath'}</h2>
                 <p className="mt-2 text-btl-100 text-sm">
-                  Watch the demonstration and follow along with proper form.
+                  {exercise.description || 'Reduce spinal compression through mindful breathing'}
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              className="p-2 rounded-full text-white hover:bg-white/20 transition-colors"
             >
-              <X className="w-6 h-6 text-white" />
+              <X className="w-6 h-6" />
             </button>
           </div>
-          
           <div className="mt-6 flex flex-wrap items-center gap-4 text-white/90 text-base">
             <div
-              className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5 transition-colors hover:bg-white/25 hover:border-white/50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60"
+              className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5 transition-all duration-200 hover:bg-white/25 hover:border-white/50 hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60 group"
               tabIndex={0}
               role="button"
-              title="Exercise phase based on SRS"
+              title="Exercise duration"
             >
-              <Target className="w-5 h-5 stroke-2" />
-              <span>{exercise.phase || exercise.exerciseData?.phase} Phase</span>
+              <Clock className="w-5 h-5 stroke-2 group-hover:scale-110 transition-transform duration-200" />
+              <span>Duration: {exercise.duration ? exercise.duration.replace('Duration: ', '') : '5-10 minutes'}</span>
+              <span className="text-xs opacity-70 group-hover:opacity-100 transition-opacity">→</span>
             </div>
             <div
-              className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5 transition-colors hover:bg-white/25 hover:border-white/50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60"
+              className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5 transition-all duration-200 hover:bg-white/25 hover:border-white/50 hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60 group"
               tabIndex={0}
               role="button"
-              title="Body region focus"
+              title="Exercise focus"
             >
-              <Activity className="w-5 h-5 stroke-2" />
-              <span>{exercise.region || exercise.exerciseData?.region} Focus</span>
+              <Target className="w-5 h-5 stroke-2 group-hover:scale-110 transition-transform duration-200" />
+              <span>Focus: {exercise.focus || 'breathing'}</span>
+              <span className="text-xs opacity-70 group-hover:opacity-100 transition-opacity">→</span>
             </div>
             <div
-              className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5 transition-colors hover:bg-white/25 hover:border-white/50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60"
+              className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5 transition-all duration-200 hover:bg-white/25 hover:border-white/50 hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60 group"
               tabIndex={0}
               role="button"
-              title="Exercise difficulty level"
+              title="Exercise difficulty"
             >
-              <Gauge className="w-5 h-5 stroke-2" />
-              <span>{exercise.difficulty}</span>
+              <Gauge className="w-5 h-5 stroke-2 group-hover:scale-110 transition-transform duration-200" />
+              <span>Difficulty: {exercise.difficulty ? (exercise.difficulty.charAt(0).toUpperCase() + exercise.difficulty.slice(1).toLowerCase()) : 'Beginner'}</span>
+              <span className="text-xs opacity-70 group-hover:opacity-100 transition-opacity">→</span>
+            </div>
+            <div
+              className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5 transition-all duration-200 hover:bg-white/25 hover:border-white/50 hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60 group"
+              tabIndex={0}
+              role="button"
+              title="Exercise points"
+            >
+              <Award className="w-5 h-5 stroke-2 group-hover:scale-110 transition-transform duration-200" />
+              <span>Points: {exercise.points ? `+${exercise.points}` : '+0'}</span>
+              <span className="text-xs opacity-70 group-hover:opacity-100 transition-opacity">→</span>
             </div>
           </div>
         </div>
@@ -167,7 +179,7 @@ export function ExerciseVideoModal({ exercise, open, onClose }: ExerciseVideoMod
 
             {/* Instructions */}
             {(exercise.instructions || exercise.exerciseData?.instructions) && (
-              <div className="mb-6 p-4 bg-cyan-50 border border-cyan-200 rounded-xl">
+              <div className="mb-6 p-4 bg-cyan-50 border border-cyan-200 rounded-xl" data-instructions>
                 <div className="flex items-start space-x-3">
                   <svg className="w-5 h-5 text-cyan-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -225,16 +237,35 @@ export function ExerciseVideoModal({ exercise, open, onClose }: ExerciseVideoMod
                 {isCompleted && <Check className="w-5 h-5 text-white" />}
                 {isCompleted ? 'Exercise Completed!' : 'Mark as Complete'}
               </button>
-              
-              <button
-                className="mt-4 w-full sm:w-auto px-8 py-3 rounded-full font-semibold transition-colors bg-gray-100 text-gray-700 text-lg shadow border border-gray-200 hover:bg-gray-200"
-                onClick={onClose}
-              >
-                Close Video
-              </button>
             </div>
           </div>
         </AssessmentDialogBody>
+
+        {/* Footer with Instructions Button */}
+        <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-200">
+          <div className="flex items-center justify-between w-full">
+            <button 
+              onClick={() => {
+                // Scroll to instructions section
+                const instructionsElement = document.querySelector('[data-instructions]');
+                if (instructionsElement) {
+                  instructionsElement.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              className="px-6 py-3 rounded-2xl font-medium transition-all duration-200 shadow-lg bg-gradient-to-r from-btl-600 to-btl-500 text-white hover:from-btl-700 hover:to-btl-600 hover:shadow-xl hover:scale-105 flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Instructions
+            </button>
+            <div className="flex items-center gap-3">
+              <div className="px-4 py-2 font-medium text-sm bg-gradient-to-br from-[#b08d57] via-[#a97142] to-[#7c5c36] text-white shadow-lg border border-[#a97142] rounded-2xl">
+                +{exercise.points || 0} pts
+              </div>
+            </div>
+          </div>
+        </div>
       </AssessmentDialogContent>
     </AssessmentDialog>
   );

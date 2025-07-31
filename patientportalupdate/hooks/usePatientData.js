@@ -1,46 +1,49 @@
-import { useState, useEffect } from 'react';
+import useSWR from 'swr';
 
-export function usePatientRecoveryData(patientId, type, enabled) {
-  const [data, setData] = useState(undefined);
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+// SWR fetcher function
+const fetcher = async (url) => {
+  const response = await fetch(url);
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  return response.json();
+};
 
-  useEffect(() => {
-    // Don't fetch during SSR or build time
-    if (typeof window === 'undefined') {
-      return;
+export function usePatientRecoveryData(patientId, type, isOpen) {
+  // Create a unique SWR key only when conditions are met
+  const swrKey = isOpen && patientId && type 
+    ? `/api/patients/${patientId}/recovery/${type}` 
+    : null;
+
+  const { data, error, isLoading, mutate } = useSWR(
+    swrKey,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 30000, // 30 seconds
+      errorRetryCount: 2,
+      errorRetryInterval: 1000,
     }
+  );
 
-    if (!enabled || !patientId || !type) {
-      setData(undefined);
-      setError(null);
-      setIsLoading(false);
-      return;
-    }
+  // Temporary debugging
+  console.log('🔍 usePatientRecoveryData DEBUG:', { 
+    patientId, 
+    type, 
+    isOpen, 
+    swrKey,
+    hasData: !!data,
+    isLoading,
+    hasError: !!error 
+  });
 
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        const response = await fetch(`/api/patients/${patientId}/recovery/${type}`);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        setData(result);
-      } catch (err) {
-        console.error('Error fetching patient recovery data:', err);
-        setError(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [patientId, type, enabled]);
-
-  return { data, error, isLoading };
+  return { 
+    data: data || undefined, 
+    error: error || null, 
+    isLoading: isLoading || false,
+    mutate 
+  };
 } 

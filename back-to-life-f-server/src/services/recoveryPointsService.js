@@ -19,11 +19,112 @@ try {
   prisma = new PrismaClient();
 }
 
+// Check if mindfulness was already logged today
+async function checkDailyMindfulness(patientId) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  const existingLog = await prisma.mindfulnessLog.findFirst({
+    where: {
+      patientId,
+      date: {
+        gte: today,
+        lt: tomorrow
+      }
+    }
+  });
+  
+  return {
+    alreadyLogged: !!existingLog,
+    log: existingLog
+  };
+}
+
 // Add Recovery Points and update SRS buffer
 async function addRecoveryPoints(patientId, category, action, points) {
   console.log(`🎯 Adding ${points} RP for patient ${patientId}: ${category} - ${action}`);
   
   try {
+    // Special handling for MINDSET category (mindfulness daily cap)
+    if (category === 'MINDSET') {
+      const dailyCheck = await checkDailyMindfulness(patientId);
+      
+      if (dailyCheck.alreadyLogged) {
+        console.log(`⚠️ Daily mindfulness already logged for patient ${patientId}`);
+        return {
+          success: false,
+          message: 'Mindfulness already logged for today',
+          alreadyLogged: true,
+          weeklyTotal: await getWeeklyRP(patientId, category),
+          cap: weeklyCaps[category]
+        };
+      }
+      
+      // Log mindfulness completion for today
+      await prisma.mindfulnessLog.create({
+        data: {
+          patientId,
+          practice: action,
+          date: new Date()
+        }
+      });
+      
+      console.log(`✅ Mindfulness logged for today: ${action}`);
+    }
+
+    // --- DAILY CAP LOGIC FOR ALL CATEGORIES ---
+    // Calculate today's total points for this patient/category
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dayPoints = await prisma.recoveryPoint.aggregate({
+      where: {
+        patientId,
+        category,
+        date: {
+          gte: today,
+          lt: tomorrow
+        }
+      },
+      _sum: { points: true }
+    });
+    const todaysTotal = dayPoints._sum.points || 0;
+    
+    // Special daily cap for recovery insights (EDUCATION category with "Watch micro-lesson" action)
+    let dailyCap;
+    if (category === 'EDUCATION' && action === 'Watch micro-lesson') {
+      dailyCap = 5; // 5 points per day for recovery insights (one insight per day)
+    } else {
+      // The daily cap is the points value for this card/task
+      dailyCap = points;
+    }
+    
+    if (todaysTotal >= dailyCap) {
+      console.log(`⚠️ Daily cap reached for ${category}: ${todaysTotal}/${dailyCap}`);
+      return {
+        success: false,
+        message: `Daily ${category.toLowerCase()} cap reached (${dailyCap} points)`,
+        alreadyLogged: true,
+        todaysTotal,
+        dailyCap
+      };
+    }
+    // Adjust points if they would exceed the daily cap
+    const adjustedPoints = Math.min(points, dailyCap - todaysTotal);
+    if (adjustedPoints <= 0) {
+      return {
+        success: false,
+        message: `No points awarded; daily cap already reached for ${category}`,
+        alreadyLogged: true,
+        todaysTotal,
+        dailyCap
+      };
+    }
+    
     // Check weekly cap
     const weeklyTotal = await getWeeklyRP(patientId, category);
     const cap = weeklyCaps[category];
@@ -37,9 +138,6 @@ async function addRecoveryPoints(patientId, category, action, points) {
         cap
       };
     }
-    
-    // Adjust points if they would exceed cap
-    const adjustedPoints = Math.min(points, cap - weeklyTotal);
     
     // Log the recovery points
     const rpRecord = await prisma.recoveryPoint.create({
@@ -66,7 +164,8 @@ async function addRecoveryPoints(patientId, category, action, points) {
       weeklyTotal: newWeeklyTotal,
       cap,
       bufferData,
-      rpRecord
+      rpRecord,
+      alreadyLogged: false
     };
     
   } catch (error) {

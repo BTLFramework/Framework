@@ -1,38 +1,49 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { Check } from "lucide-react"
 import { MovementSessionCard } from "./MovementSessionCard"
 import { PainAssessmentCard } from "./PainAssessmentCard"
 import { MindfulnessSessionCard } from "./MindfulnessSessionCard"
 import { RecoveryInsightsCard } from "./RecoveryInsightsCard"
+import { useAuth } from "@/hooks/useAuth"
 
 interface TodaysTasksSectionProps {
   onTaskClick: (task: any) => void
   onTaskComplete?: (taskData: any) => void
+  refreshKey?: number
 }
 
-export function TodaysTasksSection({ onTaskClick, onTaskComplete }: TodaysTasksSectionProps) {
-  const [patientData, setPatientData] = useState<any>(null)
-  const [patientId, setPatientId] = useState<string>("testback@example.com") // Use working patient with correct region
+export function TodaysTasksSection({ onTaskClick, onTaskComplete, refreshKey }: TodaysTasksSectionProps) {
+  // Use proper authentication
+  const { patient, loading: authLoading, isAuthenticated } = useAuth()
+  
   const [movementSessionCompleted, setMovementSessionCompleted] = useState(false)
   const [completedTaskIds, setCompletedTaskIds] = useState<Set<string>>(new Set())
 
-  // Load patient data from localStorage on mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('btl_patient_data');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.email) {
-          setPatientId(parsed.email);
-          setPatientData(parsed);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading patient data:', error);
-    }
-  }, []);
+  // Show loading state while authenticating
+  if (authLoading) {
+    return (
+      <div className="card-gradient rounded-xl shadow-lg p-6 border border-btl-200 animate-pulse">
+        <div className="h-6 bg-btl-200 rounded mb-4 w-32"></div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-80 bg-btl-200 rounded-2xl"></div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  // Show message if not authenticated
+  if (!isAuthenticated || !patient) {
+    return (
+      <div className="card-gradient rounded-xl shadow-lg p-6 border border-btl-200">
+        <h2 className="text-xl font-semibold gradient-text mb-4">Today's Tasks</h2>
+        <p className="text-btl-600">Please log in to view your daily tasks.</p>
+      </div>
+    )
+  }
 
   // Define metallic pill classes
   const metallicPills = {
@@ -62,31 +73,71 @@ export function TodaysTasksSection({ onTaskClick, onTaskComplete }: TodaysTasksS
     id: "recovery-insights",
     title: "Recovery Insights", 
     description: "View your risk profile and recovery progress",
-    points: 2,
+    points: 5,
     time: "2 min",
   };
 
   // Calculate completion stats
   const totalTasks = 4; // Movement + 3 other tasks
-  const completedTasks = (movementSessionCompleted ? 1 : 0) + completedTaskIds.size;
+  const completedTasks = completedTaskIds.size;
   const remainingTasks = totalTasks - completedTasks;
 
   // Load movement session completion from localStorage
   useEffect(() => {
-    let email = patientId;
-    try {
-      const stored = localStorage.getItem('btl_patient_data');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.email) email = parsed.email;
-      }
-    } catch {}
+    if (!patient?.email) return;
     
     const today = new Date().toISOString().slice(0, 10);
-    const key = `movementSessionCompleted_${email}_${today}`;
+    const key = `movementSessionCompleted_${patient.email}_${today}`;
     const completed = localStorage.getItem(key) === 'true';
     setMovementSessionCompleted(completed);
-  }, [patientId]);
+  }, [patient.email]);
+
+  // Load task completion status from backend
+  useEffect(() => {
+    const loadTaskCompletionStatus = async () => {
+      if (!patient?.email) return;
+      
+      try {
+        // Get patient data to get patient ID
+        const patientResponse = await fetch(`/api/patients/portal-data/${patient.email}`);
+        if (!patientResponse.ok) return;
+        
+        const patientData = await patientResponse.json();
+        const patientId = patientData.data.patient.id;
+        
+        // Get task completion stats for today
+        const taskStatsResponse = await fetch(`/api/recovery-points/task-stats/${patientId}`);
+        if (taskStatsResponse.ok) {
+          const taskStats = await taskStatsResponse.json();
+          const today = new Date().toISOString().slice(0, 10);
+          
+          // Check if tasks were completed today
+          const completedToday = new Set<string>();
+          
+          // Check each task type for today's completion
+          if (taskStats.data?.thisWeek?.MOVEMENT > 0) {
+            completedToday.add('movement-session');
+          }
+          if (taskStats.data?.thisWeek?.PAIN_ASSESSMENT > 0) {
+            completedToday.add('pain-assessment');
+          }
+          if (taskStats.data?.thisWeek?.MINDFULNESS > 0) {
+            completedToday.add('mindfulness-session');
+          }
+          if (taskStats.data?.thisWeek?.RECOVERY_INSIGHTS > 0) {
+            completedToday.add('recovery-insights');
+          }
+          
+          setCompletedTaskIds(completedToday);
+          console.log('✅ Loaded task completion status:', completedToday);
+        }
+      } catch (error) {
+        console.error('❌ Error loading task completion status:', error);
+      }
+    };
+
+    loadTaskCompletionStatus();
+  }, [patient?.email, refreshKey]);
 
   const handleTaskClick = (task: any) => {
     onTaskClick({
@@ -96,6 +147,47 @@ export function TodaysTasksSection({ onTaskClick, onTaskComplete }: TodaysTasksS
         
         // Mark task as completed using proper state update
         setCompletedTaskIds(prev => new Set([...prev, task.id]));
+        
+        // Trigger a refresh of the task completion status
+        setTimeout(() => {
+          const loadTaskCompletionStatus = async () => {
+            if (!patient?.email) return;
+            
+            try {
+              const patientResponse = await fetch(`/api/patients/portal-data/${patient.email}`);
+              if (!patientResponse.ok) return;
+              
+              const patientData = await patientResponse.json();
+              const patientId = patientData.data.patient.id;
+              
+              const taskStatsResponse = await fetch(`/api/recovery-points/task-stats/${patientId}`);
+              if (taskStatsResponse.ok) {
+                const taskStats = await taskStatsResponse.json();
+                const completedToday = new Set<string>();
+                
+                if (taskStats.data?.thisWeek?.MOVEMENT > 0) {
+                  completedToday.add('movement-session');
+                }
+                if (taskStats.data?.thisWeek?.PAIN_ASSESSMENT > 0) {
+                  completedToday.add('pain-assessment');
+                }
+                if (taskStats.data?.thisWeek?.MINDFULNESS > 0) {
+                  completedToday.add('mindfulness-session');
+                }
+                if (taskStats.data?.thisWeek?.RECOVERY_INSIGHTS > 0) {
+                  completedToday.add('recovery-insights');
+                }
+                
+                setCompletedTaskIds(completedToday);
+                console.log('✅ Refreshed task completion status:', completedToday);
+              }
+            } catch (error) {
+              console.error('❌ Error refreshing task completion status:', error);
+            }
+          };
+          
+          loadTaskCompletionStatus();
+        }, 1000); // Wait 1 second for backend to process
         
         if (onTaskComplete) {
           onTaskComplete(taskData)
@@ -110,16 +202,9 @@ export function TodaysTasksSection({ onTaskClick, onTaskComplete }: TodaysTasksS
       title: "Movement Session",
       onTaskComplete: (taskData: any) => {
         // Persist completion in localStorage
-        let email = patientId;
-        try {
-          const stored = localStorage.getItem('btl_patient_data');
-          if (stored) {
-            const parsed = JSON.parse(stored);
-            if (parsed.email) email = parsed.email;
-          }
-        } catch {}
+        if (!patient?.email) return;
         const today = new Date().toISOString().slice(0, 10);
-        const key = `movementSessionCompleted_${email}_${today}`;
+        const key = `movementSessionCompleted_${patient.email}_${today}`;
         localStorage.setItem(key, 'true');
         setMovementSessionCompleted(true);
         if (onTaskComplete) {
@@ -177,67 +262,95 @@ export function TodaysTasksSection({ onTaskClick, onTaskComplete }: TodaysTasksS
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+
+      <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))' }}>
         {/* Movement Session Card */}
-        <div className={`relative min-h-[340px] min-w-[260px] ${movementSessionCompleted ? 'opacity-60 grayscale pointer-events-none' : ''}`}> 
+        <div className={`relative min-h-[340px] max-w-[300px] ${completedTaskIds.has('movement-session') ? 'opacity-80' : ''}`}> 
           <MovementSessionCard 
-            patientId={patientId} 
             onClick={handleMovementSessionClick} 
           />
-          {movementSessionCompleted && (
-            <div className="absolute inset-0 flex items-center justify-center z-10">
-              <div className="bg-white/80 rounded-2xl w-full h-full flex items-center justify-center">
-                <Check className="w-16 h-16 text-emerald-500" />
+          {completedTaskIds.has('movement-session') && (
+            <>
+              <div className="absolute top-2 right-2 z-10">
+                <div className="bg-emerald-500 text-white rounded-full p-1">
+                  <Check className="w-4 h-4" />
+                </div>
               </div>
-            </div>
+              <div className="absolute bottom-2 left-2 z-10">
+                <div className="bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded-full font-medium">
+                  Completed Today
+                </div>
+              </div>
+            </>
           )}
         </div>
         
         {/* Pain Assessment Card */}
-        <div className={`relative min-h-[340px] min-w-[260px] ${completedTaskIds.has('pain-assessment') ? 'opacity-60 grayscale pointer-events-none' : ''}`}>
+        <div className={`relative min-h-[340px] max-w-[300px] ${completedTaskIds.has('pain-assessment') ? 'opacity-80' : ''}`}>
           <PainAssessmentCard 
-            patientId={patientId} 
-            onClick={() => !completedTaskIds.has('pain-assessment') && handleTaskClick(painAssessmentTask)}
+            patientId={patient.email} 
+            onClick={() => handleTaskClick(painAssessmentTask)}
             isOpen={true}
           />
           {completedTaskIds.has('pain-assessment') && (
-            <div className="absolute inset-0 flex items-center justify-center z-10">
-              <div className="bg-white/80 rounded-2xl w-full h-full flex items-center justify-center">
-                <Check className="w-16 h-16 text-emerald-500" />
+            <>
+              <div className="absolute top-2 right-2 z-10">
+                <div className="bg-emerald-500 text-white rounded-full p-1">
+                  <Check className="w-4 h-4" />
+                </div>
               </div>
-            </div>
+              <div className="absolute bottom-2 left-2 z-10">
+                <div className="bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded-full font-medium">
+                  Completed Today
+                </div>
+              </div>
+            </>
           )}
         </div>
 
         {/* Mindfulness Session Card */}
-        <div className={`relative min-h-[340px] min-w-[260px] ${completedTaskIds.has('mindfulness-session') ? 'opacity-60 grayscale pointer-events-none' : ''}`}>
+        <div className={`relative min-h-[340px] max-w-[300px] ${completedTaskIds.has('mindfulness-session') ? 'opacity-80' : ''}`}>
           <MindfulnessSessionCard 
-            patientId={patientId} 
-            onClick={() => !completedTaskIds.has('mindfulness-session') && handleTaskClick(mindfulnessTask)}
+            patientId={patient.email} 
+            onClick={() => handleTaskClick(mindfulnessTask)}
             isOpen={true}
           />
           {completedTaskIds.has('mindfulness-session') && (
-            <div className="absolute inset-0 flex items-center justify-center z-10">
-              <div className="bg-white/80 rounded-2xl w-full h-full flex items-center justify-center">
-                <Check className="w-16 h-16 text-emerald-500" />
+            <>
+              <div className="absolute top-2 right-2 z-10">
+                <div className="bg-emerald-500 text-white rounded-full p-1">
+                  <Check className="w-4 h-4" />
+                </div>
               </div>
-            </div>
+              <div className="absolute bottom-2 left-2 z-10">
+                <div className="bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded-full font-medium">
+                  Completed Today
+                </div>
+              </div>
+            </>
           )}
         </div>
 
         {/* Recovery Insights Card */}
-        <div className={`relative min-h-[340px] min-w-[260px] ${completedTaskIds.has('recovery-insights') ? 'opacity-60 grayscale pointer-events-none' : ''}`}>
+        <div className={`relative min-h-[340px] max-w-[300px] ${completedTaskIds.has('recovery-insights') ? 'opacity-80' : ''}`}>
           <RecoveryInsightsCard 
-            patientId={patientId} 
-            onClick={() => !completedTaskIds.has('recovery-insights') && handleTaskClick(recoveryInsightsTask)}
+            patientId={patient.email} 
+            onClick={() => handleTaskClick(recoveryInsightsTask)}
             isOpen={true}
           />
           {completedTaskIds.has('recovery-insights') && (
-            <div className="absolute inset-0 flex items-center justify-center z-10">
-              <div className="bg-white/80 rounded-2xl w-full h-full flex items-center justify-center">
-                <Check className="w-16 h-16 text-emerald-500" />
+            <>
+              <div className="absolute top-2 right-2 z-10">
+                <div className="bg-emerald-500 text-white rounded-full p-1">
+                  <Check className="w-4 h-4" />
+                </div>
               </div>
-            </div>
+              <div className="absolute bottom-2 left-2 z-10">
+                <div className="bg-emerald-100 text-emerald-700 text-xs px-2 py-1 rounded-full font-medium">
+                  Completed Today
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>

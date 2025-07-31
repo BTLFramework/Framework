@@ -1,27 +1,171 @@
 import { useState } from "react";
-import SRSDisplay from "./SRSDisplay";
 
-function PatientModal({ patient, onClose }) {
-  console.log('🎭 PatientModal - patient received:', !!patient);
-  if (patient) {
-    console.log('🔍 Patient has srsScores:', !!patient.srsScores, 'length:', patient.srsScores?.length);
-    console.log('🔍 Patient srsScores[0]:', patient.srsScores?.[0]);
+// Helper function to get disability color based on region and score
+const getDisabilityColor = (region, score) => {
+  const regionLower = region?.toLowerCase();
+  
+  // NDI (Neck Disability Index) - 0-4% (No), 5-14% (Mild), 15-24% (Moderate), 25-34% (Severe), 35-50% (Complete)
+  if (regionLower === 'neck') {
+    if (score <= 4) return '#155e75'; // Dark blue - No disability
+    if (score <= 14) return '#0891b2'; // Medium blue - Mild
+    if (score <= 24) return '#06b6d4'; // Light blue - Moderate
+    if (score <= 34) return '#e0f2fe'; // Very light blue - Severe
+    return '#f0f9ff'; // Lightest blue - Complete
   }
   
+  // ODI (Oswestry Disability Index) - 0-20% (Minimal), 21-40% (Moderate), 41-60% (Severe), 61-80% (Crippling), 81-100% (Bed-bound)
+  if (regionLower === 'low back' || regionLower === 'low back / si joint') {
+    if (score <= 20) return '#155e75'; // Dark blue - Minimal
+    if (score <= 40) return '#0891b2'; // Medium blue - Moderate
+    if (score <= 60) return '#06b6d4'; // Light blue - Severe
+    if (score <= 80) return '#e0f2fe'; // Very light blue - Crippling
+    return '#f0f9ff'; // Lightest blue - Bed-bound
+  }
+  
+  // TDI (Thoracic Disability Index) - 0-40% (Minimal), 41-60% (Moderate), 61-80% (Severe), 81-100% (Complete)
+  if (regionLower === 'mid-back / thoracic' || regionLower === 'thoracic') {
+    if (score <= 40) return '#155e75'; // Dark blue - Minimal
+    if (score <= 60) return '#0891b2'; // Medium blue - Moderate
+    if (score <= 80) return '#06b6d4'; // Light blue - Severe
+    return '#e0f2fe'; // Very light blue - Complete
+  }
+  
+  // ULFI and LEFS have different scoring systems - use generic thresholds for now
+  if (regionLower?.includes('upper limb') || regionLower?.includes('lower limb')) {
+    if (score <= 20) return '#155e75'; // Dark blue - Low
+    if (score <= 40) return '#0891b2'; // Medium blue - Moderate
+    return '#06b6d4'; // Light blue - High
+  }
+  
+  // Default fallback
+  if (score <= 20) return '#155e75';
+  if (score <= 40) return '#0891b2';
+  return '#06b6d4';
+};
+
+// Helper function to get disability severity label based on region and score
+const getDisabilityLabel = (region, score) => {
+  const regionLower = region?.toLowerCase();
+  
+  // NDI (Neck Disability Index) - 0-4% (No), 5-14% (Mild), 15-24% (Moderate), 25-34% (Severe), 35-50% (Complete)
+  if (regionLower === 'neck') {
+    if (score <= 4) return 'No Disability';
+    if (score <= 14) return 'Mild';
+    if (score <= 24) return 'Moderate';
+    if (score <= 34) return 'Severe';
+    return 'Complete';
+  }
+  
+  // ODI (Oswestry Disability Index) - 0-20% (Minimal), 21-40% (Moderate), 41-60% (Severe), 61-80% (Crippling), 81-100% (Bed-bound)
+  if (regionLower === 'low back' || regionLower === 'low back / si joint') {
+    if (score <= 20) return 'Minimal';
+    if (score <= 40) return 'Moderate';
+    if (score <= 60) return 'Severe';
+    if (score <= 80) return 'Crippling';
+    return 'Bed-bound';
+  }
+  
+  // TDI (Thoracic Disability Index) - 0-40% (Minimal), 41-60% (Moderate), 61-80% (Severe), 81-100% (Complete)
+  if (regionLower === 'mid-back / thoracic' || regionLower === 'thoracic') {
+    if (score <= 40) return 'Minimal';
+    if (score <= 60) return 'Moderate';
+    if (score <= 80) return 'Severe';
+    return 'Complete';
+  }
+  
+  // ULFI and LEFS have different scoring systems - use generic labels for now
+  if (regionLower?.includes('upper limb') || regionLower?.includes('lower limb')) {
+    if (score <= 20) return 'Low';
+    if (score <= 40) return 'Moderate';
+    return 'High';
+  }
+  
+  // Default fallback
+  if (score <= 20) return 'Minimal';
+  if (score <= 40) return 'Moderate';
+  return 'Severe';
+};
+
+// Helper functions for PCS-4 (Pain Catastrophizing Scale)
+const calculatePCS4Score = (pcs4) => {
+  if (!pcs4) return 0;
+  return Object.values(pcs4).reduce((sum, score) => sum + (score || 0), 0);
+};
+
+const getPCS4Color = (pcs4) => {
+  const score = calculatePCS4Score(pcs4);
+  if (score <= 6) return '#155e75'; // Dark blue - Low catastrophizing
+  if (score <= 12) return '#0891b2'; // Medium blue - Moderate catastrophizing
+  return '#06b6d4'; // Light blue - High catastrophizing
+};
+
+const getPCS4Label = (score) => {
+  if (score <= 6) return 'Low Catastrophizing';
+  if (score <= 12) return 'Moderate Catastrophizing';
+  return 'High Catastrophizing';
+};
+
+// Helper functions for TSK-7 (Modified Fear-Avoidance Screener)
+const calculateTSK7Score = (tsk7) => {
+  if (!tsk7) return 0;
+  let totalScore = 0;
+  let validResponses = 0;
+  
+  // TSK-7 items with reverse-scored items (2, 6, 7)
+  for (let i = 1; i <= 7; i++) {
+    const response = tsk7[i];
+    if (response !== undefined && response >= 0 && response <= 4) {
+      let itemScore = response;
+      
+      // Reverse score items 2, 6, 7 (0→4, 1→3, 2→2, 3→1, 4→0)
+      if (i === 2 || i === 6 || i === 7) {
+        itemScore = 4 - response;
+      }
+      
+      totalScore += itemScore;
+      validResponses++;
+    }
+  }
+  
+  return validResponses === 7 ? totalScore : 0;
+};
+
+const getTSK7Color = (tsk7) => {
+  const score = calculateTSK7Score(tsk7);
+  const fearScore = (score / 28) * 100; // Normalize to percentage
+  if (fearScore <= 30) return '#155e75'; // Dark blue - Low fear-avoidance
+  if (fearScore <= 50) return '#0891b2'; // Medium blue - Moderate fear-avoidance
+  return '#06b6d4'; // Light blue - High fear-avoidance
+};
+
+const getTSK7Label = (score) => {
+  const fearScore = (score / 28) * 100; // Normalize to percentage
+  if (fearScore <= 30) return 'Low Fear-Avoidance';
+  if (fearScore <= 50) return 'Moderate Fear-Avoidance';
+  return 'High Fear-Avoidance';
+};
+
+function PatientModal({ patient, onClose }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [messageText, setMessageText] = useState('');
   const [messageSubject, setMessageSubject] = useState('');
 
   if (!patient) {
-    console.log('❌ PatientModal: No patient data provided');
     return null;
   }
 
-  // Get the latest SRS score data
-  const latestScore = patient.srsScores?.[0] || {};
-  const srsScore = patient.latestSrsScore || latestScore.srsScore || 0;
-  const phase = patient.phase || { label: 'UNKNOWN', color: 'gray' };
+  // Get the latest SRS score data from patient object
+  const srsScore = patient.srs || 0;
+  const phase = patient.phase || 'UNKNOWN';
+  
+  // Debug log to see what TSK data is available
+  console.log('🔍 PatientModal TSK Debug:', { 
+    patientName: patient.name, 
+    tsk7: patient.tsk7,
+    hasTsk7: !!patient.tsk7,
+    tsk7Type: typeof patient.tsk7
+  });
 
   // Format date helper
   const formatDate = (dateString) => {
@@ -39,10 +183,10 @@ function PatientModal({ patient, onClose }) {
     : 0;
 
   // PSFS activities
-  const psfsActivities = latestScore.psfs || [];
+  const psfsActivities = patient.psfs || [];
 
   // Beliefs
-  const beliefs = latestScore.beliefs || [];
+  const beliefs = patient.beliefs || [];
 
   return (
     <div 
@@ -185,12 +329,9 @@ function PatientModal({ patient, onClose }) {
                   <span>Signature Recovery Score™</span>
                 </h3>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <SRSDisplay 
-                    score={srsScore}
-                    clinicianAssessed={latestScore.clinicianAssessed || false}
-                    grocCaptured={latestScore.grocCaptured || false}
-                    variant="compact"
-                  />
+                  <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#155e75' }}>
+                    {srsScore}/11
+                  </div>
                   <div style={{ textAlign: 'right' }}>
                     <div 
                       style={{
@@ -200,11 +341,11 @@ function PatientModal({ patient, onClose }) {
                         borderRadius: '20px',
                         fontSize: '0.875rem',
                         fontWeight: 500,
-                        backgroundColor: srsScore >= 8 ? '#d1fae5' : srsScore >= 5 ? '#fef3c7' : '#fecaca',
-                        color: srsScore >= 8 ? '#065f46' : srsScore >= 5 ? '#92400e' : '#991b1b'
+                        backgroundColor: srsScore >= 8 ? '#155e75' : srsScore >= 5 ? '#0891b2' : '#06b6d4',
+                        color: 'white'
                       }}
                     >
-                      {phase.label || phase} Phase
+                      {phase} Phase
                     </div>
                     <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '4px', margin: 0 }}>Current Phase</p>
                   </div>
@@ -232,21 +373,21 @@ function PatientModal({ patient, onClose }) {
                   <div style={{ 
                     fontSize: '1.5rem', 
                     fontWeight: 'bold', 
-                    color: '#155e75',
+                    color: (patient.painScore || 0) >= 8 ? '#155e75' : (patient.painScore || 0) >= 6 ? '#0891b2' : (patient.painScore || 0) >= 4 ? '#06b6d4' : '#e0f2fe',
                     marginBottom: '6px'
                   }}>
-                    {latestScore.vas || 'N/A'}/10
+                    {patient.painScore || 'N/A'}/10
                   </div>
                   <div style={{ fontSize: '0.8rem', color: '#6b7280', fontWeight: 500, marginBottom: '6px' }}>Pain Level</div>
                   <div style={{ 
                     fontSize: '0.7rem', 
                     padding: '3px 6px',
                     borderRadius: '10px',
-                    backgroundColor: latestScore.vas >= 7 ? '#fecaca' : latestScore.vas >= 4 ? '#fef3c7' : '#d1fae5',
-                    color: latestScore.vas >= 7 ? '#991b1b' : latestScore.vas >= 4 ? '#92400e' : '#065f46',
+                    backgroundColor: (patient.painScore || 0) >= 8 ? '#155e75' : (patient.painScore || 0) >= 6 ? '#0891b2' : (patient.painScore || 0) >= 4 ? '#06b6d4' : '#e0f2fe',
+                    color: 'white',
                     fontWeight: 600
                   }}>
-                    {latestScore.vas >= 7 ? 'High' : latestScore.vas >= 4 ? 'Moderate' : 'Low'}
+                    {(patient.painScore || 0) >= 8 ? 'Excellent' : (patient.painScore || 0) >= 6 ? 'Good' : (patient.painScore || 0) >= 4 ? 'Fair' : 'Needs Attention'}
                   </div>
                 </div>
 
@@ -263,21 +404,21 @@ function PatientModal({ patient, onClose }) {
                   <div style={{ 
                     fontSize: '1.5rem', 
                     fontWeight: 'bold', 
-                    color: '#155e75',
+                    color: (patient.confidence || 0) >= 8 ? '#155e75' : (patient.confidence || 0) >= 6 ? '#0891b2' : (patient.confidence || 0) >= 4 ? '#06b6d4' : '#e0f2fe',
                     marginBottom: '6px'
                   }}>
-                    {latestScore.confidence || 'N/A'}/10
+                    {patient.confidence || 'N/A'}/10
                   </div>
                   <div style={{ fontSize: '0.8rem', color: '#6b7280', fontWeight: 500, marginBottom: '6px' }}>Confidence</div>
                   <div style={{ 
                     fontSize: '0.7rem', 
                     padding: '3px 6px',
                     borderRadius: '10px',
-                    backgroundColor: latestScore.confidence >= 7 ? '#d1fae5' : latestScore.confidence >= 4 ? '#fef3c7' : '#fecaca',
-                    color: latestScore.confidence >= 7 ? '#065f46' : latestScore.confidence >= 4 ? '#92400e' : '#991b1b',
+                    backgroundColor: (patient.confidence || 0) >= 8 ? '#155e75' : (patient.confidence || 0) >= 6 ? '#0891b2' : (patient.confidence || 0) >= 4 ? '#06b6d4' : '#e0f2fe',
+                    color: 'white',
                     fontWeight: 600
                   }}>
-                    {latestScore.confidence >= 7 ? 'High' : latestScore.confidence >= 4 ? 'Moderate' : 'Low'}
+                    {(patient.confidence || 0) >= 8 ? 'Excellent' : (patient.confidence || 0) >= 6 ? 'Good' : (patient.confidence || 0) >= 4 ? 'Fair' : 'Needs Attention'}
                   </div>
                 </div>
 
@@ -294,21 +435,21 @@ function PatientModal({ patient, onClose }) {
                   <div style={{ 
                     fontSize: '1.5rem', 
                     fontWeight: 'bold', 
-                    color: '#155e75',
+                    color: getDisabilityColor(patient.region, (patient.disabilityIndex || patient.disabilityPercentage || 0)),
                     marginBottom: '6px'
                   }}>
-                    {latestScore.disabilityPercentage || 0}%
+                    {patient.disabilityIndex || patient.disabilityPercentage || 0}%
                   </div>
                   <div style={{ fontSize: '0.8rem', color: '#6b7280', fontWeight: 500, marginBottom: '6px' }}>Disability</div>
                   <div style={{ 
                     fontSize: '0.7rem', 
                     padding: '3px 6px',
                     borderRadius: '10px',
-                    backgroundColor: latestScore.disabilityPercentage >= 30 ? '#fecaca' : latestScore.disabilityPercentage >= 15 ? '#fef3c7' : '#d1fae5',
-                    color: latestScore.disabilityPercentage >= 30 ? '#991b1b' : latestScore.disabilityPercentage >= 15 ? '#92400e' : '#065f46',
+                    backgroundColor: getDisabilityColor(patient.region, (patient.disabilityIndex || patient.disabilityPercentage || 0)),
+                    color: 'white',
                     fontWeight: 600
                   }}>
-                    {latestScore.disabilityPercentage >= 30 ? 'Severe' : latestScore.disabilityPercentage >= 15 ? 'Moderate' : 'Mild'}
+                    {getDisabilityLabel(patient.region, (patient.disabilityIndex || patient.disabilityPercentage || 0))}
                   </div>
                 </div>
 
@@ -328,7 +469,7 @@ function PatientModal({ patient, onClose }) {
                     color: '#155e75',
                     marginBottom: '6px'
                   }}>
-                    {latestScore.region || 'N/A'}
+                    {patient.region || 'N/A'}
                   </div>
                   <div style={{ fontSize: '0.8rem', color: '#6b7280', fontWeight: 500, marginBottom: '6px' }}>Primary Region</div>
                   <div style={{ 
@@ -386,11 +527,11 @@ function PatientModal({ patient, onClose }) {
                       <span style={{ color: '#6b7280', fontSize: '0.875rem', fontWeight: 500 }}>Status</span>
                       <span style={{ 
                         fontWeight: 600, 
-                        color: '#155e75', 
+                        color: 'white', 
                         fontSize: '0.875rem',
                         padding: '2px 8px',
                         borderRadius: '12px',
-                        backgroundColor: '#67e8f9'
+                        backgroundColor: (patient.engagement || 'Active').toLowerCase() === 'active' ? '#059669' : '#dc2626'
                       }}>
                         {patient.engagement || 'Active'}
                       </span>
@@ -484,26 +625,23 @@ function PatientModal({ patient, onClose }) {
                   Assessment Data
                 </h3>
                 <div style={{ fontSize: '0.7rem', color: '#6b7280' }}>
-                  {formatDate(latestScore.createdAt)}
+                  {formatDate(patient.intakeDate)}
                 </div>
               </div>
 
               {/* Ultra Compact Overview */}
               <div style={{ background: 'white', padding: '12px', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.75rem' }}><strong>Region:</strong> {latestScore.region || 'N/A'}</span>
-                  <SRSDisplay 
-                    score={srsScore}
-                    clinicianAssessed={latestScore.clinicianAssessed || false}
-                    grocCaptured={latestScore.grocCaptured || false}
-                    variant="compact"
-                  />
+                  <span style={{ fontSize: '0.75rem' }}><strong>Region:</strong> {patient.region || 'N/A'}</span>
+                  <div style={{ fontSize: '1rem', fontWeight: 'bold', color: '#155e75' }}>
+                    {srsScore}/11
+                  </div>
                   <span style={{ 
                     fontSize: '0.75rem',
-                    color: latestScore.clinicianAssessed ? '#059669' : '#d97706',
+                    color: '#d97706',
                     fontWeight: '600'
                   }}>
-                    <strong>Reviewed:</strong> {latestScore.clinicianAssessed ? 'Yes' : 'No'}
+                    <strong>Reviewed:</strong> No
                   </span>
                 </div>
               </div>
@@ -517,16 +655,16 @@ function PatientModal({ patient, onClose }) {
                     <span style={{ 
                       fontSize: '0.875rem', 
                       fontWeight: 'bold', 
-                      color: latestScore.vas >= 7 ? '#dc2626' : latestScore.vas >= 4 ? '#d97706' : '#059669'
+                      color: (patient.painScore || 0) >= 7 ? '#dc2626' : (patient.painScore || 0) >= 4 ? '#d97706' : '#059669'
                     }}>
-                      {latestScore.vas || 'N/A'}/10
+                      {patient.painScore || 'N/A'}/10
                     </span>
                   </div>
                   <div style={{ width: '100%', height: '4px', backgroundColor: '#f3f4f6', borderRadius: '2px', overflow: 'hidden' }}>
                     <div style={{ 
-                      width: `${(latestScore.vas || 0) * 10}%`, 
+                      width: `${(patient.painScore || 0) * 10}%`, 
                       height: '100%', 
-                      backgroundColor: latestScore.vas >= 7 ? '#dc2626' : latestScore.vas >= 4 ? '#d97706' : '#059669'
+                      backgroundColor: (patient.painScore || 0) >= 7 ? '#dc2626' : (patient.painScore || 0) >= 4 ? '#d97706' : '#059669'
                     }}></div>
                   </div>
                 </div>
@@ -538,50 +676,84 @@ function PatientModal({ patient, onClose }) {
                     <span style={{ 
                       fontSize: '0.875rem', 
                       fontWeight: 'bold', 
-                      color: latestScore.confidence >= 7 ? '#059669' : latestScore.confidence >= 4 ? '#d97706' : '#dc2626'
+                      color: (patient.confidence || 0) >= 7 ? '#059669' : (patient.confidence || 0) >= 4 ? '#d97706' : '#dc2626'
                     }}>
-                      {latestScore.confidence || 'N/A'}/10
+                      {patient.confidence || 'N/A'}/10
                     </span>
                   </div>
                   <div style={{ width: '100%', height: '4px', backgroundColor: '#f3f4f6', borderRadius: '2px', overflow: 'hidden' }}>
                     <div style={{ 
-                      width: `${(latestScore.confidence || 0) * 10}%`, 
+                      width: `${(patient.confidence || 0) * 10}%`, 
                       height: '100%', 
-                      backgroundColor: latestScore.confidence >= 7 ? '#059669' : latestScore.confidence >= 4 ? '#d97706' : '#dc2626'
+                      backgroundColor: (patient.confidence || 0) >= 7 ? '#059669' : (patient.confidence || 0) >= 4 ? '#d97706' : '#dc2626'
                     }}></div>
                   </div>
                 </div>
 
-                {/* NDI */}
-                {latestScore.region === 'Neck' && (
+                {/* Disability Index - Region Specific */}
+                {(patient.region === 'Neck' || patient.region === 'Mid-Back / Thoracic' || patient.region === 'Low Back' || patient.region === 'Upper Limb' || patient.region === 'Lower Limb') && (
                   <div style={{ background: 'white', padding: '8px', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
-                    <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: '4px' }}>NDI</div>
+                    <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: '4px' }}>
+                      {patient.region === 'Neck' ? 'NDI' : 
+                       patient.region === 'Mid-Back / Thoracic' ? 'TDI' :
+                       patient.region === 'Low Back' ? 'ODI' :
+                       patient.region === 'Upper Limb' ? 'ULFI' :
+                       patient.region === 'Lower Limb' ? 'LEFS' : 'Disability Index'}
+                    </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                       <span style={{ 
                         fontSize: '0.875rem', 
                         fontWeight: 'bold', 
-                        color: latestScore.disabilityPercentage >= 30 ? '#dc2626' : latestScore.disabilityPercentage >= 15 ? '#d97706' : '#059669'
+                        color: getDisabilityColor(patient.region, (patient.disabilityIndex || patient.disabilityPercentage || 0))
                       }}>
-                        {latestScore.disabilityPercentage || 0}%
+                        {(patient.disabilityIndex || patient.disabilityPercentage || 0)}%
                       </span>
                     </div>
                     <div style={{ width: '100%', height: '4px', backgroundColor: '#f3f4f6', borderRadius: '2px', overflow: 'hidden' }}>
                       <div style={{ 
-                        width: `${latestScore.disabilityPercentage || 0}%`, 
+                        width: `${(patient.disabilityIndex || patient.disabilityPercentage || 0)}%`, 
                         height: '100%', 
-                        backgroundColor: latestScore.disabilityPercentage >= 30 ? '#dc2626' : latestScore.disabilityPercentage >= 15 ? '#d97706' : '#059669'
+                        backgroundColor: getDisabilityColor(patient.region, (patient.disabilityIndex || patient.disabilityPercentage || 0))
                       }}></div>
                     </div>
                   </div>
                 )}
 
-                {/* GROC */}
-                <div style={{ background: 'white', padding: '8px', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
-                  <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: '4px' }}>GROC</div>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 'bold', color: latestScore.groc > 0 ? '#059669' : latestScore.groc < 0 ? '#dc2626' : '#6b7280' }}>
-                    {latestScore.groc || 'N/A'}
+                                {/* Pain Beliefs (PCS-4) */}
+                {patient.pcs4 && (
+                  <div style={{ background: 'white', padding: '8px', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
+                    <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: '4px' }}>Pain Beliefs (PCS-4)</div>
+                    <div style={{ fontSize: '0.875rem', fontWeight: 'bold', color: getPCS4Color(patient.pcs4) }}>
+                      {calculatePCS4Score(patient.pcs4)}/20
+                    </div>
+                    <div style={{ fontSize: '0.6rem', color: '#6b7280', marginTop: '2px' }}>
+                      {getPCS4Label(calculatePCS4Score(patient.pcs4))}
+                    </div>
                   </div>
-                </div>
+                )}
+
+                        {/* Fear of Movement (TSK-7) */}
+        {patient.tsk7 ? (
+          <div style={{ background: 'white', padding: '8px', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
+            <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: '4px' }}>Fear of Movement (TSK-7)</div>
+            <div style={{ fontSize: '0.875rem', fontWeight: 'bold', color: getTSK7Color(patient.tsk7) }}>
+              {calculateTSK7Score(patient.tsk7)}/28
+            </div>
+            <div style={{ fontSize: '0.6rem', color: '#6b7280', marginTop: '2px' }}>
+              {getTSK7Label(calculateTSK7Score(patient.tsk7))}
+            </div>
+          </div>
+        ) : (
+          <div style={{ background: 'white', padding: '8px', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
+            <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: '4px' }}>Fear of Movement (TSK-7)</div>
+            <div style={{ fontSize: '0.875rem', fontWeight: 'bold', color: '#6b7280' }}>
+              No Data
+            </div>
+            <div style={{ fontSize: '0.6rem', color: '#6b7280', marginTop: '2px' }}>
+              Assessment not completed
+            </div>
+          </div>
+        )}
               </div>
 
               {/* PSFS - Compact */}
@@ -601,7 +773,7 @@ function PatientModal({ patient, onClose }) {
                           <span style={{ 
                             fontSize: '0.75rem', 
                             fontWeight: 'bold', 
-                            color: activity.score >= 8 ? '#059669' : activity.score >= 6 ? '#d97706' : '#dc2626',
+                            color: activity.score >= 8 ? '#155e75' : activity.score >= 6 ? '#0891b2' : '#06b6d4',
                             minWidth: '32px'
                           }}>
                             {activity.score}/10
@@ -610,7 +782,7 @@ function PatientModal({ patient, onClose }) {
                             <div style={{ 
                               width: `${activity.score * 10}%`, 
                               height: '100%', 
-                              backgroundColor: activity.score >= 8 ? '#059669' : activity.score >= 6 ? '#d97706' : '#dc2626'
+                              backgroundColor: activity.score >= 8 ? '#155e75' : activity.score >= 6 ? '#0891b2' : '#06b6d4'
                             }}></div>
                           </div>
                         </div>
@@ -628,25 +800,7 @@ function PatientModal({ patient, onClose }) {
                 )}
               </div>
 
-              {/* Beliefs - Compact */}
-              <div style={{ background: 'white', padding: '8px', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
-                <h4 style={{ fontSize: '0.75rem', fontWeight: 600, color: '#374151', marginBottom: '6px', margin: 0 }}>
-                  Beliefs & Concerns
-                </h4>
-                {beliefs && beliefs.length > 0 ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                    {beliefs.map((belief, index) => (
-                      <div key={index} style={{ padding: '4px 6px', backgroundColor: '#fef3c7', borderRadius: '3px', fontSize: '0.7rem', color: '#92400e' }}>
-                        • {belief}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div style={{ padding: '6px', backgroundColor: '#f9fafb', borderRadius: '4px', color: '#6b7280', fontSize: '0.7rem' }}>
-                    No concerns recorded
-                  </div>
-                )}
-              </div>
+
             </div>
           )}
 
@@ -701,7 +855,7 @@ function PatientModal({ patient, onClose }) {
                       </span>
                     </div>
                   )}
-                  {latestScore.vas >= 7 && (
+                  {(patient.painScore || 0) >= 7 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <div style={{ 
                         width: '8px', 
@@ -710,11 +864,11 @@ function PatientModal({ patient, onClose }) {
                         borderRadius: '50%' 
                       }}></div>
                       <span style={{ fontSize: '0.875rem', color: '#991b1b' }}>
-                        High pain levels reported (VAS: {latestScore.vas}/10)
+                        High pain levels reported (VAS: {patient.painScore}/10)
                       </span>
                     </div>
                   )}
-                  {latestScore.confidence <= 3 && (
+                  {(patient.confidence || 0) <= 3 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <div style={{ 
                         width: '8px', 
@@ -723,7 +877,7 @@ function PatientModal({ patient, onClose }) {
                         borderRadius: '50%' 
                       }}></div>
                       <span style={{ fontSize: '0.875rem', color: '#92400e' }}>
-                        Low confidence in recovery ({latestScore.confidence}/10)
+                        Low confidence in recovery ({patient.confidence}/10)
                       </span>
                     </div>
                   )}
@@ -740,7 +894,7 @@ function PatientModal({ patient, onClose }) {
                       </span>
                     </div>
                   )}
-                  {daysSinceIntake <= 28 && latestScore.vas < 7 && latestScore.confidence > 3 && (!beliefs.length || beliefs.every(b => b.includes('None'))) && (
+                  {daysSinceIntake <= 28 && (patient.painScore || 0) < 7 && (patient.confidence || 0) > 3 && (!beliefs.length || beliefs.every(b => b.includes('None'))) && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <div style={{ 
                         width: '8px', 
@@ -777,19 +931,19 @@ function PatientModal({ patient, onClose }) {
                   </div>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#155e75' }}>
-                      {phase.label || phase}
+                      {phase}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Current Phase</div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#155e75' }}>
-                      {srsScore}/{latestScore.outOf || 11}
+                      {srsScore}/11
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Recovery Score</div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: latestScore.clinicianAssessed ? '#059669' : '#d97706' }}>
-                      {latestScore.clinicianAssessed ? 'Yes' : 'No'}
+                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#d97706' }}>
+                      No
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Clinician Reviewed</div>
                   </div>
@@ -971,9 +1125,34 @@ function PatientModal({ patient, onClose }) {
                 e.target.style.transform = 'translateY(0)';
                 e.target.style.boxShadow = '0 2px 4px rgba(21, 94, 117, 0.2)';
               }}
-              onClick={() => {
-                alert(`Schedule follow-up appointment for ${patient.name}`);
-                // TODO: Implement scheduling functionality
+              onClick={async () => {
+                try {
+                  const response = await fetch('http://localhost:3001/api/messages/send', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      patientId: patient.id,
+                      subject: 'Appointment Reminder',
+                      content: `Hi ${patient.name},\n\nIt's time to schedule your next follow-up appointment. Please log into your patient portal to book a time that works for you.\n\nWe look forward to seeing you!\n\nBest regards,\nYour Back to Life Team`,
+                      senderName: 'Clinician',
+                      senderEmail: 'clinician@backtolife.ca',
+                      messageType: 'appointment_reminder'
+                    })
+                  });
+
+                  const result = await response.json();
+
+                  if (result.success) {
+                    alert(`✅ Appointment reminder sent to ${patient.name}!\n\nThe reminder will appear on their dashboard when they log into their patient portal.`);
+                  } else {
+                    throw new Error(result.error || 'Failed to send appointment reminder');
+                  }
+                } catch (error) {
+                  console.error('Error sending appointment reminder:', error);
+                  alert(`❌ Failed to send appointment reminder: ${error.message}\n\nPlease check your connection and try again.`);
+                }
               }}
             >
               📅 Schedule Follow-up
@@ -1221,8 +1400,8 @@ function PatientModal({ patient, onClose }) {
                           patientId: patient.id,
                           subject: messageSubject,
                           content: messageText,
-                          senderName: 'Dr. Sarah Mitchell', // You can make this dynamic
-                          senderEmail: 'dr.mitchell@clinic.com'
+                          senderName: 'Clinician', // TODO: Get from authenticated user context
+                          senderEmail: 'clinician@backtolife.ca' // TODO: Get from authenticated user context
                         })
                       });
 

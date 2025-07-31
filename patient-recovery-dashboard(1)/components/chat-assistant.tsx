@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { X, Send, Bot, User } from "lucide-react"
 
 interface ChatAssistantProps {
@@ -17,6 +17,14 @@ export function ChatAssistant({ onClose }: ChatAssistantProps) {
     },
   ])
   const [inputValue, setInputValue] = useState("")
+  
+  // Ref for auto-scrolling to bottom
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return
@@ -87,6 +95,7 @@ export function ChatAssistant({ onClose }: ChatAssistantProps) {
               </div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input */}

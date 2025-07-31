@@ -128,6 +128,33 @@ router.get("/profile", (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(500).json({ error: 'Server error' });
     }
 }));
+
+// Create account for patient portal (after intake completion)
+router.post('/create-account', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email, password, patientName } = req.body;
+        if (!email || !password || !patientName) {
+            return res.status(400).json({ error: 'Email, password, and patient name are required' });
+        }
+        // Find existing patient portal account (created during intake)
+        const patientPortal = yield (0, patientModel_1.findPatientPortalByEmail)(email);
+        if (!patientPortal) {
+            return res.status(404).json({ error: 'Patient portal account not found. Please complete your intake form first.' });
+        }
+        // Update the password (replacing the temporary one)
+        yield (0, patientModel_1.updatePatientPortalPassword)(email, password);
+        res.json({ 
+            message: 'Account created successfully',
+            email: email,
+            patientName: patientName
+        });
+    }
+    catch (error) {
+        console.error('Create account error:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+}));
+
 // Patient logout
 router.post('/logout', (req, res) => {
     res.clearCookie('patientToken', { path: '/' });

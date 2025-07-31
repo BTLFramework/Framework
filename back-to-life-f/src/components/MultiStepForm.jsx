@@ -9,8 +9,9 @@ import PatientInfo from "./steps/PatientInfo";
 import PainRegion from "./steps/PainRegion";
 import PainScale from "./steps/PainScale";
 import DailyActivities from "./steps/DailyActivities";
-import Beliefs from "./steps/Beliefs";
 import Confidence from "./steps/Confidence";
+import PCS4 from "./steps/PCS4";
+import TSK11 from "./steps/TSK11";
 import GROC from "./steps/GROC";
 import ClinicianInput from './steps/ClinicianInput';
 
@@ -158,9 +159,11 @@ export default function MultiStepForm() {
       { activity: "", score: 0 },
       { activity: "", score: 0 },
     ],
-    beliefs: [],
+    pcs4: { 1: undefined, 2: undefined, 3: undefined, 4: undefined }, // Initialize with undefined
+    tsk11: { 1: undefined, 2: undefined, 3: undefined, 4: undefined, 5: undefined, 6: undefined, 7: undefined, 8: undefined, 9: undefined, 10: undefined, 11: undefined }, // Initialize with undefined
     confidence: 0,
     groc: 0, // Follow‐up only
+    beliefs: [], // Initialize beliefs array
   });
 
   const [formData, setFormData] = useState(getInitialFormData());
@@ -168,23 +171,25 @@ export default function MultiStepForm() {
   // Steps array changes based on formType
   const steps =
     formData.formType === "Follow-Up"
-      ? [
-          "Patient Info",
-          "Pain & Region",
-          "Pain Scale",
-          "Daily Activities",
-          "Beliefs",
-          "Confidence",
-          "GROC",
-        ]
-      : [
-          "Patient Info",
-          "Pain & Region",
-          "Pain Scale",
-          "Daily Activities",
-          "Beliefs",
-          "Confidence",
-        ];
+              ? [
+            "Patient Info",
+            "Pain & Region",
+            "Pain Scale",
+            "Daily Activities",
+            "Confidence",
+            "Pain Beliefs",
+            "Fear of Movement",
+            "GROC",
+          ]
+              : [
+            "Patient Info",
+            "Pain & Region",
+            "Pain Scale",
+            "Daily Activities",
+            "Confidence",
+            "Pain Beliefs",
+            "Fear of Movement",
+          ];
 
   // Handle simple onChange events for text/select/radio/checkbox
   const handleChange = (e) => {
@@ -289,8 +294,44 @@ export default function MultiStepForm() {
     }
   };
 
+  // Automatically reset form when formType changes or on mount
+  useEffect(() => {
+    setFormData(getInitialFormData());
+    setCurrentStep(0);
+    setShowResult(false);
+    setSubmissionResult(null);
+  }, [formData.formType]);
+
+  // Validation for required fields per step
+  const isStepComplete = () => {
+    switch (currentStep) {
+      case 0: // Patient Info
+        return formData.patientName && formData.email && formData.dob && formData.date;
+      case 1: // Pain & Region
+        return formData.region;
+      case 2: // Pain Scale
+        return formData.vas !== undefined && formData.vas !== null;
+      case 3: // Daily Activities (PSFS)
+        return formData.psfs.every(item => item.activity && item.score !== null && item.score !== undefined);
+      case 4: // Confidence
+        return formData.confidence !== undefined && formData.confidence !== null;
+      case 5: // PCS-4
+        return [1,2,3,4].every(i => formData.pcs4 && formData.pcs4[i] !== undefined && formData.pcs4[i] !== null);
+      case 6: // TSK-11
+        return [1,2,3,4,5,6,7,8,9,10,11].every(i => formData.tsk11 && formData.tsk11[i] !== undefined && formData.tsk11[i] !== null);
+      default:
+        return true;
+    }
+  };
+  const [showStepError, setShowStepError] = useState(false);
+
   // "Next" / "Back"
   const handleNext = () => {
+    if (!isStepComplete()) {
+      setShowStepError(true);
+      return;
+    }
+    setShowStepError(false);
     setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
   };
   const handleBack = () => {
@@ -344,6 +385,8 @@ export default function MultiStepForm() {
       disabilityPercentage,
       vas: formData.vas,
       psfs: formData.psfs,
+      pcs4: formData.pcs4, // Include PCS-4 data
+      tsk11: formData.tsk11, // Include TSK-11 data
       beliefs: formData.beliefs,
       confidence: formData.confidence,
       groc: 0, // Always 0 for intake
@@ -409,104 +452,54 @@ export default function MultiStepForm() {
     const displayScore = formData.srsScore || 0;
     const displayPhase = formData.phase || "RESET";
     const maxScore = 11; // Always show out of 11 with locked points system
-    
+
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50 to-blue-50">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Header Section */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 shadow-lg back-to-life-gradient">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="text-center mb-4">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-2 shadow-lg back-to-life-gradient">
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold gradient-text mb-2">Signature Recovery Score™ Complete!</h1>
-            <p className="text-gray-600 text-lg">Your personalized recovery score has been calculated</p>
+            <h1 className="text-2xl md:text-2xl font-bold gradient-text mb-1">Signature Recovery Score™ Complete!</h1>
+            <p className="text-blue-900 text-base">Your personalized recovery score has been calculated</p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8 items-start mobile-completion-stack">
+          {/* Responsive grid: side-by-side on desktop, stacked on mobile */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             {/* Left Column - Score Display */}
-            <div className="flex justify-center">
-              <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-4">Your Recovery Score</h3>
+            <div className="flex flex-col justify-center items-center w-full max-w-md mx-auto">
+              <div className="bg-white rounded-2xl shadow-xl p-6 w-full">
+                <div className="text-center mb-3">
+                  <h3 className="text-xl font-bold text-gray-800 mb-2">Your Recovery Score</h3>
                   <SRSDisplay 
                     score={displayScore} 
                     clinicianAssessed={false} 
                     grocCaptured={false}
-                    className="justify-center text-3xl"
+                    className="justify-center text-2xl"
                   />
-                  <p className="text-gray-600 text-sm mt-4">
+                  <p className="text-gray-600 text-xs mt-2">
                     Intake assessments show 3 locked points until your first clinical visit and follow-up assessment.
                   </p>
                 </div>
                 <div className="mobile-recovery-wheel">
-                  <RecoveryScoreWheel 
-                    score={displayScore} 
-                    maxScore={maxScore} 
-                    phase={displayPhase} 
-                  />
+                  <div style={{ maxWidth: '180px', margin: '0 auto' }}>
+                    <RecoveryScoreWheel 
+                      score={displayScore} 
+                      maxScore={maxScore} 
+                      phase={displayPhase}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Column - Phase Info & Next Steps */}
-            <div className="space-y-6">
-              {/* Current Phase Card */}
-              <div className="bg-white rounded-2xl shadow-xl p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-3 h-3 rounded-full back-to-life-gradient mr-3"></div>
-                  <h2 className="text-xl font-bold text-gray-800">Your Recovery Phase</h2>
-                </div>
-                <div className={`p-4 rounded-xl border-2 ${getPhaseStyles(displayPhase).borderColor} ${getPhaseStyles(displayPhase).bgColor}`}>
-                  <h3 className={`text-2xl font-bold ${getPhaseStyles(displayPhase).textColor} mb-2`}>
-                    {displayPhase}
-                  </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {getPhaseDescription(displayPhase)}
-                  </p>
-                </div>
-              </div>
-
-              {/* Next Steps Card */}
-              <div className="bg-white rounded-2xl shadow-xl p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-3 h-3 rounded-full bg-green-500 mr-3"></div>
-                  <h2 className="text-xl font-bold text-gray-800">What Happens Next</h2>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-white text-sm font-bold">1</span>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-800">Check Your Email</h4>
-                      <p className="text-gray-600 text-sm">You'll receive your personalized portal login credentials within minutes.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-white text-sm font-bold">2</span>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-800">Access Your Portal</h4>
-                      <p className="text-gray-600 text-sm">Log in to view your recovery plan, daily tasks, and track progress.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-white text-sm font-bold">3</span>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-800">Book Your Appointment</h4>
-                      <p className="text-gray-600 text-sm">Schedule your first session to begin your personalized treatment plan.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space-y-3">
+            {/* Right Column - Portal Button and Next Steps */}
+            <div className="flex flex-col justify-start h-full w-full max-w-md mx-auto">
+              {/* Create Account Button - updated flow */}
+              <div className="mb-3">
                 <button 
                   onClick={() => {
                     if (submissionResult?.success) {
@@ -520,22 +513,33 @@ export default function MultiStepForm() {
                       const params = new URLSearchParams({
                         patientData: JSON.stringify(patientData)
                       });
-                      window.location.href = `http://localhost:3000?${params.toString()}`;
+                      window.location.href = `http://localhost:3000/create-account?${params.toString()}`;
                     } else {
                       window.location.href = 'http://localhost:3000';
                     }
                   }}
-                  className="w-full btn-primary-gradient text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:shadow-lg"
+                  className="w-full btn-primary-gradient text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 hover:shadow-lg text-base"
                 >
-                  Access Your Patient Portal
+                  Create Your Portal Account
                 </button>
+              </div>
+
+              {/* Next Steps and Info */}
+              <div className="bg-white rounded-2xl shadow-xl p-5 w-full flex flex-col gap-4">
+                <h4 className="font-semibold text-btl-800 mb-2 text-base">Next Steps</h4>
+                <ol className="list-decimal list-inside text-gray-700 text-sm space-y-1">
+                  <li><span className="font-medium">Review Your Results:</span> See your recovery score and phase. This guides your next steps in the program.</li>
+                  <li><span className="font-medium">Create Your Account:</span> Set up your secure portal account with your own password.</li>
+                  <li><span className="font-medium">Access Your Portal:</span> Log in to view your recovery plan, daily tasks, and track progress.</li>
+                  <li><span className="font-medium">Book Your Appointment:</span> Schedule your first session to begin your personalized treatment plan.</li>
+                </ol>
               </div>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="text-center mt-12 pt-8 border-t border-gray-200">
-            <p className="text-gray-500 text-sm">
+          <div className="text-center mt-8 pt-6 border-t border-gray-200">
+            <p className="text-gray-500 text-xs">
               Questions? Contact us at <a href="mailto:support@backtolife.ca" className="text-blue-600 hover:underline">support@backtolife.ca</a>
             </p>
           </div>
@@ -617,25 +621,44 @@ export default function MultiStepForm() {
               )}
 
               {currentStep === 4 && (
-                <Beliefs formData={formData} onChange={handleChange} />
-              )}
-
-              {currentStep === 5 && (
                 <Confidence formData={formData} onChange={handleChange} />
               )}
 
+              {currentStep === 5 && (
+                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-sm">
+                  <strong>PCS-4 Debug:</strong><br />
+                  {JSON.stringify(formData.pcs4)}<br />
+                  {[1,2,3,4].map(i => (
+                    <div key={i}>
+                      Question {i}: {String(formData.pcs4 && formData.pcs4[i])} (type: {typeof (formData.pcs4 && formData.pcs4[i])})
+                    </div>
+                  ))}
+                  <div>
+                    Validation: {[1,2,3,4].every(i => formData.pcs4 && formData.pcs4[i] !== undefined && formData.pcs4[i] !== null) ? 'PASS' : 'FAIL'}
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 5 && (
+                <PCS4 formData={formData} onChange={handleChange} />
+              )}
+
+              {currentStep === 6 && (
+                <TSK11 formData={formData} onChange={handleChange} />
+              )}
+
               {/* GROC only if "Follow-Up" */}
-              {formData.formType === "Follow-Up" && currentStep === 6 && (
+              {formData.formType === "Follow-Up" && currentStep === 7 && (
                 <GROC formData={formData} onChange={handleChange} />
               )}
 
               {/* Clinician Input for Intake */}
-              {formData.formType === "Intake" && currentStep === 6 && (
+              {formData.formType === "Intake" && currentStep === 7 && (
                 <ClinicianInput formData={formData} onChange={handleChange} />
               )}
 
               {/* Clinician Input for Follow-Up */}
-              {formData.formType === "Follow-Up" && currentStep === 7 && (
+              {formData.formType === "Follow-Up" && currentStep === 8 && (
                 <ClinicianInput formData={formData} onChange={handleChange} />
               )}
             </div>
@@ -672,11 +695,16 @@ export default function MultiStepForm() {
                     disabled={isSubmitting}
                     className="btn-primary-gradient disabled:opacity-50 touch-target"
                   >
-                    {isSubmitting ? '🔄 Processing...' : '🚀 Complete Assessment'}
+                    {isSubmitting ? '🔄 Processing...' : 'Complete Assessment'}
                   </button>
                 )}
               </div>
             </div>
+            {showStepError && (
+              <div className="mt-4 text-red-600 font-semibold text-center">
+                Please complete all required fields before continuing.
+              </div>
+            )}
           </form>
         </div>
       </div>

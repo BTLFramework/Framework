@@ -46,6 +46,8 @@ export async function POST(request: NextRequest) {
         psfs: formData.psfs || [],
         
         // Cognitive Assessment
+        pcs4: formData.pcs4 || null,
+        tsk11: formData.tsk11 || null,
         beliefs: formData.beliefs || [],
         confidence: formData.confidence,
         

@@ -1,241 +1,307 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { X, CheckCircle, XCircle, Info } from "lucide-react"
+import { X, CheckCircle, XCircle, Info, TrendingUp, Target, Heart, Shield, Zap } from "lucide-react"
+import { AssessmentDialog, AssessmentDialogContent, AssessmentDialogHeader } from "@/components/ui/assessment-dialog"
+
+// Custom SRS Icon Component
+function SRSIcon({ className = "w-12 h-12" }: { className?: string }) {
+  return (
+    <div className={`${className} flex items-center justify-center bg-gradient-to-br from-btl-500 to-btl-600 rounded-2xl shadow-lg border border-btl-400/30`}>
+      <div className="text-center">
+        <div className="text-lg font-bold text-white tracking-tight">SRS</div>
+        <div className="text-xs text-white/80 font-medium -mt-1">™</div>
+      </div>
+    </div>
+  )
+}
 
 interface ScoreBreakdownModalProps {
   score: number
   onClose: () => void
+  intakeData?: any // Optional real intake data from backend
 }
 
 interface BreakdownItem {
+  title: string
   description: string
   points: number
   achieved: boolean
   details: string
+  icon: React.ReactNode
+  category: 'movement' | 'mindset' | 'progress' | 'assessment'
+  helper?: string
 }
 
 interface ScoreResult {
   score: number
   breakdown: BreakdownItem[]
+  achievedAreas?: BreakdownItem[]
+  totalDomains?: number
 }
 
-// SRS Configuration - matches backend logic
-const intakeRules = {
+// Patient-friendly SRS Configuration
+const recoveryAreas = {
   pain: {
+    title: "Pain Level (0-10 scale)",
+    description: "Low pain that doesn't limit your daily activities",
     threshold: 2,
     points: 1,
-    description: "Pain (VAS ≤2)"
+    icon: <Heart className="w-5 h-5" />,
+    category: 'assessment' as const
   },
   disability: {
+    title: "Disability Index (%)",
+    description: "Able to perform daily tasks without difficulty",
     threshold: 20,
     points: 1,
-    description: "Disability (≤20%)"
+    icon: <Target className="w-5 h-5" />,
+    category: 'movement' as const
   },
   function: {
+    title: "Patient-Specific Functional Scale (0-10)",
+    description: "Confident in your ability to move and function",
     excellent: { threshold: 7, points: 2 },
     good: { threshold: 4, points: 1 },
-    description: "Task Function (PSFS)"
+    icon: <TrendingUp className="w-5 h-5" />,
+    category: 'movement' as const
   },
   confidence: {
+    title: "Recovery Confidence (0-10 scale)",
+    description: "Believe in your ability to recover and improve",
     high: { threshold: 8, points: 2 },
     moderate: { threshold: 5, points: 1 },
-    description: "Confidence"
+    icon: <Shield className="w-5 h-5" />,
+    category: 'mindset' as const
   },
   beliefs: {
+    title: "Negative Beliefs About Recovery",
+    description: "No negative thoughts about your recovery",
     points: 1,
-    description: "No negative beliefs"
+    icon: <Zap className="w-5 h-5" />,
+    category: 'mindset' as const
+  },
+  painBeliefs: {
+    title: "Pain Catastrophizing Scale",
+    description: "Understand that pain doesn't mean harm",
+    threshold: 6,
+    points: 1,
+    icon: <Heart className="w-5 h-5" />,
+    category: 'mindset' as const
+  },
+  fearAvoidance: {
+    title: "Fear of Movement",
+    description: "Not afraid to move and be active",
+    threshold: 22,
+    points: 1,
+    icon: <TrendingUp className="w-5 h-5" />,
+    category: 'movement' as const
   },
   clinician: {
-    milestone: { points: 1, description: "Recovery Milestone Met" },
-    progress: { points: 1, description: "Objective Progress" }
-  }
-}
-
-const calculateRealSRS = (formData: any): ScoreResult => {
-  let points = 0
-  const breakdown: BreakdownItem[] = []
-
-  if (!formData) {
-    return { score: 0, breakdown: [{ description: "No intake data available", points: 0, achieved: false, details: "Please complete intake form" }] }
-  }
-
-  // 1. Pain Assessment
-  const vas = parseInt(formData.vas) || 0
-  if (vas <= intakeRules.pain.threshold) {
-    points += intakeRules.pain.points
-    breakdown.push({
-      description: intakeRules.pain.description,
-      points: intakeRules.pain.points,
-      achieved: true,
-      details: `VAS Pain Score: ${vas}/10`
-    })
-  } else {
-    breakdown.push({
-      description: intakeRules.pain.description,
-      points: 0,
-      achieved: false,
-      details: `VAS Pain Score: ${vas}/10 (needs ≤${intakeRules.pain.threshold})`
-    })
-  }
-
-  // 2. Disability Assessment
-  const disabilityPercentage = formData.disabilityPercentage || 0
-  if (disabilityPercentage <= intakeRules.disability.threshold) {
-    points += intakeRules.disability.points
-    breakdown.push({
-      description: intakeRules.disability.description,
-      points: intakeRules.disability.points,
-      achieved: true,
-      details: `Disability Index: ${disabilityPercentage}%`
-    })
-  } else {
-    breakdown.push({
-      description: intakeRules.disability.description,
-      points: 0,
-      achieved: false,
-      details: `Disability Index: ${disabilityPercentage}% (needs ≤${intakeRules.disability.threshold}%)`
-    })
-  }
-
-  // 3. Task Function (PSFS)
-  if (formData.psfs && formData.psfs.length > 0) {
-    const psfaScores = formData.psfs.map((item: any) => item.score || 0)
-    const avgPSFS = psfaScores.reduce((sum: number, score: number) => sum + score, 0) / psfaScores.length
-    
-    if (avgPSFS >= intakeRules.function.excellent.threshold) {
-      points += intakeRules.function.excellent.points
-      breakdown.push({
-        description: intakeRules.function.description,
-        points: intakeRules.function.excellent.points,
-        achieved: true,
-        details: `Average PSFS: ${avgPSFS.toFixed(1)}/10 (Excellent)`
-      })
-    } else if (avgPSFS >= intakeRules.function.good.threshold) {
-      points += intakeRules.function.good.points
-      breakdown.push({
-        description: intakeRules.function.description,
-        points: intakeRules.function.good.points,
-        achieved: true,
-        details: `Average PSFS: ${avgPSFS.toFixed(1)}/10 (Good)`
-      })
-    } else {
-      breakdown.push({
-        description: intakeRules.function.description,
-        points: 0,
-        achieved: false,
-        details: `Average PSFS: ${avgPSFS.toFixed(1)}/10 (needs ≥${intakeRules.function.good.threshold})`
-      })
+    milestone: { 
+      title: "Recovery Milestone Achievement",
+      description: "Met an important recovery goal",
+      points: 1,
+      icon: <Target className="w-5 h-5" />,
+      category: 'progress' as const
+    },
+    progress: { 
+      title: "Objective Progress Measurement",
+      description: "Showing clear improvement in function",
+      points: 1,
+      icon: <TrendingUp className="w-5 h-5" />,
+      category: 'progress' as const
     }
-  } else {
-    breakdown.push({
-      description: intakeRules.function.description,
-      points: 0,
-      achieved: false,
-      details: "No functional tasks assessed"
-    })
   }
-
-  // 4. Confidence Assessment
-  const confidence = parseInt(formData.confidence) || 0
-  if (confidence >= intakeRules.confidence.high.threshold) {
-    points += intakeRules.confidence.high.points
-    breakdown.push({
-      description: intakeRules.confidence.description,
-      points: intakeRules.confidence.high.points,
-      achieved: true,
-      details: `Confidence: ${confidence}/10 (High)`
-    })
-  } else if (confidence >= intakeRules.confidence.moderate.threshold) {
-    points += intakeRules.confidence.moderate.points
-    breakdown.push({
-      description: intakeRules.confidence.description,
-      points: intakeRules.confidence.moderate.points,
-      achieved: true,
-      details: `Confidence: ${confidence}/10 (Moderate)`
-    })
-  } else {
-    breakdown.push({
-      description: intakeRules.confidence.description,
-      points: 0,
-      achieved: false,
-      details: `Confidence: ${confidence}/10 (needs ≥${intakeRules.confidence.moderate.threshold})`
-    })
-  }
-
-  // 5. Belief Assessment
-  const beliefs = Array.isArray(formData.beliefs) ? formData.beliefs : []
-  const hasNegativeBeliefs = beliefs.some((belief: string) => 
-    belief && belief.trim() !== "" && belief !== "None of these apply"
-  )
-  
-  if (!hasNegativeBeliefs || beliefs.length === 0) {
-    points += intakeRules.beliefs.points
-    breakdown.push({
-      description: intakeRules.beliefs.description,
-      points: intakeRules.beliefs.points,
-      achieved: true,
-      details: "No limiting beliefs identified"
-    })
-  } else {
-    breakdown.push({
-      description: intakeRules.beliefs.description,
-      points: 0,
-      achieved: false,
-      details: `${beliefs.length} limiting belief(s) identified`
-    })
-  }
-
-  // 6. Clinician Assessments (typically 0 for initial intake)
-  breakdown.push({
-    description: intakeRules.clinician.milestone.description,
-    points: 0,
-    achieved: false,
-    details: "Assessed during clinical visits"
-  })
-
-  breakdown.push({
-    description: intakeRules.clinician.progress.description,
-    points: 0,
-    achieved: false,
-    details: "Verified by clinician during treatment"
-  })
-
-  return { score: points, breakdown }
 }
 
-export function ScoreBreakdownModal({ score, onClose }: ScoreBreakdownModalProps) {
-  const [intakeData, setIntakeData] = useState<any>(null)
-  const [calculatedScore, setCalculatedScore] = useState({ score: 0, breakdown: [] })
+// Remove the calculateRealSRS function - frontend doesn't calculate SRS anymore
+// The backend is the single source of truth for all SRS calculations
+
+// Sample data for demonstration
+const sampleIntakeData = {
+  vas: "2",
+  disability: "15",
+  psfs: "7.5",
+  confidence: "7",
+  negativeBeliefs: "no",
+  painCatastrophizing: "5",
+      tsk7: "18"
+}
+
+export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdownModalProps) {
+  const [calculatedScore, setCalculatedScore] = useState<ScoreResult>({ score: 0, breakdown: [] })
+  const [expanded, setExpanded] = useState(false) // Tiered reveal state
 
   useEffect(() => {
-    // Load intake form data from localStorage
+    // Use the score passed from the backend (main dashboard)
+    // Create a breakdown display using Amy's real data for transparency
     try {
-      const storedIntake = localStorage.getItem('btl_intake_data')
-      if (storedIntake) {
-        const data = JSON.parse(storedIntake)
-        console.log('📊 Loaded intake data for score breakdown:', data)
-        setIntakeData(data)
-        
-        // Calculate real SRS based on intake data
-        const realScore = calculateRealSRS(data)
-        setCalculatedScore(realScore)
-      } else {
-        console.log('ℹ️ No intake data found in localStorage')
-        setCalculatedScore({
-          score: 0,
-          breakdown: [{
-            description: "Complete intake assessment",
-            points: 0,
-            achieved: false,
-            details: "No intake data available"
-          }]
-        })
-      }
+      console.log('📊 Using backend SRS score:', score)
+      console.log('📊 Backend intake data:', intakeData)
+      
+      // Create breakdown structure based on Amy's actual data
+      const displayBreakdown: BreakdownItem[] = [
+        {
+          title: "Pain Level (0-10 scale)",
+          description: "Low pain that doesn't limit your daily activities",
+          points: (intakeData && intakeData.vas <= 2) ? 1 : 0,
+          achieved: intakeData && intakeData.vas <= 2,
+          details: intakeData ? `Your score: ${intakeData.vas || 0}/10` : "Assessment data loading...",
+          icon: <Heart className="w-5 h-5" />,
+          category: 'assessment'
+        },
+        {
+          title: "Disability Index (%)",
+          description: "Able to perform daily tasks without difficulty",
+          points: (() => {
+            if (!intakeData) return 0;
+            // Calculate NDI percentage (each item 0-5, total /50 * 100)
+            if (intakeData.ndi && Array.isArray(intakeData.ndi)) {
+              const ndiTotal = intakeData.ndi.reduce((sum: number, score: number) => sum + score, 0);
+              const ndiPercentage = (ndiTotal / 50) * 100;
+              return ndiPercentage <= 20 ? 1 : 0;
+            }
+            return 0;
+          })(),
+          achieved: (() => {
+            if (!intakeData) return false;
+            if (intakeData.ndi && Array.isArray(intakeData.ndi)) {
+              const ndiTotal = intakeData.ndi.reduce((sum: number, score: number) => sum + score, 0);
+              const ndiPercentage = (ndiTotal / 50) * 100;
+              return ndiPercentage <= 20;
+            }
+            return false;
+          })(),
+          details: (() => {
+            if (!intakeData || !intakeData.ndi || !Array.isArray(intakeData.ndi)) return "Assessment data loading...";
+            const ndiTotal = intakeData.ndi.reduce((sum: number, score: number) => sum + score, 0);
+            const ndiPercentage = Math.round((ndiTotal / 50) * 100);
+            return `Your score: ${ndiPercentage}%`;
+          })(),
+          icon: <Target className="w-5 h-5" />,
+          category: 'movement'
+        },
+        {
+          title: "Patient-Specific Functional Scale (0-10)",
+          description: "Confident in your ability to move and function",
+          points: (() => {
+            if (!intakeData || !intakeData.psfs || !Array.isArray(intakeData.psfs)) return 0;
+            const avgScore = intakeData.psfs.reduce((sum: number, item: any) => sum + (item.score || 0), 0) / intakeData.psfs.length;
+            return avgScore >= 7 ? 2 : avgScore >= 4 ? 1 : 0;
+          })(),
+          achieved: (() => {
+            if (!intakeData || !intakeData.psfs || !Array.isArray(intakeData.psfs)) return false;
+            const avgScore = intakeData.psfs.reduce((sum: number, item: any) => sum + (item.score || 0), 0) / intakeData.psfs.length;
+            return avgScore >= 4;
+          })(),
+          details: (() => {
+            if (!intakeData || !intakeData.psfs || !Array.isArray(intakeData.psfs)) return "Assessment data loading...";
+            const avgScore = (intakeData.psfs.reduce((sum: number, item: any) => sum + (item.score || 0), 0) / intakeData.psfs.length).toFixed(1);
+            return `Your score: ${avgScore}/10`;
+          })(),
+          icon: <Zap className="w-5 h-5" />,
+          category: 'movement'
+        },
+        {
+          title: "Recovery Confidence (0-10 scale)",
+          description: "Feeling confident about your recovery journey",
+          points: (intakeData && intakeData.confidence >= 8) ? 2 : (intakeData && intakeData.confidence >= 5) ? 1 : 0,
+          achieved: intakeData && intakeData.confidence >= 5,
+          details: intakeData ? `Your score: ${intakeData.confidence || 0}/10` : "Assessment data loading...",
+          icon: <TrendingUp className="w-5 h-5" />,
+          category: 'mindset'
+        },
+        {
+          title: "Negative Beliefs About Recovery",
+          description: "Maintaining positive outlook on recovery",
+          points: (intakeData && intakeData.beliefStatus === "Positive") ? 1 : 0,
+          achieved: intakeData && intakeData.beliefStatus === "Positive",
+          details: intakeData ? `Your outlook: ${intakeData.beliefStatus || "Not assessed"}` : "Assessment data loading...",
+          icon: <Shield className="w-5 h-5" />,
+          category: 'mindset'
+        },
+        {
+          title: "Pain Catastrophizing Scale",
+          description: "Managing thoughts about pain in healthy ways",
+          points: (() => {
+            if (!intakeData || !intakeData.pcs4) return 0;
+            const pcsTotal = Object.values(intakeData.pcs4).reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
+            return pcsTotal <= 6 ? 1 : 0;
+          })(),
+          achieved: (() => {
+            if (!intakeData || !intakeData.pcs4) return false;
+            const pcsTotal = Object.values(intakeData.pcs4).reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
+            return pcsTotal <= 6;
+          })(),
+          details: (() => {
+            if (!intakeData || !intakeData.pcs4) return "Assessment data loading...";
+            const pcsTotal = Object.values(intakeData.pcs4).reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
+            return `Your score: ${pcsTotal}/16`;
+          })(),
+          icon: <Heart className="w-5 h-5" />,
+          category: 'mindset'
+        },
+        {
+          title: "Fear of Movement",
+          description: "Feeling comfortable with physical activity",
+          points: (() => {
+              if (!intakeData || !intakeData.tsk7) return 0;
+  const tskTotal = Object.values(intakeData.tsk7).reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
+  return tskTotal <= 8 ? 1 : 0; // TSK-7 threshold: ≤8 points (30% of 28)
+          })(),
+          achieved: (() => {
+              if (!intakeData || !intakeData.tsk7) return false;
+  const tskTotal = Object.values(intakeData.tsk7).reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
+  return tskTotal <= 8; // TSK-7 threshold: ≤8 points (30% of 28)
+          })(),
+          details: (() => {
+              if (!intakeData || !intakeData.tsk7) return "Assessment data loading...";
+  const tskTotal = Object.values(intakeData.tsk7).reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
+  return `Your score: ${tskTotal}/28`;
+          })(),
+          icon: <Zap className="w-5 h-5" />,
+          category: 'movement'
+        },
+        {
+          title: "Recovery Milestone Achievement",
+          description: "Met a meaningful goal in your recovery",
+        points: 0,
+        achieved: false,
+          details: "Not yet assessed",
+          icon: <Target className="w-5 h-5" />,
+          category: 'progress',
+          helper: "Your therapist will update this during your treatment sessions."
+        },
+        {
+          title: "Objective Progress Measurement",
+          description: "Shows clear, measurable improvement in your function",
+          points: 0,
+          achieved: false,
+          details: "Not yet assessed", 
+          icon: <TrendingUp className="w-5 h-5" />,
+          category: 'progress',
+          helper: "Your therapist will track and update this based on your progress."
+        }
+      ]
+
+      // Filter achieved areas for Tier 1 display
+      const achievedAreas = displayBreakdown.filter(item => item.achieved)
+      const totalDomains = displayBreakdown.length
+
+      // Set the calculated score for display
+      setCalculatedScore({ 
+        score: score, // Use backend score (single source of truth)
+        breakdown: displayBreakdown,
+        achievedAreas: achievedAreas,
+        totalDomains: totalDomains
+      })
+      
     } catch (error) {
-      console.error('❌ Error loading intake data:', error)
+      console.error('Error processing SRS breakdown data:', error)
+      setCalculatedScore({ score: score, breakdown: [] })
     }
-  }, [])
+  }, [score, intakeData])
 
   const getPhase = (score: number) => {
     if (score <= 3) return "RESET"
@@ -245,103 +311,206 @@ export function ScoreBreakdownModal({ score, onClose }: ScoreBreakdownModalProps
 
   const currentPhase = getPhase(calculatedScore.score)
 
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'movement': return 'from-btl-500 to-btl-600'
+      case 'mindset': return 'from-btl-400 to-btl-500'
+      case 'progress': return 'from-btl-600 to-btl-700'
+      case 'assessment': return 'from-btl-300 to-btl-400'
+      default: return 'from-btl-500 to-btl-600'
+    }
+  }
+
+  const getCategoryLabel = (category: string) => {
+    switch (category) {
+      case 'movement': return 'Movement & Function'
+      case 'mindset': return 'Mindset & Beliefs'
+      case 'progress': return 'Progress Tracking'
+      case 'assessment': return 'Initial Assessment'
+      default: return 'Other'
+    }
+  }
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+    <AssessmentDialog open={true} onOpenChange={onClose}>
+      <AssessmentDialogContent className="max-w-4xl max-h-[95vh] flex flex-col rounded-2xl shadow-2xl bg-white p-0 overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-btl-600 to-btl-700 text-white p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold mb-1">Recovery Score Breakdown</h2>
-              <p className="text-btl-100 text-sm">Based on your intake assessment</p>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-btl-600 rounded-lg transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
+        <AssessmentDialogHeader className="px-8 py-6 bg-gradient-to-r from-btl-600 to-btl-500 text-white relative">
+          <button
+            onClick={onClose}
+            className="absolute right-6 top-6 text-white/80 hover:text-white transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </button>
           
-          {/* Score Summary */}
-          <div className="mt-4 flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="text-3xl font-bold">{calculatedScore.score}/11</div>
-              <div className="text-btl-100">
-                <div className="text-sm">Current Phase</div>
-                <div className="font-semibold">{currentPhase}</div>
-              </div>
-            </div>
-            <div className="text-right text-sm text-btl-100">
-              <div>Baseline Score</div>
-              <div>(0-9 baseline, 0-11 follow-up)</div>
+          <div className="flex items-center space-x-2">
+            <img src="/SRS-icon.png" alt="SRS Logo" className="w-24 h-24 object-contain" />
+            <div>
+              <div className="text-2xl font-bold leading-tight">SRS Score Breakdown</div>
+              <div className="text-btl-100 text-base font-medium">Understanding your recovery progress</div>
             </div>
           </div>
-        </div>
+        </AssessmentDialogHeader>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-          <div className="space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <div className="flex items-start space-x-3">
-                <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                <div className="text-sm text-blue-800">
-                  <p className="font-medium mb-1">About Your Score</p>
-                  <p>This is your baseline score from intake assessment. Scores increase with follow-up assessments as you progress through treatment.</p>
-                </div>
+        <div className="flex-1 overflow-y-auto px-8 py-6 space-y-6">
+          
+            {/* About Your Score Info */}
+          <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-btl-50 to-btl-100 rounded-xl border border-btl-200">
+            <Info className="w-6 h-6 text-btl-600 mt-0.5 flex-shrink-0" />
+              <div>
+              <p className="font-bold text-btl-900 mb-1">About Your Recovery Score</p>
+              <p className="text-sm text-btl-800">
+                Your Signature Recovery Score™ is a personalized snapshot of your recovery—tracking real progress across pain, movement, mindset, and clinical milestones. It helps guide your recovery phase and shows what's working, what's holding you back, and when you're ready to move forward.
+                </p>
               </div>
             </div>
 
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Score Components</h3>
-            
-            {calculatedScore.breakdown.map((item: any, index: number) => (
-              <div
-                key={index}
-                className={`p-4 rounded-lg border-2 ${
-                  item.achieved 
-                    ? "bg-green-50 border-green-200" 
-                    : "bg-gray-50 border-gray-200"
-                }`}
-              >
-                  <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      item.achieved ? "bg-green-600" : "bg-gray-400"
-                    }`}>
-                      {item.achieved ? (
-                        <CheckCircle className="w-5 h-5 text-white" />
-                      ) : (
-                        <XCircle className="w-5 h-5 text-white" />
-                      )}
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900">{item.description}</h4>
-                      <p className="text-sm text-gray-600">{item.details}</p>
-                    </div>
-                  </div>
-                  <div className={`px-3 py-1 rounded-full text-sm font-bold ${
-                    item.achieved 
-                      ? "bg-green-600 text-white" 
-                      : "bg-gray-300 text-gray-600"
-                  }`}>
-                    +{item.points} pt{item.points !== 1 ? 's' : ''}
-                  </div>
-                </div>
+            {/* Score Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="text-center p-6 bg-gradient-to-br from-btl-50 to-btl-100 rounded-xl border border-btl-200">
+              <h3 className="font-semibold text-btl-900 mb-2">Your Current Score</h3>
+              <div className="text-4xl font-bold text-btl-700 mb-1">
+                  {calculatedScore.score}/11
               </div>
-            ))}
-          </div>
+              <p className="text-sm text-btl-600">Signature Recovery Score™</p>
+                </div>
+            
+            <div className="text-center p-6 bg-gradient-to-br from-btl-50 to-btl-100 rounded-xl border border-btl-200">
+              <h3 className="font-semibold text-btl-900 mb-2">Your Progress</h3>
+              <div className="text-4xl font-bold text-btl-700 mb-1">
+                {getPhase(calculatedScore.score)}
+              </div>
+              <p className="text-sm text-btl-600">Current recovery phase</p>
+              </div>
+            </div>
 
-          {/* Phase Information */}
-          <div className="mt-6 p-4 bg-btl-50 border border-btl-200 rounded-lg">
-            <h4 className="font-semibold text-btl-800 mb-2">Your Current Phase: {currentPhase}</h4>
-            <p className="text-sm text-btl-700">
-              {currentPhase === "RESET" && "Focus on education, pain understanding, and establishing baseline function."}
-              {currentPhase === "EDUCATE" && "Progressive strengthening, movement retraining, and confidence building."}
-              {currentPhase === "REBUILD" && "Advanced recovery strategies and return-to-activity planning."}
-            </p>
+          {/* Tiered Content */}
+          {!expanded ? (
+            /* Tier 1: Wins-only view */
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Your Strengths ({calculatedScore.achievedAreas?.length || 0} / {calculatedScore.totalDomains} domains met)
+              </h3>
+                <button
+                  onClick={() => setExpanded(true)}
+                  className="text-btl-600 hover:text-btl-700 text-sm font-medium flex items-center space-x-1 hover:bg-btl-50 px-3 py-1 rounded-lg transition-all duration-200"
+                >
+                  <span>See all domains</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+
+              {calculatedScore.achievedAreas && calculatedScore.achievedAreas.length > 0 ? (
+              <div className="space-y-3">
+                  {calculatedScore.achievedAreas.map((item, index) => (
+                  <div
+                    key={index}
+                      className="p-4 rounded-xl border-2 bg-gradient-to-r from-btl-50 to-btl-100 border-btl-200 shadow-sm"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-r from-btl-500 to-btl-600 text-white">
+                          <CheckCircle className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium text-btl-900">{item.title}</h4>
+                          <p className="text-sm text-btl-700 mt-1">{item.details}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p className="mb-2">No domains met yet - this is normal at the start of your recovery journey!</p>
+                  <p className="text-sm">Your therapist will help you work on these areas.</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Tier 2: Full breakdown table */
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">Complete Breakdown</h3>
+                <button
+                  onClick={() => setExpanded(false)}
+                  className="text-btl-600 hover:text-btl-700 text-sm font-medium flex items-center space-x-1 hover:bg-btl-50 px-3 py-1 rounded-lg transition-all duration-200"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                  </svg>
+                  <span>Hide details</span>
+                </button>
+              </div>
+
+              {/* Full breakdown table */}
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gradient-to-r from-btl-50 to-btl-100 border-b border-btl-200">
+                      <th className="text-left p-3 font-semibold text-btl-900">Domain</th>
+                      <th className="text-left p-3 font-semibold text-btl-900">Your Score</th>
+                      <th className="text-center p-3 font-semibold text-btl-900">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {calculatedScore.breakdown.map((item, index) => (
+                      <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
+                        <td className="p-3">
+                          <div className="flex items-center space-x-3">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                              item.achieved ? 'bg-btl-500 text-white' : 'bg-gray-300 text-gray-600'
+                            }`}>
+                              {item.icon}
+                            </div>
+                            <div>
+                              <div className="font-medium text-gray-900">{item.title}</div>
+                              {item.helper && (
+                                <div className="text-xs text-btl-600 mt-1">{item.helper}</div>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-3 text-gray-700">{item.details}</td>
+                        <td className="p-3 text-center">
+                          {item.achieved ? (
+                            <span className="inline-flex items-center text-btl-700">
+                              <CheckCircle className="w-4 h-4 mr-1" />
+                              Met
+                            </span>
+                          ) : item.details === "Not yet assessed" ? (
+                            <span className="inline-flex items-center text-gray-500">
+                              <span className="w-4 h-4 mr-1">—</span>
+                              Not assessed
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center text-gray-600">
+                              <XCircle className="w-4 h-4 mr-1" />
+                              Not yet
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+            </div>
+
+              {/* Legend */}
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">Legend:</span> ✓ Met threshold · ✗ Not yet · — Not assessed
+              </p>
+            </div>
           </div>
+          )}
+
         </div>
-      </div>
-    </div>
+      </AssessmentDialogContent>
+    </AssessmentDialog>
   )
 }
+

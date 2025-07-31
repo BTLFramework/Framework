@@ -1,7 +1,7 @@
 export interface RecoveryMetric {
-  label: string;
-  value: string | number;
-  change?: number;
+  name: string;
+  value: number;
+  unit: string;
 }
 
 export interface RecoveryInsight {
@@ -14,4 +14,17 @@ export interface RecoveryInsight {
   metrics?: RecoveryMetric[];
   recommendations?: string[];
   viewed: boolean;
+  completed: boolean;
+  conditions?: {
+    minVAS?: number;
+    maxVAS?: number;
+    minPCS4?: number;
+    maxPCS4?: number;
+    minFearAvoidance?: number;
+    maxFearAvoidance?: number;
+    minConfidence?: number;
+    maxConfidence?: number;
+    minStress?: number;
+    maxStress?: number;
+  };
 } 

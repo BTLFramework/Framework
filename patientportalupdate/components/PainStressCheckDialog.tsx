@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Heart, Smile, Frown, Meh, Angry, Plus, Info, CheckCircle, Target, Activity, Gauge, Play, Headphones, Award } from "lucide-react";
 import {
   Dialog,
@@ -10,10 +10,14 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { addRecoveryPoints } from "@/lib/recoveryPointsApi";
+import { classifyTier, Mood } from "@/utils/assessment";
+import { tierContent } from "@/content/assessmentResponses";
+import ResultModal from "./ResultModal";
 
 interface PainStressCheckDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  patientId: string;
   onComplete?: (data: any) => void;
   onTaskComplete?: (taskData: any) => void;
 }
@@ -42,53 +46,116 @@ const TRIGGERS = [
   "Poor sleep",
 ];
 
-const RELIEF = [
-  "Heat",
-  "Breathwork",
-  "Exercise",
-  "Walk",
+// Replace PAIN_EMOJI_OPTIONS with mood/stress blend
+const MOOD_EMOJI_OPTIONS = [
+  { value: 'very_happy', emoji: '😄', label: 'Very happy' },
+  { value: 'calm', emoji: '🙂', label: 'Calm' },
+  { value: 'neutral', emoji: '😐', label: 'Neutral' },
+  { value: 'down', emoji: '🙁', label: 'Down' },
+  { value: 'stressed', emoji: '😣', label: 'Stressed' },
+  { value: 'very_stressed', emoji: '😫', label: 'Very stressed' },
 ];
 
-const MOOD_EMOJIS = [
-  { icon: <Smile className="w-6 h-6" />, label: "Great" },
-  { icon: <Meh className="w-6 h-6" />, label: "Okay" },
-  { icon: <Frown className="w-6 h-6" />, label: "Low" },
-  { icon: <Angry className="w-6 h-6" />, label: "Rough" },
-];
+// Add a mapping from mood emoji value to Mood type
+const moodMap: Record<string, Mood> = {
+  very_happy: 'positive',
+  calm: 'positive',
+  neutral: 'neutral',
+  down: 'negative',
+  stressed: 'distressed',
+  very_stressed: 'distressed',
+};
 
-export function PainStressCheckDialog({ open, onOpenChange, onComplete, onTaskComplete }: PainStressCheckDialogProps) {
-  const [pain, setPain] = useState<number>(0);
+export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplete, onTaskComplete }: PainStressCheckDialogProps) {
+  const [pain, setPain] = useState<number>(5);
   const [painArea, setPainArea] = useState<string>("");
   const [functionLikert, setFunctionLikert] = useState<string>("");
   const [triggers, setTriggers] = useState<string[]>([]);
   const [customTrigger, setCustomTrigger] = useState<string>("");
-  const [relief, setRelief] = useState<string[]>([]);
-  const [customRelief, setCustomRelief] = useState<string>("");
-  const [stress, setStress] = useState<number>(0);
-  const [mood, setMood] = useState<string>("");
-  const [moodNote, setMoodNote] = useState<string>("");
-  const [reflect, setReflect] = useState<string>("");
-  const [lessonWatched, setLessonWatched] = useState<boolean>(false);
+  const [stress, setStress] = useState<number>(5);
+  const [stressFactors, setStressFactors] = useState<string[]>([]);
+  const [customStressFactor, setCustomStressFactor] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showCelebration, setShowCelebration] = useState<boolean>(false);
+  const [patientData, setPatientData] = useState<any>(null);
+  const [result, setResult] = useState<null | { tier: 1|2|3|4; debugInfo?: { pain: number; stress: number; mood: string; painConverted: number; stressConverted: number; tier: number; } }>(null);
+  const [escalate, setEscalate] = useState(false);
+  // Add mood state
+  const [mood, setMood] = useState<string>('neutral');
 
-  const canSubmit = pain > 0 && painArea && functionLikert && stress > 0 && mood;
+  // Fetch patient data to get correct SRS score
+  useEffect(() => {
+    const fetchPatientData = async () => {
+      try {
+        const response = await fetch(`/api/patients/portal-data/${patientId}`);
+        if (response.ok) {
+          const result = await response.json();
+          setPatientData(result.data);
+        }
+      } catch (error) {
+        console.error('Error fetching patient data:', error);
+      }
+    };
 
-  // Calculate total points (same formula as MovementSessionDialog)
-  const totalPoints = 20; // Base points for completing the assessment
+    if (open && patientId) {
+      fetchPatientData();
+    }
+  }, [open, patientId]);
+
+  // Reset escalate on dialog close/reset
+  useEffect(() => {
+    if (!open) {
+      setEscalate(false);
+    }
+  }, [open]);
+
+  // Get actual patient data instead of hardcoded values
+  const srsScore = patientData?.srsScore || 0;
+  const phaseLabel = patientData?.phase || "EDUCATE";
+  const regionLabel = "Lower back";
+
+  const canSubmit = pain > 0 && painArea && functionLikert && stress > 0;
+  const totalPoints = 3;
 
   const handleChipToggle = (arr: string[], setArr: (v: string[]) => void, value: string) => {
     setArr(arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]);
   };
 
+  const getStressLabel = (stress: number) => {
+    if (stress === 0) return "Completely calm";
+    if (stress <= 3) return "Relaxed";
+    if (stress <= 6) return "Moderate stress";
+    if (stress <= 8) return "High stress";
+    return "Overwhelmed";
+  };
+
+  const feedbackOptions = [
+    {
+      label: "Mindfulness",
+      onClick: () => window.dispatchEvent(new CustomEvent('openMindfulnessSession')),
+    },
+    {
+      label: "Breathing",
+      onClick: () => window.dispatchEvent(new CustomEvent('openBreathingSession')),
+    },
+    {
+      label: "NSDR (YouTube)",
+      onClick: () => window.open('https://www.youtube.com/watch?v=1vx8iUvfyCY', '_blank'),
+    },
+    {
+      label: "Direct Message",
+      onClick: () => window.dispatchEvent(new CustomEvent('openDirectMessage')),
+    },
+    {
+      label: "Book Appointment",
+      onClick: () => window.dispatchEvent(new CustomEvent('openBookAppointment')),
+    },
+  ];
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     
     try {
-      // Get patient ID from email (you'll need to pass patientId as prop or get it from context)
-      const patientId = "testback@example.com"; // Replace with actual patient ID
-      
-      // Get patient data to get numeric ID
       const patientResponse = await fetch(`/api/patients/portal-data/${patientId}`)
       if (!patientResponse.ok) {
         throw new Error('Failed to get patient data')
@@ -96,134 +163,166 @@ export function PainStressCheckDialog({ open, onOpenChange, onComplete, onTaskCo
       const patientData = await patientResponse.json()
       const numericPatientId = patientData.data.patient.id
       
-      // Add recovery points for the completed assessment
+      // Submit daily pain and stress assessment to backend
+      const dailyAssessmentResponse = await fetch('http://localhost:3001/patients/daily-assessment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          patientId: patientId, // Use email format
+          pain: pain,
+          stress: stress,
+          mood: mood,
+          painArea: painArea,
+          functionLikert: functionLikert,
+          triggers: triggers,
+          stressFactors: stressFactors
+        })
+      });
+      
+      if (dailyAssessmentResponse.ok) {
+        const assessmentResult = await dailyAssessmentResponse.json();
+        console.log('✅ Daily assessment stored:', assessmentResult);
+      }
+      
+      // Call real backend for recovery points
       const result = await addRecoveryPoints(
         numericPatientId.toString(),
         'LIFESTYLE',
         'Pain & Stress Check-in completed',
         totalPoints
       );
-      
-      if (result.success) {
-        console.log('✅ Recovery points added successfully:', result.pointsAdded);
-        // Show celebration
-        setShowCelebration(true);
-        
-        // Call parent's task completion handler to trigger refresh
-        if (onTaskComplete) {
-          onTaskComplete({
-            taskId: 'pain-assessment',
-            taskTitle: 'Pain & Stress Check-in',
-            pointsEarned: totalPoints,
-            newSRSScore: 7, // You might want to calculate this based on the assessment
-            phase: 'EDUCATE' // You might want to get this from patient data
-          });
-        }
-        
-        // Call parent's completion handler
-        onComplete?.({ 
-          pain, 
-          painArea, 
-          functionLikert, 
-          triggers, 
-          relief, 
-          stress, 
-          mood, 
-          moodNote, 
-          reflect, 
-          lessonWatched,
-          pointsEarned: totalPoints
+
+      // Record task completion to backend
+      try {
+        await fetch('/api/recovery-points/task-completion', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            patientId: numericPatientId,
+            taskType: 'PAIN_ASSESSMENT',
+            sessionDuration: null,
+            pointsEarned: totalPoints
+          }),
         });
-        
-        // Close the dialog after a short delay to show celebration
-        setTimeout(() => {
-          onOpenChange(false);
-          setShowCelebration(false);
-        }, 2000);
-      } else {
-        console.error('❌ Failed to add recovery points:', result.error);
-        // Still show celebration but log the error
-        setShowCelebration(true);
-        
-        // Still call parent's task completion handler
-        if (onTaskComplete) {
-          onTaskComplete({
-            taskId: 'pain-assessment',
-            taskTitle: 'Pain & Stress Check-in',
-            pointsEarned: totalPoints,
-            newSRSScore: 7,
-            phase: 'EDUCATE'
-          });
-        }
-        
-        // Still call parent's completion handler
-        onComplete?.({ 
-          pain, 
-          painArea, 
-          functionLikert, 
-          triggers, 
-          relief, 
-          stress, 
-          mood, 
-          moodNote, 
-          reflect, 
-          lessonWatched,
-          pointsEarned: totalPoints
-        });
-        
-        // Close the dialog after a short delay
-        setTimeout(() => {
-          onOpenChange(false);
-          setShowCelebration(false);
-        }, 2000);
+        console.log('✅ Task completion recorded for pain assessment');
+      } catch (taskError) {
+        console.error('❌ Failed to record task completion:', taskError);
       }
-    } catch (error) {
-      console.error('❌ Error completing assessment:', error);
-      // Still mark as completed locally
+
+      // Use real escalate value from backend
       setShowCelebration(true);
+      setTimeout(() => {
+        setShowCelebration(false);
+        const mappedMood = moodMap[mood] || 'neutral';
+        // Convert 0-10 scales to expected scales for classifyTier
+        const painConverted = Math.floor((pain / 10) * 6) as 0|1|2|3|4|5|6; // Convert 0-10 to 0-6
+        const stressConverted = Math.floor((stress / 10) * 3) as 0|1|2|3; // Convert 0-10 to 0-3
+        const tier = classifyTier({ pain: painConverted, stress: stressConverted, mood: mappedMood });
+        const debugInfo = {
+          pain,
+          stress,
+          mood: mappedMood,
+          painConverted,
+          stressConverted,
+          tier
+        };
+        setResult({ tier, debugInfo });
+        setEscalate(false); // Backend doesn't support escalation yet
+      }, 2000);
       
-      // Still call parent's task completion handler
       if (onTaskComplete) {
         onTaskComplete({
           taskId: 'pain-assessment',
           taskTitle: 'Pain & Stress Check-in',
           pointsEarned: totalPoints,
-          newSRSScore: 7,
-          phase: 'EDUCATE'
+          newSRSScore: srsScore,
+          phase: phaseLabel
         });
       }
       
-      // Still call parent's completion handler
       onComplete?.({ 
         pain, 
         painArea, 
         functionLikert, 
         triggers, 
-        relief, 
         stress, 
-        mood, 
-        moodNote, 
-        reflect, 
-        lessonWatched,
+        stressFactors,
         pointsEarned: totalPoints
       });
+    } catch (error) {
+      console.error('❌ Error completing pain assessment:', error);
       
-      // Close the dialog after a short delay
+      // Still record task completion to backend even if everything else failed
+      try {
+        const patientResponse = await fetch(`/api/patients/portal-data/${patientId}`)
+        if (patientResponse.ok) {
+          const patientData = await patientResponse.json()
+          const numericPatientId = patientData.data.patient.id
+          
+          await fetch('/api/recovery-points/task-completion', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              patientId: numericPatientId,
+              taskType: 'PAIN_ASSESSMENT',
+              sessionDuration: null,
+              pointsEarned: totalPoints
+            }),
+          });
+          console.log('✅ Task completion recorded for pain assessment (despite error)');
+        }
+      } catch (taskError) {
+        console.error('❌ Failed to record task completion:', taskError);
+      }
+      
+      setShowCelebration(true);
       setTimeout(() => {
-        onOpenChange(false);
         setShowCelebration(false);
+        const painConverted = Math.floor((pain / 6) * 3) as 0|1|2|3;
+        const stressConverted = Math.floor((stress / 10) * 3) as 0|1|2|3;
+        const tier = classifyTier({ pain: painConverted, stress: stressConverted, mood: 'neutral' });
+        const debugInfo = {
+          pain,
+          stress,
+          mood,
+          painConverted,
+          stressConverted,
+          tier
+        };
+        setResult({ tier, debugInfo });
+        setEscalate(false);
       }, 2000);
+      
+      if (onTaskComplete) {
+        onTaskComplete({
+          taskId: 'pain-assessment',
+          taskTitle: 'Pain & Stress Check-in',
+          pointsEarned: totalPoints,
+          newSRSScore: srsScore,
+          phase: phaseLabel
+        });
+      }
+      
+      onComplete?.({ 
+        pain, 
+        painArea, 
+        functionLikert, 
+        triggers, 
+        stress, 
+        stressFactors,
+        pointsEarned: totalPoints
+      });
     }
     
     setIsSubmitting(false);
   };
 
-  // Placeholder values for pills (replace with real patient data as needed)
-  const phaseLabel = "EDUCATE";
-  const regionLabel = "Lower back";
-  const srsScore = 7;
-
-  // Navigation functions for the pills (dispatch custom events for now)
   const handlePhaseClick = () => {
     const event = new CustomEvent('openExerciseVideos', {
       detail: { filter: 'phase', value: phaseLabel }
@@ -231,6 +330,7 @@ export function PainStressCheckDialog({ open, onOpenChange, onComplete, onTaskCo
     window.dispatchEvent(event);
     onOpenChange(false);
   };
+
   const handleRegionClick = () => {
     const event = new CustomEvent('openExerciseVideos', {
       detail: { filter: 'region', value: regionLabel }
@@ -238,6 +338,7 @@ export function PainStressCheckDialog({ open, onOpenChange, onComplete, onTaskCo
     window.dispatchEvent(event);
     onOpenChange(false);
   };
+
   const handleSRSClick = () => {
     const event = new CustomEvent('openRecoveryScore');
     window.dispatchEvent(event);
@@ -253,6 +354,7 @@ export function PainStressCheckDialog({ open, onOpenChange, onComplete, onTaskCo
             Your daily wellness assessment. Track your progress and get personalized insights.
           </DialogDescription>
         </DialogHeader>
+        
         <div className="bg-gradient-to-br from-btl-900 via-btl-700 to-btl-100 px-8 pt-8 pb-4 border-b border-white/40">
           <div className="flex items-center gap-8 items-center">
             <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
@@ -329,19 +431,13 @@ export function PainStressCheckDialog({ open, onOpenChange, onComplete, onTaskCo
                     <span className="font-medium text-btl-600">10 - Worst</span>
                   </div>
                 </div>
-                <div className="flex justify-center">
-                  <div className="w-full max-w-xl mx-auto py-3 px-0">
-                    <div className="w-full rounded-xl bg-gradient-to-r from-btl-500 to-btl-400 shadow-xl border border-btl-200 flex flex-col items-center justify-center transition-all duration-300 py-1" style={{ minHeight: 40 }}>
-                      <div className="text-3xl font-extrabold text-white drop-shadow-lg select-none">{pain}</div>
-                      <div className="mt-1 min-h-[1.2em] flex items-center justify-center w-full">
-                        <span className="text-xs text-white/90 font-medium select-none text-center">
-                          {pain === 0 && "No pain"}
-                          {pain > 0 && pain <= 3 && "Mild pain"}
-                          {pain > 3 && pain <= 6 && "Moderate pain"}
-                          {pain > 6 && pain <= 8 && "Severe pain"}
-                          {pain > 8 && "Very severe pain"}
-                        </span>
-                      </div>
+                <div className="flex justify-center my-2">
+                  <div className="flex flex-col items-center">
+                    <div className="rounded-full bg-gradient-to-r from-btl-500 to-btl-400 shadow-xl border border-btl-200 w-20 h-20 flex items-center justify-center">
+                      <span className="text-4xl font-extrabold text-white select-none">{pain}</span>
+                    </div>
+                    <div className="mt-2 text-sm font-medium text-btl-600 text-center">
+                      {pain === 0 ? "No pain" : pain <= 3 ? "Mild pain" : pain <= 6 ? "Moderate pain" : pain <= 8 ? "Severe pain" : "Very severe pain"}
                     </div>
                   </div>
                 </div>
@@ -422,43 +518,6 @@ export function PainStressCheckDialog({ open, onOpenChange, onComplete, onTaskCo
                   </div>
                 </div>
               </div>
-
-              {/* Relief Chips */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-4">
-                  What helped relieve your pain?
-                </label>
-                <div className="space-y-4">
-                  <div className="flex flex-wrap gap-3">
-                    {RELIEF.map(r => (
-                      <button 
-                        key={r} 
-                        type="button" 
-                        onClick={() => handleChipToggle(relief, setRelief, r)} 
-                        className={`px-4 py-2 rounded-2xl border-2 text-sm font-medium transition-all duration-200 hover:shadow-lg ${
-                          relief.includes(r)
-                            ? 'bg-gradient-to-r from-btl-600 to-btl-500 text-white border-btl-600 shadow-xl scale-105'
-                            : 'bg-gradient-to-br from-gray-50 to-white text-gray-700 border-gray-200 hover:bg-gradient-to-br hover:from-btl-50 hover:to-blue-50 hover:border-btl-400 hover:text-btl-700 hover:shadow-md'
-                        }`}
-                      >
-                        {r}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <input 
-                      type="text" 
-                      value={customRelief} 
-                      onChange={e => setCustomRelief(e.target.value)} 
-                      placeholder="Add custom relief method..." 
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-btl-500 focus:border-btl-500 shadow-sm hover:shadow-md transition-all duration-200"
-                    />
-                    <div className="p-2 bg-btl-100 rounded-2xl">
-                      <Plus className="w-5 h-5 text-btl-600" />
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Stress Section */}
@@ -467,7 +526,7 @@ export function PainStressCheckDialog({ open, onOpenChange, onComplete, onTaskCo
                 <div className="w-3 h-3 bg-gradient-to-r from-btl-600 to-btl-400 rounded-full shadow-sm"></div>
                 Stress & Mood
               </h3>
-
+              
               {/* Stress Slider */}
               <div className="space-y-4 mb-6">
                 <label className="block text-sm font-medium text-gray-700">
@@ -488,153 +547,43 @@ export function PainStressCheckDialog({ open, onOpenChange, onComplete, onTaskCo
                     <span className="font-medium text-btl-600">10 - Maxed out</span>
                   </div>
                 </div>
-                <div className="flex justify-center">
-                  <div className="w-full max-w-xl mx-auto py-3 px-0">
-                    <div className="w-full rounded-xl bg-gradient-to-r from-btl-500 to-btl-400 shadow-xl border border-btl-200 flex flex-col items-center justify-center transition-all duration-300 py-1" style={{ minHeight: 40 }}>
-                      <div className="text-3xl font-extrabold text-white drop-shadow-lg select-none">{stress}</div>
-                      <div className="mt-1 min-h-[1.2em] flex items-center justify-center w-full">
-                        <span className="text-xs text-white/90 font-medium select-none text-center">
-                          {stress === 0 && "Completely calm"}
-                          {stress <= 3 && "Relaxed"}
-                          {stress <= 6 && "Moderate stress"}
-                          {stress <= 8 && "High stress"}
-                          {stress > 8 && "Overwhelmed"}
-                        </span>
-                      </div>
+                <div className="flex justify-center my-2">
+                  <div className="flex flex-col items-center">
+                    <div className="rounded-full bg-gradient-to-r from-btl-500 to-btl-400 shadow-xl border border-btl-200 w-20 h-20 flex items-center justify-center">
+                      <span className="text-4xl font-extrabold text-white select-none">{stress}</span>
+                    </div>
+                    <div className="mt-2 text-sm font-medium text-btl-600 text-center">
+                      {getStressLabel(stress)}
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Mood Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-4">
-                  How are you feeling?
-                </label>
-                <div className="space-y-4">
-                  <div className="flex gap-4 justify-center">
-                    {MOOD_EMOJIS.map(({ icon, label }) => (
-                      <button 
-                        key={label} 
-                        type="button" 
-                        onClick={() => setMood(label)} 
-                        className={`p-4 rounded-2xl border-2 transition-all duration-200 shadow-xl hover:scale-110 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-btl-400 
-                          ${mood === label
-                            ? 'bg-gradient-to-br from-btl-600 to-btl-400 text-white border-btl-600 ring-2 ring-btl-400 shadow-2xl scale-110 drop-shadow-lg'
-                            : 'bg-gradient-to-br from-white to-gray-50 text-btl-600 border-btl-400 hover:bg-gradient-to-br hover:from-btl-50 hover:to-blue-50 hover:border-btl-600 hover:text-btl-700 hover:shadow-xl'}
-                        `}
-                      >
-                        {icon}
-                      </button>
-                    ))}
-                  </div>
-                  <input 
-                    type="text" 
-                    value={moodNote} 
-                    onChange={e => setMoodNote(e.target.value)} 
-                    placeholder="Add a note about your mood (optional)" 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-btl-500 focus:border-btl-500 shadow-sm hover:shadow-md transition-all duration-200"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Reflection & Lesson */}
-            <div className="bg-gradient-to-r from-btl-50 via-blue-50 to-indigo-50 rounded-2xl border border-btl-200 p-6 shadow-lg">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-btl-100 rounded-2xl">
-                  <Info className="w-6 h-6 text-btl-600" />
-                </div>
-                <span className="text-xl font-semibold text-gray-900">Daily Reflection</span>
-              </div>
-              
-              <div className="space-y-6">
-                {/* 90-second lesson section - enhanced with UX improvements */}
-                <div className="mb-6">
-                  <span className="text-lg font-bold text-gray-800 mb-2 block">90-second lesson</span>
-                  
-                  {/* Main lesson button with enhanced UX */}
-                  <div className="relative">
-                    <button 
-                      type="button" 
-                      onClick={() => setLessonWatched(true)} 
-                      className={`w-full px-6 py-4 rounded-2xl text-base font-semibold shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-300 hover:scale-105 hover:shadow-xl ${
-                        lessonWatched 
-                          ? 'bg-slate-200 text-slate-600 border-2 border-slate-300' 
-                          : 'bg-gradient-to-br from-btl-500 to-btl-400 text-white border-2 border-btl-400 hover:from-btl-600 hover:to-btl-500'
-                      }`}
-                      aria-label="Play 90-second lesson: Why stress turns pain up"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          {lessonWatched ? (
-                            <CheckCircle className="w-5 h-5 text-green-600" />
-                          ) : (
-                            <Play className="w-5 h-5" />
-                          )}
-                          <span>Why stress turns pain up</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm opacity-90">90s</span>
-                          {lessonWatched && (
-                            <CheckCircle className="w-4 h-4 text-green-600" />
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                    
-                    {/* Sub-headline teaser */}
-                    <p className="text-sm text-gray-600 mt-2 ml-2">
-                      Learn how stress affects your pain and simple ways to manage both.
-                    </p>
-                    
-                    {/* Audio fallback option */}
-                    <button 
+              <div className="flex flex-col items-center my-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Mood</label>
+                <div className="flex gap-4 justify-center mb-2">
+                  {MOOD_EMOJI_OPTIONS.map(opt => (
+                    <button
+                      key={opt.value}
                       type="button"
-                      className="absolute top-2 right-2 p-1.5 bg-white/20 rounded-full hover:bg-white/30 transition-colors duration-200"
-                      title="Listen instead (90s, 0.7 MB)"
-                      aria-label="Listen instead (90s, 0.7 MB)"
+                      onClick={() => setMood(opt.value)}
+                      className={`flex flex-col items-center justify-center w-20 h-20 rounded-xl focus:outline-none transition-all duration-150 border border-btl-400 ${mood === opt.value ? 'ring-2 ring-btl-500 border-2 bg-btl-100' : 'bg-white hover:bg-btl-50'}`}
+                      aria-label={opt.label}
+                      tabIndex={0}
+                      title={opt.label}
                     >
-                      <Headphones className="w-3 h-3 text-white/80" />
+                      <span className="text-2xl mb-2">{opt.emoji}</span>
+                      <span className="text-sm leading-tight text-gray-600 text-center w-full whitespace-normal break-words">{opt.label}</span>
                     </button>
-                  </div>
-                  
-                  {/* Earn-points badge */}
-                  <div className="flex justify-end mt-2">
-                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      lessonWatched 
-                        ? 'bg-green-100 text-green-700 border border-green-200' 
-                        : 'bg-gray-100 text-gray-600 border border-gray-200'
-                    }`}>
-                      {lessonWatched ? '✓ +3 pts earned' : '+3 pts on finish'}
-                    </div>
-                  </div>
-                </div>
-                <div className="border-t border-btl-100/30 my-2"></div>
-                {lessonWatched && (
-                  <div className="text-sm text-green-600 font-medium flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4" />
-                    +3 bonus points earned!
-                  </div>
-                )}
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
-                    One thing that helped today…
-                  </label>
-                  <textarea 
-                    value={reflect} 
-                    onChange={e => setReflect(e.target.value)} 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-btl-500 focus:border-btl-500 min-h-[80px] resize-none shadow-sm hover:shadow-md transition-all duration-200" 
-                    placeholder="Share a win, tip, or something that helped you today..."
-                  />
+                  ))}
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Celebration Message - moved outside scrollable area */}
+        {/* Celebration Message */}
         {showCelebration && (
           <div className="px-6 py-4 bg-yellow-50 border-t border-yellow-200">
             <div className="flex items-center justify-center">
@@ -662,7 +611,7 @@ export function PainStressCheckDialog({ open, onOpenChange, onComplete, onTaskCo
         <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-200">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-3">
-              <div className="px-4 py-2 font-medium text-sm bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-yellow-900 shadow-lg border border-yellow-500 rounded-2xl">
+              <div className="px-4 py-2 font-medium text-sm bg-gradient-to-br from-[#b08d57] via-[#a97142] to-[#7c5c36] text-white shadow-lg border border-[#a97142] rounded-2xl">
                 Total: {totalPoints} pts
               </div>
             </div>
@@ -690,6 +639,18 @@ export function PainStressCheckDialog({ open, onOpenChange, onComplete, onTaskCo
           </div>
         </div>
       </DialogContent>
+      
+      {result && (
+        <ResultModal
+          message={tierContent[result.tier].message}
+          label={tierContent[result.tier].cta.label}
+          route={tierContent[result.tier].cta.route}
+          onClose={() => setResult(null)}
+          tier={result.tier}
+          escalate={escalate}
+          debugInfo={process.env.NODE_ENV === 'development' ? result.debugInfo : undefined}
+        />
+      )}
     </Dialog>
   );
 } 

@@ -9,7 +9,7 @@ const navigationItems = [
   { name: "Weekly Plan", icon: Calendar, href: "/weekly-plan" },
   { name: "Forms", icon: FileText, href: "/forms" },
   { name: "Recovery Toolkit", icon: Book, href: "/toolkit" },
-  { name: "Book Appointment", icon: Phone, href: "/appointment" },
+  { name: "Book Appointment", icon: Phone, href: "https://kineticliving.janeapp.com/#/staff_member/37", external: true },
   { name: "Support", icon: HelpCircle, href: "/support" },
 ]
 
@@ -50,19 +50,37 @@ export function Sidebar() {
           <ul className="space-y-2">
             {navigationItems.map((item) => (
               <li key={item.name}>
-                <a
-                  href={item.href}
-                  className={`flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group ${
-                    item.active
-                      ? "bg-teal-50 text-teal-700 border border-teal-200"
-                      : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                  }`}
-                >
-                  <item.icon
-                    className={`w-5 h-5 ${item.active ? "text-teal-600" : "text-gray-500 group-hover:text-gray-700"}`}
-                  />
-                  {!isCollapsed && <span className="ml-3 font-medium">{item.name}</span>}
-                </a>
+                {item.external ? (
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group ${
+                      item.active
+                        ? "bg-teal-50 text-teal-700 border border-teal-200"
+                        : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                    }`}
+                  >
+                    <item.icon
+                      className={`w-5 h-5 ${item.active ? "text-teal-600" : "text-gray-500 group-hover:text-gray-700"}`}
+                    />
+                    {!isCollapsed && <span className="ml-3 font-medium">{item.name}</span>}
+                  </a>
+                ) : (
+                  <a
+                    href={item.href}
+                    className={`flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group ${
+                      item.active
+                        ? "bg-teal-50 text-teal-700 border border-teal-200"
+                        : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                    }`}
+                  >
+                    <item.icon
+                      className={`w-5 h-5 ${item.active ? "text-teal-600" : "text-gray-500 group-hover:text-gray-700"}`}
+                    />
+                    {!isCollapsed && <span className="ml-3 font-medium">{item.name}</span>}
+                  </a>
+                )}
               </li>
             ))}
           </ul>

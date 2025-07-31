@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { SWRProvider } from '@/components/SWRProvider'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export const metadata: Metadata = {
   title: 'Back to Life - Patient Portal',
@@ -14,7 +16,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ErrorBoundary>
+          <SWRProvider>
+            {children}
+          </SWRProvider>
+        </ErrorBoundary>
+      </body>
     </html>
   )
 }

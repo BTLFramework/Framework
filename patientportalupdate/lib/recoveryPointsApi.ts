@@ -15,6 +15,7 @@ export interface RecoveryPointsResponse {
   bufferData?: any;
   message?: string;
   error?: string;
+  alreadyLogged?: boolean;
 }
 
 // Add recovery points for a patient
@@ -136,5 +137,39 @@ export async function getSRSBuffer(patientId: string) {
   } catch (error) {
     console.error('❌ Error fetching SRS buffer:', error);
     return null;
+  }
+}
+
+// Log mood after mindfulness session
+export async function logMood(patientId: string, mood: string) {
+  try {
+    console.log(`😊 Logging mood for patient ${patientId}: ${mood}`);
+    
+    const response = await fetch('/api/recovery-points/mood', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        patientId: parseInt(patientId),
+        mood
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `HTTP ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Mood logged successfully:', result);
+    return result;
+    
+  } catch (error) {
+    console.error('❌ Error logging mood:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
   }
 } 

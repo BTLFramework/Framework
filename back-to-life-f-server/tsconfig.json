@@ -16,5 +16,9 @@
   },
   "include": [
     "src/**/*" /* Include all TypeScript files in the src directory. */
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
   ]
 }

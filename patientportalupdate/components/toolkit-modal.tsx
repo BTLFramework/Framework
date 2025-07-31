@@ -1,9 +1,22 @@
 "use client"
 
-import { X, Play, Download, BookOpen, Search, Filter, Target, Activity } from "lucide-react"
-import { useState } from "react"
+import { X, Play, Download, BookOpen, Search, Filter, Target, Activity, FileText, Wrench, Clock, Moon } from "lucide-react"
+import { useState, useRef } from "react"
 import { exercises as allExercises } from "@/lib/exerciseLibrary"
 import { ExerciseVideoModal } from "@/components/exercise-video-modal"
+import { generatePainJournalPDF, generateSMARTGoalsPDF } from "@/utils/pdfGenerator"
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
+import {
+  AssessmentDialog,
+  AssessmentDialogContent,
+  AssessmentDialogHeader,
+  AssessmentDialogTitle,
+  AssessmentDialogDescription,
+  AssessmentDialogBody,
+  AssessmentDialogFooter,
+} from "@/components/ui/assessment-dialog";
+import { Button } from "@/components/ui/button";
 
 interface ToolkitModalProps {
   toolkit: {
@@ -20,6 +33,638 @@ export function ToolkitModal({ toolkit, onClose }: ToolkitModalProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedRegion, setSelectedRegion] = useState("all")
   const [selectedPhase, setSelectedPhase] = useState("all")
+  
+  // Support Tools State
+  const [showTimer, setShowTimer] = useState(false)
+  const [timerMinutes, setTimerMinutes] = useState(10)
+  const [timerSeconds, setTimerSeconds] = useState(0)
+  const [isTimerRunning, setIsTimerRunning] = useState(false)
+  const [showGoals, setShowGoals] = useState(false)
+  const [showSleepTracker, setShowSleepTracker] = useState(false)
+  const [sleepData, setSleepData] = useState({
+    sleepQuality: 7,
+    painLevel: 5,
+    sleepHours: 7.5,
+    stressLevel: 6
+  })
+
+  // New popup states
+  const [showPainJournalPopup, setShowPainJournalPopup] = useState(false)
+  const [showSMARTGoalsPopup, setShowSMARTGoalsPopup] = useState(false)
+
+  // Timer functionality
+  const startTimer = () => {
+    setIsTimerRunning(true)
+    const interval = setInterval(() => {
+      setTimerSeconds(prev => {
+        if (prev === 0) {
+          if (timerMinutes === 0) {
+            setIsTimerRunning(false)
+            clearInterval(interval)
+            return 0
+          }
+          setTimerMinutes(prev => prev - 1)
+          return 59
+        }
+        return prev - 1
+      })
+    }, 1000)
+  }
+
+  const resetTimer = () => {
+    setIsTimerRunning(false)
+    setTimerMinutes(10)
+    setTimerSeconds(0)
+  }
+
+  // Generate Pain Journal PDF
+  const generatePainJournal = async () => {
+    try {
+      await generatePainJournalPDF()
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      // Fallback to text file if PDF generation fails
+      alert('PDF generation failed. Please try again.')
+    }
+  }
+
+  // Generate SMART Goals PDF
+  const generateSMARTGoals = async () => {
+    try {
+      await generateSMARTGoalsPDF()
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      // Fallback to text file if PDF generation fails
+      alert('PDF generation failed. Please try again.')
+    }
+  }
+
+  // Generate PDF from popup content
+  const generatePDFFromPopup = async (contentRef: any, filename: string) => {
+    if (!contentRef.current) return
+    
+    try {
+      const canvas = await html2canvas(contentRef.current, {
+        useCORS: true,
+        allowTaint: true,
+        background: '#ffffff'
+      })
+      
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF('p', 'mm', 'a4')
+      const imgWidth = 210
+      const pageHeight = 295
+      const imgHeight = (canvas.height * imgWidth) / canvas.width
+      let heightLeft = imgHeight
+      let position = 0
+      
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+      heightLeft -= pageHeight
+      
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight
+        pdf.addPage()
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+        heightLeft -= pageHeight
+      }
+      
+      pdf.save(filename)
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      alert('PDF generation failed. Please try again.')
+    }
+  }
+
+  // Pain Journal Popup
+  const PainJournalPopup = () => {
+    const contentRef = useRef<HTMLDivElement>(null)
+    
+    // State for Pain Journal form data
+    const [painJournalData, setPainJournalData] = useState({
+      painLevel: '',
+      painLocations: [] as string[],
+      otherLocation: '',
+      mood: '',
+      stressLevel: 5,
+      activities: [] as string[],
+      restDay: false,
+      automaticThought: '',
+      copingStrategies: [] as string[],
+      otherCoping: '',
+      helpfulness: '',
+      notes: ''
+    })
+
+    const handlePainLocationChange = (location: string) => {
+      setPainJournalData(prev => ({
+        ...prev,
+        painLocations: prev.painLocations.includes(location)
+          ? prev.painLocations.filter(l => l !== location)
+          : [...prev.painLocations, location]
+      }))
+    }
+
+    const handleActivityChange = (activity: string) => {
+      setPainJournalData(prev => ({
+        ...prev,
+        activities: prev.activities.includes(activity)
+          ? prev.activities.filter(a => a !== activity)
+          : [...prev.activities, activity]
+      }))
+    }
+
+    const handleCopingStrategyChange = (strategy: string) => {
+      setPainJournalData(prev => ({
+        ...prev,
+        copingStrategies: prev.copingStrategies.includes(strategy)
+          ? prev.copingStrategies.filter(s => s !== strategy)
+          : [...prev.copingStrategies, strategy]
+      }))
+    }
+
+    return (
+      <AssessmentDialog open={showPainJournalPopup} onOpenChange={setShowPainJournalPopup}>
+        <AssessmentDialogContent className="max-w-4xl w-full max-h-[90vh] flex flex-col rounded-2xl shadow-2xl bg-white p-0 overflow-hidden">
+          <AssessmentDialogHeader className="bg-gradient-to-r from-btl-700 to-btl-600 text-white p-6 rounded-t-2xl">
+            <div className="flex items-center gap-4">
+              <div className="bg-white bg-opacity-20 rounded-full p-2 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 19.5A2.5 2.5 0 006.5 22h11a2.5 2.5 0 002.5-2.5V6a2 2 0 00-2-2H6a2 2 0 00-2 2v13.5z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 2v4m8-4v4" />
+                </svg>
+              </div>
+              <div>
+                <AssessmentDialogTitle>Daily Pain Journal</AssessmentDialogTitle>
+                <AssessmentDialogDescription>Fill out the form below, then print your answers or download a blank version using the buttons at the bottom.</AssessmentDialogDescription>
+              </div>
+            </div>
+          </AssessmentDialogHeader>
+          <AssessmentDialogBody>
+            <div ref={contentRef} className="bg-white p-8 rounded-lg mx-auto" style={{ minHeight: '11in', width: '8.5in' }}>
+              {/* Header Bar (for PDF date) */}
+              <div className="flex items-center justify-between border-b-2 border-btl-600 pb-4 mb-8">
+                <div className="flex items-center space-x-4"></div>
+                <div className="text-right">
+                  <div className="text-sm text-gray-600">Date:</div>
+                  <div className="text-lg font-semibold text-btl-800">{new Date().toLocaleDateString()}</div>
+                </div>
+              </div>
+
+              {/* Two-Column Grid Layout */}
+              <div className="grid grid-cols-2 gap-8 mb-8">
+                {/* Left Column: Pain + Mood */}
+                <div className="space-y-8">
+                  {/* Pain Level Section */}
+                  <div className="border-b border-gray-200 pb-6">
+                    <h3 className="text-lg font-semibold text-btl-700 mb-4">Pain Level (0-10)</h3>
+                    <div className="flex space-x-1">
+                      {[0,1,2,3,4,5,6,7,8,9,10].map(num => (
+                        <button
+                          key={num}
+                          onClick={() => setPainJournalData(prev => ({ ...prev, painLevel: num.toString() }))}
+                          className={`w-8 h-8 border-2 rounded flex items-center justify-center text-sm font-medium transition-colors ${
+                            painJournalData.painLevel === num.toString()
+                              ? 'border-btl-600 bg-btl-600 text-white'
+                              : 'border-gray-300 hover:bg-btl-50'
+                          }`}
+                        >
+                          {num}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Pain Location Section */}
+                  <div className="border-b border-gray-200 pb-6">
+                    <h3 className="text-lg font-semibold text-btl-700 mb-4">Pain Location</h3>
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                      {['Neck', 'Upper Back', 'Shoulders', 'Lower Back', 'Arms', 'Legs'].map(location => (
+                        <div key={location} className="flex items-center space-x-2">
+                          <button
+                            onClick={() => handlePainLocationChange(location)}
+                            className={`w-4 h-4 border rounded flex items-center justify-center transition-colors ${
+                              painJournalData.painLocations.includes(location)
+                                ? 'border-btl-600 bg-btl-600'
+                                : 'border-gray-300 hover:border-btl-400'
+                            }`}
+                          >
+                            {painJournalData.painLocations.includes(location) && (
+                              <div className="w-2 h-2 bg-white rounded-sm"></div>
+                            )}
+                          </button>
+                          <span className="text-sm">{location}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 border border-gray-300 rounded"></div>
+                      <span className="text-sm">Other:</span>
+                      <input
+                        type="text"
+                        value={painJournalData.otherLocation}
+                        onChange={(e) => setPainJournalData(prev => ({ ...prev, otherLocation: e.target.value }))}
+                        className="flex-1 h-6 border-b border-gray-300 focus:border-btl-600 focus:outline-none text-sm"
+                        placeholder=""
+                      />
+                    </div>
+                  </div>
+
+                  {/* Mood & Stress Section */}
+                  <div className="border-b border-gray-200 pb-6">
+                    <h3 className="text-lg font-semibold text-btl-700 mb-4">Mood & Stress</h3>
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-3">How are you feeling today?</label>
+                      <div className="flex space-x-4">
+                        {[
+                          { emoji: '😄', value: 'Happy' },
+                          { emoji: '🙂', value: 'Good' },
+                          { emoji: '😐', value: 'Neutral' },
+                          { emoji: '🙁', value: 'Sad' },
+                          { emoji: '😢', value: 'Very Sad' }
+                        ].map((item, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setPainJournalData(prev => ({ ...prev, mood: item.value }))}
+                            className={`text-2xl transition-transform hover:scale-110 ${
+                              painJournalData.mood === item.value ? 'scale-110 ring-2 ring-btl-600 rounded-full p-1' : ''
+                            }`}
+                          >
+                            {item.emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-3">Stress Level (0-10)</label>
+                      <div className="flex items-center space-x-2 mb-2">
+                        <span className="text-xs text-gray-500">0</span>
+                        <input
+                          type="range"
+                          min="0"
+                          max="10"
+                          value={painJournalData.stressLevel}
+                          onChange={(e) => setPainJournalData(prev => ({ ...prev, stressLevel: parseInt(e.target.value) }))}
+                          className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                        />
+                        <span className="text-xs text-gray-500">10</span>
+                      </div>
+                      <div className="text-center text-sm text-gray-600">{painJournalData.stressLevel}/10</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column: Activities + Coping */}
+                <div className="space-y-8">
+                  {/* Daily Activities Section */}
+                  <div className="border-b border-gray-200 pb-6">
+                    <h3 className="text-lg font-semibold text-btl-700 mb-4">Daily Activities</h3>
+                    <div className="space-y-3 mb-4">
+                      {['Movement session', 'Walking', 'Stretching', 'Work activities', 'Household tasks'].map(activity => (
+                        <div key={activity} className="flex items-center space-x-2">
+                          <button
+                            onClick={() => handleActivityChange(activity)}
+                            className={`w-4 h-4 border rounded flex items-center justify-center transition-colors ${
+                              painJournalData.activities.includes(activity)
+                                ? 'border-btl-600 bg-btl-600'
+                                : 'border-gray-300 hover:border-btl-400'
+                            }`}
+                          >
+                            {painJournalData.activities.includes(activity) && (
+                              <div className="w-2 h-2 bg-white rounded-sm"></div>
+                            )}
+                          </button>
+                          <span className="text-sm">{activity}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => setPainJournalData(prev => ({ ...prev, restDay: !prev.restDay }))}
+                        className={`w-4 h-4 border rounded flex items-center justify-center transition-colors ${
+                          painJournalData.restDay
+                            ? 'border-btl-600 bg-btl-600'
+                            : 'border-gray-300 hover:border-btl-400'
+                        }`}
+                      >
+                        {painJournalData.restDay && (
+                          <div className="w-2 h-2 bg-white rounded-sm"></div>
+                        )}
+                      </button>
+                      <span className="text-sm">Rest day</span>
+                    </div>
+                  </div>
+
+                  {/* Automatic Thought Section */}
+                  <div className="border-b border-gray-200 pb-6">
+                    <h3 className="text-lg font-semibold text-btl-700 mb-4">Automatic Thought</h3>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-3">First thought when pain spiked:</label>
+                      <input
+                        type="text"
+                        value={painJournalData.automaticThought}
+                        onChange={(e) => setPainJournalData(prev => ({ ...prev, automaticThought: e.target.value }))}
+                        maxLength={30}
+                        className="w-full h-8 border border-gray-300 rounded px-3 py-1 bg-white focus:border-btl-600 focus:outline-none text-sm"
+                        placeholder=""
+                      />
+                    </div>
+                  </div>
+
+                  {/* Coping Strategies Section */}
+                  <div className="border-b border-gray-200 pb-6">
+                    <h3 className="text-lg font-semibold text-btl-700 mb-4">Coping Strategies</h3>
+                    <div className="space-y-3 mb-6">
+                      {['Breathing', 'Heat/Ice', 'Stretching', 'Positive self-talk', 'Medication'].map(strategy => (
+                        <div key={strategy} className="flex items-center space-x-2">
+                          <button
+                            onClick={() => handleCopingStrategyChange(strategy)}
+                            className={`w-4 h-4 border rounded flex items-center justify-center transition-colors ${
+                              painJournalData.copingStrategies.includes(strategy)
+                                ? 'border-btl-600 bg-btl-600'
+                                : 'border-gray-300 hover:border-btl-400'
+                            }`}
+                          >
+                            {painJournalData.copingStrategies.includes(strategy) && (
+                              <div className="w-2 h-2 bg-white rounded-sm"></div>
+                            )}
+                          </button>
+                          <span className="text-sm">{strategy}</span>
+                        </div>
+                      ))}
+                      <div className="flex items-center space-x-2">
+                        <div className="w-4 h-4 border border-gray-300 rounded"></div>
+                        <span className="text-sm">Other:</span>
+                        <input
+                          type="text"
+                          value={painJournalData.otherCoping}
+                          onChange={(e) => setPainJournalData(prev => ({ ...prev, otherCoping: e.target.value }))}
+                          className="flex-1 h-6 border-b border-gray-300 focus:border-btl-600 focus:outline-none text-sm"
+                          placeholder=""
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-3">How helpful were these strategies?</label>
+                      <div className="flex space-x-6">
+                        {['Not', 'Some', 'Very'].map((level, index) => (
+                          <div key={index} className="flex items-center space-x-2">
+                            <button
+                              onClick={() => setPainJournalData(prev => ({ ...prev, helpfulness: level }))}
+                              className={`w-4 h-4 border rounded-full flex items-center justify-center transition-colors ${
+                                painJournalData.helpfulness === level
+                                  ? 'border-btl-600 bg-btl-600'
+                                  : 'border-gray-300 hover:border-btl-400'
+                              }`}
+                            >
+                              {painJournalData.helpfulness === level && (
+                                <div className="w-2 h-2 bg-white rounded-full"></div>
+                              )}
+                            </button>
+                            <span className="text-sm">{level}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Notes & Observations Section - Full Width */}
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="text-lg font-semibold text-btl-700 mb-4">Notes & Observations</h3>
+                <textarea
+                  value={painJournalData.notes}
+                  onChange={(e) => setPainJournalData(prev => ({ ...prev, notes: e.target.value }))}
+                  className="w-full h-24 border border-gray-300 rounded bg-white p-3 focus:border-btl-600 focus:outline-none text-sm resize-none"
+                  placeholder=""
+                  rows={4}
+                />
+              </div>
+
+              {/* Footer */}
+              <div className="mt-8 pt-4 border-t border-gray-200 flex justify-end text-xs text-gray-500">
+                <span>Page 1 of 1</span>
+              </div>
+            </div>
+          </AssessmentDialogBody>
+          <AssessmentDialogFooter>
+            {/* Use btn-primary-gradient for BTL blue branding on all main action buttons */}
+            <div className="flex gap-2">
+              <Button className="btn-primary-gradient text-white rounded-xl" onClick={() => generatePDFFromPopup(contentRef, 'Pain-Journal.pdf')}>Open PDF</Button>
+              <Button className="btn-primary-gradient text-white rounded-xl" onClick={() => {
+                const printContents = contentRef.current?.innerHTML;
+                if (printContents) {
+                  const printWindow = window.open('', '', 'height=900,width=800');
+                  if (printWindow) {
+                    printWindow.document.write('<html><head><title>Pain Journal</title>');
+                    printWindow.document.write('<style>body{background:white;margin:0;padding:0;}@media print{body{margin:0;padding:0;}}</style>');
+                    printWindow.document.write('</head><body >');
+                    printWindow.document.write(printContents);
+                    printWindow.document.write('</body></html>');
+                    printWindow.document.close();
+                    printWindow.focus();
+                    setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
+                  }
+                }
+              }}>Print Pre-filled Form</Button>
+            </div>
+          </AssessmentDialogFooter>
+        </AssessmentDialogContent>
+      </AssessmentDialog>
+    )
+  }
+
+  // SMART Goals Popup
+  const SMARTGoalsPopup = () => {
+    const contentRef = useRef<HTMLDivElement>(null)
+    // Prefillable SMART goal state
+    type SmartGoalFields = 'main' | 'Specific' | 'Measurable' | 'Achievable' | 'Relevant' | 'Time-bound';
+    const [smartGoal, setSmartGoal] = useState<Record<SmartGoalFields, string>>({
+      main: '',
+      Specific: '',
+      Measurable: '',
+      Achievable: '',
+      Relevant: '',
+      'Time-bound': ''
+    });
+    return (
+      <AssessmentDialog open={showSMARTGoalsPopup} onOpenChange={setShowSMARTGoalsPopup}>
+        <AssessmentDialogContent className="max-w-4xl w-full max-h-[90vh] flex flex-col rounded-2xl shadow-2xl bg-white p-0 overflow-hidden">
+          <AssessmentDialogHeader className="bg-gradient-to-r from-btl-700 to-btl-600 text-white p-6 rounded-t-2xl">
+            <div className="flex items-center gap-4">
+              <div className="bg-white bg-opacity-20 rounded-full p-2 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 19.5A2.5 2.5 0 006.5 22h11a2.5 2.5 0 002.5-2.5V6a2 2 0 00-2-2H6a2 2 0 00-2 2v13.5z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 2v4m8-4v4" />
+                </svg>
+              </div>
+              <div>
+                <AssessmentDialogTitle>SMART Goals Tracker</AssessmentDialogTitle>
+                <AssessmentDialogDescription>Fill out the form below, then print your answers or download a blank version using the buttons at the bottom.</AssessmentDialogDescription>
+              </div>
+            </div>
+          </AssessmentDialogHeader>
+          <AssessmentDialogBody>
+            <div ref={contentRef} className="bg-white p-8 rounded-lg mx-auto" style={{ minHeight: '11in', width: '8.5in' }}>
+              {/* Header Bar (for PDF date) */}
+              <div className="flex items-center justify-between border-b-2 border-btl-600 pb-4 mb-8">
+                <div className="flex items-center space-x-4"></div>
+                <div className="text-right">
+                  <div className="text-sm text-gray-600">Date:</div>
+                  <div className="text-lg font-semibold text-btl-800">{new Date().toLocaleDateString()}</div>
+                </div>
+              </div>
+
+              {/* SMART Framework Section */}
+              <div className="bg-btl-50 rounded-lg p-6 mb-6 border border-btl-200">
+                <h3 className="text-lg font-semibold text-btl-700 mb-4">SMART Framework</h3>
+                <div className="space-y-4">
+                  {[
+                    'S - SPECIFIC: Clear, detailed goal with concrete actions',
+                    'M - MEASURABLE: Can track progress with numbers or observations',
+                    'A - ACHIEVABLE: Realistic for your current situation and abilities',
+                    'R - RELEVANT: Important to your recovery journey and long-term health',
+                    'T - TIME-BOUND: Has a specific deadline or timeframe'
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center space-x-4">
+                      <div className="w-8 h-8 bg-btl-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                        {item.charAt(0)}
+                      </div>
+                      <span className="text-sm text-gray-700 leading-relaxed">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Example Goals Note and Two-Column Layout for Goals */}
+              <div className="mb-2 flex items-center gap-2 text-btl-700 text-sm font-medium">
+                <span role="img" aria-label="lightbulb">💡</span>
+                These are example goals to inspire you. Please set your own goals below.
+              </div>
+              <div className="grid grid-cols-2 gap-8 mb-6">
+                {/* Movement Goals */}
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-btl-700 mb-4 border-b border-gray-200 pb-2">Movement Goals</h3>
+                  <div className="space-y-3">
+                    {[
+                      'Week 1-2: Walk 10 min daily',
+                      'Week 2-4: Stand 15 min without pain',
+                      'Week 3-6: Light household tasks',
+                      'Week 4-8: Movement session 4x/week',
+                      'Week 6-12: Return to work'
+                    ].map((goal, index) => (
+                      <div key={index} className="flex items-start space-x-2">
+                        <span className="text-btl-600 text-lg" role="img" aria-label="lightbulb">💡</span>
+                        <span className="text-sm text-gray-700">{goal}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Pain Management Goals */}
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-btl-700 mb-4 border-b border-gray-200 pb-2">Pain Management Goals</h3>
+                  <div className="space-y-3">
+                    {[
+                      'Week 1-2: Breathing exercises 2x/day',
+                      'Week 1-4: Reduce catastrophizing',
+                      'Week 2-6: Mindfulness 10 min daily',
+                      'Week 4-8: Pain self-management skills',
+                      'Week 6-12: Master techniques'
+                    ].map((goal, index) => (
+                      <div key={index} className="flex items-start space-x-2">
+                        <span className="text-btl-600 text-lg" role="img" aria-label="lightbulb">💡</span>
+                        <span className="text-sm text-gray-700">{goal}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Goal Tracking Template */}
+              <div className="bg-white border border-gray-200 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-btl-700 mb-4 border-b border-gray-200 pb-2">My SMART Goal Template</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">My SMART Goal:</label>
+                    <input
+                      type="text"
+                      value={smartGoal.main}
+                      onChange={e => setSmartGoal(g => ({ ...g, main: e.target.value }))}
+                      className="w-full border border-gray-300 rounded bg-white p-3 text-sm focus:ring-2 focus:ring-btl-500 focus:border-btl-500"
+                      placeholder="Describe your main goal..."
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {(['Specific', 'Measurable', 'Achievable', 'Relevant', 'Time-bound'] as SmartGoalFields[]).map(item => (
+                      <div key={item}>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{item}:</label>
+                        <input
+                          type="text"
+                          value={smartGoal[item]}
+                          onChange={e => setSmartGoal(g => ({ ...g, [item]: e.target.value }))}
+                          className="w-full border border-gray-300 rounded bg-white p-2 text-sm focus:ring-2 focus:ring-btl-500 focus:border-btl-500"
+                          placeholder={`How is your goal ${item.toLowerCase()}?`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress Tracking Section */}
+              <div className="mt-6 bg-btl-50 rounded-lg p-6 border border-btl-200">
+                <h3 className="text-lg font-semibold text-btl-700 mb-4">Progress Tracking</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-btl-600">0%</div>
+                    <div className="text-xs text-gray-600">Week 1</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-gray-400">25%</div>
+                    <div className="text-xs text-gray-600">Week 4</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-gray-400">100%</div>
+                    <div className="text-xs text-gray-600">Week 12</div>
+                  </div>
+                </div>
+                <div className="mt-4 h-3 bg-gray-200 rounded-full">
+                  <div className="w-0 h-3 bg-btl-600 rounded-full transition-all duration-500"></div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="mt-8 pt-4 border-t border-gray-200 flex justify-end text-xs text-gray-500">
+                <span>Page 1 of 1</span>
+              </div>
+            </div>
+          </AssessmentDialogBody>
+          <AssessmentDialogFooter>
+            {/* Use btn-primary-gradient for BTL blue branding on all main action buttons */}
+            <div className="flex gap-2">
+              <Button className="btn-primary-gradient text-white rounded-xl" onClick={() => generatePDFFromPopup(contentRef, 'SMART-Goals-Tracker.pdf')}>Open PDF</Button>
+              <Button className="btn-primary-gradient text-white rounded-xl" onClick={() => {
+                const printContents = contentRef.current?.innerHTML;
+                if (printContents) {
+                  const printWindow = window.open('', '', 'height=900,width=800');
+                  if (printWindow) {
+                    printWindow.document.write('<html><head><title>SMART Goals</title>');
+                    printWindow.document.write('<style>body{background:white;margin:0;padding:0;}@media print{body{margin:0;padding:0;}}</style>');
+                    printWindow.document.write('</head><body >');
+                    printWindow.document.write(printContents);
+                    printWindow.document.write('</body></html>');
+                    printWindow.document.close();
+                    printWindow.focus();
+                    setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
+                  }
+                }
+              }}>Print Pre-filled Form</Button>
+            </div>
+          </AssessmentDialogFooter>
+        </AssessmentDialogContent>
+      </AssessmentDialog>
+    )
+  }
 
   const getContent = () => {
     switch (toolkit.category) {
@@ -53,18 +698,439 @@ export function ToolkitModal({ toolkit, onClose }: ToolkitModalProps) {
 
         return grouped
       case "guides":
-        return [
-          { title: "Understanding Your Recovery", pages: "12 pages", type: "guide" },
-          { title: "Pain Management Strategies", pages: "8 pages", type: "guide" },
-          { title: "Exercise Safety Guidelines", pages: "6 pages", type: "guide" },
-          { title: "Nutrition for Recovery", pages: "10 pages", type: "guide" },
+        // Define the guides content array
+        const guidesContent = [
+          // Mindfulness Practices
+          {
+            title: "Mindful Breathing for Pain Relief",
+            description: "Deep breathing techniques to reduce pain and stress",
+            duration: "5-10 min",
+            difficulty: "Beginner",
+            type: "mindfulness",
+            topic: "pain-management"
+          },
+          {
+            title: "Progressive Muscle Relaxation",
+            description: "Systematic tension and release for full body relaxation",
+            duration: "15-20 min", 
+            difficulty: "Beginner",
+            type: "mindfulness",
+            topic: "pain-management"
+          },
+          {
+            title: "Body Scan Meditation",
+            description: "Mindful awareness of physical sensations throughout the body",
+            duration: "10-15 min",
+            difficulty: "Beginner", 
+            type: "mindfulness",
+            topic: "mindfulness"
+          },
+          {
+            title: "Visualization for Recovery",
+            description: "Mental imagery techniques to support healing and movement",
+            duration: "8-12 min",
+            difficulty: "Intermediate",
+            type: "mindfulness", 
+            topic: "mindset"
+          },
+          {
+            title: "Loving-Kindness Meditation",
+            description: "Cultivating compassion for yourself and your recovery journey",
+            duration: "10-15 min",
+            difficulty: "Intermediate",
+            type: "mindfulness",
+            topic: "mindset"
+          },
+          {
+            title: "Mindful Movement Awareness",
+            description: "Bringing mindfulness to daily movements and activities",
+            duration: "5-8 min",
+            difficulty: "Beginner",
+            type: "mindfulness",
+            topic: "movement"
+          },
+          {
+            title: "Stress Response Regulation",
+            description: "Techniques to calm your nervous system during pain flares",
+            duration: "8-12 min",
+            difficulty: "Intermediate",
+            type: "mindfulness",
+            topic: "flare-ups"
+          },
+          {
+            title: "Mindful Pain Observation",
+            description: "Learning to observe pain without judgment or resistance",
+            duration: "10-15 min",
+            difficulty: "Advanced",
+            type: "mindfulness",
+            topic: "pain-management"
+          },
+          
+          // Recovery Insights & Education
+          {
+            title: "Understanding Your Pain",
+            description: "Educational guide to pain science and recovery principles",
+            duration: "12 pages",
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "education"
+          },
+          {
+            title: "Movement Confidence Building",
+            description: "Strategies to overcome fear and build movement trust",
+            duration: "8 pages", 
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "movement"
+          },
+          {
+            title: "Recovery Mindset Mastery",
+            description: "Developing a positive, resilient approach to recovery",
+            duration: "10 pages",
+            difficulty: "Intermediate",
+            type: "insight", 
+            topic: "mindset"
+          },
+          {
+            title: "Flare-Up Management",
+            description: "How to handle pain flares and setbacks effectively",
+            duration: "6 pages",
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "flare-ups"
+          },
+          {
+            title: "The Science of Pain",
+            description: "Understanding how pain works and why it persists",
+            duration: "15 pages",
+            difficulty: "Intermediate",
+            type: "insight",
+            topic: "education"
+          },
+          {
+            title: "Building Movement Tolerance",
+            description: "Gradually increasing your capacity for movement",
+            duration: "10 pages",
+            difficulty: "Intermediate",
+            type: "insight",
+            topic: "movement"
+          },
+          {
+            title: "Sleep and Recovery",
+            description: "Optimizing sleep for better pain management and healing",
+            duration: "8 pages",
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "pain-management"
+          },
+          {
+            title: "Nutrition for Pain Relief",
+            description: "Anti-inflammatory foods and supplements for recovery",
+            duration: "12 pages",
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "pain-management"
+          },
+          {
+            title: "Stress and Pain Connection",
+            description: "Understanding how stress affects your pain experience",
+            duration: "10 pages",
+            difficulty: "Intermediate",
+            type: "insight",
+            topic: "education"
+          },
+          {
+            title: "Graded Exposure to Movement",
+            description: "Systematic approach to reintroducing feared movements",
+            duration: "14 pages",
+            difficulty: "Advanced",
+            type: "insight",
+            topic: "movement"
+          },
+          {
+            title: "Cognitive Behavioral Techniques",
+            description: "Practical tools for changing pain-related thoughts",
+            duration: "16 pages",
+            difficulty: "Advanced",
+            type: "insight",
+            topic: "mindset"
+          },
+          {
+            title: "Pacing Strategies",
+            description: "Learning to balance activity and rest for optimal recovery",
+            duration: "8 pages",
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "movement"
+          },
+          {
+            title: "Goal Setting for Recovery",
+            description: "Creating meaningful, achievable recovery milestones",
+            duration: "6 pages",
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "mindset"
+          },
+          {
+            title: "Social Support in Recovery",
+            description: "Building a support network for your recovery journey",
+            duration: "7 pages",
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "mindset"
+          },
+          {
+            title: "Return to Work Strategies",
+            description: "Managing pain while maintaining productivity",
+            duration: "12 pages",
+            difficulty: "Intermediate",
+            type: "insight",
+            topic: "movement"
+          },
+          {
+            title: "Exercise Modification Principles",
+            description: "Adapting activities to work with your current limitations",
+            duration: "10 pages",
+            difficulty: "Intermediate",
+            type: "insight",
+            topic: "movement"
+          },
+          {
+            title: "Pain Catastrophizing Reduction",
+            description: "Techniques to reduce catastrophic thinking about pain",
+            duration: "14 pages",
+            difficulty: "Advanced",
+            type: "insight",
+            topic: "mindset"
+          },
+          {
+            title: "Acceptance and Commitment Therapy",
+            description: "Living a meaningful life despite pain",
+            duration: "18 pages",
+            difficulty: "Advanced",
+            type: "insight",
+            topic: "mindset"
+          },
+          {
+            title: "Breathing Techniques for Pain",
+            description: "Specific breathing patterns to reduce pain intensity",
+            duration: "8 pages",
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "pain-management"
+          },
+          {
+            title: "Posture and Pain",
+            description: "How posture affects pain and strategies for improvement",
+            duration: "10 pages",
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "movement"
+          },
+          {
+            title: "Pain Neuroscience Education",
+            description: "Advanced concepts in pain science and treatment",
+            duration: "20 pages",
+            difficulty: "Advanced",
+            type: "insight",
+            topic: "education"
+          },
+          {
+            title: "Mindfulness-Based Stress Reduction",
+            description: "Comprehensive mindfulness program for chronic pain",
+            duration: "25 pages",
+            difficulty: "Advanced",
+            type: "insight",
+            topic: "mindfulness"
+          },
+          {
+            title: "Graded Motor Imagery",
+            description: "Using mental imagery to improve movement and reduce pain",
+            duration: "12 pages",
+            difficulty: "Advanced",
+            type: "insight",
+            topic: "movement"
+          },
+          {
+            title: "Pain Self-Management Skills",
+            description: "Essential skills for managing pain independently",
+            duration: "15 pages",
+            difficulty: "Intermediate",
+            type: "insight",
+            topic: "pain-management"
+          },
+          {
+            title: "Recovery Plateaus and Progress",
+            description: "Understanding and navigating recovery plateaus",
+            duration: "8 pages",
+            difficulty: "Intermediate",
+            type: "insight",
+            topic: "mindset"
+          },
+          {
+            title: "Fear Avoidance Cycle",
+            description: "Breaking the cycle of fear, avoidance, and increased pain",
+            duration: "12 pages",
+            difficulty: "Intermediate",
+            type: "insight",
+            topic: "education"
+          },
+          {
+            title: "Movement Variability",
+            description: "The importance of movement variety in recovery",
+            duration: "9 pages",
+            difficulty: "Intermediate",
+            type: "insight",
+            topic: "movement"
+          },
+          {
+            title: "Pain and Emotions",
+            description: "Understanding the emotional aspects of chronic pain",
+            duration: "14 pages",
+            difficulty: "Intermediate",
+            type: "insight",
+            topic: "education"
+          },
+          {
+            title: "Recovery Timeline Expectations",
+            description: "Setting realistic expectations for your recovery journey",
+            duration: "6 pages",
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "mindset"
+          },
+          {
+            title: "Activity Pacing Techniques",
+            description: "Practical strategies for managing daily activities",
+            duration: "10 pages",
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "movement"
+          },
+          {
+            title: "Pain and Sleep Hygiene",
+            description: "Creating optimal sleep conditions for pain relief",
+            duration: "8 pages",
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "pain-management"
+          },
+          {
+            title: "Movement Confidence Exercises",
+            description: "Specific exercises to build confidence in movement",
+            duration: "12 pages",
+            difficulty: "Intermediate",
+            type: "insight",
+            topic: "movement"
+          },
+          {
+            title: "Cognitive Distraction Techniques",
+            description: "Using mental strategies to reduce pain focus",
+            duration: "7 pages",
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "pain-management"
+          },
+          {
+            title: "Recovery Journaling",
+            description: "Using writing to track progress and process emotions",
+            duration: "5 pages",
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "mindset"
+          },
+          {
+            title: "Pain and Weather Changes",
+            description: "Managing pain during weather-related flare-ups",
+            duration: "6 pages",
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "flare-ups"
+          },
+          {
+            title: "Movement and Breathing Coordination",
+            description: "Coordinating breath with movement for better function",
+            duration: "8 pages",
+            difficulty: "Intermediate",
+            type: "insight",
+            topic: "movement"
+          },
+          {
+            title: "Recovery Setbacks and Resilience",
+            description: "Building resilience to handle recovery setbacks",
+            duration: "10 pages",
+            difficulty: "Intermediate",
+            type: "insight",
+            topic: "mindset"
+          },
+          {
+            title: "Pain and Social Relationships",
+            description: "Maintaining relationships while managing chronic pain",
+            duration: "11 pages",
+            difficulty: "Intermediate",
+            type: "insight",
+            topic: "mindset"
+          },
+          {
+            title: "Movement Quality vs Quantity",
+            description: "Focusing on movement quality over quantity in recovery",
+            duration: "9 pages",
+            difficulty: "Intermediate",
+            type: "insight",
+            topic: "movement"
+          },
+          {
+            title: "Pain and Work-Life Balance",
+            description: "Balancing work demands with pain management needs",
+            duration: "13 pages",
+            difficulty: "Intermediate",
+            type: "insight",
+            topic: "movement"
+          },
+          {
+            title: "Recovery Celebration and Gratitude",
+            description: "Celebrating progress and practicing gratitude in recovery",
+            duration: "6 pages",
+            difficulty: "Beginner",
+            type: "insight",
+            topic: "mindset"
+          }
         ]
+
+        // Filter guides based on search and filters
+        let filteredGuides = guidesContent.filter(guide => {
+          const matchesSearch = guide.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                               guide.description.toLowerCase().includes(searchTerm.toLowerCase())
+          const matchesTopic = selectedRegion === "all" || guide.topic === selectedRegion
+          const matchesDifficulty = selectedPhase === "all" || guide.difficulty.toLowerCase() === selectedPhase
+          return matchesSearch && matchesTopic && matchesDifficulty
+        })
+
+        // Group guides by type (mindfulness vs insight)
+        const groupedGuides: { [key: string]: any[] } = {}
+        filteredGuides.forEach(guide => {
+          const type = guide.type === "mindfulness" ? "mindfulness" : "insight"
+          if (!groupedGuides[type]) {
+            groupedGuides[type] = []
+          }
+          groupedGuides[type].push(guide)
+        })
+
+        // Sort guides within each type by difficulty (Beginner -> Intermediate -> Advanced)
+        Object.keys(groupedGuides).forEach(type => {
+          groupedGuides[type].sort((a, b) => {
+            const difficultyOrder = { "Beginner": 1, "Intermediate": 2, "Advanced": 3 }
+            return (difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 0) - (difficultyOrder[b.difficulty as keyof typeof difficultyOrder] || 0)
+          })
+        })
+
+        return groupedGuides
       case "tools":
         return [
-          { title: "Pain Tracking Journal", description: "Daily pain monitoring", type: "tool" },
-          { title: "Breathing Exercise Timer", description: "Guided breathing sessions", type: "tool" },
-          { title: "Progress Photo Tracker", description: "Visual recovery tracking", type: "tool" },
-          { title: "Medication Reminder", description: "Never miss a dose", type: "tool" },
+          { title: "Pain Tracking Journal", description: "Downloadable PDF with guided prompts", type: "tool" },
+          { title: "Exercise Timer", description: "Customizable intervals for different exercises", type: "tool" },
+          { title: "Recovery Goal Setting", description: "SMART goal templates and progress tracking", type: "tool" },
+          { title: "Sleep Hygiene Tracker", description: "Sleep quality, pain levels, and correlation insights", type: "tool" },
         ]
       default:
         return []
@@ -75,7 +1141,7 @@ export function ToolkitModal({ toolkit, onClose }: ToolkitModalProps) {
 
   // Get unique regions and phases for filters
   const regions = ["all", ...Array.from(new Set(allExercises.map(ex => ex.region)))]
-  const phases = ["all", "Reset", "Educate", "Rebuild"]
+  const phases = ["all", "Beginner", "Intermediate", "Advanced"]
 
   // Type guard for exercises
   const isExercise = (item: any): item is { name: string; duration: string; difficulty: string; region: string } => {
@@ -84,9 +1150,9 @@ export function ToolkitModal({ toolkit, onClose }: ToolkitModalProps) {
 
   const getPhaseColor = (phase: string) => {
     switch (phase) {
-      case "Reset": return "bg-[#D0F6FB] text-[#005F75] border-[#D0F6FB]" // Light teal with dark text
-      case "Educate": return "bg-[#00C7E3] text-white border-[#00C7E3]" // Medium teal with white text
-      case "Rebuild": return "bg-[#005F75] text-white border-[#005F75]" // Dark teal with white text
+      case "Beginner": return "bg-[#D0F6FB] text-[#005F75] border-[#D0F6FB]" // Light teal with dark text
+      case "Intermediate": return "bg-[#00C7E3] text-white border-[#00C7E3]" // Medium teal with white text
+      case "Advanced": return "bg-[#005F75] text-white border-[#005F75]" // Dark teal with white text
       default: return "bg-gray-50 text-gray-700 border-gray-200"
     }
   }
@@ -96,24 +1162,32 @@ export function ToolkitModal({ toolkit, onClose }: ToolkitModalProps) {
       <div className="bg-white rounded-xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="bg-gradient-to-br from-btl-900 via-btl-700 to-btl-100 px-8 pt-8 pb-4 border-b border-white/40 rounded-t-xl relative">
-          <button onClick={onClose} className="absolute top-6 right-6 p-2 hover:bg-white/20 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-white/60">
-            <X className="w-6 h-6 text-white opacity-80" />
+          <button onClick={onClose} className="absolute top-6 right-6 p-2 rounded-full text-white hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/60">
+            <X className="w-6 h-6" />
           </button>
           <div className="flex items-center gap-8">
-            <Play className="w-12 h-12 text-white opacity-90" />
-            <h2 className="text-3xl font-bold text-white">{toolkit.title}</h2>
+            {toolkit.category === "videos" ? (
+              <Play className="w-12 h-12 text-white opacity-90" />
+            ) : toolkit.category === "guides" ? (
+              <BookOpen className="w-12 h-12 text-white opacity-90" />
+            ) : (
+              <Wrench className="w-12 h-12 text-white opacity-90" />
+            )}
+            <div>
+              <h2 className="text-3xl font-bold text-white">{toolkit.title}</h2>
+              <p className="mt-2 text-btl-100 text-sm">{toolkit.description}</p>
+            </div>
           </div>
-          <p className="mt-2 text-btl-100 text-sm">{toolkit.description}</p>
         </div>
         {/* Filters */}
-        {toolkit.category === "videos" && (
+        {(toolkit.category === "videos" || toolkit.category === "guides") && (
           <div className="p-6 border-b border-gray-200 bg-white sticky top-0 z-10">
             {/* Search Bar */}
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Search exercises..."
+                placeholder={toolkit.category === "videos" ? "Search exercises..." : "Search guides..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-btl-500 focus:border-transparent"
@@ -121,6 +1195,8 @@ export function ToolkitModal({ toolkit, onClose }: ToolkitModalProps) {
             </div>
             {/* Filter Controls */}
             <div className="flex flex-wrap gap-4">
+              {toolkit.category === "videos" ? (
+                <>
               {/* Region Filter */}
               <div className="flex items-center space-x-2">
                 <Activity className="w-4 h-4 text-gray-500" />
@@ -146,11 +1222,47 @@ export function ToolkitModal({ toolkit, onClose }: ToolkitModalProps) {
                 >
                   {phases.map(phase => (
                     <option key={phase} value={phase}>
-                      {phase === "all" ? "All Phases" : phase}
+                          {phase === "all" ? "All Levels" : phase}
                     </option>
                   ))}
                 </select>
               </div>
+                </>
+              ) : (
+                <>
+                  {/* Topic Filter for Guides */}
+                  <div className="flex items-center space-x-2">
+                    <Filter className="w-4 h-4 text-gray-500" />
+                    <select
+                      value={selectedRegion}
+                      onChange={(e) => setSelectedRegion(e.target.value)}
+                      className="px-3 py-1 border border-gray-300 rounded-full text-sm focus:ring-2 focus:ring-btl-500 focus:border-transparent"
+                    >
+                      <option value="all">All Topics</option>
+                      <option value="pain-management">Pain Management</option>
+                      <option value="mindfulness">Mindfulness</option>
+                      <option value="movement">Movement & Function</option>
+                      <option value="mindset">Recovery Mindset</option>
+                      <option value="flare-ups">Flare-Up Management</option>
+                      <option value="education">Pain Education</option>
+                    </select>
+                  </div>
+                  {/* Difficulty Filter for Guides */}
+                  <div className="flex items-center space-x-2">
+                    <Target className="w-4 h-4 text-gray-500" />
+                    <select
+                      value={selectedPhase}
+                      onChange={(e) => setSelectedPhase(e.target.value)}
+                      className="px-3 py-1 border border-gray-300 rounded-full text-sm focus:ring-2 focus:ring-btl-500 focus:border-transparent"
+                    >
+                      <option value="all">All Levels</option>
+                      <option value="beginner">Beginner</option>
+                      <option value="intermediate">Intermediate</option>
+                      <option value="advanced">Advanced</option>
+                    </select>
+                  </div>
+                </>
+              )}
               {/* Clear Filters */}
               {(searchTerm || selectedRegion !== "all" || selectedPhase !== "all") && (
                 <button
@@ -234,18 +1346,421 @@ export function ToolkitModal({ toolkit, onClose }: ToolkitModalProps) {
                 </div>
               ))}
             </div>
+          ) : toolkit.category === "guides" ? (
+            // Grouped Recovery Guides by Type
+            <div className="space-y-8">
+              {/* Mindfulness Section */}
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                <div className="bg-gradient-to-r from-btl-50 to-btl-100 px-6 py-4 border-b border-btl-200">
+                  <h3 className="text-xl font-semibold text-gray-900">Mindfulness & Meditation</h3>
+                  <p className="text-gray-600 text-sm">
+                    {(content as { [key: string]: any[] }).mindfulness ? (content as { [key: string]: any[] }).mindfulness.length : 0} mindfulness practices available
+                  </p>
+                </div>
+                <div className="p-6">
+                  <div className="space-y-6">
+                    {/* Group by difficulty */}
+                    {["Beginner", "Intermediate", "Advanced"].map(difficulty => {
+                      const difficultyGuides = (content as { [key: string]: any[] }).mindfulness ? (content as { [key: string]: any[] }).mindfulness.filter((item: any) => item.difficulty === difficulty) : []
+                      if (difficultyGuides.length === 0) return null
+                      
+                      return (
+                        <div key={difficulty} className="space-y-3">
+                          {/* Difficulty Sub-header */}
+                          <div className="flex items-center space-x-3">
+                            <h4 className={`text-lg font-semibold px-3 py-1 rounded-full border ${getPhaseColor(difficulty)}`}>
+                              {difficulty} Level
+                            </h4>
+                            <span className="text-sm text-gray-500 px-2 py-0.5 rounded-full bg-gray-100">
+                              {difficultyGuides.length} practice{difficultyGuides.length !== 1 ? 's' : ''}
+                            </span>
+                          </div>
+                          
+                          {/* Guides Grid */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {difficultyGuides.map((guide: any, index: number) => (
+                              <div
+                                key={index}
+                                className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg hover:border-btl-200 hover:shadow-md transition-all duration-200 cursor-pointer"
+                              >
+                                <div className="p-2 bg-btl-100 rounded-full border-2 border-btl-600">
+                                  <BookOpen className="w-5 h-5 text-btl-600" />
+                                </div>
+                                <div className="flex-1">
+                                  <h3 className="font-medium text-gray-900">{guide.title}</h3>
+                                  <p className="text-sm text-gray-600 mb-1">{guide.description}</p>
+                                  <p className="text-sm text-gray-600">
+                                    <span className="px-2 py-0.5 rounded-full bg-gray-100">{guide.duration}</span>
+                                    <span className="mx-2">•</span>
+                                    <span className="px-2 py-0.5 rounded-full bg-gray-100">{guide.difficulty}</span>
+                                  </p>
+                                </div>
+                                <button className="px-3 py-1 bg-btl-600 text-white text-sm rounded-full hover:bg-btl-700 transition-colors">
+                                  Start
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Recovery Insights Section */}
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                <div className="bg-gradient-to-r from-btl-50 to-btl-100 px-6 py-4 border-b border-btl-200">
+                  <h3 className="text-xl font-semibold text-gray-900">Recovery Insights</h3>
+                  <p className="text-gray-600 text-sm">
+                    {(content as { [key: string]: any[] }).insight ? (content as { [key: string]: any[] }).insight.length : 0} educational guides available
+                  </p>
+                </div>
+                <div className="p-6">
+                  <div className="space-y-6">
+                    {/* Group by difficulty */}
+                    {["Beginner", "Intermediate", "Advanced"].map(difficulty => {
+                      const difficultyInsights = (content as { [key: string]: any[] }).insight ? (content as { [key: string]: any[] }).insight.filter((item: any) => item.difficulty === difficulty) : []
+                      if (difficultyInsights.length === 0) return null
+                      
+                      return (
+                        <div key={difficulty} className="space-y-3">
+                          {/* Difficulty Sub-header */}
+                          <div className="flex items-center space-x-3">
+                            <h4 className={`text-lg font-semibold px-3 py-1 rounded-full border ${getPhaseColor(difficulty)}`}>
+                              {difficulty} Level
+                            </h4>
+                            <span className="text-sm text-gray-500 px-2 py-0.5 rounded-full bg-gray-100">
+                              {difficultyInsights.length} guide{difficultyInsights.length !== 1 ? 's' : ''}
+                            </span>
+                          </div>
+                          
+                          {/* Insights Grid */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {difficultyInsights.map((insight: any, index: number) => (
+                              <div
+                                key={index}
+                                className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg hover:border-btl-200 hover:shadow-md transition-all duration-200 cursor-pointer"
+                              >
+                                <div className="p-2 bg-btl-100 rounded-full border-2 border-btl-600">
+                                  <FileText className="w-5 h-5 text-btl-600" />
+                                </div>
+                                <div className="flex-1">
+                                  <h3 className="font-medium text-gray-900">{insight.title}</h3>
+                                  <p className="text-sm text-gray-600 mb-1">{insight.description}</p>
+                                  <p className="text-sm text-gray-600">
+                                    <span className="px-2 py-0.5 rounded-full bg-gray-100">{insight.duration}</span>
+                                    <span className="mx-2">•</span>
+                                    <span className="px-2 py-0.5 rounded-full bg-gray-100">{insight.difficulty}</span>
+                                  </p>
+                                </div>
+                                <button className="px-3 py-1 bg-btl-600 text-white text-sm rounded-full hover:bg-btl-700 transition-colors">
+                                  Read
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : toolkit.category === "tools" ? (
+            // Support Tools Layout
+            <div className="space-y-6">
+              {/* Pain Tracking Journal */}
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                <div className="bg-gradient-to-r from-btl-50 to-btl-100 px-6 py-4 border-b border-btl-200">
+                  <h3 className="text-xl font-semibold text-gray-900">Pain Tracking Journal</h3>
+                  <p className="text-gray-600 text-sm">Evidence-based daily pain monitoring with guided prompts</p>
+                </div>
+                <div className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-4 p-4 border border-gray-200 rounded-xl hover:border-btl-200 hover:shadow-md transition-all duration-200">
+                      <div className="p-2 bg-btl-100 rounded-xl border-2 border-btl-600">
+                        <FileText className="w-5 h-5 text-btl-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-medium text-gray-900">Daily Pain Journal</h3>
+                        <p className="text-sm text-gray-600 mb-2">Track pain levels, triggers, and recovery progress based on Pain Neuroscience Education</p>
+                        <div className="flex space-x-2">
+                          <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Evidence-Based</span>
+                          <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Guided Prompts</span>
+                          <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Sleep Correlation</span>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => setShowPainJournalPopup(true)}
+                        className="px-4 py-2 bg-btl-600 text-white text-sm rounded-xl hover:bg-btl-700 transition-colors"
+                      >
+                        Open PDF
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Exercise Timer */}
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                <div className="bg-gradient-to-r from-btl-50 to-btl-100 px-6 py-4 border-b border-btl-200">
+                  <h3 className="text-xl font-semibold text-gray-900">Exercise Timer</h3>
+                  <p className="text-gray-600 text-sm">Evidence-based timing for movement sessions and rest periods</p>
+                </div>
+                <div className="p-6">
+                  {!showTimer ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-4 p-4 border border-gray-200 rounded-xl hover:border-btl-200 hover:shadow-md transition-all duration-200">
+                        <div className="p-2 bg-btl-100 rounded-xl border-2 border-btl-600">
+                          <Clock className="w-5 h-5 text-btl-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-medium text-gray-900">Movement Session Timer</h3>
+                          <p className="text-sm text-gray-600 mb-2">Set intervals for exercise and rest periods based on activity pacing principles</p>
+                          <div className="flex space-x-2">
+                            <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Activity Pacing</span>
+                            <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Rest Intervals</span>
+                            <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Visual Cues</span>
+                          </div>
+                        </div>
+                        <button 
+                          onClick={() => setShowTimer(true)}
+                          className="px-4 py-2 bg-btl-600 text-white text-sm rounded-xl hover:bg-btl-700 transition-colors"
+                        >
+                          Start Timer
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      <div className="text-center">
+                        <div className="text-6xl font-bold text-btl-600 mb-4">
+                          {String(timerMinutes).padStart(2, '0')}:{String(timerSeconds).padStart(2, '0')}
+                        </div>
+                        <div className="flex justify-center space-x-4">
+                          {!isTimerRunning ? (
+                            <button 
+                              onClick={startTimer}
+                              className="px-6 py-3 bg-btl-600 text-white rounded-xl hover:bg-btl-700 transition-colors"
+                            >
+                              Start
+                            </button>
+                          ) : (
+                            <button 
+                              onClick={() => setIsTimerRunning(false)}
+                              className="px-6 py-3 bg-yellow-600 text-white rounded-xl hover:bg-yellow-700 transition-colors"
+                            >
+                              Pause
+                            </button>
+                          )}
+                          <button 
+                            onClick={resetTimer}
+                            className="px-6 py-3 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-colors"
+                          >
+                            Reset
+                          </button>
+                          <button 
+                            onClick={() => setShowTimer(false)}
+                            className="px-6 py-3 btn-primary-gradient text-white rounded-xl hover:bg-btl-700 transition-colors"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Minutes</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="60"
+                            value={timerMinutes}
+                            onChange={(e) => setTimerMinutes(parseInt(e.target.value) || 0)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-btl-500 focus:border-btl-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Seconds</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={timerSeconds}
+                            onChange={(e) => setTimerSeconds(parseInt(e.target.value) || 0)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-btl-500 focus:border-btl-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Recovery Goal Setting */}
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                <div className="bg-gradient-to-r from-btl-50 to-btl-100 px-6 py-4 border-b border-btl-200">
+                  <h3 className="text-xl font-semibold text-gray-900">Recovery Goal Setting</h3>
+                  <p className="text-gray-600 text-sm">Evidence-based SMART goal templates and progress tracking</p>
+                </div>
+                <div className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-4 p-4 border border-gray-200 rounded-xl hover:border-btl-200 hover:shadow-md transition-all duration-200">
+                      <div className="p-2 bg-btl-100 rounded-xl border-2 border-btl-600">
+                        <Target className="w-5 h-5 text-btl-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-medium text-gray-900">SMART Goal Tracker</h3>
+                        <p className="text-sm text-gray-600 mb-2">Set specific, measurable recovery milestones based on graded exposure principles</p>
+                        <div className="flex space-x-2">
+                          <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Evidence-Based</span>
+                          <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Goal Templates</span>
+                          <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Progress Tracking</span>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => setShowSMARTGoalsPopup(true)}
+                        className="px-4 py-2 bg-btl-600 text-white text-sm rounded-xl hover:bg-btl-700 transition-colors"
+                      >
+                        Open PDF
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sleep Hygiene Tracker */}
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                <div className="bg-gradient-to-r from-btl-50 to-btl-100 px-6 py-4 border-b border-btl-200">
+                  <h3 className="text-xl font-semibold text-gray-900">Sleep Hygiene Tracker</h3>
+                  <p className="text-gray-600 text-sm">Evidence-based sleep tracking and pain correlation analysis</p>
+                </div>
+                <div className="p-6">
+                  {!showSleepTracker ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-4 p-4 border border-gray-200 rounded-xl hover:border-btl-200 hover:shadow-md transition-all duration-200">
+                        <div className="p-2 bg-btl-100 rounded-xl border-2 border-btl-600">
+                          <Moon className="w-5 h-5 text-btl-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-medium text-gray-900">Sleep & Pain Correlation</h3>
+                          <p className="text-sm text-gray-600 mb-2">Track sleep patterns and pain correlation based on sleep medicine research</p>
+                          <div className="flex space-x-2">
+                            <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Sleep Quality</span>
+                            <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Pain Correlation</span>
+                            <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Evidence-Based</span>
+                          </div>
+                        </div>
+                        <button 
+                          onClick={() => setShowSleepTracker(true)}
+                          className="px-4 py-2 bg-btl-600 text-white text-sm rounded-xl hover:bg-btl-700 transition-colors"
+                        >
+                          Track Sleep
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Sleep Quality (1-10)</label>
+                          <input
+                            type="range"
+                            min="1"
+                            max="10"
+                            value={sleepData.sleepQuality}
+                            onChange={(e) => setSleepData({...sleepData, sleepQuality: parseInt(e.target.value)})}
+                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                          />
+                          <div className="text-center text-sm text-gray-600 mt-1">{sleepData.sleepQuality}/10</div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Pain Level (1-10)</label>
+                          <input
+                            type="range"
+                            min="1"
+                            max="10"
+                            value={sleepData.painLevel}
+                            onChange={(e) => setSleepData({...sleepData, painLevel: parseInt(e.target.value)})}
+                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                          />
+                          <div className="text-center text-sm text-gray-600 mt-1">{sleepData.painLevel}/10</div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Hours of Sleep</label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="12"
+                            step="0.5"
+                            value={sleepData.sleepHours}
+                            onChange={(e) => setSleepData({...sleepData, sleepHours: parseFloat(e.target.value)})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-btl-500 focus:border-btl-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Stress Level (1-10)</label>
+                          <input
+                            type="range"
+                            min="1"
+                            max="10"
+                            value={sleepData.stressLevel}
+                            onChange={(e) => setSleepData({...sleepData, stressLevel: parseInt(e.target.value)})}
+                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                          />
+                          <div className="text-center text-sm text-gray-600 mt-1">{sleepData.stressLevel}/10</div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-btl-50 p-4 rounded-xl border border-btl-200">
+                        <h4 className="font-semibold text-btl-700 mb-2">Sleep-Pain Correlation Insights</h4>
+                        <div className="text-sm text-gray-700 space-y-1">
+                          {sleepData.sleepQuality < 6 && (
+                            <p>⚠️ Poor sleep quality may be contributing to increased pain sensitivity</p>
+                          )}
+                          {sleepData.sleepHours < 7 && (
+                            <p>⚠️ Less than 7 hours of sleep can amplify pain perception</p>
+                          )}
+                          {sleepData.stressLevel > 7 && (
+                            <p>⚠️ High stress levels can interfere with sleep quality and pain management</p>
+                          )}
+                          {sleepData.sleepQuality >= 7 && sleepData.sleepHours >= 7 && sleepData.stressLevel <= 6 && (
+                            <p>✅ Good sleep hygiene! This should support your pain management efforts</p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-center space-x-4">
+                        <button 
+                          onClick={() => setShowSleepTracker(false)}
+                          className="px-6 py-3 bg-btl-600 text-white rounded-xl hover:bg-btl-700 transition-colors"
+                        >
+                          Save & Close
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           ) : (
             // Regular Grid Layout for other categories
             <div className="grid gap-4">
               {(content as any[]).map((item: any, index: number) => (
                 <div
                   key={index}
-                  className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg hover:border-teal-200 hover:shadow-md transition-all duration-200 cursor-pointer"
+                  className="flex items-center space-x-4 p-4 border border-gray-200 rounded-xl hover:border-teal-200 hover:shadow-md transition-all duration-200 cursor-pointer"
                 >
-                  <div className="p-2 bg-teal-100 rounded-full border-2 border-teal-600">
+                  <div className="p-2 bg-teal-100 rounded-xl border-2 border-teal-600">
                     {item.type === "video" && <Play className="w-5 h-5 text-teal-600" />}
                     {item.type === "guide" && <BookOpen className="w-5 h-5 text-teal-600" />}
-                    {item.type === "tool" && <Download className="w-5 h-5 text-teal-600" />}
+                    {item.type === "tool" && (
+                      item.title.includes("Journal") ? <FileText className="w-5 h-5 text-teal-600" /> :
+                      item.title.includes("Timer") ? <Clock className="w-5 h-5 text-teal-600" /> :
+                      item.title.includes("Goal") ? <Target className="w-5 h-5 text-teal-600" /> :
+                      item.title.includes("Sleep") ? <Moon className="w-5 h-5 text-teal-600" /> :
+                      <Download className="w-5 h-5 text-teal-600" />
+                    )}
                   </div>
                   <div className="flex-1">
                     <h3 className="font-medium text-gray-900">{item.title}</h3>
@@ -269,6 +1784,8 @@ export function ToolkitModal({ toolkit, onClose }: ToolkitModalProps) {
           )}
         </div>
       </div>
+      {showPainJournalPopup && <PainJournalPopup />}
+      {showSMARTGoalsPopup && <SMARTGoalsPopup />}
     </div>
   )
 }
