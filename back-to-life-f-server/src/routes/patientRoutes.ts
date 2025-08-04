@@ -52,16 +52,10 @@ router.post("/update-portal-password", async (req: any, res: any) => {
 // Create patient portal account for testing
 router.post("/create-portal-account", async (req: any, res: any) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, patientName } = req.body;
     
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required" });
-    }
-    
-    // Find the patient first
-    const patient = await findPatientByEmail(email);
-    if (!patient) {
-      return res.status(404).json({ error: "Patient not found" });
     }
     
     // Check if portal account already exists
@@ -71,6 +65,27 @@ router.post("/create-portal-account", async (req: any, res: any) => {
     
     if (existingPortal) {
       return res.status(400).json({ error: "Portal account already exists" });
+    }
+    
+    // Find the patient first
+    let patient = await findPatientByEmail(email);
+    
+    // If patient doesn't exist and we have patientName, create the patient
+    if (!patient && patientName) {
+      console.log('Creating new patient for direct signup:', { email, patientName });
+      const newPatient = await prisma.patient.create({
+        data: {
+          name: patientName,
+          email: email,
+          intakeDate: new Date(),
+        },
+      });
+      patient = await findPatientByEmail(email); // Get the full patient object with relations
+    }
+    
+    // If still no patient found, return error
+    if (!patient) {
+      return res.status(404).json({ error: "Patient not found. Please complete intake first or provide patient name for direct signup." });
     }
     
     // Create the portal account
@@ -87,14 +102,16 @@ router.post("/create-portal-account", async (req: any, res: any) => {
       message: "Patient portal account created successfully",
       data: {
         email: portalAccount.email,
-        patientId: portalAccount.patientId
+        patientId: portalAccount.patientId,
+        patientName: patient.name
       }
     });
   } catch (error) {
     console.error('Error creating patient portal account:', error);
     res.status(500).json({ 
       error: 'Server error',
-      message: 'Failed to create patient portal account'
+      message: 'Failed to create patient portal account',
+      details: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 });
@@ -200,7 +217,7 @@ router.get("/portal-data/:email", async (req: any, res: any) => {
         vas: latestScore?.vas || null,
         psfs: latestScore?.psfs || null,
         pcs4: latestScore?.pcs4 || null,
-        tsk11: latestScore?.tsk11 || null,
+        tsk7: latestScore?.tsk7 || null,
         beliefs: latestScore?.beliefs || null,
         confidence: latestScore?.confidence || null,
         groc: latestScore?.groc || null,

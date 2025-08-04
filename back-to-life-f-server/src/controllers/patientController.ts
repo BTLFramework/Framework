@@ -10,23 +10,25 @@ import { PrismaClient } from "@prisma/client";
 import { sendWelcomeEmailDev } from "../services/emailService";
 import { generateSetupLink } from "../services/jwtService";
 
-// TSK-11 calculation function
-const calculateTSK11Score = (tsk11Data: any) => {
-  if (!tsk11Data || typeof tsk11Data !== 'object') {
+// TSK-7 calculation function (standardized across all apps)
+const calculateTSK7Score = (tsk7Data: any) => {
+  if (!tsk7Data || typeof tsk7Data !== 'object') {
     return null;
   }
   
   let totalScore = 0;
   let validResponses = 0;
   
-  // TSK-11 items with reverse-scored items (4, 8, 9)
-  for (let i = 1; i <= 11; i++) {
-    const response = tsk11Data[i];
-    if (response !== undefined && response >= 0 && response <= 4) {
+  // TSK-7 items with reverse-scored items (2, 6, 7)
+  const reverseScoredItems = [2, 6, 7];
+  
+  for (let i = 1; i <= 7; i++) {
+    const response = tsk7Data[i];
+    if (response !== undefined && response >= 1 && response <= 4) {
       let itemScore = response;
       
-      // Reverse score items 4, 8, 9 (1→4, 2→3, 3→2, 4→1)
-      if (i === 4 || i === 8 || i === 9) {
+      // Reverse score items 2, 6, 7 (1→4, 2→3, 3→2, 4→1)
+      if (reverseScoredItems.includes(i)) {
         itemScore = 5 - response;
       }
       
@@ -35,13 +37,13 @@ const calculateTSK11Score = (tsk11Data: any) => {
     }
   }
   
-  return validResponses === 11 ? totalScore : null;
+  return validResponses === 7 ? totalScore : null;
 };
 
 const prisma = new PrismaClient();
 
 // Import standardized SRS configuration
-const { intakeRules, followUpRules, getPhase } = require('../config/srsConfig.js');
+import { intakeRules, followUpRules, getPhase } from '../config/srsConfig';
 
 // Standardized SRS calculation function using centralized configuration
 const calculateSRS = (formData: any, previousData?: any) => {
@@ -113,17 +115,18 @@ const computeBaselineSRS = (formData: any) => {
     breakdown.push(`❌ ${intakeRules.confidence.description} (${confidence} < ${intakeRules.confidence.moderate.threshold}): +0 points`);
   }
 
-  // 5. Fear-Avoidance Assessment (TSK-11 ≤22 → +1 point)
-  const tsk11RawScore = calculateTSK11Score(formData.tsk11);
-  if (tsk11RawScore !== null) {
-    if (tsk11RawScore <= intakeRules.fearAvoidance.threshold) {
+  // 5. Fear-Avoidance Assessment (TSK-7 ≤8 → +1 point)
+  const tsk7RawScore = calculateTSK7Score(formData.tsk7);
+  
+  if (tsk7RawScore !== null) {
+    if (tsk7RawScore <= intakeRules.fearAvoidance.threshold) {
       points += intakeRules.fearAvoidance.points;
-      breakdown.push(`✅ ${intakeRules.fearAvoidance.description} (${tsk11RawScore}): +${intakeRules.fearAvoidance.points} point`);
+      breakdown.push(`✅ ${intakeRules.fearAvoidance.description} (${tsk7RawScore}): +${intakeRules.fearAvoidance.points} point`);
     } else {
-      breakdown.push(`❌ Fear-Avoidance (TSK-11 ${tsk11RawScore} > ${intakeRules.fearAvoidance.threshold}): +0 points`);
+      breakdown.push(`❌ Fear-Avoidance (TSK-7 ${tsk7RawScore} > ${intakeRules.fearAvoidance.threshold}): +0 points`);
     }
   } else {
-    breakdown.push(`❌ Fear-Avoidance (TSK-11 incomplete): +0 points`);
+    breakdown.push(`❌ Fear-Avoidance (TSK-7 incomplete): +0 points`);
   }
 
   // 6. Pain Beliefs Assessment (PCS-4 ≤6 → +1 point)
@@ -459,7 +462,7 @@ export const submitIntake = async (req: any, res: any) => {
       psfs, 
       // Cognitive Assessment
       pcs4,
-      tsk11,
+      tsk7,
       beliefs, 
       confidence, 
       // Follow-up specific
@@ -508,7 +511,7 @@ export const submitIntake = async (req: any, res: any) => {
     
     // Calculate SRS score
     const srsScore = calculateSRS({
-      vas, psfs, pcs4, tsk11, disabilityPercentage, confidence, beliefs, groc, formType,
+      vas, psfs, pcs4, tsk7, disabilityPercentage, confidence, beliefs, groc, formType,
       recoveryMilestone, clinicalProgressVerified
     }, previousData);
     
@@ -516,11 +519,11 @@ export const submitIntake = async (req: any, res: any) => {
     
     // NEW: Calculate continuous SRS components (0-100 scale)
     const continuousSRS = calculateContinuousSRS({
-      vas, psfs, pcs4, tsk11, disabilityPercentage
+      vas, psfs, pcs4, tsk7, disabilityPercentage
     });
     
     // NEW: Store assessment results
-    await storeAssessmentResults(patient.id, { pcs4, tsk11 });
+    await storeAssessmentResults(patient.id, { pcs4, tsk7 });
     
     // NEW: Update or create SRSDaily record
     await updateSRSDaily(patient.id, continuousSRS);
@@ -542,7 +545,7 @@ export const submitIntake = async (req: any, res: any) => {
       psfs: psfs || [],
       // Cognitive Assessment
       pcs4: pcs4 || null,
-      tsk11: tsk11 || null,
+      tsk7: tsk7 || null,
       beliefs: beliefs || [],
       confidence: Number(confidence),
       // Follow-up specific
@@ -620,13 +623,13 @@ const calculateContinuousSRS = (formData: any) => {
     }
   }
   
-  // 4. Fear-avoidance (0-100): TSK-11 raw → normalized
+  // 4. Fear-avoidance (0-100): TSK-7 raw → normalized
   let fa = 0;
-  if (formData.tsk11) {
-    const tsk11Raw = calculateTSK11Score(formData.tsk11);
-    if (tsk11Raw !== null) {
-      // Use the tskRawToFa function from computeFaScore
-      fa = ((tsk11Raw - 11) / 33) * 100;
+  if (formData.tsk7) {
+    const tsk7Raw = calculateTSK7Score(formData.tsk7);
+    if (tsk7Raw !== null) {
+      // Normalize TSK-7 score (7-28) to 0-100 scale
+      fa = ((tsk7Raw - 7) / 21) * 100;
     }
   }
   
@@ -685,20 +688,20 @@ const storeAssessmentResults = async (patientId: number, assessments: any) => {
       }
     }
     
-    // Store TSK-11 score
-    if (assessments.tsk11) {
-      const tsk11Score = calculateTSK11Score(assessments.tsk11);
-      if (tsk11Score !== null) {
-        await prisma.assessmentResult.create({
-          data: {
-            patientId,
-            name: 'TSK11',
-            score: tsk11Score
-          }
-        });
-        console.log(`📊 Stored TSK-11 score: ${tsk11Score}`);
-      }
+      // Store TSK-7 score
+  if (assessments.tsk7) {
+    const tsk7Score = calculateTSK7Score(assessments.tsk7);
+    if (tsk7Score !== null) {
+      await prisma.assessmentResult.create({
+        data: {
+          patientId,
+          name: 'TSK7',
+          score: tsk7Score
+        }
+      });
+      console.log(`📊 Stored TSK-7 score: ${tsk7Score}`);
     }
+  }
   } catch (error) {
     console.error('Error storing assessment results:', error);
   }
@@ -782,7 +785,7 @@ export const getAllPatientsWithScores = async (_req: any, res: any) => {
         lefs: latestScore?.lefs || null,
         // Cognitive assessments
         pcs4: latestScore?.pcs4 || null,
-        tsk11: latestScore?.tsk11 || null,
+        tsk7: latestScore?.tsk7 || null,
         lastUpdate: latestScore?.date || patient.createdAt,
         notes: [], // Clinical notes would come from a separate table
         // Real recovery points data from database

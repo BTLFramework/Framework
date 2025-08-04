@@ -2,7 +2,7 @@
 // Defines actions, point values, and SRS buffer conversion rules
 
 // Daily Actions Configuration
-export const rpActions = {
+const rpActions = {
   MOVEMENT: [
     { action: 'Exercise video completed', points: 3, description: 'Complete assigned exercise video (per exercise)' },
     { action: 'Walk ≥3000 steps', points: 3, description: 'Achieve daily step goal' },
@@ -40,7 +40,7 @@ export const rpActions = {
 };
 
 // Weekly Point Caps (prevents super-users from skewing)
-export const weeklyCaps = {
+const weeklyCaps = {
   MOVEMENT: 60,
   LIFESTYLE: 40,
   MINDSET: 40,
@@ -49,7 +49,7 @@ export const weeklyCaps = {
 };
 
 // SRS Buffer Conversion Rules
-export const bufferConfig = {
+const bufferConfig = {
   MOVEMENT: {
     domain: 'psfsBuffer',
     perQuarter: 25,        // 25 RP = +0.25 buffer points
@@ -80,7 +80,7 @@ export const bufferConfig = {
 };
 
 // 4-Week RP Thresholds for SRS Eligibility
-export const fourWeekThresholds = {
+const fourWeekThresholds = {
   PSFS: {
     category: 'MOVEMENT',
     threshold: 120,        // ≥120 Movement RP in 4 weeks
@@ -111,7 +111,7 @@ export const fourWeekThresholds = {
 };
 
 // Progress Ring Targets (for UI display)
-export const weeklyTargets = {
+const weeklyTargets = {
   total: 150,            // Total weekly RP target
   breakdown: {
     MOVEMENT: 45,        // 30% of total
@@ -123,7 +123,7 @@ export const weeklyTargets = {
 };
 
 // Gamification Levels
-export const achievementLevels = {
+const achievementLevels = {
   bronze: { threshold: 50, badge: '🥉', title: 'Getting Started' },
   silver: { threshold: 100, badge: '🥈', title: 'Making Progress' },
   gold: { threshold: 150, badge: '🥇', title: 'Recovery Champion' },
@@ -131,10 +131,21 @@ export const achievementLevels = {
 };
 
 // Helper function to get achievement level
-export function getAchievementLevel(weeklyRP) {
+function getAchievementLevel(weeklyRP) {
   if (weeklyRP >= achievementLevels.platinum.threshold) return achievementLevels.platinum;
   if (weeklyRP >= achievementLevels.gold.threshold) return achievementLevels.gold;
   if (weeklyRP >= achievementLevels.silver.threshold) return achievementLevels.silver;
   if (weeklyRP >= achievementLevels.bronze.threshold) return achievementLevels.bronze;
   return { threshold: 0, badge: '⭐', title: 'Just Starting' };
-} 
+}
+
+// CommonJS exports
+module.exports = {
+  rpActions,
+  weeklyCaps,
+  bufferConfig,
+  fourWeekThresholds,
+  weeklyTargets,
+  achievementLevels,
+  getAchievementLevel
+}; 

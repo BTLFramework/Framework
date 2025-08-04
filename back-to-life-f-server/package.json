@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "start": "node dist/app.js",
-    "build": "tsc && cp -r src/config dist/ && cp -r src/routes/*.js dist/routes/ 2>/dev/null || true"
+    "build": "tsc && cp -r src/routes/*.js dist/routes/ && cp -r src/services/*.js dist/services/ && echo 'Build completed successfully'"
   },
   "keywords": [],
   "author": "",

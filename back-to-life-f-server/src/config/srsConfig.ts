@@ -2,7 +2,7 @@
 // This file centralizes all scoring rules and phase cutoffs
 
 // Baseline (Intake) Scoring Rules - Range: 0-11 points
-const intakeRules = {
+export const intakeRules = {
   pain: {
     // VAS 0-10: ≤2 → +1 point
     threshold: 2,
@@ -52,7 +52,7 @@ const intakeRules = {
 };
 
 // Follow-up Scoring Rules - Range: 0-11 points
-const followUpRules = {
+export const followUpRules = {
   pain: {
     // VAS decrease ≥2 pts → +1
     improvement: 2,
@@ -101,26 +101,26 @@ const followUpRules = {
 };
 
 // Phase Determination Cutoffs
-const phaseCutoffs = {
+export const phaseCutoffs = {
   reset: 3,     // 0-3 = RESET
   educate: 7    // 4-7 = EDUCATE, 8-11 = REBUILD
 };
 
 // Phase Helper Function
-function getPhase(score) {
+export function getPhase(score: number): string {
   if (score <= phaseCutoffs.reset) return "RESET";
   if (score <= phaseCutoffs.educate) return "EDUCATE";
   return "REBUILD";
 }
 
 // Score Ranges
-const scoreRanges = {
+export const scoreRanges = {
   baseline: { min: 0, max: 11 },
   followup: { min: 0, max: 11 }
 };
 
 // Phase Descriptions for UI
-const phaseDescriptions = {
+export const phaseDescriptions = {
   RESET: {
     title: "RESET Phase",
     description: "Focus on symptom control & movement reassurance",
@@ -142,7 +142,7 @@ const phaseDescriptions = {
 };
 
 // Clinical Evidence References
-const evidenceBase = {
+export const evidenceBase = {
   painThreshold: {
     reference: "pubmed.ncbi.nlm.nih.gov",
     note: "Mild pain band ≤ 30 mm (≈2/10)"
@@ -159,15 +159,4 @@ const evidenceBase = {
     reference: "pmc.ncbi.nlm.nih.gov",
     note: "High self-efficacy drives adherence"
   }
-};
-
-// CommonJS exports
-module.exports = {
-  intakeRules,
-  followUpRules,
-  phaseCutoffs,
-  getPhase,
-  scoreRanges,
-  phaseDescriptions,
-  evidenceBase
 }; 

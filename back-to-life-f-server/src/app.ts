@@ -70,6 +70,20 @@ app.use((req, res, next) => {
   next();
 });
 
+// Root route to keep server alive
+app.get("/", (req, res) => {
+  res.json({ 
+    message: "Back to Life Server is running!",
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      health: "/health",
+      patients: "/patients",
+      auth: "/auth",
+      test: "/test"
+    }
+  });
+});
+
 // Test route
 app.get("/test", (req, res) => {
   console.log("Test route hit");
@@ -150,8 +164,14 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 3001;
 
+console.log(`🚀 Starting server on port ${PORT}`);
+console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+console.log(`🔗 Database URL: ${process.env.DATABASE_URL ? 'Set' : 'Not set'}`);
+
 app.listen(PORT, () => {
-  console.log(`HTTP Server running at http://localhost:${PORT}`);
+  console.log(`✅ HTTP Server running at http://localhost:${PORT}`);
+  console.log(`🏥 Health check available at http://localhost:${PORT}/health`);
+  console.log(`👥 Patient routes available at http://localhost:${PORT}/patients`);
 });
 
 export default app;

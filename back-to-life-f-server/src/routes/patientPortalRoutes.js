@@ -136,11 +136,31 @@ router.post('/create-account', (req, res) => __awaiter(void 0, void 0, void 0, f
         if (!email || !password || !patientName) {
             return res.status(400).json({ error: 'Email, password, and patient name are required' });
         }
-        // Find existing patient portal account (created during intake)
-        const patientPortal = yield (0, patientModel_1.findPatientPortalByEmail)(email);
+        
+        // Retry logic for database connection issues
+        let patientPortal;
+        let retries = 3;
+        
+        while (retries > 0) {
+            try {
+                // Find existing patient portal account (created during intake)
+                patientPortal = yield (0, patientModel_1.findPatientPortalByEmail)(email);
+                break; // Success, exit retry loop
+            } catch (dbError) {
+                retries--;
+                if (retries === 0) {
+                    console.error('Database connection failed after retries:', dbError);
+                    return res.status(500).json({ error: 'Database connection error. Please try again.' });
+                }
+                console.log(`Database connection failed, retrying... (${retries} attempts left)`);
+                yield new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+            }
+        }
+        
         if (!patientPortal) {
             return res.status(404).json({ error: 'Patient portal account not found. Please complete your intake form first.' });
         }
+        
         // Update the password (replacing the temporary one)
         yield (0, patientModel_1.updatePatientPortalPassword)(email, password);
         res.json({ 

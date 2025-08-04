@@ -92,7 +92,7 @@ model SRSScore {
   
   // Cognitive Assessment
   pcs4                Json?    // Pain Catastrophizing Scale (4 items)
-  tsk11               Json?    // Tampa Scale for Kinesiophobia (11 items)
+  tsk7                Json?    // Tampa Scale for Kinesiophobia (7 items)
   beliefs             Json?    // Limiting beliefs (changed to optional JSON)
   confidence          Int      // Confidence level (0-10)
   
