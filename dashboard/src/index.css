@@ -1,0 +1,940 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== BACK TO LIFE CLINICIAN DESIGN SYSTEM ===== */
+
+/* Brand Gradients - Exact Logo Colors */
+.gradient-text {
+  background: linear-gradient(135deg, #0891b2 0%, #155e75 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.back-to-life-gradient {
+  background: linear-gradient(135deg, #155e75 0%, #0e7490 20%, #0891b2 40%, #06b6d4 60%, #22d3ee 80%, #67e8f9 100%);
+}
+
+@layer base {
+  html {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --radius: 0.5rem;
+  }
+}
+
+/* BTL Typography */
+.text-display {
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: #155e75;
+}
+
+.text-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: #155e75;
+}
+
+.text-body {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #475569;
+}
+
+.text-caption {
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: #64748b;
+}
+
+/* BTL Color System - Clinical Professional */
+.text-primary { color: #155e75; }
+.text-secondary { color: #475569; }
+.text-tertiary { color: #64748b; }
+.text-accent { color: #0891b2; }
+.text-success { color: #059669; }
+.text-warning { color: #d97706; }
+.text-error { color: #dc2626; }
+
+.bg-primary { background-color: #155e75; }
+.bg-secondary { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); }
+.bg-tertiary { background-color: #ffffff; }
+.bg-accent { background-color: #0891b2; }
+.bg-success { background-color: #059669; }
+.bg-warning { background-color: #d97706; }
+.bg-error { background-color: #dc2626; }
+
+/* BTL Surfaces & Cards */
+.surface-primary {
+  background: #ffffff;
+  border: 1px solid rgba(6, 182, 212, 0.15);
+  box-shadow: 0 4px 20px rgba(21, 94, 117, 0.06);
+}
+
+.surface-elevated {
+  background: white;
+  border: 1px solid rgba(6, 182, 212, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(21, 94, 117, 0.08);
+}
+
+.surface-glass {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(6, 182, 212, 0.1);
+}
+
+/* BTL Buttons - Clinical Style */
+.btn-primary {
+  background: linear-gradient(135deg, #155e75 0%, #0891b2 100%);
+  color: white;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 12px 24px;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #164e63 0%, #155e75 25%, #0891b2 50%, #06b6d4 75%, #22d3ee 100%);
+  box-shadow: 0 6px 20px rgba(6, 182, 212, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #f0fdff 0%, #cffafe 50%, #a5f3fc 100%);
+  color: #0e7490;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 12px 24px;
+  border: 2px solid #06b6d4;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 50%, #67e8f9 100%);
+  border-color: #0891b2;
+  color: #155e75;
+  transform: translateY(-1px);
+}
+
+/* BTL Professional Status System */
+.status-excellent {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+}
+
+.status-good {
+  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(8, 145, 178, 0.3);
+}
+
+.status-needs-attention {
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+}
+
+.status-critical {
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+.status-monitor { 
+  background: linear-gradient(135deg, #0891b2 0%, #22d3ee 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(8, 145, 178, 0.3);
+}
+
+/* BTL Phase Indicators - Clinical Clean */
+.phase-reset {
+  background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
+  color: #0277bd;
+  border: 1px solid #81d4fa;
+  font-weight: 600;
+}
+
+.phase-educate {
+  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+  color: #ef6c00;
+  border: 1px solid #ffcc02;
+  font-weight: 600;
+}
+
+.phase-rebuild {
+  background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+  color: #2e7d32;
+  border: 1px solid #81c784;
+  font-weight: 600;
+}
+
+/* BTL Professional Dashboard */
+.dashboard-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.dashboard-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* BTL Professional Overview Cards */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.overview-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(6, 182, 212, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(21, 94, 117, 0.06);
+}
+
+.overview-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #155e75 0%, #0891b2 50%, #22d3ee 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.overview-card:hover::before {
+  opacity: 1;
+}
+
+.overview-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(21, 94, 117, 0.15);
+  border-color: rgba(6, 182, 212, 0.2);
+}
+
+.overview-card:active {
+  transform: translateY(-2px);
+  transition: transform 0.1s ease;
+}
+
+.overview-card-content {
+  position: relative;
+  z-index: 1;
+}
+
+.overview-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.overview-card:hover .overview-icon {
+  transform: scale(1.1);
+}
+
+.overview-icon.total { 
+  background: linear-gradient(135deg, #155e75 0%, #0891b2 100%);
+  color: white;
+}
+
+.overview-icon.excellent { 
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: white;
+}
+
+.overview-icon.attention { 
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  color: white;
+}
+
+.overview-icon.followup { 
+  background: linear-gradient(135deg, #0891b2 0%, #22d3ee 100%);
+  color: white;
+}
+
+.overview-text h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #155e75;
+  margin: 0;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.overview-text p {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+
+/* BTL Phase Distribution */
+.phase-section {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(6, 182, 212, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(21, 94, 117, 0.06);
+}
+
+.phase-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #155e75;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.phase-bars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.phase-bar {
+  background: white;
+  border: 1px solid rgba(6, 182, 212, 0.15);
+  border-radius: 12px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.phase-bar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(21, 94, 117, 0.1);
+  border-color: rgba(6, 182, 212, 0.25);
+}
+
+.phase-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.phase-bar-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.phase-bar-count {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #155e75;
+}
+
+.phase-bar-fill {
+  height: 8px;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.phase-bar-fill.reset { background: linear-gradient(90deg, #f0f9ff 0%, #e0f2fe 100%); }
+.phase-bar-fill.educate { background: linear-gradient(90deg, #e0f2fe 0%, #b3e5fc 100%); }
+.phase-bar-fill.rebuild { background: linear-gradient(90deg, #b3e5fc 0%, #81d4fa 100%); }
+
+.phase-bar-progress {
+  height: 100%;
+  border-radius: 4px;
+  position: relative;
+  transition: width 0.6s ease;
+}
+
+.phase-bar-progress::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.phase-bar-progress.reset { 
+  background: linear-gradient(90deg, #155e75 0%, #0891b2 100%);
+}
+.phase-bar-progress.educate { 
+  background: linear-gradient(90deg, #0891b2 0%, #06b6d4 100%);
+}
+.phase-bar-progress.rebuild { 
+  background: linear-gradient(90deg, #06b6d4 0%, #22d3ee 100%);
+}
+
+/* BTL Dashboard Header */
+.dashboard-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(6, 182, 212, 0.15);
+  padding: 1rem 0;
+  margin-bottom: 2rem;
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-gradient {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #155e75 0%, #0891b2 40%, #06b6d4 60%, #22d3ee 80%, #67e8f9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25);
+}
+
+.logo-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #155e75;
+  letter-spacing: -0.025em;
+}
+
+.header-title h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #155e75;
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+
+.header-subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
+}
+
+.dashboard-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #f0fdff 0%, #cffafe 100%);
+  border: 1px solid #06b6d4;
+  border-radius: 8px;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: pulse 2s infinite;
+}
+
+.status-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0e7490;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.last-updated {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.nav-btn:hover {
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  color: #475569;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-btn.active {
+  background: linear-gradient(135deg, #155e75 0%, #0891b2 100%);
+  color: white;
+  border-color: #0891b2;
+  box-shadow: 0 2px 8px rgba(8, 145, 178, 0.2);
+}
+
+.nav-btn.active:hover {
+  background: linear-gradient(135deg, #164e63 0%, #0e7490 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #f0fdff 0%, #cffafe 100%);
+  color: #0e7490;
+  border: 1px solid #22d3ee;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.refresh-btn:hover {
+  background: linear-gradient(135deg, #ecfeff 0%, #a5f3fc 100%);
+  color: #155e75;
+  border-color: #06b6d4;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.2);
+}
+
+.refresh-btn:active {
+  transform: translateY(0);
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+  color: #b91c1c;
+  border-color: #f87171;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+}
+
+.logout-btn:active {
+  transform: translateY(0);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* BTL Patient Table */
+.patient-table-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(6, 182, 212, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(21, 94, 117, 0.06);
+}
+
+.table-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(6, 182, 212, 0.15);
+}
+
+.search-section {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 250px;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #0891b2;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+  background: white;
+}
+
+.filter-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #475569;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #0891b2;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+  background: white;
+}
+
+/* BTL Status Badges - Keep existing functionality */
+.status-excellent { 
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+}
+
+.status-good { 
+  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 4px rgba(8, 145, 178, 0.2);
+}
+
+.status-monitor { 
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
+}
+
+/* BTL Phase Badges */
+.phase-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid;
+}
+
+.phase-badge.reset { 
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  color: #475569;
+  border-color: #64748b;
+}
+
+.phase-badge.educate { 
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #d97706;
+  border-color: #d97706;
+}
+
+.phase-badge.rebuild { 
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  color: #059669;
+  border-color: #059669;
+}
+
+/* BTL Confidence Bar */
+.confidence-bar {
+  width: 60px;
+  height: 8px;
+  background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.confidence-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #155e75 0%, #0891b2 50%, #22d3ee 100%);
+  border-radius: 4px;
+  transition: width 0.6s ease;
+  position: relative;
+}
+
+.confidence-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+/* BTL Table Interactions */
+.table-row-interactive {
+  transition: all 0.2s ease;
+}
+
+.table-row-interactive:hover {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  box-shadow: 0 2px 8px rgba(21, 94, 117, 0.06);
+}
+
+/* BTL Alert Badges */
+.alert-badge {
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.alert-badge.high-priority {
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  color: white;
+}
+
+.alert-badge.medium-priority {
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  color: white;
+}
+
+.alert-badge.follow-up {
+  background: linear-gradient(135deg, #0891b2 0%, #22d3ee 100%);
+  color: white;
+}
+
+.alert-badge.critical {
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+.alert-badge.declining-severe {
+  background: linear-gradient(135deg, #7c2d12 0%, #dc2626 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(124, 45, 18, 0.4);
+  border: 2px solid #991b1b;
+}
+
+.alert-badge.declining {
+  background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.3);
+}
+
+.alert-badge.disengaged {
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+
+.alert-badge.no-contact {
+  background: linear-gradient(135deg, #0891b2 0%, #22d3ee 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(8, 145, 178, 0.3);
+}
+
+.alert-badge.follow-up-due {
+  background: linear-gradient(135deg, #0891b2 0%, #22d3ee 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(8, 145, 178, 0.3);
+}
+
+/* BTL Engagement Status */
+.status-highly-engaged { 
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: white;
+}
+
+.status-engaged { 
+  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+  color: white;
+}
+
+.status-moderate { 
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  color: white;
+}
+
+.status-low-engagement { 
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  color: white;
+}
+
+/* BTL Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(6, 182, 212, 0.3) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #155e75 0%, #0891b2 100%);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #164e63 0%, #155e75 100%);
+}
+
+/* BTL Focus Ring */
+.focus-ring {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+}
+
+/* BTL Border Radius */
+.rounded-apple { border-radius: 16px; }
+.rounded-apple-sm { border-radius: 12px; }
+.rounded-apple-lg { border-radius: 20px; }
+
+/* BTL Shadows */
+.shadow-apple {
+  box-shadow: 0 4px 20px rgba(21, 94, 117, 0.06);
+}
+
+.shadow-apple-lg {
+  box-shadow: 0 12px 40px rgba(21, 94, 117, 0.15);
+}
