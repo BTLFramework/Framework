@@ -20,15 +20,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Send to backend to update patient portal account
-    const backendResponse = await fetch(`${process.env.BACKEND_URL || 'http://localhost:3001'}/patients/create-portal-account`, {
+    // Send to Railway backend to create patient portal account
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const backendResponse = await fetch(`${backendUrl}/api/patient-portal/create-account`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         email,
-        password
+        password,
+        patientName
       }),
     })
 

@@ -32,10 +32,10 @@ export const intakeRules = {
   },
   
   fearAvoidance: {
-    // TSK-11 raw score ≤22 → +1 point (low fear-avoidance)
-    threshold: 22,
+    // TSK-7 raw score ≤8 → +1 point (low fear-avoidance)
+    threshold: 8,
     points: 1,
-    description: "Low fear-avoidance (TSK-11 ≤22)"
+    description: "Low fear-avoidance (TSK-7 ≤8)"
   },
   
   clinician: {

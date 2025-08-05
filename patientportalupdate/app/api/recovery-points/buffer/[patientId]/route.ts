@@ -8,7 +8,8 @@ export async function GET(
     const { patientId } = await params;
     
     // Proxy the request to the backend server
-    const response = await fetch(`http://localhost:3001/api/recovery-points/buffer/${patientId}`, {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const response = await fetch(`${backendUrl}/api/recovery-points/buffer/${patientId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

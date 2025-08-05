@@ -84,18 +84,18 @@ export function computeBaselineSRS(formData, clinicianData = {}) {
     breakdown.push(`❌ ${intakeRules.confidence.description} (${confidence} < ${intakeRules.confidence.moderate.threshold}): +0 points`);
   }
 
-  // 5. Fear-Avoidance Assessment (TSK-11)
-  const calculateTSK11Score = (tsk11Data) => {
-    if (!tsk11Data || typeof tsk11Data !== 'object') return null;
+  // 5. Fear-Avoidance Assessment (TSK-7)
+  const calculateTSK7Score = (tsk7Data) => {
+    if (!tsk7Data || typeof tsk7Data !== 'object') return null;
     
     let rawScore = 0;
     let answeredCount = 0;
     
-    // TSK-11 items with reverse-scored items (4, 8, 9)
-    const reverseScoredItems = [4, 8, 9];
+    // TSK-7 items with reverse-scored items (2, 6, 7)
+    const reverseScoredItems = [2, 6, 7];
     
-    for (let i = 1; i <= 11; i++) {
-      const response = tsk11Data[i];
+    for (let i = 1; i <= 7; i++) {
+      const response = tsk7Data[i];
       if (response && response >= 1 && response <= 4) {
         answeredCount++;
         if (reverseScoredItems.includes(i)) {
@@ -106,20 +106,20 @@ export function computeBaselineSRS(formData, clinicianData = {}) {
       }
     }
     
-    return answeredCount === 11 ? rawScore : null;
+    return answeredCount === 7 ? rawScore : null;
   };
   
-  const tsk11RawScore = calculateTSK11Score(formData.tsk11);
+  const tsk7RawScore = calculateTSK7Score(formData.tsk7);
   
-  if (tsk11RawScore !== null) {
-    if (tsk11RawScore <= intakeRules.fearAvoidance.threshold) {
+  if (tsk7RawScore !== null) {
+    if (tsk7RawScore <= intakeRules.fearAvoidance.threshold) {
       points += intakeRules.fearAvoidance.points;
-      breakdown.push(`✅ ${intakeRules.fearAvoidance.description} (${tsk11RawScore}): +${intakeRules.fearAvoidance.points} point`);
+      breakdown.push(`✅ ${intakeRules.fearAvoidance.description} (${tsk7RawScore}): +${intakeRules.fearAvoidance.points} point`);
     } else {
-      breakdown.push(`❌ Fear-Avoidance (TSK-11 ${tsk11RawScore} > ${intakeRules.fearAvoidance.threshold}): +0 points`);
+      breakdown.push(`❌ Fear-Avoidance (TSK-7 ${tsk7RawScore} > ${intakeRules.fearAvoidance.threshold}): +0 points`);
     }
   } else {
-    breakdown.push(`❌ Fear-Avoidance (TSK-11 incomplete): +0 points`);
+    breakdown.push(`❌ Fear-Avoidance (TSK-7 incomplete): +0 points`);
   }
 
   // 6. Clinician Assessments

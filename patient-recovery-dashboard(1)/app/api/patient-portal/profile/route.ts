@@ -3,9 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest) {
   try {
     // Fixed: Use correct backend port 3001 instead of 5000
-    const backendUrl = 'http://localhost:3001/api/patient-portal/profile';
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const fullUrl = `${backendUrl}/api/patient-portal/profile`;
     
-    const response = await fetch(backendUrl, {
+    const response = await fetch(fullUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

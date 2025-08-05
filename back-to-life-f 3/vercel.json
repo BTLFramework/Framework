@@ -1,0 +1,17 @@
+{
+  "name": "theframework-dashboard",
+  "version": 2,
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_API_URL": "@api-url"
+  }
+} 

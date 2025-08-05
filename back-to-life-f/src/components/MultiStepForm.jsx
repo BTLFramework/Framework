@@ -11,7 +11,7 @@ import PainScale from "./steps/PainScale";
 import DailyActivities from "./steps/DailyActivities";
 import Confidence from "./steps/Confidence";
 import PCS4 from "./steps/PCS4";
-import TSK11 from "./steps/TSK11";
+import TSK7 from "./steps/TSK7";
 import GROC from "./steps/GROC";
 import ClinicianInput from './steps/ClinicianInput';
 
@@ -160,7 +160,7 @@ export default function MultiStepForm() {
       { activity: "", score: 0 },
     ],
     pcs4: { 1: undefined, 2: undefined, 3: undefined, 4: undefined }, // Initialize with undefined
-    tsk11: { 1: undefined, 2: undefined, 3: undefined, 4: undefined, 5: undefined, 6: undefined, 7: undefined, 8: undefined, 9: undefined, 10: undefined, 11: undefined }, // Initialize with undefined
+    tsk7: { 1: undefined, 2: undefined, 3: undefined, 4: undefined, 5: undefined, 6: undefined, 7: undefined }, // Initialize with undefined
     confidence: 0,
     groc: 0, // Follow‐up only
     beliefs: [], // Initialize beliefs array
@@ -317,8 +317,8 @@ export default function MultiStepForm() {
         return formData.confidence !== undefined && formData.confidence !== null;
       case 5: // PCS-4
         return [1,2,3,4].every(i => formData.pcs4 && formData.pcs4[i] !== undefined && formData.pcs4[i] !== null);
-      case 6: // TSK-11
-        return [1,2,3,4,5,6,7,8,9,10,11].every(i => formData.tsk11 && formData.tsk11[i] !== undefined && formData.tsk11[i] !== null);
+      case 6: // TSK-7
+        return [1,2,3,4,5,6,7].every(i => formData.tsk7 && formData.tsk7[i] !== undefined && formData.tsk7[i] !== null);
       default:
         return true;
     }
@@ -386,7 +386,7 @@ export default function MultiStepForm() {
       vas: formData.vas,
       psfs: formData.psfs,
       pcs4: formData.pcs4, // Include PCS-4 data
-      tsk11: formData.tsk11, // Include TSK-11 data
+      tsk7: formData.tsk7, // Include TSK-7 data
       beliefs: formData.beliefs,
       confidence: formData.confidence,
       groc: 0, // Always 0 for intake
@@ -406,7 +406,8 @@ export default function MultiStepForm() {
       // Submit to patient portal API
       console.log('🔄 Submitting to patient portal...', submissionDataWithEmail);
       
-      const response = await fetch('http://localhost:3000/api/intake', {
+      const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${backendUrl}/patients/submit-intake`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -644,7 +645,7 @@ export default function MultiStepForm() {
               )}
 
               {currentStep === 6 && (
-                <TSK11 formData={formData} onChange={handleChange} />
+                <TSK7 formData={formData} onChange={handleChange} />
               )}
 
               {/* GROC only if "Follow-Up" */}

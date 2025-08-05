@@ -44,8 +44,8 @@ export function calculateContinuousSRS(data) {
   domains.psychLoad = (stressScaled + pcsScaled) / 2; // Average of stress and PCS
   
   // 4. Fear-Avoidance Domain (25%) - NEW
-  // TSK-11 raw score (11-44) → 0-100
-  domains.fa = calculateTSK11Score(data.tsk11);
+  // TSK-7 raw score (7-28) → 0-100
+  domains.fa = calculateTSK7Score(data.tsk7);
   
   // Calculate composite SRS (equal weights: 25% each)
   const composite = (
@@ -66,23 +66,23 @@ export function calculateContinuousSRS(data) {
 }
 
 /**
- * Calculate TSK-11 score from responses
- * @param {Object} tsk11Data - TSK-11 responses {1: 1-4, 2: 1-4, ...}
+ * Calculate TSK-7 score from responses
+ * @param {Object} tsk7Data - TSK-7 responses {1: 1-4, 2: 1-4, ...}
  * @returns {number} Normalized score 0-100
  */
-function calculateTSK11Score(tsk11Data) {
-  if (!tsk11Data || typeof tsk11Data !== 'object') {
+function calculateTSK7Score(tsk7Data) {
+  if (!tsk7Data || typeof tsk7Data !== 'object') {
     return 0; // Default to 0 if no data
   }
   
   let rawScore = 0;
   let answeredCount = 0;
   
-  // TSK-11 items with reverse-scored items (4, 8, 9)
-  const reverseScoredItems = [4, 8, 9];
+  // TSK-7 items with reverse-scored items (2, 6, 7)
+  const reverseScoredItems = [2, 6, 7];
   
-  for (let i = 1; i <= 11; i++) {
-    const response = tsk11Data[i];
+  for (let i = 1; i <= 7; i++) {
+    const response = tsk7Data[i];
     if (response && response >= 1 && response <= 4) {
       answeredCount++;
       if (reverseScoredItems.includes(i)) {
@@ -93,11 +93,11 @@ function calculateTSK11Score(tsk11Data) {
     }
   }
   
-  // Only calculate if all 11 items are answered
-  if (answeredCount === 11) {
-    // Normalize: (raw - 11) / 33 * 100
-    // 11 → 0%, 44 → 100%
-    return Math.round(((rawScore - 11) / 33) * 100);
+  // Only calculate if all 7 items are answered
+  if (answeredCount === 7) {
+    // Normalize: (raw - 7) / 21 * 100
+    // 7 → 0%, 28 → 100%
+    return Math.round(((rawScore - 7) / 21) * 100);
   }
   
   return 0; // Incomplete data

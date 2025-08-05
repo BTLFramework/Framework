@@ -16,7 +16,8 @@ export async function POST(request: NextRequest) {
     console.log(`✅ Frontend API: Recording task completion for patient ${patientId}: ${taskType}`);
     
     // Proxy to backend
-    const response = await fetch('http://localhost:3001/api/recovery-points/task-completion', {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const response = await fetch(`${backendUrl}/api/recovery-points/task-completion`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

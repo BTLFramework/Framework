@@ -5,7 +5,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     // Proxy the request to the backend server
-    const response = await fetch('http://localhost:3001/api/recovery-points/add', {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const response = await fetch(`${backendUrl}/api/recovery-points/add`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

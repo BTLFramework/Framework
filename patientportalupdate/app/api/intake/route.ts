@@ -21,7 +21,8 @@ export async function POST(request: NextRequest) {
     console.log('Patient Portal - Received intake form data:', formData);
     
     // Send comprehensive data to backend server
-    const backendResponse = await fetch('http://localhost:3001/patients/submit-intake', {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const backendResponse = await fetch(`${backendUrl}/patients/submit-intake`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

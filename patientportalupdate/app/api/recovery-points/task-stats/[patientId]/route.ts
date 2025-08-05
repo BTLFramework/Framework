@@ -10,7 +10,8 @@ export async function GET(
     console.log(`📈 Frontend API: Getting task completion stats for patient ${patientId}`);
     
     // Proxy to backend
-    const response = await fetch(`http://localhost:3001/api/recovery-points/task-stats/${patientId}`, {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const response = await fetch(`${backendUrl}/api/recovery-points/task-stats/${patientId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

@@ -5,7 +5,7 @@ export async function GET(
   { params }: { params: Promise<{ email: string }> }
 ) {
   try {
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
     const { email } = await params;
 
     const response = await fetch(`${backendUrl}/patients/portal-data/${email}`);

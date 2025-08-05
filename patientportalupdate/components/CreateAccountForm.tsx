@@ -8,10 +8,12 @@ interface CreateAccountFormProps {
   patientName: string
   onSuccess: () => void
   onBack: () => void
+  isDirectSignup?: boolean
 }
 
-export function CreateAccountForm({ patientEmail, patientName, onSuccess, onBack }: CreateAccountFormProps) {
+export function CreateAccountForm({ patientEmail, patientName, onSuccess, onBack, isDirectSignup = false }: CreateAccountFormProps) {
   const [email, setEmail] = useState(patientEmail)
+  const [name, setName] = useState(patientName)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -43,6 +45,13 @@ export function CreateAccountForm({ patientEmail, patientName, onSuccess, onBack
       return
     }
 
+    // For direct signup, require name and email
+    if (isDirectSignup && (!name.trim() || !email.trim())) {
+      setError('Please fill in all required fields.')
+      setIsLoading(false)
+      return
+    }
+
     try {
       const response = await fetch('/api/patient-portal/create-account', {
         method: 'POST',
@@ -51,7 +60,7 @@ export function CreateAccountForm({ patientEmail, patientName, onSuccess, onBack
         body: JSON.stringify({ 
           email, 
           password,
-          patientName 
+          patientName: name 
         }),
       })
 
@@ -109,19 +118,47 @@ export function CreateAccountForm({ patientEmail, patientName, onSuccess, onBack
         {/* Logo/Brand */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold gradient-text mb-2">Back to Life</h1>
-          <p className="text-btl-600">Create Your Patient Portal Account</p>
+          <p className="text-btl-600">
+            {isDirectSignup ? 'Create Your Patient Portal Account' : 'Create Your Patient Portal Account'}
+          </p>
         </div>
 
         {/* Create Account Card */}
         <div className="card-gradient rounded-xl shadow-lg p-8 border border-btl-200">
           <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-btl-900 mb-2 text-center">Welcome, {patientName}!</h2>
+            <h2 className="text-2xl font-semibold text-btl-900 mb-2 text-center">
+              {isDirectSignup ? 'Welcome!' : `Welcome, ${patientName}!`}
+            </h2>
             <p className="text-btl-600 text-center text-sm">
-              Your assessment is complete. Now let's create your secure portal account.
+              {isDirectSignup 
+                ? 'Create your secure patient portal account to access your recovery tools and track your progress.'
+                : 'Your assessment is complete. Now let\'s create your secure portal account.'
+              }
             </p>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Name Field - Only show for direct signup */}
+            {isDirectSignup && (
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-btl-700 mb-2">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-btl-400 h-5 w-5" />
+                  <input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-btl-200 rounded-lg focus:ring-2 focus:ring-btl-500 focus:border-transparent bg-white text-btl-900"
+                    placeholder="Enter your full name"
+                    required
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-btl-700 mb-2">
@@ -135,7 +172,9 @@ export function CreateAccountForm({ patientEmail, patientName, onSuccess, onBack
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-btl-200 rounded-lg focus:ring-2 focus:ring-btl-500 focus:border-transparent bg-white text-btl-900"
+                  placeholder={isDirectSignup ? "Enter your email address" : ""}
                   required
+                  readOnly={!isDirectSignup}
                 />
               </div>
             </div>
@@ -266,7 +305,7 @@ export function CreateAccountForm({ patientEmail, patientName, onSuccess, onBack
               onClick={onBack}
               className="w-full text-btl-600 font-medium py-2 px-4 rounded-lg hover:bg-btl-50 transition-all duration-200"
             >
-              ← Back to Assessment Results
+              {isDirectSignup ? '← Back to Login' : '← Back to Assessment Results'}
             </button>
           </form>
         </div>

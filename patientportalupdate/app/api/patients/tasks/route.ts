@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export async function GET(request: Request) {
   try {
     // Forward the request to the backend server
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
     const patientId = request.url.split('/tasks/')[1];
 
     const response = await fetch(`${backendUrl}/patients/tasks/${patientId}`);
