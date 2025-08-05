@@ -7,6 +7,10 @@ import PatientTable from "../components/PatientTable";
 import PatientModal from "../components/PatientModal";
 import FilteredPatientsModal from "../components/FilteredPatientsModal";
 
+// CACHE BUSTER: Force bundle change - timestamp: 2024-08-04-23:30
+console.log('🔥 DASHBOARD CACHE BUSTER: This should force bundle change!');
+console.log('🔥 API_URL being used:', API_URL);
+
 // API function to fetch patients from backend
 const fetchPatientsFromAPI = async () => {
   try {
