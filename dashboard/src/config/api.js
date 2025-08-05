@@ -1,36 +1,29 @@
-import { ENV_DEBUG, testEnvironment } from './environment.js';
-
-// API Configuration - Nuclear Option
+// API Configuration - ULTIMATE NUCLEAR OPTION
 const getApiUrl = () => {
-  // Try environment variable first (highest priority)
-  if (import.meta.env.VITE_API_URL) {
-    console.log('🌐 Using VITE_API_URL:', import.meta.env.VITE_API_URL);
-    return import.meta.env.VITE_API_URL;
+  // FORCE PRODUCTION URL - NO EXCEPTIONS
+  const productionUrl = 'https://backend-production-3545.up.railway.app';
+  
+  // Only use localhost if we're actually on localhost AND the URL contains localhost
+  if (window.location.hostname === 'localhost') {
+    console.log('🔧 Development mode on localhost, using localhost:3001');
+    return 'http://localhost:3001';
   }
   
-  // NUCLEAR OPTION: If we're not on localhost, use production URL
-  if (window.location.hostname !== 'localhost') {
-    const productionUrl = 'https://backend-production-3545.up.railway.app';
-    console.log('🚀 NUCLEAR: Using production URL (not localhost):', productionUrl);
-    return productionUrl;
-  }
+  // EVERYTHING ELSE USES PRODUCTION - NO EXCEPTIONS
+  console.log('🚀 ULTIMATE NUCLEAR: Using production URL:', productionUrl);
+  console.log('  - Hostname:', window.location.hostname);
+  console.log('  - Host:', window.location.host);
   
-  // Only use localhost for actual local development
-  console.log('🔧 Using development URL: localhost:3001');
-  return 'http://localhost:3001';
+  return productionUrl;
 };
 
 export const API_URL = getApiUrl();
 
 // Force debug logging
-console.log('🔍 NUCLEAR API Configuration Debug:');
-console.log('  - VITE_API_URL:', import.meta.env.VITE_API_URL);
-console.log('  - PROD:', import.meta.env.PROD);
-console.log('  - MODE:', import.meta.env.MODE);
+console.log('🔍 ULTIMATE NUCLEAR API Configuration:');
 console.log('  - HOSTNAME:', window.location.hostname);
 console.log('  - HOST:', window.location.host);
 console.log('  - Final API_URL:', API_URL);
-console.log('  - Environment Debug:', ENV_DEBUG);
 
 // Global test function for debugging
 window.testApiConfig = () => {
@@ -52,4 +45,15 @@ window.testApiConfig = () => {
 };
 
 // Global environment test function
-window.testEnvironment = testEnvironment;
+window.testEnvironment = () => {
+  console.log('🧪 Environment Test:');
+  console.log('  - Is Localhost:', window.location.hostname === 'localhost');
+  console.log('  - Final API URL:', API_URL);
+  
+  return {
+    IS_LOCALHOST: window.location.hostname === 'localhost',
+    FINAL_API_URL: API_URL,
+    HOSTNAME: window.location.hostname,
+    HOST: window.location.host
+  };
+};
