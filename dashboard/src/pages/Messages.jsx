@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardHeader from "../components/DashboardHeader";
+import { API_URL } from "../config/api";
 
 const Messages = () => {
   const navigate = useNavigate();

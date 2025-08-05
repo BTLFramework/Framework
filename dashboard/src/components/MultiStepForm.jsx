@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Stepper from "./Stepper";
 import PhaseFlow from "./PhaseFlow";
 import { calculateSRS, getPhaseByScore } from "../helpers/scoreLogic";
+import { API_URL } from "../config/api";
 
 // Import each step
 import PatientInfo from "./steps/PatientInfo";
@@ -164,7 +165,7 @@ export default function MultiStepForm() {
       };
 
       // Submit to patient portal API (which forwards to backend)
-      const response = await fetch('http://localhost:3000/api/intake', {
+      const response = await fetch(`${API_URL}/api/intake`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
