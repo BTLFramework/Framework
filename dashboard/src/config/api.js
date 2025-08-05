@@ -1,4 +1,4 @@
-// API Configuration - COMPLETELY NEW FILE - FORCE REBUILD
+// API Configuration - FINAL VERSION - FORCE PRODUCTION
 const getApiUrl = () => {
   // FORCE PRODUCTION URL - NO LOCALHOST EVER
   const productionUrl = 'https://backend-production-3545.up.railway.app';
@@ -10,30 +10,30 @@ const getApiUrl = () => {
   }
   
   // EVERYTHING ELSE USES PRODUCTION - GUARANTEED
-  console.log('🚀 NEW FILE v4.0: Using production URL:', productionUrl);
+  console.log('🚀 FINAL VERSION: Using production URL:', productionUrl);
   console.log('  - Hostname:', window.location.hostname);
   console.log('  - Host:', window.location.host);
-  console.log('  - NEW FILE CREATED: This MUST work now!');
+  console.log('  - FINAL VERSION: This MUST work now!');
   
   return productionUrl;
 };
 
 export const API_URL = getApiUrl();
 
-// Force debug logging - NEW FILE VERSION
-console.log('🔍 NEW FILE v4.0 API Configuration:');
+// Force debug logging - FINAL VERSION
+console.log('🔍 FINAL VERSION API Configuration:');
 console.log('  - Build timestamp:', new Date().toISOString());
 console.log('  - HOSTNAME:', window.location.hostname);
 console.log('  - HOST:', window.location.host);
 console.log('  - Final API_URL:', API_URL);
-console.log('  - NEW FILE v4.0: If you see this, the new file worked!');
+console.log('  - FINAL VERSION: If you see this, it worked!');
 
 // Add a unique identifier
-window.BTL_BUILD_VERSION = 'NEW-FILE-v4.0-' + Date.now();
+window.BTL_BUILD_VERSION = 'FINAL-v5.0-' + Date.now();
 
 // Global test function for debugging
 window.testApiConfig = () => {
-  console.log('🧪 API Configuration Test - NEW FILE:');
+  console.log('🧪 API Configuration Test - FINAL VERSION:');
   console.log('  - API_URL:', API_URL);
   console.log('  - Will make test request to:', `${API_URL}/patients`);
   
@@ -52,7 +52,7 @@ window.testApiConfig = () => {
 
 // Global environment test function
 window.testEnvironment = () => {
-  console.log('🧪 Environment Test - NEW FILE:');
+  console.log('🧪 Environment Test - FINAL VERSION:');
   console.log('  - Is Localhost:', window.location.hostname === 'localhost');
   console.log('  - Final API URL:', API_URL);
   console.log('  - Build Version:', window.BTL_BUILD_VERSION);
