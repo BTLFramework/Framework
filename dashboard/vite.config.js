@@ -13,7 +13,11 @@ export default defineConfig({
     assetsDir: 'assets',
     rollupOptions: {
       output: {
-        manualChunks: undefined
+        manualChunks: undefined,
+        // Force new hash by adding timestamp
+        entryFileNames: 'assets/[name]-[hash]-' + Date.now() + '.js',
+        chunkFileNames: 'assets/[name]-[hash]-' + Date.now() + '.js',
+        assetFileNames: 'assets/[name]-[hash]-' + Date.now() + '.[ext]'
       }
     }
   }
