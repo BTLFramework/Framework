@@ -138,33 +138,66 @@ export default function MultiStepForm() {
   const [resultPhase, setResultPhase] = useState({ label: "", color: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionResult, setSubmissionResult] = useState(null);
+  const [quickTestMode, setQuickTestMode] = useState(false);
 
   // Initial form data factory function
-  const getInitialFormData = () => ({
-    patientName: "",
-    email: "", // Add email field
-    dob: "", // Date of Birth
-    date: new Date().toISOString().split("T")[0], // Default to today
-    formType: "Intake", // "Intake" or "Follow-Up"
-    region: "",
-    ndi: Array(10).fill(0),
-    tdi: Array(10).fill(0), // Thoracic Disability Index
-    odi: Array(10).fill(0),
-    ulfi: Array(25).fill(0),
-    lefs: Array(20).fill(0),
-    disabilityPercentage: 0,
-    vas: 0,
-    psfs: [
-      { activity: "", score: 0 },
-      { activity: "", score: 0 },
-      { activity: "", score: 0 },
-    ],
-    pcs4: { 1: undefined, 2: undefined, 3: undefined, 4: undefined }, // Initialize with undefined
-    tsk7: { 1: undefined, 2: undefined, 3: undefined, 4: undefined, 5: undefined, 6: undefined, 7: undefined }, // Initialize with undefined
-    confidence: 0,
-    groc: 0, // Follow‐up only
-    beliefs: [], // Initialize beliefs array
-  });
+  const getInitialFormData = () => {
+    if (quickTestMode) {
+      // Quick test data - pre-filled for rapid testing
+      return {
+        patientName: "Test Patient",
+        email: "test@example.com",
+        dob: "1990-01-01",
+        date: new Date().toISOString().split("T")[0],
+        formType: "Intake",
+        region: "Low Back / SI Joint",
+        ndi: Array(10).fill(0),
+        tdi: Array(10).fill(0),
+        odi: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // Low disability
+        ulfi: Array(25).fill(0),
+        lefs: Array(20).fill(0),
+        disabilityPercentage: 10, // Low disability
+        vas: 2, // Low pain
+        psfs: [
+          { activity: "Lifting groceries", score: 8 },
+          { activity: "Climbing stairs", score: 7 },
+          { activity: "Playing with kids", score: 8 },
+        ],
+        pcs4: { 1: 1, 2: 1, 3: 1, 4: 1 }, // Low catastrophizing
+        tsk7: { 1: 1, 2: 4, 3: 1, 4: 1, 5: 1, 6: 4, 7: 4 }, // Low fear-avoidance
+        confidence: 8, // High confidence
+        groc: 0,
+        beliefs: ["None of these apply"],
+      };
+    }
+    
+    // Normal empty form
+    return {
+      patientName: "",
+      email: "",
+      dob: "",
+      date: new Date().toISOString().split("T")[0],
+      formType: "Intake",
+      region: "",
+      ndi: Array(10).fill(0),
+      tdi: Array(10).fill(0),
+      odi: Array(10).fill(0),
+      ulfi: Array(25).fill(0),
+      lefs: Array(20).fill(0),
+      disabilityPercentage: 0,
+      vas: 0,
+      psfs: [
+        { activity: "", score: 0 },
+        { activity: "", score: 0 },
+        { activity: "", score: 0 },
+      ],
+      pcs4: { 1: undefined, 2: undefined, 3: undefined, 4: undefined },
+      tsk7: { 1: undefined, 2: undefined, 3: undefined, 4: undefined, 5: undefined, 6: undefined, 7: undefined },
+      confidence: 0,
+      groc: 0,
+      beliefs: [],
+    };
+  };
 
   const [formData, setFormData] = useState(getInitialFormData());
 
@@ -294,13 +327,13 @@ export default function MultiStepForm() {
     }
   };
 
-  // Automatically reset form when formType changes or on mount
+  // Automatically reset form when formType changes, quickTestMode changes, or on mount
   useEffect(() => {
     setFormData(getInitialFormData());
     setCurrentStep(0);
     setShowResult(false);
     setSubmissionResult(null);
-  }, [formData.formType]);
+  }, [formData.formType, quickTestMode]);
 
   // Validation for required fields per step
   const isStepComplete = () => {
@@ -348,6 +381,22 @@ export default function MultiStepForm() {
       return;
     }
     
+    // Validate TSK-7 completion
+    if (!formData.tsk7 || Object.keys(formData.tsk7).length !== 7) {
+      alert("Please complete all TSK-7 Fear of Movement questions before submitting.");
+      return;
+    }
+    
+    // Check if all TSK-7 responses are valid
+    const tsk7Keys = Object.keys(formData.tsk7);
+    const incompleteTSK7 = tsk7Keys.some(key => 
+      formData.tsk7[key] === undefined || formData.tsk7[key] === null
+    );
+    if (incompleteTSK7) {
+      alert("Please answer all TSK-7 questions before submitting.");
+      return;
+    }
+    
     console.log('🚀 Starting form submission...');
     
     // Use already calculated disability percentage from formData
@@ -390,7 +439,7 @@ export default function MultiStepForm() {
       beliefs: formData.beliefs,
       confidence: formData.confidence,
       groc: 0, // Always 0 for intake
-      srsScore: srsResult.formattedScore, // Send as "X/9" format
+      srsScore: srsResult.score, // Send numeric score
       phase: srsResult.phase
     };
 
@@ -404,7 +453,6 @@ export default function MultiStepForm() {
       };
 
       // Submit to patient portal API
-      console.log('🔄 Submitting to patient portal...', submissionDataWithEmail);
       
       const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
       const response = await fetch(`${backendUrl}/patients/submit-intake`, {
@@ -415,8 +463,12 @@ export default function MultiStepForm() {
         body: JSON.stringify(submissionDataWithEmail)
       });
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(`Backend error: ${errorData.error || response.statusText}`);
+      }
+
       const result = await response.json();
-      console.log('✅ Patient portal response:', result);
       
       // Store patient data for portal access
       if (result.success) {
@@ -427,7 +479,6 @@ export default function MultiStepForm() {
           phase: result.data.phase,
           timestamp: new Date().toISOString()
         };
-        console.log('💾 Storing patient data for redirect:', patientData);
         localStorage.setItem('btl_patient_data', JSON.stringify(patientData));
       }
       
@@ -435,7 +486,6 @@ export default function MultiStepForm() {
       setShowResult(true);
       
     } catch (error) {
-      console.error('❌ Submission error:', error);
       setSubmissionResult({ 
         success: false, 
         error: 'Failed to connect to patient portal',
@@ -469,71 +519,93 @@ export default function MultiStepForm() {
           </div>
 
           {/* Responsive grid: side-by-side on desktop, stacked on mobile */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-            {/* Left Column - Score Display */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            {/* Left Column - Score Display (matching patient portal) */}
             <div className="flex flex-col justify-center items-center w-full max-w-md mx-auto">
-              <div className="bg-white rounded-2xl shadow-xl p-6 w-full">
-                <div className="text-center mb-3">
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">Your Recovery Score</h3>
-                  <SRSDisplay 
-                    score={displayScore} 
-                    clinicianAssessed={false} 
-                    grocCaptured={false}
-                    className="justify-center text-2xl"
-                  />
-                  <p className="text-gray-600 text-xs mt-2">
-                    Intake assessments show 3 locked points until your first clinical visit and follow-up assessment.
-                  </p>
-                </div>
-                <div className="mobile-recovery-wheel">
-                  <div style={{ maxWidth: '180px', margin: '0 auto' }}>
+              <div className="bg-white rounded-xl shadow-sm p-6 w-full border border-gray-200">
+                <div className="text-center">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-6">Signature Recovery Score™</h3>
+                  
+                  <div className="mb-6">
+                    <div className="text-5xl font-bold text-blue-600 mb-2">{displayScore}/11</div>
+                    <div className="w-24 h-1 bg-blue-600 rounded-full mx-auto"></div>
+                  </div>
+
+                  <div className="mb-4">
                     <RecoveryScoreWheel 
                       score={displayScore} 
                       maxScore={maxScore} 
                       phase={displayPhase}
                     />
                   </div>
+
+                  <p className="text-gray-600 text-sm">
+                    {displayScore < 4 ? "RESET Phase" : displayScore < 7 ? "EDUCATE Phase" : "REBUILD Phase"}
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Right Column - Portal Button and Next Steps */}
-            <div className="flex flex-col justify-start h-full w-full max-w-md mx-auto">
-              {/* Create Account Button - updated flow */}
-              <div className="mb-3">
-                <button 
-                  onClick={() => {
-                    if (submissionResult?.success) {
-                      const patientData = {
-                        name: submissionResult.data.patient.name,
-                        email: submissionResult.data.patient.email,
-                        score: `${submissionResult.data.srsScore}/9`,
-                        phase: submissionResult.data.phase,
-                        timestamp: new Date().toISOString()
-                      };
-                      const params = new URLSearchParams({
-                        patientData: JSON.stringify(patientData)
-                      });
-                      window.location.href = `http://localhost:3000/create-account?${params.toString()}`;
-                    } else {
-                      window.location.href = 'http://localhost:3000';
-                    }
-                  }}
-                  className="w-full btn-primary-gradient text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 hover:shadow-lg text-base"
-                >
-                  Create Your Portal Account
-                </button>
-              </div>
+            {/* Right Column - Clean Instructions */}
+            <div className="flex flex-col justify-start h-full w-full max-w-md mx-auto space-y-4">
+              {/* Create Account Button */}
+              <button 
+                onClick={() => {
+                  if (submissionResult?.success) {
+                    const patientData = {
+                      name: submissionResult.data.patient.name,
+                      email: submissionResult.data.patient.email,
+                      score: `${submissionResult.data.srsScore}/9`,
+                      phase: submissionResult.data.phase,
+                      timestamp: new Date().toISOString()
+                    };
+                    const params = new URLSearchParams({
+                      patientData: JSON.stringify(patientData)
+                    });
+                    const patientPortalUrl = import.meta.env.VITE_PATIENT_PORTAL_URL || 'http://localhost:3000';
+                    window.location.href = `${patientPortalUrl}/create-account?${params.toString()}`;
+                  } else {
+                    const patientPortalUrl = import.meta.env.VITE_PATIENT_PORTAL_URL || 'http://localhost:3000';
+                    window.location.href = patientPortalUrl;
+                  }
+                }}
+                className="w-full btn-primary-gradient text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:shadow-lg text-lg"
+              >
+                Create Your Portal Account
+              </button>
 
-              {/* Next Steps and Info */}
-              <div className="bg-white rounded-2xl shadow-xl p-5 w-full flex flex-col gap-4">
-                <h4 className="font-semibold text-btl-800 mb-2 text-base">Next Steps</h4>
-                <ol className="list-decimal list-inside text-gray-700 text-sm space-y-1">
-                  <li><span className="font-medium">Review Your Results:</span> See your recovery score and phase. This guides your next steps in the program.</li>
-                  <li><span className="font-medium">Create Your Account:</span> Set up your secure portal account with your own password.</li>
-                  <li><span className="font-medium">Access Your Portal:</span> Log in to view your recovery plan, daily tasks, and track progress.</li>
-                  <li><span className="font-medium">Book Your Appointment:</span> Schedule your first session to begin your personalized treatment plan.</li>
-                </ol>
+              {/* Next Steps - Cleaner */}
+              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                <h4 className="font-semibold text-gray-900 mb-4 text-lg">What's Next?</h4>
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-blue-600 text-sm font-bold">1</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Set up your secure portal account</p>
+                      <p className="text-sm text-gray-600">Create your password and access your personalized recovery dashboard</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-blue-600 text-sm font-bold">2</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Book your first appointment</p>
+                      <p className="text-sm text-gray-600">Schedule your initial consultation to begin your treatment plan</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-blue-600 text-sm font-bold">3</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Start your recovery journey</p>
+                      <p className="text-sm text-gray-600">Access daily tasks, track progress, and view your recovery insights</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -564,25 +636,50 @@ export default function MultiStepForm() {
                 Complete your assessment to calculate your personalized recovery score
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleReset}
-              className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              <span>Reset</span>
-            </button>
+            <div className="flex items-center space-x-3">
+              {/* Quick Test Mode Toggle */}
+              <button
+                type="button"
+                onClick={() => setQuickTestMode(!quickTestMode)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
+                  quickTestMode 
+                    ? 'bg-green-500 hover:bg-green-600 text-white' 
+                    : 'bg-white/20 hover:bg-white/30 text-white'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span>{quickTestMode ? 'Test Mode ON' : 'Quick Test'}</span>
+              </button>
+              
+              <button
+                type="button"
+                onClick={handleReset}
+                className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Reset</span>
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Progress Bar */}
         <div className="bg-white px-8 py-4 border-b border-gray-100">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-600">
-              Step {currentStep + 1} of {steps.length}
-            </span>
+            <div className="flex items-center space-x-3">
+              <span className="text-sm font-medium text-gray-600">
+                Step {currentStep + 1} of {steps.length}
+              </span>
+              {quickTestMode && (
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                  🚀 Quick Test Mode
+                </span>
+              )}
+            </div>
             <span className="text-sm font-medium text-gray-600">
               {Math.round(((currentStep + 1) / steps.length) * 100)}% Complete
             </span>
@@ -623,21 +720,6 @@ export default function MultiStepForm() {
 
               {currentStep === 4 && (
                 <Confidence formData={formData} onChange={handleChange} />
-              )}
-
-              {currentStep === 5 && (
-                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-sm">
-                  <strong>PCS-4 Debug:</strong><br />
-                  {JSON.stringify(formData.pcs4)}<br />
-                  {[1,2,3,4].map(i => (
-                    <div key={i}>
-                      Question {i}: {String(formData.pcs4 && formData.pcs4[i])} (type: {typeof (formData.pcs4 && formData.pcs4[i])})
-                    </div>
-                  ))}
-                  <div>
-                    Validation: {[1,2,3,4].every(i => formData.pcs4 && formData.pcs4[i] !== undefined && formData.pcs4[i] !== null) ? 'PASS' : 'FAIL'}
-                  </div>
-                </div>
               )}
 
               {currentStep === 5 && (

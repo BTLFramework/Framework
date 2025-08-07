@@ -30,8 +30,6 @@ export function calculateSRS(formData, previousData = null, clinicianData = {}) 
 
 // Baseline (Intake) SRS Calculation - Range: 0-9 points
 export function computeBaselineSRS(formData, clinicianData = {}) {
-  console.log('🔢 Frontend: Starting Baseline SRS Calculation');
-  console.log('📊 Form data:', formData);
   
   let points = 0;
   const breakdown = [];
@@ -140,11 +138,6 @@ export function computeBaselineSRS(formData, clinicianData = {}) {
   // Determine phase using centralized helper
   const phase = getPhase(points);
 
-  console.log('📋 SRS Calculation Breakdown:');
-  breakdown.forEach(item => console.log(`   ${item}`));
-  console.log(`🎯 Final Baseline SRS Score: ${points}/${scoreRanges.baseline.max}`);
-  console.log(`🔄 Determined Phase: ${phase}`);
-
   return {
     score: points,
     maxScore: scoreRanges.baseline.max,
@@ -157,9 +150,6 @@ export function computeBaselineSRS(formData, clinicianData = {}) {
 
 // Follow-up SRS Calculation - Range: 0-11 points
 export function computeFollowUpSRS(baselineData, currentData, clinicianData = {}) {
-  console.log('🔢 Frontend: Starting Follow-up SRS Calculation');
-  console.log('📊 Baseline data:', baselineData);
-  console.log('📊 Current data:', currentData);
   
   let points = 0;
   const breakdown = [];

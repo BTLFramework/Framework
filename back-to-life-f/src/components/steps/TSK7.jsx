@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 export default function TSK7({ formData, onChange }) {
   // TSK-7 items with reverse-scored items marked (matching patient portal)
@@ -6,44 +6,37 @@ export default function TSK7({ formData, onChange }) {
     {
       id: 1,
       text: "I avoid certain movements because I worry they'll make my pain worse",
-      category: "Fear of Movement",
-      reverseScored: false
+      category: "Fear of Movement"
     },
     {
       id: 2,
       text: "I feel safe being physically active, even if I feel a little discomfort",
-      category: "Movement Confidence",
-      reverseScored: true
+      category: "Movement Confidence"
     },
     {
       id: 3,
       text: "I worry that doing too much could delay my recovery",
-      category: "Recovery Concerns",
-      reverseScored: false
+      category: "Recovery Concerns"
     },
     {
       id: 4,
       text: "I think my body is fragile and needs to be protected",
-      category: "Body Confidence",
-      reverseScored: false
+      category: "Body Confidence"
     },
     {
       id: 5,
       text: "If something hurts, I assume it's causing damage",
-      category: "Pain Interpretation",
-      reverseScored: false
+      category: "Pain Interpretation"
     },
     {
       id: 6,
       text: "Just because something hurts doesn't mean it's harmful",
-      category: "Pain Understanding",
-      reverseScored: true
+      category: "Pain Understanding"
     },
     {
       id: 7,
       text: "I'm confident in my body's ability to handle movement",
-      category: "Body Confidence",
-      reverseScored: true
+      category: "Body Confidence"
     }
   ];
 
@@ -53,111 +46,36 @@ export default function TSK7({ formData, onChange }) {
     onChange({ target: { name: 'tsk7', value: newTSK } });
   };
 
-  const calculateTSK7Score = () => {
-    if (!formData.tsk7) return null;
-    
-    let rawScore = 0;
-    let answeredCount = 0;
-    
-    // TSK-7 items with reverse-scored items (2, 6, 7)
-    const reverseScoredItems = [2, 6, 7];
-    
-    for (let i = 1; i <= 7; i++) {
-      const response = formData.tsk7[i];
-      if (response !== undefined && response >= 1 && response <= 4) {
-        answeredCount++;
-        if (reverseScoredItems.includes(i)) {
-          rawScore += (5 - response); // Reverse score: 1→4, 2→3, 3→2, 4→1
-        } else {
-          rawScore += response;
-        }
-      }
-    }
-    
-    return answeredCount === 7 ? rawScore : null;
-  };
-
-  const tskScore = calculateTSK7Score();
-  const faScore = tskScore !== null ? Math.round(((tskScore - 7) / 21) * 100) : null;
-  
-  const getFearAvoidanceLevel = (score) => {
-    if (score <= 30) return { level: "Low", color: "text-green-600", bgColor: "bg-green-50", borderColor: "border-green-200" };
-    if (score <= 50) return { level: "Moderate", color: "text-yellow-600", bgColor: "bg-yellow-50", borderColor: "border-yellow-200" };
-    return { level: "High", color: "text-red-600", bgColor: "bg-red-50", borderColor: "border-red-200" };
-  };
-
-  const fearLevel = faScore !== null ? getFearAvoidanceLevel(faScore) : null;
-
-  // Auto-save when score changes
-  useEffect(() => {
-    if (tskScore !== null) {
-      console.log(`TSK-7 Score: ${tskScore}/28 (${faScore}% fear-avoidance)`);
-    }
-  }, [tskScore, faScore]);
-
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Fear-Avoidance Assessment</h2>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Please rate how much you agree with each statement about your current condition.
+    <section>
+      <div className="mb-8">
+        <h2 className="btl-section-header">Fear of Movement Assessment</h2>
+        <p className="btl-section-subtitle">
+          Please rate how much you agree with each statement about your current condition and movement. This helps us understand your confidence in movement and recovery.
         </p>
       </div>
-
-      {/* Score Display */}
-      {tskScore !== null && (
-        <div className={`p-4 rounded-lg border-2 ${fearLevel?.borderColor} ${fearLevel?.bgColor} mb-6`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-semibold text-gray-900">Fear-Avoidance Level</h3>
-              <p className={`text-sm ${fearLevel?.color}`}>
-                {fearLevel?.level} ({faScore}%)
-              </p>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-gray-900">{tskScore}</div>
-              <div className="text-sm text-gray-500">/ 28</div>
-            </div>
-          </div>
-          <div className="mt-2 bg-gray-200 rounded-full h-2">
-            <div 
-              className={`h-2 rounded-full transition-all duration-500 ${
-                fearLevel?.level === 'Low' ? 'bg-green-500' :
-                fearLevel?.level === 'Moderate' ? 'bg-yellow-500' : 'bg-red-500'
-              }`}
-              style={{ width: `${(tskScore / 28) * 100}%` }}
-            ></div>
-          </div>
-        </div>
-      )}
-
-      {/* Questions */}
-      <div className="space-y-4">
+      
+      <div className="space-y-6">
         {tskItems.map((item) => (
-          <div key={item.id} className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-            <div className="mb-4">
-              <div className="flex items-start justify-between mb-2">
-                <h3 className="text-lg font-medium text-gray-900 flex-1 pr-4">
+          <div key={item.id} className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-2xl border border-gray-100 btl-card-hover">
+            <div className="mb-6">
+              <div className="flex items-start justify-between mb-4">
+                <label className="btl-label block text-lg font-medium text-gray-900 flex-1 pr-4">
                   {item.text}
-                </h3>
+                </label>
                 <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded whitespace-nowrap">
                   {item.category}
                 </span>
               </div>
-              {item.reverseScored && (
-                <p className="text-xs text-blue-600 mb-3">
-                  ✨ This item is reverse-scored (higher agreement = lower fear)
-                </p>
-              )}
             </div>
 
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-4 gap-3">
               {[1, 2, 3, 4].map((value) => (
                 <label
                   key={value}
-                  className={`relative flex flex-col items-center p-3 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                  className={`relative flex flex-col items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
                     formData.tsk7?.[item.id] === value
-                      ? 'border-btl-500 bg-btl-50 text-btl-700'
+                      ? 'border-btl-500 bg-btl-50 text-btl-700 shadow-md'
                       : 'border-gray-200 hover:border-btl-300 hover:bg-gray-50'
                   }`}
                 >
@@ -169,8 +87,8 @@ export default function TSK7({ formData, onChange }) {
                     onChange={(e) => handleTSKChange(item.id, parseInt(e.target.value))}
                     className="sr-only"
                   />
-                  <div className="text-lg font-semibold mb-1">{value}</div>
-                  <div className="text-xs text-center leading-tight">
+                  <div className="text-xl font-bold mb-2">{value}</div>
+                  <div className="text-xs text-center leading-tight font-medium">
                     {value === 1 && "Strongly Disagree"}
                     {value === 2 && "Disagree"}
                     {value === 3 && "Agree"}
@@ -181,13 +99,14 @@ export default function TSK7({ formData, onChange }) {
             </div>
 
             {formData.tsk7?.[item.id] && (
-              <div className="mt-3 text-sm text-gray-600">
-                Your response: <span className="font-medium">
+              <div className="mt-4 p-3 bg-btl-50 border border-btl-200 rounded-lg">
+                <div className="text-sm text-btl-700">
+                  <span className="font-medium">Your response:</span>{" "}
                   {formData.tsk7[item.id] === 1 && "Strongly Disagree"}
                   {formData.tsk7[item.id] === 2 && "Disagree"}
                   {formData.tsk7[item.id] === 3 && "Agree"}
                   {formData.tsk7[item.id] === 4 && "Strongly Agree"}
-                </span>
+                </div>
               </div>
             )}
           </div>
@@ -195,28 +114,33 @@ export default function TSK7({ formData, onChange }) {
       </div>
 
       {/* Progress Indicator */}
-      <div className="mt-8 bg-gray-50 p-4 rounded-lg">
-        <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-          <span>Progress</span>
-          <span>{Object.keys(formData.tsk7 || {}).length} / 7 questions answered</span>
+      <div className="mt-8 bg-gradient-to-br from-gray-50 to-white p-6 rounded-2xl border border-gray-100">
+        <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
+          <span className="font-medium">Assessment Progress</span>
+          <span className="font-medium">{Object.keys(formData.tsk7 || {}).filter(key => formData.tsk7[key] !== undefined && formData.tsk7[key] !== null).length} / 7 questions answered</span>
         </div>
-        <div className="bg-gray-200 rounded-full h-2">
+        <div className="bg-gray-200 rounded-full h-3">
           <div 
-            className="bg-btl-500 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${(Object.keys(formData.tsk7 || {}).length / 7) * 100}%` }}
+            className="bg-gradient-to-r from-btl-500 to-btl-600 h-3 rounded-full transition-all duration-300"
+            style={{ width: `${(Object.keys(formData.tsk7 || {}).filter(key => formData.tsk7[key] !== undefined && formData.tsk7[key] !== null).length / 7) * 100}%` }}
           ></div>
         </div>
       </div>
 
-      {/* Clinical Information */}
-      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <h4 className="font-semibold text-blue-900 mb-2">Understanding Your Score</h4>
-        <div className="text-sm text-blue-800 space-y-1">
-          <p><strong>Low Fear-Avoidance (≤8 points):</strong> You feel confident moving and don't avoid activities due to fear.</p>
-          <p><strong>Moderate Fear-Avoidance (9-14 points):</strong> You have some concerns about movement but are generally willing to be active.</p>
-          <p><strong>High Fear-Avoidance (≥15 points):</strong> You may avoid activities due to fear of pain or injury.</p>
+      {/* Information section */}
+      <div className="mt-6 p-4 bg-cyan-50 border border-cyan-200 rounded-xl">
+        <div className="flex items-start space-x-3">
+          <svg className="w-5 h-5 text-cyan-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <h4 className="font-semibold text-cyan-800 mb-1">Fear of Movement Assessment</h4>
+            <p className="text-sm text-cyan-700 leading-relaxed">
+              Understanding your confidence in movement helps us create a recovery plan that addresses both physical and psychological aspects of your condition. This assessment is based on evidence showing that movement confidence significantly impacts recovery outcomes.
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
