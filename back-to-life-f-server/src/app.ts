@@ -44,6 +44,9 @@ const allowedOrigins = [
   "http://localhost:5177",
   "http://localhost:5178",
   // Production domains (will be HTTPS when deployed)
+  "https://dashboard-2awgqzcyj-theframework.vercel.app",
+  "https://dashboard-pddbpp75m-theframework.vercel.app",
+  "https://theframework-dashboard.vercel.app",
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
   ...(process.env.PATIENT_PORTAL_URL ? [process.env.PATIENT_PORTAL_URL] : []),
   ...(process.env.CLINICIAN_DASHBOARD_URL ? [process.env.CLINICIAN_DASHBOARD_URL] : [])
@@ -167,6 +170,11 @@ const PORT = process.env.PORT || 3001;
 console.log(`🚀 Starting server on port ${PORT}`);
 console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
 console.log(`🔗 Database URL: ${process.env.DATABASE_URL ? 'Set' : 'Not set'}`);
+console.log(`🔗 Environment Variables Debug:`);
+console.log(`   - NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`   - PORT: ${process.env.PORT}`);
+console.log(`   - JWT_SECRET: ${process.env.JWT_SECRET ? 'Set' : 'Not set'}`);
+console.log(`   - SETUP_SECRET: ${process.env.SETUP_SECRET ? 'Set' : 'Not set'}`);
 
 app.listen(PORT, () => {
   console.log(`✅ HTTP Server running at http://localhost:${PORT}`);

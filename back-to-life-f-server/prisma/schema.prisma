@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -20,229 +14,189 @@ model User {
 }
 
 model Patient {
-  id           Int         @id @default(autoincrement())
-  name         String
-  email        String      @unique
-  dob          DateTime?   // Date of Birth (optional for existing patients)
-  intakeDate   DateTime
-  srsScores    SRSScore[]
-  portalAccount PatientPortal?
-  recoveryPoints RecoveryPoint[]
-  srsBuffers   SRSBuffer?
-  messages     Message[]   // Messages to this patient
-  mindfulnessLogs MindfulnessLog[] // Daily mindfulness tracking
-  srsDaily     SRSDaily[]  // NEW: Daily SRS tracking
-  assessmentResults AssessmentResult[] // NEW: Assessment results
-  taskCompletions TaskCompletion[] // NEW: Task completions
-  
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @default(now()) @updatedAt
+  id                Int                @id @default(autoincrement())
+  name              String
+  email             String             @unique
+  dob               DateTime?
+  intakeDate        DateTime
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @default(now()) @updatedAt
+  assessmentResults AssessmentResult[]
+  messages          Message[]
+  mindfulnessLogs   MindfulnessLog[]
+  portalAccount     PatientPortal?
+  recoveryPoints    RecoveryPoint[]
+  srsBuffers        SRSBuffer?
+  srsDaily          SRSDaily[]
+  srsScores         SRSScore[]
+  taskCompletions   TaskCompletion[]
 }
 
-// NEW: Daily SRS tracking for continuous 0-100 scale
 model SRSDaily {
-  id         String   @id @default(uuid())
-  patientId  Int
-  date       DateTime @default(now())
-  
-  pain       Float    // Pain intensity 0-100
-  function   Float    // Function score 0-100
-  psychLoad  Float    // Psychological load (stress + PCS-4) 0-100
-  fa         Float?   // NEW: Fear-avoidance 0-100
-  
-  patient    Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  
+  id        String   @id @default(uuid())
+  patientId Int
+  date      DateTime @default(now())
+  pain      Float
+  function  Float
+  psychLoad Float
+  fa        Float?
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
   @@unique([patientId, date])
   @@index([patientId, date])
   @@index([date])
 }
 
-// NEW: Assessment results storage
 model AssessmentResult {
   id        String   @id @default(uuid())
   patientId Int
-  name      String   // 'PCS4', 'TSK11', etc.
+  name      String
   score     Int
   createdAt DateTime @default(now())
-  
   patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  
+
   @@index([patientId])
   @@index([patientId, name, createdAt])
 }
 
 model SRSScore {
-  id                  Int      @id @default(autoincrement())
-  patientId           Int
-  date                DateTime
-  formType            String   // "Intake" or "Follow-Up"
-  region              String
-  
-  // Disability Index data
-  ndi                 Json?    // Neck Disability Index
-  tdi                 Json?    // Thoracic Disability Index (new)
-  odi                 Json?    // Oswestry Disability Index
-  ulfi                Json?    // Upper Limb Functional Index
-  lefs                Json?    // Lower Extremity Functional Scale
-  disabilityPercentage Float?
-  
-  // Pain and Function
-  vas                 Int      // Visual Analog Scale (0-10)
-  psfs                Json     // Patient-Specific Functional Scale
-  
-  // Cognitive Assessment
-  pcs4                Json?    // Pain Catastrophizing Scale (4 items)
-  tsk7                Json?    // Tampa Scale for Kinesiophobia (7 items)
-  beliefs             Json?    // Limiting beliefs (changed to optional JSON)
-  confidence          Int      // Confidence level (0-10)
-  
-  // Follow-up specific
-  groc                Int?     // Global Rating of Change
-  
-  // Calculated values
-  srsScore            Int      // Signature Recovery Score (0-11)
-  beliefStatus        String?  // Status of limiting beliefs
-  
-  // Clinical verification flags
-  recoveryMilestone   Boolean? @default(false)
+  id                       Int      @id @default(autoincrement())
+  patientId                Int
+  date                     DateTime
+  formType                 String
+  region                   String
+  ndi                      Json?
+  tdi                      Json?
+  odi                      Json?
+  ulfi                     Json?
+  lefs                     Json?
+  disabilityPercentage     Float?
+  vas                      Int
+  psfs                     Json
+  pcs4                     Json?
+  tsk7                     Json?
+  beliefs                  Json?
+  confidence               Int
+  groc                     Int?
+  srsScore                 Int
+  beliefStatus             String?
+  recoveryMilestone        Boolean? @default(false)
   clinicalProgressVerified Boolean? @default(false)
-  clinicianAssessed   Boolean? @default(false)
-  grocCaptured        Boolean? @default(false)
-  
-  patient             Patient  @relation(fields: [patientId], references: [id])
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @default(now()) @updatedAt
+  clinicianAssessed        Boolean? @default(false)
+  grocCaptured             Boolean? @default(false)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @default(now()) @updatedAt
+  patient                  Patient  @relation(fields: [patientId], references: [id])
 }
 
 model PatientPortal {
   id        Int      @id @default(autoincrement())
   patientId Int      @unique
-  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
 }
 
-// Recovery Points System
 model RecoveryPoint {
   id        Int      @id @default(autoincrement())
   patientId Int
-  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
   date      DateTime @default(now())
   category  RPType
-  action    String   // Description of the action taken
-  points    Int      // Points earned for this action
-  
+  action    String
+  points    Int
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
   @@index([patientId, category, date])
+}
+
+model SRSBuffer {
+  id           Int      @id @default(autoincrement())
+  patientId    Int      @unique
+  psfsBuffer   Float    @default(0.0)
+  vasBuffer    Float    @default(0.0)
+  confBuffer   Float    @default(0.0)
+  beliefBuffer Float    @default(0.0)
+  movementRP   Int      @default(0)
+  lifestyleRP  Int      @default(0)
+  mindsetRP    Int      @default(0)
+  educationRP  Int      @default(0)
+  updatedAt    DateTime @updatedAt
+  patient      Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+}
+
+model RPThresholdHit {
+  id        Int       @id @default(autoincrement())
+  patientId Int
+  domain    SRSDomain
+  windowEnd DateTime
+  met       Boolean
+  rpTotal   Int
+  createdAt DateTime  @default(now())
+
+  @@unique([patientId, domain, windowEnd])
+  @@index([patientId, domain, windowEnd])
+}
+
+model Message {
+  id          Int        @id @default(autoincrement())
+  patientId   Int
+  subject     String
+  content     String
+  senderType  SenderType
+  senderName  String
+  senderEmail String?
+  isRead      Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  patient     Patient    @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([patientId, createdAt])
+}
+
+model MindfulnessLog {
+  id        Int      @id @default(autoincrement())
+  patientId Int
+  date      DateTime @default(now())
+  practice  String
+  mood      String?
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@unique([patientId, date])
+  @@index([patientId, date])
+}
+
+model TaskCompletion {
+  id              Int      @id @default(autoincrement())
+  patientId       Int
+  taskType        TaskType
+  completedAt     DateTime @default(now())
+  sessionDuration Int?
+  pointsEarned    Int?
+  patient         Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([patientId, taskType, completedAt])
+  @@index([completedAt])
 }
 
 enum RPType {
   MOVEMENT
-  LIFESTYLE  
+  LIFESTYLE
   MINDSET
   EDUCATION
   ADHERENCE
 }
 
-// SRS Buffer - stores partial credit accumulation
-model SRSBuffer {
-  id           Int     @id @default(autoincrement())
-  patientId    Int     @unique
-  patient      Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  
-  // Buffer values (0.0 to domain max)
-  psfsBuffer   Float   @default(0.0)    // Max 2.0 points
-  vasBuffer    Float   @default(0.0)    // Max 1.0 points  
-  confBuffer   Float   @default(0.0)    // Max 2.0 points
-  beliefBuffer Float   @default(0.0)    // Max 1.0 points
-  
-  // RP counters (reset when buffer increments)
-  movementRP   Int     @default(0)      // MOVEMENT category
-  lifestyleRP  Int     @default(0)      // LIFESTYLE category
-  mindsetRP    Int     @default(0)      // MINDSET category
-  educationRP  Int     @default(0)      // EDUCATION category
-  
-  updatedAt    DateTime @updatedAt
-}
-
-// Threshold tracking for clinician alerts
-model RPThresholdHit {
-  id        Int       @id @default(autoincrement())
-  patientId Int
-  domain    SRSDomain // Which SRS domain threshold was hit
-  windowEnd DateTime  // 4-week window end date
-  met       Boolean   // Whether threshold was met
-  rpTotal   Int       // Total RP earned in the window
-  
-  createdAt DateTime  @default(now())
-  
-  @@unique([patientId, domain, windowEnd])
-  @@index([patientId, domain, windowEnd])
-}
-
 enum SRSDomain {
   PSFS
-  VAS  
+  VAS
   CONFIDENCE
   BELIEFS
-}
-
-// Messages between clinicians and patients
-model Message {
-  id          Int      @id @default(autoincrement())
-  patientId   Int
-  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  
-  // Message content
-  subject     String
-  content     String
-  senderType  SenderType // CLINICIAN or PATIENT
-  senderName  String     // Name of the sender
-  senderEmail String?    // Email of the sender (optional)
-  
-  // Message status
-  isRead      Boolean  @default(false)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@index([patientId, createdAt])
 }
 
 enum SenderType {
   CLINICIAN
   PATIENT
-}
-
-// Mindfulness daily tracking
-model MindfulnessLog {
-  id        Int      @id @default(autoincrement())
-  patientId Int
-  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  date      DateTime @default(now())
-  practice  String   // Type of mindfulness practice (breathwork, nsdr, etc.)
-  mood      String?  // Optional mood rating
-  
-  @@unique([patientId, date])
-  @@index([patientId, date])
-}
-
-// Task Completion tracking for "Biggest Win This Week"
-model TaskCompletion {
-  id        Int      @id @default(autoincrement())
-  patientId Int
-  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  
-  // Task details
-  taskType  TaskType // Type of task completed
-  completedAt DateTime @default(now())
-  
-  // Optional metadata
-  sessionDuration Int? // Duration in minutes
-  pointsEarned   Int? // Points earned for this completion
-  
-  @@index([patientId, taskType, completedAt])
-  @@index([completedAt])
 }
 
 enum TaskType {

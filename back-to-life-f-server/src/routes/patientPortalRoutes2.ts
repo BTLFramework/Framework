@@ -85,6 +85,8 @@ router.post('/create-account', async (req: any, res: any) => {
     // Update the password (replacing the temporary one)
     await updatePatientPortalPassword(email, password);
     
+    console.log(`✅ Password updated for patient: ${email}`);
+    
     res.json({ 
       message: 'Account created successfully',
       email: email,
@@ -101,23 +103,36 @@ router.post('/login', async (req: any, res: any) => {
   try {
     const { email, password } = req.body;
     
+    console.log(`🔐 Login attempt for: ${email}`);
+    
     if (!email || !password) {
+      console.log('❌ Missing email or password');
       return res.status(400).json({ error: 'Email and password are required' });
     }
     
     const patientPortal = await findPatientPortalByEmail(email);
     
     if (!patientPortal) {
+      console.log(`❌ No patient portal account found for: ${email}`);
       return res.status(401).json({ error: 'Invalid email or password' });
     }
     
+    console.log(`🔍 Found patient portal account for: ${email}`);
+    console.log(`🔑 Stored password: ${patientPortal.password}`);
+    console.log(`🔑 Provided password: ${password}`);
+    
     if (patientPortal.password !== password) {
+      console.log(`❌ Password mismatch for: ${email}`);
       return res.status(401).json({ error: 'Invalid email or password' });
     }
+    
+    console.log(`✅ Password match for: ${email}`);
     
     // Generate JWT token for patient
     const { generatePatientToken } = require('../services/jwtService');
     const token = generatePatientToken(patientPortal);
+    
+    console.log(`🎫 JWT token generated for: ${email}`);
     
     // Set JWT as HTTP-only cookie
     res.cookie('patientToken', token, {
@@ -128,12 +143,15 @@ router.post('/login', async (req: any, res: any) => {
       path: '/',
     });
     
+    console.log(`✅ Login successful for: ${email}`);
+    
     res.json({
       message: 'Login successful',
       patient: patientPortal.patient
       // Do NOT include token here
     });
   } catch (error) {
+    console.error('❌ Login error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });

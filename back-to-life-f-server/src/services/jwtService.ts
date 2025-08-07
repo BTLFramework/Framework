@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const SETUP_SECRET = process.env.SETUP_SECRET || 'setup-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'back-to-life-jwt-secret-2024-production';
+const SETUP_SECRET = process.env.SETUP_SECRET || 'back-to-life-setup-secret-2024-production';
 
 export interface SetupTokenPayload {
   email: string;
