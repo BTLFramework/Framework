@@ -41,6 +41,7 @@ interface ScoreResult {
 }
 
 // Patient-friendly SRS Configuration
+
 const recoveryAreas = {
   pain: {
     title: "Pain Level (0-10 scale)",

@@ -148,7 +148,7 @@ function ScoreBreakdownSection({ score, intakeData }: { score: number; intakeDat
       {
         title: "Recovery Milestone Achievement",
         description: "Met a meaningful goal in your recovery",
-        points: 0,
+                points: 0,
         achieved: false,
         details: "Not yet assessed",
         icon: <Target className="w-5 h-5" />,
@@ -164,7 +164,7 @@ function ScoreBreakdownSection({ score, intakeData }: { score: number; intakeDat
         icon: <TrendingUp className="w-5 h-5" />,
         category: 'progress',
         helper: "Your therapist will track and update this based on your progress."
-      }
+        }
     ];
     
     setCalculatedScore({ score, breakdown: displayBreakdown, achievedAreas: [], totalDomains: displayBreakdown.length })
@@ -255,7 +255,7 @@ export default function RecoveryScorePage() {
         console.log('🔍 Fetching Amy\'s real data for Recovery Score Details...')
         
         // Fetch Amy's portal data (intake information)
-        const portalResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/patients/portal-data/amy@123.com`)
+        const portalResponse = await fetch('http://localhost:3001/patients/portal-data/amy@123.com')
         
         // Fetch Amy's progress history
         const progressResponse = await fetch('/api/patients/progress-history/amy@123.com')

@@ -49,8 +49,8 @@ export function PainAssessmentCard({ patientId, onClick, isOpen = false }: PainA
       <div className="w-14 h-14 bg-btl-600 rounded-xl flex items-center justify-center mb-4 mt-1 shadow-md">
         <Heart className="w-8 h-8 text-white" />
       </div>
-      <h3 className="font-bold text-lg mb-1 text-center text-black">Pain Assessment</h3>
-      <p className="text-[15px] mb-3 text-center text-black">
+      <h3 className="font-bold text-lg mb-1 text-center text-white">Pain Assessment</h3>
+      <p className="text-[15px] mb-3 text-center text-white">
         {lastAssessment ? "Update your pain levels and track patterns" : "Rate your current pain levels and track patterns"}
       </p>
       <span className="inline-block px-4 py-1 text-xs font-semibold rounded-full bg-btl-100 text-btl-600 mb-3 text-center whitespace-nowrap">
@@ -59,13 +59,13 @@ export function PainAssessmentCard({ patientId, onClick, isOpen = false }: PainA
       <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full ${pillClass} mb-2`}>
         +{points} pts
       </span>
-      <div className="text-btl-600 font-semibold text-sm underline flex items-center gap-1 mb-2 hover:text-btl-700">
+      <div className="text-white font-semibold text-sm underline flex items-center gap-1 mb-2 hover:text-white/80">
         {lastAssessment ? "Update Assessment" : "Begin Assessment"}
         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
         </svg>
       </div>
-      <div className="flex items-center justify-center text-xs text-btl-600/70 mt-auto">
+      <div className="flex items-center justify-center text-xs text-white/70 mt-auto">
         <Clock className="w-4 h-4 mr-1" />3 min
       </div>
     </div>
