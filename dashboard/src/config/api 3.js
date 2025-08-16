@@ -1,26 +1,22 @@
-// API Configuration - FINAL VERSION - FORCE PRODUCTION
+// API Configuration - Use Environment Variable - CACHE BUSTER v2
 const getApiUrl = () => {
+  console.log('🔥 CACHE BUSTER v2 - This should force a new build!');
+  console.log('🔥 Timestamp:', new Date().toISOString());
   // Check if Vite environment variable is available
   const viteApiUrl = import.meta.env.VITE_API_URL;
   console.log('🔍 Vite Environment Check:');
   console.log('  - VITE_API_URL from env:', viteApiUrl);
   console.log('  - Is defined:', !!viteApiUrl);
   
-  // FORCE PRODUCTION URL - NO LOCALHOST EVER
-  const productionUrl = 'https://backend-production-3545.up.railway.app';
-  
-  // Only use localhost if we're actually on localhost
-  if (window.location.hostname === 'localhost') {
-    console.log('🔧 Development mode on localhost, using localhost:3001');
-    return 'http://localhost:3001';
+  // Use environment variable if available, otherwise fallback to production
+  if (viteApiUrl) {
+    console.log('🚀 Using VITE_API_URL from environment:', viteApiUrl);
+    return viteApiUrl;
   }
   
-  // EVERYTHING ELSE USES PRODUCTION - GUARANTEED
-  console.log('🚀 FINAL VERSION: Using production URL:', productionUrl);
-  console.log('  - Hostname:', window.location.hostname);
-  console.log('  - Host:', window.location.host);
-  console.log('  - FINAL VERSION: This MUST work now!');
-  
+  // Fallback to production URL
+  const productionUrl = 'https://backend-production-3545.up.railway.app';
+  console.log('🚀 Using fallback production URL:', productionUrl);
   return productionUrl;
 };
 

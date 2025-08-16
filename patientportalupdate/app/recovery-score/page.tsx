@@ -255,7 +255,7 @@ export default function RecoveryScorePage() {
         console.log('🔍 Fetching Amy\'s real data for Recovery Score Details...')
         
         // Fetch Amy's portal data (intake information)
-        const portalResponse = await fetch('http://localhost:3001/patients/portal-data/amy@123.com')
+        const portalResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/patients/portal-data/amy@123.com`)
         
         // Fetch Amy's progress history
         const progressResponse = await fetch('/api/patients/progress-history/amy@123.com')

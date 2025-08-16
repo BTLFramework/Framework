@@ -164,7 +164,7 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
       const numericPatientId = patientData.data.patient.id
       
       // Submit daily pain and stress assessment to backend
-      const dailyAssessmentResponse = await fetch('http://localhost:3001/patients/daily-assessment', {
+              const dailyAssessmentResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/patients/daily-assessment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
