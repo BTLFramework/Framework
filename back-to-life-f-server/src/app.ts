@@ -15,6 +15,10 @@ import { Request, Response } from "express";
 
 dotenv.config();
 
+// Validate environment variables before starting
+const { validateEnvironment } = require('./config/envValidation');
+validateEnvironment();
+
 const app = express();
 
 // Enhanced logging middleware
