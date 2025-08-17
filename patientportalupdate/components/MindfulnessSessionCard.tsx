@@ -39,7 +39,7 @@ export function MindfulnessSessionCard({ patientId, onClick, isOpen = false }: M
   const availableTracks = mindfulnessData.availableTracks || 3;
   const points = 5;
   // Pills styling (silver for mindfulness)
-  const pillClass = 'bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 text-gray-900 shadow border border-gray-400';
+  const pillClass = 'bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 text-white shadow border border-gray-400';
 
   return (
     <div

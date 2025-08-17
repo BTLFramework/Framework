@@ -49,7 +49,7 @@ export function MovementSessionCard({ onClick }: MovementSessionCardProps) {
   
   // Define metallic pill classes for Movement Session (gold theme)
   const metallicPills = {
-    gold: 'bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-yellow-900 shadow border border-yellow-500 rounded-full',
+    gold: 'bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-white shadow border border-yellow-500 rounded-full',
     silver: 'bg-gradient-to-br from-btl-800 via-btl-600 to-btl-200 text-white shadow border border-btl-500 rounded-full',
     bronze: 'bg-gradient-to-br from-btl-700 via-btl-500 to-btl-300 text-white shadow border border-btl-400 rounded-full',
   };
