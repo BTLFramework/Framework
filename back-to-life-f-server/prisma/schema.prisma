@@ -29,6 +29,7 @@ model Patient {
   srsBuffers        SRSBuffer?
   srsDaily          SRSDaily[]
   srsScores         SRSScore[]
+  practitionerAssessments PractitionerAssessment[]
   taskCompletions   TaskCompletion[]
 }
 
@@ -87,6 +88,74 @@ model SRSScore {
   createdAt                DateTime @default(now())
   updatedAt                DateTime @default(now()) @updatedAt
   patient                  Patient  @relation(fields: [patientId], references: [id])
+}
+
+model PractitionerAssessment {
+  id        Int      @id @default(autoincrement())
+  patientId Int
+  date      DateTime @default(now())
+  
+  // Section 1: Symptom & Key Finding Resolution
+  neurologicalSelected     Boolean  @default(false)
+  neurologicalScore        Float    @default(0)
+  neurologicalNotes        String?
+  
+  mechanicalSelected       Boolean  @default(false)
+  mechanicalScore          Float    @default(0)
+  mechanicalNotes          String?
+  
+  orthopedicSelected       Boolean  @default(false)
+  orthopedicScore          Float    @default(0)
+  orthopedicNotes          String?
+  
+  provocativeSelected      Boolean  @default(false)
+  provocativeScore         Float    @default(0)
+  provocativeNotes         String?
+  
+  // Section 2: Functional & Mechanical Progress
+  romSelected              Boolean  @default(false)
+  romScore                 Float    @default(0)
+  romNotes                 String?
+  
+  functionalSelected       Boolean  @default(false)
+  functionalScore          Float    @default(0)
+  functionalNotes          String?
+  
+  movementSelected         Boolean  @default(false)
+  movementScore            Float    @default(0)
+  movementNotes            String?
+  
+  strengthSelected         Boolean  @default(false)
+  strengthScore            Float    @default(0)
+  strengthNotes            String?
+  
+  balanceSelected          Boolean  @default(false)
+  balanceScore             Float    @default(0)
+  balanceNotes             String?
+  
+  stabilitySelected        Boolean  @default(false)
+  stabilityScore           Float    @default(0)
+  stabilityNotes           String?
+  
+  treatmentSelected        Boolean  @default(false)
+  treatmentScore           Float    @default(0)
+  treatmentNotes           String?
+  
+  // Calculated scores
+  section1Score            Float    @default(0)
+  section2Score            Float    @default(0)
+  totalPractitionerScore   Float    @default(0)
+  
+  // Metadata
+  clinicianId              String?  // ID of the clinician who performed assessment
+  clinicianName            String?  // Name of the clinician
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  
+  patient                  Patient  @relation(fields: [patientId], references: [id])
+  
+  @@index([patientId, date])
+  @@index([clinicianId])
 }
 
 model PatientPortal {

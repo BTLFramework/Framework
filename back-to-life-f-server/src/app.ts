@@ -9,6 +9,7 @@ import patientRoutes from "./routes/patientRoutes";
 import patientPortalRoutes from "./routes/patientPortalRoutes2";
 const recoveryPointsRoutes = require("./routes/recoveryPointsRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const practitionerAssessmentRoutes = require("./routes/practitionerAssessmentRoutes");
 // Use require for getAssignedExercisesByEmail to avoid import issues
 const { getAssignedExercisesByEmail } = require("./models/patientModel");
 import { Request, Response } from "express";
@@ -134,6 +135,7 @@ app.use("/patients", patientRoutes);
 app.use("/api/patient-portal", patientPortalRoutes);
 app.use("/api/recovery-points", recoveryPointsRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/practitioner-assessment", practitionerAssessmentRoutes);
 
 // Direct route for assigned exercises (for Next.js API proxy compatibility)
 app.get("/api/patient-portal/exercises/:email", async (req: any, res: any) => {

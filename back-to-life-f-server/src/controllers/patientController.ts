@@ -46,7 +46,7 @@ const prisma = new PrismaClient();
 import { intakeRules, followUpRules, getPhase } from '../config/srsConfig';
 
 // Standardized SRS calculation function using centralized configuration
-const calculateSRS = (formData: any, previousData?: any) => {
+const calculateSRS = async (formData: any, previousData?: any) => {
   console.log('🔢 Backend: Starting standardized SRS calculation');
   console.log('📊 Form data:', formData);
   console.log('📊 Previous data:', previousData);
@@ -57,7 +57,7 @@ const calculateSRS = (formData: any, previousData?: any) => {
   }
   
   // For follow-up, use standardized follow-up calculation
-  return computeFollowUpSRS(previousData, formData);
+  return await computeFollowUpSRS(previousData, formData);
 };
 
 // Baseline (Intake) SRS Calculation - Range: 0-11 points
@@ -182,7 +182,7 @@ const computeBaselineSRS = (formData: any) => {
 };
 
 // Follow-up SRS Calculation - Range: 0-11 points
-const computeFollowUpSRS = (baselineData: any, currentData: any) => {
+const computeFollowUpSRS = async (baselineData: any, currentData: any) => {
   console.log('🔢 Backend: Starting Follow-up SRS Calculation');
   
   let points = 0;
@@ -251,20 +251,31 @@ const computeFollowUpSRS = (baselineData: any, currentData: any) => {
     breakdown.push(`❌ GROC (${groc}): +0 points`);
   }
 
-  // 7. Clinician Assessments
-  if (currentData.recoveryMilestone) {
-    points += followUpRules.clinician.milestone.points;
-    breakdown.push(`✅ ${followUpRules.clinician.milestone.description}: +${followUpRules.clinician.milestone.points} point`);
+  // 7. Practitioner Assessment Points (replaces generic clinician assessments)
+  let practitionerPoints = 0;
+  
+  // Get the latest practitioner assessment for this patient
+  const practitionerAssessment = await prisma.practitionerAssessment.findFirst({
+    where: { patientId: parseInt(currentData.patientId) },
+    orderBy: { date: 'desc' }
+  });
+  
+  if (practitionerAssessment) {
+    practitionerPoints = practitionerAssessment.totalPractitionerScore;
+    breakdown.push(`✅ Practitioner Assessment: +${practitionerAssessment.totalPractitionerScore} points`);
+    
+    // Add detailed breakdown if available
+    if (practitionerAssessment.section1Score > 0) {
+      breakdown.push(`   - Symptom Resolution: ${practitionerAssessment.section1Score}/1`);
+    }
+    if (practitionerAssessment.section2Score > 0) {
+      breakdown.push(`   - Functional Progress: ${practitionerAssessment.section2Score}/1`);
+    }
   } else {
-    breakdown.push(`❌ ${followUpRules.clinician.milestone.description} (not met): +0 points`);
+    breakdown.push(`❌ No practitioner assessment: +0 points`);
   }
-
-  if (currentData.clinicalProgressVerified) {
-    points += followUpRules.clinician.progress.points;
-    breakdown.push(`✅ ${followUpRules.clinician.progress.description}: +${followUpRules.clinician.progress.points} point`);
-  } else {
-    breakdown.push(`❌ ${followUpRules.clinician.progress.description} (not verified): +0 points`);
-  }
+  
+  points += practitionerPoints;
 
   console.log('📋 Follow-up SRS Calculation Breakdown:');
   breakdown.forEach(item => console.log(`   ${item}`));
@@ -510,7 +521,7 @@ export const submitIntake = async (req: any, res: any) => {
     }
     
     // Calculate SRS score
-    const srsScore = calculateSRS({
+    const srsScore = await calculateSRS({
       vas, psfs, pcs4, tsk7, disabilityPercentage, confidence, beliefs, groc, formType,
       recoveryMilestone, clinicalProgressVerified
     }, previousData);
