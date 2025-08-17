@@ -14,6 +14,7 @@ try {
   prisma = db.default || db;
 } catch (error) {
   console.warn('Could not import centralized DB, creating new Prisma client');
+  const { PrismaClient } = require('@prisma/client');
   prisma = new PrismaClient();
 }
 

@@ -179,8 +179,7 @@ router.get("/profile", async (req: any, res: any) => {
     }
     
     // Include SRS scores in the response
-    const { PrismaClient } = require('@prisma/client');
-    const prisma = new PrismaClient();
+    const prisma = require('../db').default;
     
     const patientWithScores = await prisma.patient.findUnique({
       where: { id: patientPortal.patientId },

@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "../db";
 
 export const createPatient = async (name: string, email: string, intakeDate: Date, dob?: string) => {
   return await prisma.patient.create({ 

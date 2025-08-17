@@ -101,11 +101,9 @@ app.get("/test", (req, res) => {
 // Health check endpoint with database status
 app.get("/health", async (req, res) => {
   try {
-    // Test database connection
-    const { PrismaClient } = require('@prisma/client');
-    const testPrisma = new PrismaClient();
-    await testPrisma.$queryRaw`SELECT 1`;
-    await testPrisma.$disconnect();
+    // Test database connection using centralized Prisma instance
+    const prisma = require('./db').default;
+    await prisma.$queryRaw`SELECT 1`;
     
     res.json({ 
       status: "OK", 
@@ -182,10 +180,16 @@ console.log(`   - PORT: ${process.env.PORT}`);
 console.log(`   - JWT_SECRET: ${process.env.JWT_SECRET ? 'Set' : 'Not set'}`);
 console.log(`   - SETUP_SECRET: ${process.env.SETUP_SECRET ? 'Set' : 'Not set'}`);
 
-app.listen(PORT, () => {
-  console.log(`✅ HTTP Server running at http://localhost:${PORT}`);
-  console.log(`🏥 Health check available at http://localhost:${PORT}/health`);
-  console.log(`👥 Patient routes available at http://localhost:${PORT}/patients`);
+// Use Railway's PORT or fallback to 3001
+const serverPort = parseInt(process.env.PORT || '3001', 10);
+
+app.listen(serverPort, '0.0.0.0', () => {
+  console.log(`✅ HTTP Server running at http://0.0.0.0:${serverPort}`);
+  console.log(`🏥 Health check available at http://0.0.0.0:${serverPort}/health`);
+  console.log(`👥 Patient routes available at http://0.0.0.0:${serverPort}/patients`);
+}).on('error', (err) => {
+  console.error('❌ Server failed to start:', err);
+  process.exit(1);
 });
 
 export default app;

@@ -1,9 +1,7 @@
 import { Router } from "express";
 import { submitIntake, getPatientLatestScore, getAllPatientsWithScores, deletePatient, getPatientRecoveryPointsData, getPhaseByScore } from "../controllers/patientController";
 import { findPatientByEmail, getLatestSRSScore } from "../models/patientModel";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "../db";
 
 const router = Router();
 
@@ -151,8 +149,7 @@ router.get("/:id/srs-scores", async (req: any, res: any) => {
       return res.status(400).json({ error: "Invalid patient ID" });
     }
     
-    const { PrismaClient } = require('@prisma/client');
-    const prisma = new PrismaClient();
+    const prisma = require('../db').default;
     
     const srsScores = await prisma.sRSScore.findMany({
       where: { patientId },

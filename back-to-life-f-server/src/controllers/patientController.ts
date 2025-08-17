@@ -40,7 +40,7 @@ const calculateTSK7Score = (tsk7Data: any) => {
   return validResponses === 7 ? totalScore : null;
 };
 
-const prisma = new PrismaClient();
+import prisma from '../db';
 
 // Import standardized SRS configuration
 import { intakeRules, followUpRules, getPhase } from '../config/srsConfig';
