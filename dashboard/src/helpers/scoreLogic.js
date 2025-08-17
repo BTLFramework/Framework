@@ -51,6 +51,16 @@ export function calculateSRS(data) {
     score += 1;
   }
 
+  // Clinician Assessment (Recovery Milestone)
+  if (data.recoveryMilestone) {
+    score += 1;
+  }
+
+  // Clinician Assessment (Clinical Progress Verified)
+  if (data.clinicalProgressVerified) {
+    score += 1;
+  }
+
   // Cap at 11
   return Math.min(score, 11);
 }

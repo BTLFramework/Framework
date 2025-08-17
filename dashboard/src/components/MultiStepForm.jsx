@@ -12,6 +12,7 @@ import DailyActivities from "./steps/DailyActivities";
 import Beliefs from "./steps/Beliefs";
 import Confidence from "./steps/Confidence";
 import GROC from "./steps/GROC";
+import ClinicianInput from "./steps/ClinicianInput";
 
 export default function MultiStepForm() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -40,6 +41,8 @@ export default function MultiStepForm() {
     beliefs: [],
     confidence: 0,
     groc: 0, // Follow‐up only
+    recoveryMilestone: false,
+    clinicalProgressVerified: false,
   });
 
   // Steps array changes based on formType
@@ -53,6 +56,7 @@ export default function MultiStepForm() {
           "Beliefs",
           "Confidence",
           "GROC",
+          "Clinician Input",
         ]
       : [
           "Patient Info",
@@ -61,6 +65,7 @@ export default function MultiStepForm() {
           "Daily Activities",
           "Beliefs",
           "Confidence",
+          "Clinician Input",
         ];
 
   // Handle simple onChange events for text/select/radio/checkbox
@@ -274,6 +279,11 @@ export default function MultiStepForm() {
         {/* GROC only if “Follow-Up” */}
         {formData.formType === "Follow-Up" && currentStep === 6 && (
           <GROC formData={formData} onChange={handleChange} />
+        )}
+
+        {/* Clinician Input step */}
+        {currentStep === (formData.formType === "Follow-Up" ? 7 : 6) && (
+          <ClinicianInput formData={formData} onChange={handleChange} />
         )}
 
         {/* Navigation Buttons */}
