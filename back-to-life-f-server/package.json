@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
-    "start": "node dist/app.js",
+    "start": "npx prisma generate && node dist/app.js",
     "postinstall": "npx prisma generate",
-    "build": "npx prisma generate && tsc && cp src/config/recoveryPointsConfig.js dist/config/ && cp src/config/tdiQuestions.js dist/config/ && cp src/config/regionConfig.js dist/config/ && cp src/config/envValidation.js dist/config/ && cp -r src/routes/*.js dist/routes/ && cp -r src/services/*.js dist/services/ && cp -r node_modules/@prisma dist/ && echo 'Build completed successfully with envValidation.js'"
+    "build": "tsc && cp src/config/recoveryPointsConfig.js dist/config/ && cp src/config/tdiQuestions.js dist/config/ && cp src/config/regionConfig.js dist/config/ && cp src/config/envValidation.js dist/config/ && cp -r src/routes/*.js dist/routes/ && cp -r src/services/*.js dist/services/ && cp -r node_modules/@prisma dist/ && echo 'Build completed successfully with envValidation.js'"
   },
   "keywords": [],
   "author": "",
