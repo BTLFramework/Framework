@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { API_URL } from "../config/api";
 
 // Helper function to get disability color based on region and score
 const getDisabilityColor = (region, score) => {
@@ -151,6 +150,24 @@ function PatientModal({ patient, onClose }) {
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [messageText, setMessageText] = useState('');
   const [messageSubject, setMessageSubject] = useState('');
+  
+  // Practitioner Assessment State
+  const [practitionerAssessment, setPractitionerAssessment] = useState({
+    // Section 1: Symptom & Key Finding Resolution
+    neurological: { selected: false, score: '0', notes: '' },
+    mechanical: { selected: false, score: '0', notes: '' },
+    orthopedic: { selected: false, score: '0', notes: '' },
+    provocative: { selected: false, score: '0', notes: '' },
+    
+    // Section 2: Functional & Mechanical Progress
+    rom: { selected: false, score: '0', notes: '' },
+    functional: { selected: false, score: '0', notes: '' },
+    movement: { selected: false, score: '0', notes: '' },
+    strength: { selected: false, score: '0', notes: '' },
+    balance: { selected: false, score: '0', notes: '' },
+    stability: { selected: false, score: '0', notes: '' },
+    treatment: { selected: false, score: '0', notes: '' }
+  });
 
   if (!patient) {
     return null;
@@ -188,6 +205,75 @@ function PatientModal({ patient, onClose }) {
 
   // Beliefs
   const beliefs = patient.beliefs || [];
+  
+  // Practitioner Assessment Handlers
+  const handlePractitionerAssessmentChange = (category, field, value) => {
+    setPractitionerAssessment(prev => ({
+      ...prev,
+      [category]: {
+        ...prev[category],
+        [field]: value
+      }
+    }));
+  };
+  
+  const calculateSection1Score = () => {
+    const selectedItems = Object.values(practitionerAssessment)
+      .filter(item => item.selected && ['neurological', 'mechanical', 'orthopedic', 'provocative'].includes(Object.keys(practitionerAssessment).find(key => practitionerAssessment[key] === item)))
+      .map(item => parseFloat(item.score));
+    
+    if (selectedItems.length === 0) return 0;
+    return Math.min(1, selectedItems.reduce((sum, score) => sum + score, 0) / selectedItems.length);
+  };
+  
+  const calculateSection2Score = () => {
+    const selectedItems = Object.values(practitionerAssessment)
+      .filter(item => item.selected && ['rom', 'functional', 'movement', 'strength', 'balance', 'stability', 'treatment'].includes(Object.keys(practitionerAssessment).find(key => practitionerAssessment[key] === item)))
+      .map(item => parseFloat(item.score));
+    
+    if (selectedItems.length === 0) return 0;
+    return Math.min(1, selectedItems.reduce((sum, score) => sum + score, 0) / selectedItems.length);
+  };
+  
+  const calculateTotalPractitionerScore = () => {
+    const section1Score = calculateSection1Score();
+    const section2Score = calculateSection2Score();
+    return Math.round((section1Score + section2Score) * 10) / 10;
+  };
+  
+  const handleSavePractitionerAssessment = async () => {
+    try {
+      const assessmentData = {
+        patientId: patient.id,
+        ...practitionerAssessment,
+        clinicianId: 'clinician-001', // TODO: Get from auth context
+        clinicianName: 'Dr. Practitioner' // TODO: Get from auth context
+      };
+
+      const response = await fetch('http://localhost:3001/api/practitioner-assessment/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(assessmentData)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Assessment saved successfully:', result);
+        alert('Practitioner assessment saved successfully!');
+        
+        // TODO: Refresh patient data to show updated SRS score
+        // This would typically trigger a refresh of the patient list
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save assessment');
+      }
+    } catch (error) {
+      console.error('Error saving practitioner assessment:', error);
+      alert(`Failed to save assessment: ${error.message}`);
+    }
+  };
 
   return (
     <div 
@@ -951,6 +1037,593 @@ function PatientModal({ patient, onClose }) {
                 </div>
               </div>
 
+              {/* SRS Practitioner Assessment */}
+              <div 
+                style={{
+                  background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+                  padding: '24px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}
+              >
+                <h4 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#1e293b', marginBottom: '20px', margin: 0 }}>
+                  SRS Practitioner Assessment
+                </h4>
+                
+                {/* Section 1: Symptom & Key Finding Resolution */}
+                <div style={{ marginBottom: '24px' }}>
+                  <h5 style={{ fontSize: '1rem', fontWeight: 600, color: '#475569', marginBottom: '16px', margin: 0 }}>
+                    1️⃣ Symptom & Key Finding Resolution (max 1 point)
+                  </h5>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '12px', alignItems: 'center', marginBottom: '12px' }}>
+                    <div style={{ fontWeight: '500', color: '#374151' }}>Criteria</div>
+                    <div style={{ fontWeight: '500', color: '#374151', textAlign: 'center' }}>Score</div>
+                    <div style={{ fontWeight: '500', color: '#374151', textAlign: 'center' }}>Notes</div>
+                  </div>
+                  
+                  {/* Neurological */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '12px', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={practitionerAssessment.neurological.selected}
+                        onChange={(e) => handlePractitionerAssessmentChange('neurological', 'selected', e.target.checked)}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <span>Neurological: radicular pain, sensory changes, reflexes</span>
+                    </div>
+                    <select 
+                      value={practitionerAssessment.neurological.score}
+                      onChange={(e) => handlePractitionerAssessmentChange('neurological', 'score', e.target.value)}
+                      disabled={!practitionerAssessment.neurological.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.neurological.selected ? 'white' : '#f9fafb'
+                      }}
+                    >
+                      <option value="0">0</option>
+                      <option value="0.5">0.5</option>
+                      <option value="1">1</option>
+                    </select>
+                    <input 
+                      type="text" 
+                      placeholder="Clinical details..."
+                      value={practitionerAssessment.neurological.notes}
+                      onChange={(e) => handlePractitionerAssessmentChange('neurological', 'notes', e.target.value)}
+                      disabled={!practitionerAssessment.neurological.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.neurological.selected ? 'white' : '#f9fafb'
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Mechanical/Local Pain */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '12px', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={practitionerAssessment.mechanical.selected}
+                        onChange={(e) => handlePractitionerAssessmentChange('mechanical', 'selected', e.target.checked)}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <span>Mechanical/local pain: facet, SIJ, muscle hypertonicity</span>
+                    </div>
+                    <select 
+                      value={practitionerAssessment.mechanical.score}
+                      onChange={(e) => handlePractitionerAssessmentChange('mechanical', 'score', e.target.value)}
+                      disabled={!practitionerAssessment.mechanical.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.mechanical.selected ? 'white' : '#f9fafb'
+                      }}
+                    >
+                      <option value="0">0</option>
+                      <option value="0.5">0.5</option>
+                      <option value="1">1</option>
+                    </select>
+                    <input 
+                      type="text" 
+                      placeholder="Clinical details..."
+                      value={practitionerAssessment.mechanical.notes}
+                      onChange={(e) => handlePractitionerAssessmentChange('mechanical', 'notes', e.target.value)}
+                      disabled={!practitionerAssessment.mechanical.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.mechanical.selected ? 'white' : '#f9fafb'
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Orthopedic Tests */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '12px', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={practitionerAssessment.orthopedic.selected}
+                        onChange={(e) => handlePractitionerAssessmentChange('orthopedic', 'selected', e.target.checked)}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <span>Orthopedic test resolution</span>
+                    </div>
+                    <select 
+                      value={practitionerAssessment.orthopedic.score}
+                      onChange={(e) => handlePractitionerAssessmentChange('orthopedic', 'score', e.target.value)}
+                      disabled={!practitionerAssessment.orthopedic.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.orthopedic.selected ? 'white' : '#f9fafb'
+                      }}
+                    >
+                      <option value="0">0</option>
+                      <option value="0.5">0.5</option>
+                      <option value="1">1</option>
+                    </select>
+                    <input 
+                      type="text" 
+                      placeholder="Clinical details..."
+                      value={practitionerAssessment.orthopedic.notes}
+                      onChange={(e) => handlePractitionerAssessmentChange('orthopedic', 'notes', e.target.value)}
+                      disabled={!practitionerAssessment.orthopedic.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.orthopedic.selected ? 'white' : '#f9fafb'
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Provocative Movements */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '12px', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={practitionerAssessment.provocative.selected}
+                        onChange={(e) => handlePractitionerAssessmentChange('provocative', 'selected', e.target.checked)}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <span>Pain during provocative movements</span>
+                    </div>
+                    <select 
+                      value={practitionerAssessment.provocative.score}
+                      onChange={(e) => handlePractitionerAssessmentChange('provocative', 'score', e.target.value)}
+                      disabled={!practitionerAssessment.provocative.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.provocative.selected ? 'white' : '#f9fafb'
+                      }}
+                    >
+                      <option value="0">0</option>
+                      <option value="0.5">0.5</option>
+                      <option value="1">1</option>
+                    </select>
+                    <input 
+                      type="text" 
+                      placeholder="Clinical details..."
+                      value={practitionerAssessment.provocative.notes}
+                      onChange={(e) => handlePractitionerAssessmentChange('provocative', 'notes', e.target.value)}
+                      disabled={!practitionerAssessment.provocative.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.provocative.selected ? 'white' : '#f9fafb'
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Section 1 Score Summary */}
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center', 
+                    marginTop: '16px',
+                    padding: '12px',
+                    backgroundColor: '#f8fafc',
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0'
+                  }}>
+                    <span style={{ fontWeight: '500', color: '#475569' }}>Section 1 Score:</span>
+                    <span style={{ 
+                      fontSize: '1.125rem', 
+                      fontWeight: 'bold', 
+                      color: '#0c4a6e',
+                      padding: '4px 12px',
+                      backgroundColor: 'white',
+                      borderRadius: '6px',
+                      border: '1px solid #0ea5e9'
+                    }}>
+                      {calculateSection1Score()}/1
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Section 2: Functional & Mechanical Progress */}
+                <div style={{ marginBottom: '24px' }}>
+                  <h5 style={{ fontSize: '1rem', fontWeight: '600', color: '#475569', marginBottom: '16px', margin: 0 }}>
+                    2️⃣ Functional & Mechanical Progress (max 1 point)
+                  </h5>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '12px', alignItems: 'center', marginBottom: '12px' }}>
+                    <div style={{ fontWeight: '500', color: '#374151' }}>Criteria</div>
+                    <div style={{ fontWeight: '500', color: '#374151', textAlign: 'center' }}>Score</div>
+                    <div style={{ fontWeight: '500', color: '#374151', textAlign: 'center' }}>Notes</div>
+                  </div>
+                  
+                  {/* ROM/Flexibility */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '12px', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={practitionerAssessment.rom.selected}
+                        onChange={(e) => handlePractitionerAssessmentChange('rom', 'selected', e.target.checked)}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <span>ROM/Flexibility</span>
+                    </div>
+                    <select 
+                      value={practitionerAssessment.rom.score}
+                      onChange={(e) => handlePractitionerAssessmentChange('rom', 'score', e.target.value)}
+                      disabled={!practitionerAssessment.rom.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.rom.selected ? 'white' : '#f9fafb'
+                      }}
+                    >
+                      <option value="0">0</option>
+                      <option value="0.5">0.5</option>
+                      <option value="1">1</option>
+                    </select>
+                    <input 
+                      type="text" 
+                      placeholder="Clinical details..."
+                      value={practitionerAssessment.rom.notes}
+                      onChange={(e) => handlePractitionerAssessmentChange('rom', 'notes', e.target.value)}
+                      disabled={!practitionerAssessment.rom.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.rom.selected ? 'white' : '#f9fafb'
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Functional Tasks */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '12px', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={practitionerAssessment.functional.selected}
+                        onChange={(e) => handlePractitionerAssessmentChange('functional', 'selected', e.target.checked)}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <span>Functional Tasks</span>
+                    </div>
+                    <select 
+                      value={practitionerAssessment.functional.score}
+                      onChange={(e) => handlePractitionerAssessmentChange('functional', 'score', e.target.value)}
+                      disabled={!practitionerAssessment.functional.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.functional.selected ? 'white' : '#f9fafb'
+                      }}
+                    >
+                      <option value="0">0</option>
+                      <option value="0.5">0.5</option>
+                      <option value="1">1</option>
+                    </select>
+                    <input 
+                      type="text" 
+                      placeholder="Clinical details..."
+                      value={practitionerAssessment.functional.notes}
+                      onChange={(e) => handlePractitionerAssessmentChange('functional', 'notes', e.target.value)}
+                      disabled={!practitionerAssessment.functional.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.functional.selected ? 'white' : '#f9fafb'
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Movement Pattern/Posture */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '12px', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={practitionerAssessment.movement.selected}
+                        onChange={(e) => handlePractitionerAssessmentChange('movement', 'selected', e.target.checked)}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <span>Movement Pattern/Posture</span>
+                    </div>
+                    <select 
+                      value={practitionerAssessment.movement.score}
+                      onChange={(e) => handlePractitionerAssessmentChange('movement', 'score', e.target.value)}
+                      disabled={!practitionerAssessment.movement.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.movement.selected ? 'white' : '#f9fafb'
+                      }}
+                    >
+                      <option value="0">0</option>
+                      <option value="0.5">0.5</option>
+                      <option value="1">1</option>
+                    </select>
+                    <input 
+                      type="text" 
+                      placeholder="Clinical details..."
+                      value={practitionerAssessment.movement.notes}
+                      onChange={(e) => handlePractitionerAssessmentChange('movement', 'notes', e.target.value)}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.movement.selected ? 'white' : '#f9fafb'
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Strength/MMT */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '12px', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={practitionerAssessment.strength.selected}
+                        onChange={(e) => handlePractitionerAssessmentChange('strength', 'selected', e.target.checked)}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <span>Strength/MMT</span>
+                    </div>
+                    <select 
+                      value={practitionerAssessment.strength.score}
+                      onChange={(e) => handlePractitionerAssessmentChange('strength', 'score', e.target.value)}
+                      disabled={!practitionerAssessment.strength.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.strength.selected ? 'white' : '#f9fafb'
+                      }}
+                    >
+                      <option value="0">0</option>
+                      <option value="0.5">0.5</option>
+                      <option value="1">1</option>
+                    </select>
+                    <input 
+                      type="text" 
+                      placeholder="Clinical details..."
+                      value={practitionerAssessment.strength.notes}
+                      onChange={(e) => handlePractitionerAssessmentChange('strength', 'notes', e.target.value)}
+                      disabled={!practitionerAssessment.strength.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.strength.selected ? 'white' : '#f9fafb'
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Balance/Proprioception */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '12px', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={practitionerAssessment.balance.selected}
+                        onChange={(e) => handlePractitionerAssessmentChange('balance', 'selected', e.target.checked)}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <span>Balance/Proprioception</span>
+                    </div>
+                    <select 
+                      value={practitionerAssessment.balance.score}
+                      onChange={(e) => handlePractitionerAssessmentChange('balance', 'score', e.target.value)}
+                      disabled={!practitionerAssessment.balance.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.balance.selected ? 'white' : '#f9fafb'
+                      }}
+                    >
+                      <option value="0">0</option>
+                      <option value="0.5">0.5</option>
+                      <option value="1">1</option>
+                    </select>
+                    <input 
+                      type="text" 
+                      placeholder="Clinical details..."
+                      value={practitionerAssessment.balance.notes}
+                      onChange={(e) => handlePractitionerAssessmentChange('balance', 'notes', e.target.value)}
+                      disabled={!practitionerAssessment.balance.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.balance.selected ? 'white' : '#f9fafb'
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Stability/Endurance */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '12px', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={practitionerAssessment.stability.selected}
+                        onChange={(e) => handlePractitionerAssessmentChange('stability', 'selected', e.target.checked)}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <span>Stability/Endurance</span>
+                    </div>
+                    <select 
+                      value={practitionerAssessment.stability.score}
+                      onChange={(e) => handlePractitionerAssessmentChange('stability', 'score', e.target.value)}
+                      disabled={!practitionerAssessment.stability.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.stability.selected ? 'white' : '#f9fafb'
+                      }}
+                    >
+                      <option value="0">0</option>
+                      <option value="0.5">0.5</option>
+                      <option value="1">1</option>
+                    </select>
+                    <input 
+                      type="text" 
+                      placeholder="Clinical details..."
+                      value={practitionerAssessment.stability.notes}
+                      onChange={(e) => handlePractitionerAssessmentChange('stability', 'notes', e.target.value)}
+                      disabled={!practitionerAssessment.stability.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.stability.selected ? 'white' : '#f9fafb'
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Treatment Response */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '12px', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f1f5f9' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={practitionerAssessment.treatment.selected}
+                        onChange={(e) => handlePractitionerAssessmentChange('treatment', 'selected', e.target.checked)}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <span>Positive Response to Treatment</span>
+                    </div>
+                    <select 
+                      value={practitionerAssessment.treatment.score}
+                      onChange={(e) => handlePractitionerAssessmentChange('treatment', 'score', e.target.value)}
+                      disabled={!practitionerAssessment.treatment.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.treatment.selected ? 'white' : '#f9fafb'
+                      }}
+                    >
+                      <option value="0">0</option>
+                      <option value="0.5">0.5</option>
+                      <option value="1">1</option>
+                    </select>
+                    <input 
+                      type="text" 
+                      placeholder="Clinical details..."
+                      value={practitionerAssessment.treatment.notes}
+                      onChange={(e) => handlePractitionerAssessmentChange('treatment', 'notes', e.target.value)}
+                      disabled={!practitionerAssessment.treatment.selected}
+                      style={{ 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        border: '1px solid #d1d5db',
+                        backgroundColor: practitionerAssessment.treatment.selected ? 'white' : '#f9fafb'
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Section 2 Score Summary */}
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center', 
+                    marginTop: '16px',
+                    padding: '12px',
+                    backgroundColor: '#f8fafc',
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0'
+                  }}>
+                    <span style={{ fontWeight: '500', color: '#475569' }}>Section 2 Score:</span>
+                    <span style={{ 
+                      fontSize: '1.125rem', 
+                      fontWeight: 'bold', 
+                      color: '#0c4a6e',
+                      padding: '4px 12px',
+                      backgroundColor: 'white',
+                      borderRadius: '6px',
+                      border: '1px solid #0ea5e9'
+                    }}>
+                      {calculateSection2Score()}/1
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Total Practitioner Score */}
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center', 
+                  padding: '16px',
+                  background: 'linear-gradient(135deg, #0ea5e9 0%, #0891b2 100%)',
+                  borderRadius: '12px',
+                  border: '2px solid #0ea5e9'
+                }}>
+                  <span style={{ fontWeight: '600', color: 'white', fontSize: '1.125rem' }}>
+                    Total Practitioner Points:
+                  </span>
+                  <span style={{ 
+                    fontSize: '1.5rem', 
+                    fontWeight: 'bold', 
+                    color: 'white',
+                    padding: '8px 16px',
+                    backgroundColor: 'rgba(255,255,255,0.2)',
+                    borderRadius: '8px'
+                  }}>
+                    {calculateTotalPractitionerScore()}/2
+                  </span>
+                </div>
+                
+                {/* Save Button */}
+                <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                  <button 
+                    onClick={handleSavePractitionerAssessment}
+                    style={{
+                      padding: '12px 24px',
+                      fontSize: '1rem',
+                      fontWeight: '600',
+                      color: 'white',
+                      backgroundColor: '#0ea5e9',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseOver={(e) => e.target.style.backgroundColor = '#0891b2'}
+                    onMouseOut={(e) => e.target.style.backgroundColor = '#0ea5e9'}
+                  >
+                    Save Practitioner Assessment
+                  </button>
+                </div>
+              </div>
+
               {/* Notes Area */}
               <div 
                 style={{
@@ -1128,7 +1801,7 @@ function PatientModal({ patient, onClose }) {
               }}
               onClick={async () => {
                 try {
-                  const response = await fetch(`${API_URL}/api/messages/send`, {
+                  const response = await fetch('http://localhost:3001/api/messages/send', {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
@@ -1392,7 +2065,7 @@ function PatientModal({ patient, onClose }) {
                 <button 
                   onClick={async () => {
                     try {
-                      const response = await fetch(`${API_URL}/api/messages/send`, {
+                      const response = await fetch('http://localhost:3001/api/messages/send', {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',
