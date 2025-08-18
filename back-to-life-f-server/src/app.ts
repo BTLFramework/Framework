@@ -54,17 +54,42 @@ const allowedOrigins = [
   "https://theframework-dashboard.vercel.app",
   "https://dashboard-e9khyy8u1-theframework.vercel.app",
   "https://dashboard-4xar3wl7e-theframework.vercel.app",
+  // Patient Portal domains (add your actual Vercel domains here)
+  "https://patientportalupdate.vercel.app",
+  "https://patientportalupdate-theframework.vercel.app",
+  // Environment variable fallbacks
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
   ...(process.env.PATIENT_PORTAL_URL ? [process.env.PATIENT_PORTAL_URL] : []),
   ...(process.env.CLINICIAN_DASHBOARD_URL ? [process.env.CLINICIAN_DASHBOARD_URL] : [])
 ];
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log(`🚫 CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With'],
-  optionsSuccessStatus: 200
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization', 
+    'Cookie', 
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Access-Control-Request-Method',
+    'Access-Control-Request-Headers'
+  ],
+  exposedHeaders: ['Set-Cookie'],
+  optionsSuccessStatus: 200,
+  preflightContinue: false
 }));
 
 app.use(express.json({ limit: '10mb' }));
