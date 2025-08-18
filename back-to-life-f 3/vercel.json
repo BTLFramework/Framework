@@ -1,5 +1,4 @@
 {
-  "name": "theframework-dashboard",
   "version": 2,
   "routes": [
     {
@@ -12,6 +11,6 @@
     }
   ],
   "env": {
-    "NEXT_PUBLIC_API_URL": "@api-url"
+    "NEXT_PUBLIC_API_URL": "https://backend-production-3545.up.railway.app"
   }
 } 
