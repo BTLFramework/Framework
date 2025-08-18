@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { API_URL } from "../config/api";
 
 // Helper function to get disability color based on region and score
 const getDisabilityColor = (region, score) => {
@@ -256,7 +257,7 @@ function PatientModal({ patient, onClose }) {
         clinicianName: 'Dr. Practitioner' // TODO: Get from auth context
       };
 
-      const response = await fetch('http://localhost:3001/api/practitioner-assessment/save', {
+      const response = await fetch(`${API_URL}/api/practitioner-assessment/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -298,7 +299,7 @@ function PatientModal({ patient, onClose }) {
         clinicianName: 'Dr. Practitioner' // TODO: Get from auth context
       };
 
-      const response = await fetch('http://localhost:3001/api/clinician-assessment/save', {
+      const response = await fetch(`${API_URL}/api/clinician-assessment/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1942,7 +1943,7 @@ function PatientModal({ patient, onClose }) {
               }}
               onClick={async () => {
                 try {
-                  const response = await fetch('http://localhost:3001/api/messages/send', {
+                  const response = await fetch(`${API_URL}/api/messages/send`, {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
@@ -2206,7 +2207,7 @@ function PatientModal({ patient, onClose }) {
                 <button 
                   onClick={async () => {
                     try {
-                      const response = await fetch('http://localhost:3001/api/messages/send', {
+                      const response = await fetch(`${API_URL}/api/messages/send`, {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',
