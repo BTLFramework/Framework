@@ -54,14 +54,14 @@ const PatientRecoveryDashboard: React.FC = () => {
 
     try {
       // Get baseline data
-              const portalResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/patients/portal-data/${patient.email}`)
+              const portalResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-3545.up.railway.app'}/patients/portal-data/${patient.email}`)
       if (!portalResponse.ok) return
 
       const portalData = await portalResponse.json()
       const baselineVAS = portalData.data.vas || 5
       
       // Get current daily data
-              const dailyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/patients/daily-data/${patient.email}`)
+              const dailyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-3545.up.railway.app'}/patients/daily-data/${patient.email}`)
       let currentPain = baselineVAS
       let currentStress = 2 // Default stress level
       
@@ -153,7 +153,7 @@ const PatientRecoveryDashboard: React.FC = () => {
       setLoading(true)
       console.log('🔄 Refreshing patient data from backend...')
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/patients/portal-data/${patient.email}`)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-3545.up.railway.app'}/patients/portal-data/${patient.email}`)
       if (response.ok) {
         const result = await response.json()
         
@@ -202,7 +202,7 @@ const PatientRecoveryDashboard: React.FC = () => {
       
       // Optional: Record activity in backend
       try {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/patients/activity`, {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-3545.up.railway.app'}/patients/activity`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -230,7 +230,7 @@ const PatientRecoveryDashboard: React.FC = () => {
   useEffect(() => {
     const recordPortalVisit = async () => {
       try {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/patients/update-engagement`, {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-3545.up.railway.app'}/patients/update-engagement`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -359,7 +359,7 @@ const PatientRecoveryDashboard: React.FC = () => {
       console.log('🔍 Fetching patient intake data for SRS breakdown...')
       
       // Fetch current patient's portal data which includes intake information
-      const response = await fetch(`${process.env.BACKEND_URL || 'http://localhost:3001'}/patients/portal-data/${patient.email}`)
+              const response = await fetch(`${process.env.BACKEND_URL || 'https://backend-production-3545.up.railway.app'}/patients/portal-data/${patient.email}`)
       if (response.ok) {
         const result = await response.json()
         console.log('📊 Patient portal data:', result.data)

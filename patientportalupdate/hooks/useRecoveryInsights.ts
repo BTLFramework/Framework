@@ -182,7 +182,7 @@ function personalizeInsights(patientData: any): RecoveryInsight[] {
       if (!patientData.patient?.email) return;
       
       try {
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-3545.up.railway.app';
         const response = await fetch(`${backendUrl}/patients/daily-data/${patientData.patient.email}`);
         if (response.ok) {
           const result = await response.json();

@@ -13,7 +13,7 @@ const fetchPatientsFromAPI = async () => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
     
-    const response = await fetch('http://localhost:3001/patients', {
+    const response = await fetch('https://backend-production-3545.up.railway.app/patients', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -249,7 +249,7 @@ function Dashboard() {
       
       // Delete each patient from the backend
       const deletePromises = patientIds.map(async (patientId) => {
-        const response = await fetch(`http://localhost:3001/patients/${patientId}`, {
+        const response = await fetch(`https://backend-production-3545.up.railway.app/patients/${patientId}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',

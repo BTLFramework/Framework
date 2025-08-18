@@ -8,6 +8,9 @@ export default defineConfig({
     port: 5175,
     strictPort: true
   },
+  define: {
+    'import.meta.env.VITE_API_URL': JSON.stringify('https://backend-production-3545.up.railway.app')
+  },
   build: {
     outDir: 'dist',
     assetsDir: 'assets',

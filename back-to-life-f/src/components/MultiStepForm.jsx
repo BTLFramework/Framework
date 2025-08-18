@@ -454,7 +454,7 @@ export default function MultiStepForm() {
 
       // Submit to patient portal API
       
-      const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const backendUrl = import.meta.env.VITE_API_URL || 'https://backend-production-3545.up.railway.app';
       const response = await fetch(`${backendUrl}/patients/submit-intake`, {
         method: 'POST',
         headers: {

@@ -6,7 +6,7 @@ export async function GET(
 ) {
   try {
     const { email } = await params;
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-3545.up.railway.app';
     
     // Proxy the request to the backend server
     const response = await fetch(`${backendUrl}/api/patient-portal/exercises/${email}`, {

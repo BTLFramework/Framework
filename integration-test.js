@@ -15,7 +15,7 @@ const fetch = require('node-fetch');
 // Test configuration
 const config = {
   patientPortal: 'http://localhost:3000',
-  backendServer: 'http://localhost:3001',
+  backendServer: 'https://backend-production-3545.up.railway.app',
   clinicianDashboard: 'http://localhost:5178'
 };
 

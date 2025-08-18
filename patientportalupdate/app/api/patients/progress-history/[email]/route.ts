@@ -5,7 +5,7 @@ export async function GET(
   { params }: { params: Promise<{ email: string }> }
 ) {
   try {
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-3545.up.railway.app';
     const { email } = await params;
 
     console.log(`📊 Frontend API: Fetching progress history for ${email}`);

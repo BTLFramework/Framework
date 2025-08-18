@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     console.log('Patient Portal - Fetching intake data for:', patientEmail)
     
     // Fetch patient data from backend server
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-3545.up.railway.app';
     const backendResponse = await fetch(`${backendUrl}/patients/by-email/${encodeURIComponent(patientEmail)}`, {
       method: 'GET',
       headers: {

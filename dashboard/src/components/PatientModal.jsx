@@ -183,6 +183,12 @@ function PatientModal({ patient, onClose }) {
     reviewed: false
   });
 
+  // Clinical Notes State
+  const [clinicalNotes, setClinicalNotes] = useState([]);
+  const [showAddNoteModal, setShowAddNoteModal] = useState(false);
+  const [newNoteText, setNewNoteText] = useState('');
+  const [newNoteType, setNewNoteType] = useState('general');
+
   if (!patient) {
     return null;
   }
@@ -421,6 +427,81 @@ function PatientModal({ patient, onClose }) {
     } catch (error) {
       console.error('Error marking patient as reviewed:', error);
       alert(`Failed to mark patient as reviewed: ${error.message}`);
+    }
+  };
+
+  // Clinical Notes Handlers
+  const handleAddNote = async () => {
+    if (!newNoteText.trim()) {
+      alert('Please enter a note before saving.');
+      return;
+    }
+
+    try {
+      const noteData = {
+        patientId: patient.id,
+        text: newNoteText.trim(),
+        type: newNoteType,
+        createdAt: new Date().toISOString(),
+        clinicianId: 'clinician-001',
+        clinicianName: 'Dr. Practitioner'
+      };
+
+      const response = await fetch(`${API_URL}/api/clinical-notes/add`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(noteData)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        const newNote = {
+          id: result.noteId || Date.now(),
+          text: newNoteText.trim(),
+          type: newNoteType,
+          createdAt: new Date().toISOString(),
+          clinicianName: 'Dr. Practitioner'
+        };
+        
+        setClinicalNotes(prev => [newNote, ...prev]);
+        setNewNoteText('');
+        setNewNoteType('general');
+        setShowAddNoteModal(false);
+        alert('Clinical note added successfully!');
+      } else {
+        throw new Error('Failed to add clinical note');
+      }
+    } catch (error) {
+      console.error('Error adding clinical note:', error);
+      alert(`Failed to add clinical note: ${error.message}`);
+    }
+  };
+
+  const handleDeleteNote = async (noteId) => {
+    if (!confirm('Are you sure you want to delete this note?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/clinical-notes/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ noteId, patientId: patient.id })
+      });
+
+      if (response.ok) {
+        setClinicalNotes(prev => prev.filter(note => note.id !== noteId));
+        alert('Note deleted successfully!');
+      } else {
+        throw new Error('Failed to delete note');
+      }
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      alert(`Failed to delete note: ${error.message}`);
     }
   };
 
@@ -1047,6 +1128,7 @@ function PatientModal({ patient, onClose }) {
                   Clinical Notes & Flags
                 </h3>
                 <button 
+                  onClick={() => setShowAddNoteModal(true)}
                   style={{
                     padding: '10px 16px',
                     background: 'linear-gradient(135deg, #155e75 0%, #0891b2 100%)',
@@ -1878,6 +1960,67 @@ function PatientModal({ patient, onClose }) {
                 <h4 style={{ fontSize: '1rem', fontWeight: 600, color: '#374151', marginBottom: '20px', margin: 0 }}>
                   Clinical Notes
                 </h4>
+                
+                {clinicalNotes.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '20px' }}>
+                    {clinicalNotes.map((note, index) => (
+                      <div 
+                        key={note.id} 
+                        style={{
+                          background: '#f9fafb',
+                          padding: '16px',
+                          borderRadius: '8px',
+                          border: '1px solid #e5e7eb',
+                          position: 'relative'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{
+                              padding: '4px 8px',
+                              fontSize: '0.75rem',
+                              fontWeight: '500',
+                              color: '#155e75',
+                              backgroundColor: '#f0fdff',
+                              borderRadius: '12px',
+                              border: '1px solid #67e8f9'
+                            }}>
+                              {note.type}
+                            </span>
+                            <span style={{
+                              fontSize: '0.75rem',
+                              color: '#6b7280'
+                            }}>
+                              {new Date(note.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteNote(note.id)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: '#ef4444',
+                              cursor: 'pointer',
+                              padding: '4px',
+                              borderRadius: '4px',
+                              fontSize: '0.75rem'
+                            }}
+                            onMouseOver={(e) => e.target.style.backgroundColor = '#fef2f2'}
+                            onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                        <p style={{ fontSize: '0.875rem', color: '#374151', margin: '0 0 8px 0', lineHeight: '1.5' }}>
+                          {note.text}
+                        </p>
+                        <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                          Added by: {note.clinicianName}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6b7280' }}>
                   <svg 
                     style={{ width: '48px', height: '48px', margin: '0 auto 16px', color: '#d1d5db' }} 
@@ -1892,8 +2035,12 @@ function PatientModal({ patient, onClose }) {
                       d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" 
                     />
                   </svg>
-                  <p style={{ fontSize: '1rem', fontWeight: 500, margin: '0 0 8px 0' }}>No clinical notes yet</p>
-                  <p style={{ fontSize: '0.875rem', margin: 0 }}>Click "Add Note" to start documenting patient progress</p>
+                  <p style={{ fontSize: '1rem', fontWeight: 500, margin: '0 0 8px 0' }}>
+                    {clinicalNotes.length === 0 ? 'No clinical notes yet' : `${clinicalNotes.length} clinical note${clinicalNotes.length === 1 ? '' : 's'}`}
+                  </p>
+                  <p style={{ fontSize: '0.875rem', margin: 0 }}>
+                    {clinicalNotes.length === 0 ? 'Click "Add Note" to start documenting patient progress' : 'Click "Add Note" to add more notes'}
+                  </p>
                 </div>
               </div>
 
@@ -2399,6 +2546,185 @@ function PatientModal({ patient, onClose }) {
                   Send Message
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Note Modal */}
+      {showAddNoteModal && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 10000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            padding: '20px'
+          }}
+        >
+          <div 
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '16px',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)',
+              maxWidth: '500px',
+              width: '100%',
+              maxHeight: '80vh',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            {/* Modal Header */}
+            <div 
+              style={{
+                background: 'linear-gradient(135deg, #155e75 0%, #0891b2 100%)',
+                color: 'white',
+                padding: '20px',
+                borderTopLeftRadius: '16px',
+                borderTopRightRadius: '16px'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', margin: 0 }}>
+                  Add Clinical Note
+                </h3>
+                <button 
+                  onClick={() => setShowAddNoteModal(false)}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px',
+                    color: 'white',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'background 0.2s ease'
+                  }}
+                  onMouseOver={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.3)'}
+                  onMouseOut={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.2)'}
+                >
+                  <svg style={{ width: '20px', height: '20px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div style={{ padding: '24px', flex: 1 }}>
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>
+                  Note Type
+                </label>
+                <select
+                  value={newNoteType}
+                  onChange={(e) => setNewNoteType(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    fontSize: '0.875rem',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    backgroundColor: 'white'
+                  }}
+                >
+                  <option value="general">General Note</option>
+                  <option value="assessment">Assessment</option>
+                  <option value="treatment">Treatment</option>
+                  <option value="progress">Progress Update</option>
+                  <option value="concern">Concern</option>
+                  <option value="recommendation">Recommendation</option>
+                </select>
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>
+                  Clinical Note
+                </label>
+                <textarea
+                  value={newNoteText}
+                  onChange={(e) => setNewNoteText(e.target.value)}
+                  placeholder="Enter your clinical note here..."
+                  style={{
+                    width: '100%',
+                    minHeight: '120px',
+                    padding: '12px',
+                    fontSize: '0.875rem',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    backgroundColor: 'white',
+                    resize: 'vertical',
+                    fontFamily: 'inherit'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div 
+              style={{
+                background: '#f9fafb',
+                padding: '20px 24px',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '12px',
+                borderTop: '1px solid #e5e7eb'
+              }}
+            >
+              <button 
+                onClick={() => setShowAddNoteModal(false)}
+                style={{
+                  padding: '10px 20px',
+                  color: '#6b7280',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  background: 'white',
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => e.target.style.background = '#f9fafb'}
+                onMouseOut={(e) => e.target.style.background = 'white'}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleAddNote}
+                disabled={!newNoteText.trim()}
+                style={{
+                  padding: '10px 20px',
+                  background: !newNoteText.trim() ? '#d1d5db' : 'linear-gradient(135deg, #155e75 0%, #0891b2 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  cursor: !newNoteText.trim() ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  if (newNoteText.trim()) {
+                    e.target.style.transform = 'translateY(-1px)';
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (newNoteText.trim()) {
+                    e.target.style.transform = 'translateY(0)';
+                  }
+                }}
+              >
+                Add Note
+              </button>
             </div>
           </div>
         </div>

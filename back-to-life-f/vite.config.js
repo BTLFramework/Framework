@@ -9,4 +9,7 @@ export default defineConfig({
     strictPort: true
   },
   plugins: [react(), tailwindcss()],
+  define: {
+    'import.meta.env.VITE_API_URL': JSON.stringify('https://backend-production-3545.up.railway.app')
+  }
 });
