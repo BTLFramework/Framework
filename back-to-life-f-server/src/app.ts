@@ -108,20 +108,8 @@ app.use(cors({
   preflightContinue: false
 }));
 
-// Add explicit OPTIONS handler for all routes
-app.options('*', (req, res) => {
-  console.log('🔍 CORS: Handling OPTIONS preflight request');
-  console.log('🔍 CORS: Origin:', req.headers.origin);
-  console.log('🔍 CORS: Method:', req.headers['access-control-request-method']);
-  console.log('🔍 CORS: Headers:', req.headers['access-control-request-headers']);
-  
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Max-Age', '86400');
-  res.status(200).end();
-});
+// Note: CORS middleware handles OPTIONS requests automatically
+// No need for explicit OPTIONS handler
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
