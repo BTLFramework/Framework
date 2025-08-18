@@ -61,22 +61,34 @@ const allowedOrigins = [
   "https://back-to-life-f-3.vercel.app",
   "https://back-to-life-f-3-theframework.vercel.app",
   "https://dashboard-theframework.vercel.app",
+  // Additional dashboard domains that might be used
+  "https://dashboard-vercel.vercel.app",
+  "https://dashboard-vercel-theframework.vercel.app",
+  "https://back-to-life-f-3-vercel.vercel.app",
   // Environment variable fallbacks
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
   ...(process.env.PATIENT_PORTAL_URL ? [process.env.PATIENT_PORTAL_URL] : []),
   ...(process.env.CLINICIAN_DASHBOARD_URL ? [process.env.CLINICIAN_DASHBOARD_URL] : [])
 ];
 
+// Enhanced CORS configuration with better debugging
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      console.log('🌐 CORS: Allowing request with no origin');
+      return callback(null, true);
+    }
+    
+    console.log(`🌐 CORS: Checking origin: ${origin}`);
     
     if (allowedOrigins.includes(origin)) {
+      console.log(`✅ CORS: Allowing origin: ${origin}`);
       callback(null, true);
     } else {
-      console.log(`🚫 CORS blocked origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
+      console.log(`🚫 CORS: Blocking origin: ${origin}`);
+      console.log(`📋 Allowed origins:`, allowedOrigins);
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   },
   credentials: true,
@@ -95,6 +107,21 @@ app.use(cors({
   optionsSuccessStatus: 200,
   preflightContinue: false
 }));
+
+// Add explicit OPTIONS handler for all routes
+app.options('*', (req, res) => {
+  console.log('🔍 CORS: Handling OPTIONS preflight request');
+  console.log('🔍 CORS: Origin:', req.headers.origin);
+  console.log('🔍 CORS: Method:', req.headers['access-control-request-method']);
+  console.log('🔍 CORS: Headers:', req.headers['access-control-request-headers']);
+  
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Max-Age', '86400');
+  res.status(200).end();
+});
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
