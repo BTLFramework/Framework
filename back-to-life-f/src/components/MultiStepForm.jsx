@@ -562,10 +562,10 @@ export default function MultiStepForm() {
                     const params = new URLSearchParams({
                       patientData: JSON.stringify(patientData)
                     });
-                    const patientPortalUrl = import.meta.env.VITE_PATIENT_PORTAL_URL || 'http://localhost:3000';
+                    const patientPortalUrl = import.meta.env.VITE_PATIENT_PORTAL_URL || 'https://dashboard-2awgqzcyj-theframework.vercel.app';
                     window.location.href = `${patientPortalUrl}/create-account?${params.toString()}`;
                   } else {
-                    const patientPortalUrl = import.meta.env.VITE_PATIENT_PORTAL_URL || 'http://localhost:3000';
+                    const patientPortalUrl = import.meta.env.VITE_PATIENT_PORTAL_URL || 'https://dashboard-2awgqzcyj-theframework.vercel.app';
                     window.location.href = patientPortalUrl;
                   }
                 }}
