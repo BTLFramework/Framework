@@ -176,6 +176,13 @@ function PatientModal({ patient, onClose }) {
     clinicalProgressVerified: false
   });
 
+  // Quick Actions State
+  const [quickActions, setQuickActions] = useState({
+    reassessmentScheduled: false,
+    treatmentPlanUpdated: false,
+    reviewed: false
+  });
+
   if (!patient) {
     return null;
   }
@@ -321,6 +328,99 @@ function PatientModal({ patient, onClose }) {
     } catch (error) {
       console.error('Error saving clinician assessment:', error);
       alert(`Failed to save assessment: ${error.message}`);
+    }
+  };
+
+  // Quick Actions Handlers
+  const handleScheduleReassessment = async () => {
+    try {
+      const reassessmentData = {
+        patientId: patient.id,
+        scheduledDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+        type: 'follow_up',
+        clinicianId: 'clinician-001',
+        clinicianName: 'Dr. Practitioner'
+      };
+
+      const response = await fetch(`${API_URL}/api/reassessment/schedule`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reassessmentData)
+      });
+
+      if (response.ok) {
+        setQuickActions(prev => ({ ...prev, reassessmentScheduled: true }));
+        alert('Reassessment scheduled successfully for 7 days from now!');
+      } else {
+        throw new Error('Failed to schedule reassessment');
+      }
+    } catch (error) {
+      console.error('Error scheduling reassessment:', error);
+      alert(`Failed to schedule reassessment: ${error.message}`);
+    }
+  };
+
+  const handleUpdateTreatmentPlan = async () => {
+    try {
+      const treatmentPlanData = {
+        patientId: patient.id,
+        updatedAt: new Date().toISOString(),
+        currentPhase: phase,
+        srsScore: srsScore,
+        recommendations: `Treatment plan updated based on current SRS score of ${srsScore}/11 and ${phase} phase.`,
+        clinicianId: 'clinician-001',
+        clinicianName: 'Dr. Practitioner'
+      };
+
+      const response = await fetch(`${API_URL}/api/treatment-plan/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(treatmentPlanData)
+      });
+
+      if (response.ok) {
+        setQuickActions(prev => ({ ...prev, treatmentPlanUpdated: true }));
+        alert('Treatment plan updated successfully!');
+      } else {
+        throw new Error('Failed to update treatment plan');
+      }
+    } catch (error) {
+      console.error('Error updating treatment plan:', error);
+      alert(`Failed to update treatment plan: ${error.message}`);
+    }
+  };
+
+  const handleMarkAsReviewed = async () => {
+    try {
+      const reviewData = {
+        patientId: patient.id,
+        reviewedAt: new Date().toISOString(),
+        reviewedBy: 'clinician-001',
+        reviewerName: 'Dr. Practitioner',
+        reviewType: 'clinical_review'
+      };
+
+      const response = await fetch(`${API_URL}/api/patient/review`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reviewData)
+      });
+
+      if (response.ok) {
+        setQuickActions(prev => ({ ...prev, reviewed: true }));
+        alert('Patient marked as reviewed successfully!');
+      } else {
+        throw new Error('Failed to mark patient as reviewed');
+      }
+    } catch (error) {
+      console.error('Error marking patient as reviewed:', error);
+      alert(`Failed to mark patient as reviewed: ${error.message}`);
     }
   };
 
@@ -1811,67 +1911,97 @@ function PatientModal({ patient, onClose }) {
                 </h4>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                   <button 
+                    onClick={handleScheduleReassessment}
+                    disabled={quickActions.reassessmentScheduled}
                     style={{
                       padding: '8px 16px',
                       fontSize: '0.875rem',
                       fontWeight: 500,
-                      color: '#155e75',
-                      backgroundColor: 'white',
-                      border: '1px solid #155e75',
+                      color: quickActions.reassessmentScheduled ? '#9ca3af' : '#155e75',
+                      backgroundColor: quickActions.reassessmentScheduled ? '#f3f4f6' : 'white',
+                      border: `1px solid ${quickActions.reassessmentScheduled ? '#d1d5db' : '#155e75'}`,
                       borderRadius: '6px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
+                      cursor: quickActions.reassessmentScheduled ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
                     }}
                     onMouseOver={(e) => {
-                      e.target.style.backgroundColor = '#f0fdff';
+                      if (!quickActions.reassessmentScheduled) {
+                        e.target.style.backgroundColor = '#f0fdff';
+                      }
                     }}
                     onMouseOut={(e) => {
-                      e.target.style.backgroundColor = 'white';
+                      if (!quickActions.reassessmentScheduled) {
+                        e.target.style.backgroundColor = 'white';
+                      }
                     }}
                   >
-                    Schedule Reassessment
+                    {quickActions.reassessmentScheduled ? '✅' : '📅'} 
+                    {quickActions.reassessmentScheduled ? 'Reassessment Scheduled' : 'Schedule Reassessment'}
                   </button>
                   <button 
+                    onClick={handleUpdateTreatmentPlan}
+                    disabled={quickActions.treatmentPlanUpdated}
                     style={{
                       padding: '8px 16px',
                       fontSize: '0.875rem',
                       fontWeight: 500,
-                      color: '#155e75',
-                      backgroundColor: 'white',
-                      border: '1px solid #155e75',
+                      color: quickActions.treatmentPlanUpdated ? '#9ca3af' : '#155e75',
+                      backgroundColor: quickActions.treatmentPlanUpdated ? '#f3f4f6' : 'white',
+                      border: `1px solid ${quickActions.treatmentPlanUpdated ? '#d1d5db' : '#155e75'}`,
                       borderRadius: '6px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
+                      cursor: quickActions.treatmentPlanUpdated ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
                     }}
                     onMouseOver={(e) => {
-                      e.target.style.backgroundColor = '#f0fdff';
+                      if (!quickActions.treatmentPlanUpdated) {
+                        e.target.style.backgroundColor = '#f0fdff';
+                      }
                     }}
                     onMouseOut={(e) => {
-                      e.target.style.backgroundColor = 'white';
+                      if (!quickActions.treatmentPlanUpdated) {
+                        e.target.style.backgroundColor = 'white';
+                      }
                     }}
                   >
-                    Update Treatment Plan
+                    {quickActions.treatmentPlanUpdated ? '✅' : '📋'} 
+                    {quickActions.treatmentPlanUpdated ? 'Treatment Plan Updated' : 'Update Treatment Plan'}
                   </button>
                   <button 
+                    onClick={handleMarkAsReviewed}
+                    disabled={quickActions.reviewed}
                     style={{
                       padding: '8px 16px',
                       fontSize: '0.875rem',
                       fontWeight: 500,
-                      color: '#155e75',
-                      backgroundColor: 'white',
-                      border: '1px solid #155e75',
+                      color: quickActions.reviewed ? '#9ca3af' : '#155e75',
+                      backgroundColor: quickActions.reviewed ? '#f3f4f6' : 'white',
+                      border: `1px solid ${quickActions.reviewed ? '#d1d5db' : '#155e75'}`,
                       borderRadius: '6px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
+                      cursor: quickActions.reviewed ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
                     }}
                     onMouseOver={(e) => {
-                      e.target.style.backgroundColor = '#f0fdff';
+                      if (!quickActions.reviewed) {
+                        e.target.style.backgroundColor = '#f0fdff';
+                      }
                     }}
                     onMouseOut={(e) => {
-                      e.target.style.backgroundColor = 'white';
+                      if (!quickActions.reviewed) {
+                        e.target.style.backgroundColor = 'white';
+                      }
                     }}
                   >
-                    Mark as Reviewed
+                    {quickActions.reviewed ? '✅' : '👁️'} 
+                    {quickActions.reviewed ? 'Marked as Reviewed' : 'Mark as Reviewed'}
                   </button>
                 </div>
               </div>
