@@ -150,6 +150,8 @@ function PatientModal({ patient, onClose }) {
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [messageText, setMessageText] = useState('');
   const [messageSubject, setMessageSubject] = useState('');
+  const [recoveryMilestone, setRecoveryMilestone] = useState(patient?.recoveryMilestone || false);
+  const [clinicalProgressVerified, setClinicalProgressVerified] = useState(patient?.clinicalProgressVerified || false);
 
   if (!patient) {
     return null;
@@ -798,6 +800,138 @@ function PatientModal({ patient, onClose }) {
                     No PSFS activities recorded
                   </div>
                 )}
+              </div>
+
+              {/* SRS Clinician Input */}
+              <div style={{ background: 'white', padding: '16px', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                <h4 style={{ fontSize: '0.875rem', fontWeight: 600, color: '#155e75', marginBottom: '12px', margin: 0 }}>
+                  SRS Clinician Assessment
+                </h4>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {/* Recovery Milestone */}
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={recoveryMilestone}
+                      onChange={(e) => {
+                        setRecoveryMilestone(e.target.checked);
+                        // Here you would typically call an API to update the patient
+                        console.log('Recovery Milestone updated:', e.target.checked);
+                      }}
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        accentColor: '#155e75'
+                      }}
+                    />
+                    <span style={{ fontSize: '0.875rem', color: '#374151' }}>
+                      Recovery Milestone Achieved
+                    </span>
+                    <span style={{ 
+                      fontSize: '0.75rem', 
+                      color: '#059669', 
+                      backgroundColor: '#f0fdf4',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      border: '1px solid #bbf7d0'
+                    }}>
+                      +1 SRS Point
+                    </span>
+                  </label>
+
+                  {/* Clinical Progress Verified */}
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={clinicalProgressVerified}
+                      onChange={(e) => {
+                        setClinicalProgressVerified(e.target.checked);
+                        // Here you would typically call an API to update the patient
+                        console.log('Clinical Progress Verified updated:', e.target.checked);
+                      }}
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        accentColor: '#155e75'
+                      }}
+                    />
+                    <span style={{ fontSize: '0.875rem', color: '#374151' }}>
+                      Clinical Progress Verified
+                    </span>
+                    <span style={{ 
+                      fontSize: '0.75rem', 
+                      color: '#059669', 
+                      backgroundColor: '#f0fdf4',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      border: '1px solid #bbf7d0'
+                    }}>
+                      +1 SRS Point
+                    </span>
+                  </label>
+                </div>
+
+                {/* Save Button */}
+                <div style={{ marginTop: '16px', textAlign: 'center' }}>
+                  <button
+                    onClick={() => {
+                      // Here you would save the clinician input changes to the backend
+                      console.log('Saving clinician input:', { recoveryMilestone, clinicalProgressVerified });
+                      // You could call an API here to update the patient record
+                    }}
+                    style={{
+                      padding: '8px 16px',
+                      background: 'linear-gradient(135deg, #155e75 0%, #0891b2 100%)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseOver={(e) => e.target.style.transform = 'translateY(-1px)'}
+                    onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
+                  >
+                    Save Clinician Assessment
+                  </button>
+                </div>
+
+                {/* Current SRS Score Display */}
+                <div style={{ 
+                  marginTop: '16px', 
+                  padding: '12px', 
+                  backgroundColor: '#f0fdff', 
+                  borderRadius: '6px', 
+                  border: '1px solid #67e8f9',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '4px' }}>
+                    Current SRS Score
+                  </div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#155e75' }}>
+                    {srsScore}/11
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: '#6b7280', marginTop: '2px' }}>
+                    Phase: {phase}
+                  </div>
+                </div>
+
+                {/* SRS Breakdown */}
+                <div style={{ marginTop: '12px', fontSize: '0.75rem', color: '#6b7280' }}>
+                  <div style={{ marginBottom: '4px' }}>
+                    <strong>SRS Breakdown:</strong>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', fontSize: '0.7rem' }}>
+                    <div>• Pain Assessment: +1 pt</div>
+                    <div>• Disability Index: +1 pt</div>
+                    <div>• PSFS Function: +2 pts</div>
+                    <div>• Confidence Level: +2 pts</div>
+                    <div>• Beliefs Resolved: +1 pt</div>
+                    <div>• Clinician Assessment: +2 pts</div>
+                  </div>
+                </div>
               </div>
 
 
