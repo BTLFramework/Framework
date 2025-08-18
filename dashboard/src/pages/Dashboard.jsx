@@ -95,7 +95,7 @@ const fetchPatientsFromAPI = async () => {
     if (err.name === 'AbortError') {
       throw new Error('Request timed out - backend server may be slow or unresponsive');
     } else if (err.message.includes('Failed to fetch')) {
-      throw new Error('Unable to connect to backend server. Please ensure the server is running on port 3001.');
+      throw new Error('Unable to connect to backend server. Please check your internet connection and try again.');
     } else if (err.message.includes('NetworkError')) {
       throw new Error('Network error - please check your internet connection and backend server status.');
     }
