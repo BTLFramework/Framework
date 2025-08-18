@@ -57,6 +57,10 @@ const allowedOrigins = [
   // Patient Portal domains (add your actual Vercel domains here)
   "https://patientportalupdate.vercel.app",
   "https://patientportalupdate-theframework.vercel.app",
+  // Dashboard domains (add your actual Vercel domains here)
+  "https://back-to-life-f-3.vercel.app",
+  "https://back-to-life-f-3-theframework.vercel.app",
+  "https://dashboard-theframework.vercel.app",
   // Environment variable fallbacks
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
   ...(process.env.PATIENT_PORTAL_URL ? [process.env.PATIENT_PORTAL_URL] : []),
