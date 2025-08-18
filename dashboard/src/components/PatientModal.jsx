@@ -169,6 +169,12 @@ function PatientModal({ patient, onClose }) {
     treatment: { selected: false, score: '0', notes: '' }
   });
 
+  // Clinician Assessment State
+  const [clinicianAssessment, setClinicianAssessment] = useState({
+    recoveryMilestone: false,
+    clinicalProgressVerified: false
+  });
+
   if (!patient) {
     return null;
   }
@@ -271,6 +277,48 @@ function PatientModal({ patient, onClose }) {
       }
     } catch (error) {
       console.error('Error saving practitioner assessment:', error);
+      alert(`Failed to save assessment: ${error.message}`);
+    }
+  };
+
+  // Clinician Assessment Handlers
+  const handleClinicianAssessmentChange = (field, value) => {
+    setClinicianAssessment(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSaveClinicianAssessment = async () => {
+    try {
+      const assessmentData = {
+        patientId: patient.id,
+        ...clinicianAssessment,
+        clinicianId: 'clinician-001', // TODO: Get from auth context
+        clinicianName: 'Dr. Practitioner' // TODO: Get from auth context
+      };
+
+      const response = await fetch('http://localhost:3001/api/clinician-assessment/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(assessmentData)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Clinician assessment saved successfully:', result);
+        alert('Clinician assessment saved successfully!');
+        
+        // TODO: Refresh patient data to show updated SRS score
+        // This would typically trigger a refresh of the patient list
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save assessment');
+      }
+    } catch (error) {
+      console.error('Error saving clinician assessment:', error);
       alert(`Failed to save assessment: ${error.message}`);
     }
   };
@@ -1034,6 +1082,99 @@ function PatientModal({ patient, onClose }) {
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Clinician Reviewed</div>
                   </div>
+                </div>
+              </div>
+
+              {/* SRS Clinician Assessment */}
+              <div 
+                style={{
+                  background: 'white',
+                  padding: '20px',
+                  borderRadius: '12px',
+                  border: '1px solid #e5e7eb',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                }}
+              >
+                <h4 style={{ fontSize: '1rem', fontWeight: 600, color: '#155e75', marginBottom: '16px', margin: 0 }}>
+                  SRS Clinician Assessment
+                </h4>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {/* Recovery Milestone */}
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={clinicianAssessment.recoveryMilestone}
+                      onChange={(e) => handleClinicianAssessmentChange('recoveryMilestone', e.target.checked)}
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        accentColor: '#155e75'
+                      }}
+                    />
+                    <span style={{ fontSize: '0.875rem', color: '#374151' }}>
+                      Recovery Milestone Achieved
+                    </span>
+                    <span style={{ 
+                      fontSize: '0.75rem', 
+                      color: '#059669', 
+                      backgroundColor: '#f0fdf4',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      border: '1px solid #bbf7d0'
+                    }}>
+                      +1 SRS Point
+                    </span>
+                  </label>
+
+                  {/* Clinical Progress Verified */}
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={clinicianAssessment.clinicalProgressVerified}
+                      onChange={(e) => handleClinicianAssessmentChange('clinicalProgressVerified', e.target.checked)}
+                      style={{
+                        width: '16px',
+                        height: '16px',
+                        accentColor: '#155e75'
+                      }}
+                    />
+                    <span style={{ fontSize: '0.875rem', color: '#374151' }}>
+                      Clinical Progress Verified
+                    </span>
+                    <span style={{ 
+                      fontSize: '0.75rem', 
+                      color: '#059669', 
+                      backgroundColor: '#f0fdf4',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      border: '1px solid #bbf7d0'
+                    }}>
+                      +1 SRS Point
+                    </span>
+                  </label>
+                </div>
+
+                {/* Save Button */}
+                <div style={{ marginTop: '16px', textAlign: 'center' }}>
+                  <button
+                    onClick={handleSaveClinicianAssessment}
+                    style={{
+                      padding: '8px 16px',
+                      background: 'linear-gradient(135deg, #155e75 0%, #0891b2 100%)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseOver={(e) => e.target.style.transform = 'translateY(-1px)'}
+                    onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
+                  >
+                    Save Clinician Assessment
+                  </button>
                 </div>
               </div>
 
