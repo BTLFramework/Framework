@@ -359,7 +359,7 @@ const PatientRecoveryDashboard: React.FC = () => {
       console.log('🔍 Fetching patient intake data for SRS breakdown...')
       
       // Fetch current patient's portal data which includes intake information
-              const response = await fetch(`${process.env.BACKEND_URL || 'https://backend-production-3545.up.railway.app'}/patients/portal-data/${patient.email}`)
+              const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-3545.up.railway.app'}/patients/portal-data/${patient.email}`)
       if (response.ok) {
         const result = await response.json()
         console.log('📊 Patient portal data:', result.data)
