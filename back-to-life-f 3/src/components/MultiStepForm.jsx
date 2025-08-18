@@ -164,7 +164,8 @@ export default function MultiStepForm() {
       };
 
       // Submit to patient portal API (which forwards to backend)
-      const response = await fetch('http://localhost:3000/api/intake', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://backend-production-3545.up.railway.app';
+      const response = await fetch(`${apiUrl}/api/patient-portal/intake`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
