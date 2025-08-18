@@ -200,4 +200,4 @@ npm run dev
 # Terminal 4 - Patient Recovery Dashboard
 cd patient-recovery-dashboard
 npm run dev
-```
+```# Railway redeploy trigger - Sun Aug 17 23:41:08 MDT 2025
