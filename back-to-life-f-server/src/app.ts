@@ -52,6 +52,7 @@ const allowedOrigins = [
   "https://dashboard-2awgqzcyj-theframework.vercel.app",
   "https://dashboard-pddbpp75m-theframework.vercel.app",
   "https://theframework-dashboard.vercel.app",
+  "https://dashboard-e9khyy8u1-theframework.vercel.app",
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
   ...(process.env.PATIENT_PORTAL_URL ? [process.env.PATIENT_PORTAL_URL] : []),
   ...(process.env.CLINICIAN_DASHBOARD_URL ? [process.env.CLINICIAN_DASHBOARD_URL] : [])
