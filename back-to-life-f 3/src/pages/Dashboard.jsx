@@ -249,19 +249,14 @@ function Dashboard() {
       
       // Delete each patient from the backend
       const deletePromises = patientIds.map(async (patientId) => {
-        const response = await fetch(`https://backend-production-3545.up.railway.app/patients/${patientId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+        const axiosInstance = (await import('../api/axios')).default;
+        const response = await axiosInstance.delete(`/patients/${patientId}`);
         
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(`Failed to delete patient ${patientId}: ${errorData.message || response.statusText}`);
+        if (!response.data) {
+          throw new Error(`Failed to delete patient ${patientId}: No response data`);
         }
         
-        return response.json();
+        return response.data;
       });
       
       // Wait for all deletions to complete
