@@ -54,6 +54,7 @@ const allowedOrigins = [
   "https://theframework-dashboard.vercel.app",
   "https://dashboard-e9khyy8u1-theframework.vercel.app",
   "https://dashboard-4xar3wl7e-theframework.vercel.app",
+  "https://dashboard-5057ubz7n-theframework.vercel.app",
   // Patient Portal domains (add your actual Vercel domains here)
   "https://patientportalupdate.vercel.app",
   "https://patientportalupdate-theframework.vercel.app",
