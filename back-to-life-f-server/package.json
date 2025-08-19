@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "start": "npx prisma generate && node dist/app.js",
-    "start:railway": "npm run build && npx prisma generate && node dist/app.js",
-    "start:railway:debug": "echo 'Starting Railway deployment...' && npm run build && echo 'Build complete, generating Prisma client...' && npx prisma generate && echo 'Prisma client generated, starting server...' && node dist/app.js",
+    "start:railway": "npm run build:railway && npx prisma generate && node dist/app.js",
+    "start:railway:debug": "echo 'Starting Railway deployment...' && npm run build:railway && echo 'Build complete, generating Prisma client...' && npx prisma generate && echo 'Prisma client generated, starting server...' && node dist/app.js",
+    "build:railway": "tsc --skipLibCheck && cp src/config/recoveryPointsConfig.js dist/config/ && cp src/config/tdiQuestions.js dist/config/ && cp src/config/regionConfig.js dist/config/ && cp src/config/envValidation.js dist/config/ && cp -r src/routes/*.js dist/routes/ && cp -r src/services/*.js dist/services/ && cp -r node_modules/@prisma dist/ && echo 'Railway build completed successfully'",
     "postinstall": "npx prisma generate",
     "build": "tsc && cp src/config/recoveryPointsConfig.js dist/config/ && cp src/config/tdiQuestions.js dist/config/ && cp src/config/regionConfig.js dist/config/ && cp src/config/envValidation.js dist/config/ && cp -r src/routes/*.js dist/routes/ && cp -r src/services/*.js dist/services/ && cp -r node_modules/@prisma dist/ && echo 'Build completed successfully with envValidation.js'",
     "check-env": "node check-env.js",
