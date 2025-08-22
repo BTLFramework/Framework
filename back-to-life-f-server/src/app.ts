@@ -70,6 +70,12 @@ const allowedOrigins = [
   "https://framework-recovery.vercel.app",
   "https://theframework-app.vercel.app",
   "https://framework-portal.vercel.app",
+  "https://dashboard-ag1sllt22-theframework.vercel.app",
+  "https://dashboard-kdpgzr1ic-theframework.vercel.app",
+  "https://dashboard-pddbpp75m-theframework.vercel.app",
+  "https://dashboard-e9khyy8u1-theframework.vercel.app",
+  "https://dashboard-4xar3wl7e-theframework.vercel.app",
+  "https://dashboard-5057ubz7u-theframework.vercel.app",
   // Environment variable fallbacks
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
   ...(process.env.PATIENT_PORTAL_URL ? [process.env.PATIENT_PORTAL_URL] : []),
