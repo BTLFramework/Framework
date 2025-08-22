@@ -40,6 +40,7 @@ app.use((req, res, next) => {
 
 // CORS configuration - HTTP for development, HTTPS-ready for production
 // UPDATED: Added dashboard-kdpgzr1ic-theframework.vercel.app for Railway deployment
+// DEPLOYMENT TIMESTAMP: 2025-08-22 22:27 UTC - Force Railway redeploy
 const allowedOrigins = [
   // Local development HTTP
   "http://localhost:3000",
@@ -76,6 +77,7 @@ const allowedOrigins = [
 ];
 
 // Enhanced CORS configuration with better debugging
+console.log('🚀 CORS Configuration loaded - Updated deployment with dashboard-kdpgzr1ic-theframework.vercel.app');
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl requests)
