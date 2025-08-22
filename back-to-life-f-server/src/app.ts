@@ -59,6 +59,7 @@ const allowedOrigins = [
   "https://dashboard-4xar3wl7e-theframework.vercel.app",
   "https://dashboard-5057ubz7n-theframework.vercel.app",
   "https://dashboard-kdpgzr1ic-theframework.vercel.app", // Added for Railway deployment
+  "https://dashboard-ag1sllt22-theframework.vercel.app", // Added for Railway deployment
   // Patient Portal domains (add your actual Vercel domains here)
   "https://patientportalupdate.vercel.app",
   "https://patientportalupdate-theframework.vercel.app",
@@ -77,7 +78,7 @@ const allowedOrigins = [
 ];
 
 // Enhanced CORS configuration with better debugging
-console.log('🚀 CORS Configuration loaded - Updated deployment with dashboard-kdpgzr1ic-theframework.vercel.app');
+console.log('🚀 CORS Configuration loaded - Updated deployment with multiple dashboard domains including dashboard-kdpgzr1ic-theframework.vercel.app and dashboard-ag1sllt22-theframework.vercel.app');
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl requests)
