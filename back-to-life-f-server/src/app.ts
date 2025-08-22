@@ -43,8 +43,8 @@ app.use((req, res, next) => {
 });
 
 // CORS configuration - Railway deployment focused
-// UPDATED: Railway deployment with proper CORS configuration for production frontends
-// DEPLOYMENT TIMESTAMP: 2025-01-27 - Railway deployment with production CORS setup
+// UPDATED: Railway deployment with dynamic CORS for Vercel preview deployments
+// DEPLOYMENT TIMESTAMP: 2025-01-27 - Railway deployment with dynamic CORS setup
 
 const allowedOrigins = [
   // Local development HTTP (for development only)
@@ -70,20 +70,49 @@ const allowedOrigins = [
   "https://framework-recovery.vercel.app",
   "https://theframework-app.vercel.app",
   "https://framework-portal.vercel.app",
-  "https://dashboard-ag1sllt22-theframework.vercel.app",
-  "https://dashboard-kdpgzr1ic-theframework.vercel.app",
-  "https://dashboard-pddbpp75m-theframework.vercel.app",
-  "https://dashboard-e9khyy8u1-theframework.vercel.app",
-  "https://dashboard-4xar3wl7e-theframework.vercel.app",
-  "https://dashboard-5057ubz7u-theframework.vercel.app",
   // Environment variable fallbacks
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
   ...(process.env.PATIENT_PORTAL_URL ? [process.env.PATIENT_PORTAL_URL] : []),
   ...(process.env.CLINICIAN_DASHBOARD_URL ? [process.env.CLINICIAN_DASHBOARD_URL] : [])
 ];
 
+// Dynamic CORS configuration for Vercel preview deployments
+const dynamicOriginCheck = function (origin: string | undefined, callback: any) {
+  // Allow requests with no origin (like mobile apps or curl requests)
+  if (!origin) {
+    console.log('🌐 CORS: Allowing request with no origin');
+    return callback(null, true);
+  }
+  
+  console.log(`🌐 CORS: Checking origin: ${origin}`);
+  
+  // Check if origin is in allowed list
+  if (allowedOrigins.includes(origin)) {
+    console.log(`✅ CORS: Allowing origin: ${origin}`);
+    return callback(null, true);
+  }
+  
+  // Dynamic check for Vercel preview deployments
+  if (/^https:\/\/dashboard-[\w-]+-theframework\.vercel\.app$/.test(origin)) {
+    console.log(`✅ CORS: Allowing Vercel preview deployment: ${origin}`);
+    return callback(null, true);
+  }
+  
+  // Dynamic check for other Vercel preview patterns
+  if (/^https:\/\/[a-z0-9-]+-theframework\.vercel\.app$/.test(origin)) {
+    console.log(`✅ CORS: Allowing Vercel preview deployment: ${origin}`);
+    return callback(null, true);
+  }
+  
+  // Block all other origins
+  console.log(`🚫 CORS: Blocking origin: ${origin}`);
+  console.log(`📋 Allowed origins:`, allowedOrigins);
+  console.log(`❌ CORS Error: Origin ${origin} not allowed`);
+  callback(new Error(`Origin ${origin} not allowed by CORS`));
+};
+
 // Clean CORS configuration for Railway deployment
-console.log('🚀 Railway CORS Configuration loaded');
+console.log('🚀 Railway CORS Configuration loaded with dynamic Vercel support');
 console.log('📋 Allowed origins count:', allowedOrigins.length);
 console.log('🔍 Railway URL included:', allowedOrigins.includes('https://framework-production-92f5.up.railway.app'));
 
@@ -95,32 +124,7 @@ console.log(`🔧 CORS Mode: ${isDevelopment ? 'Development' : 'Production'}`);
 console.log(`🐛 Debug Mode: ${isDebugMode ? 'Enabled' : 'Disabled'}`);
 
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) {
-      console.log('🌐 CORS: Allowing request with no origin');
-      return callback(null, true);
-    }
-    
-    console.log(`🌐 CORS: Checking origin: ${origin}`);
-    
-    // In debug mode, allow all origins for troubleshooting
-    if (isDebugMode) {
-      console.log(`🐛 DEBUG MODE: Allowing all origins including ${origin}`);
-      return callback(null, true);
-    }
-    
-    // Check if origin is in allowed list
-    if (allowedOrigins.includes(origin)) {
-      console.log(`✅ CORS: Allowing origin: ${origin}`);
-      callback(null, true);
-    } else {
-      console.log(`🚫 CORS: Blocking origin: ${origin}`);
-      console.log(`📋 Allowed origins:`, allowedOrigins);
-      console.log(`❌ CORS Error: Origin ${origin} not allowed`);
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
-    }
-  },
+  origin: dynamicOriginCheck,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: [
