@@ -9,25 +9,25 @@ const requiredEnvVars = [
 ];
 
 function validateEnvironment() {
-  // TEMPORARY FIX: Hardcode values if Railway isn't injecting them
+  // Check if Railway environment variables are properly set
   if (!process.env.JWT_SECRET) {
-    process.env.JWT_SECRET = "067ab2801453eda64bfcbf33c52920061320907ffa2839b4bfc26a95bde807b5";
-    console.log("⚠️  Using hardcoded JWT_SECRET (Railway injection failed)");
+    console.error("❌ CRITICAL: JWT_SECRET not set in Railway environment");
+    process.exit(1);
   }
   
   if (!process.env.SETUP_SECRET) {
-    process.env.SETUP_SECRET = "9b10d81b24a920bd996a9ed3973cfd5e";
-    console.log("⚠️  Using hardcoded SETUP_SECRET (Railway injection failed)");
+    console.error("❌ CRITICAL: SETUP_SECRET not set in Railway environment");
+    process.exit(1);
   }
   
   if (!process.env.DATABASE_URL) {
-    process.env.DATABASE_URL = "postgresql://postgres:TpOMVoiKZbBlphyjkUBFQRGrFuNxfbMj@maglev.proxy.rlwy.net:56776/railway";
-    console.log("⚠️  Using hardcoded DATABASE_URL (Railway injection failed)");
+    console.error("❌ CRITICAL: DATABASE_URL not set in Railway environment");
+    process.exit(1);
   }
   
   if (!process.env.NODE_ENV) {
     process.env.NODE_ENV = "production";
-    console.log("⚠️  Using hardcoded NODE_ENV (Railway injection failed)");
+    console.log("ℹ️  Setting NODE_ENV to production for Railway deployment");
   }
 
   const missing = [];
@@ -44,11 +44,12 @@ function validateEnvironment() {
       console.error(`   - ${varName}`);
     });
     console.error('\n💡 Add these variables in Railway Dashboard → Variables tab');
-    console.error('💡 See ENVIRONMENT_VARIABLE.md for details');
+    console.error('💡 See ENVIRONMENT_VARIABLES.md for details');
     process.exit(1);
   }
   
   console.log('✅ All required environment variables are present');
+  console.log('🚀 Railway deployment environment validated successfully');
 }
 
 module.exports = { validateEnvironment };

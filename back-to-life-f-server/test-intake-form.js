@@ -22,7 +22,7 @@ async function testIntakeForm() {
 
   try {
     console.log('📤 Sending test data to patient portal...');
-    const response = await fetch('https://backend-production-3545.up.railway.app/patients/submit-intake', {
+    const response = await fetch('http://localhost:3001/patients/submit-intake', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -32,21 +32,18 @@ async function testIntakeForm() {
 
     const result = await response.json();
     
-    console.log('📊 Full response data:');
-    console.log(JSON.stringify(result, null, 2));
-    
     if (result.success) {
       console.log('✅ Intake form submission successful!');
       console.log('📊 Response data:');
-      console.log(`   - Patient: ${result.data?.patient?.name || result.patient?.name || 'N/A'}`);
-      console.log(`   - SRS Score: ${result.data?.srsScore || result.srsScore || 'N/A'}/11`);
-      console.log(`   - Phase: ${result.data?.phase || result.phase || 'N/A'}`);
-      console.log(`   - Disability: ${result.data?.disabilityPercentage || result.disabilityPercentage || 'N/A'}%`);
-      console.log(`   - Message: ${result.message || 'N/A'}`);
+      console.log(`   - Patient: ${result.data.patient?.name || 'N/A'}`);
+      console.log(`   - SRS Score: ${result.data.srsScore}/11`);
+      console.log(`   - Phase: ${result.data.phase}`);
+      console.log(`   - Disability: ${result.data.disabilityPercentage}%`);
+      console.log(`   - Message: ${result.message}`);
     } else {
       console.log('❌ Intake form submission failed:');
-      console.log(`   - Error: ${result.error || 'Unknown error'}`);
-      console.log(`   - Message: ${result.message || 'No message'}`);
+      console.log(`   - Error: ${result.error}`);
+      console.log(`   - Message: ${result.message}`);
     }
   } catch (error) {
     console.log('❌ Test failed with error:', error.message);

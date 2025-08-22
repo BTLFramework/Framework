@@ -31,6 +31,7 @@ model Patient {
   srsScores         SRSScore[]
   practitionerAssessments PractitionerAssessment[]
   taskCompletions   TaskCompletion[]
+  clinicalNotes    ClinicalNote[]
 }
 
 model SRSDaily {
@@ -246,6 +247,20 @@ model TaskCompletion {
 
   @@index([patientId, taskType, completedAt])
   @@index([completedAt])
+}
+
+model ClinicalNote {
+  id             Int      @id @default(autoincrement())
+  patientId      Int
+  note           String
+  practitionerId Int?     // Optional: if we want to track which practitioner wrote it
+  isPrivate      Boolean  @default(true)  // Always true for now (practitioner-only)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  patient        Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([patientId, createdAt])
+  @@index([practitionerId])
 }
 
 enum RPType {

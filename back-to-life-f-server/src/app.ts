@@ -17,6 +17,10 @@ import { Request, Response } from "express";
 
 dotenv.config();
 
+// CORS DEBUGGING: To enable debug mode, set DEBUG_CORS=true in environment variables
+// This will allow all origins for troubleshooting CORS issues
+// DEPLOYMENT TIMESTAMP: 2025-08-22 22:37 UTC - Force Railway redeploy with enhanced CORS debugging
+
 // Validate environment variables before starting
 const { validateEnvironment } = require('./config/envValidation');
 validateEnvironment();
@@ -38,11 +42,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// CORS configuration - HTTP for development, HTTPS-ready for production
-// UPDATED: Added dashboard-kdpgzr1ic-theframework.vercel.app for Railway deployment
-// DEPLOYMENT TIMESTAMP: 2025-08-22 22:27 UTC - Force Railway redeploy
+// CORS configuration - Railway deployment focused
+// UPDATED: Railway deployment with proper CORS configuration for production frontends
+// DEPLOYMENT TIMESTAMP: 2025-01-27 - Railway deployment with production CORS setup
+
 const allowedOrigins = [
-  // Local development HTTP
+  // Local development HTTP (for development only)
   "http://localhost:3000",
   "http://localhost:3001", 
   "http://localhost:5173",
@@ -51,34 +56,38 @@ const allowedOrigins = [
   "http://localhost:5176",
   "http://localhost:5177",
   "http://localhost:5178",
-  // Production domains (will be HTTPS when deployed)
-  "https://dashboard-2awgqzcyj-theframework.vercel.app",
-  "https://dashboard-pddbpp75m-theframework.vercel.app",
-  "https://theframework-dashboard.vercel.app",
-  "https://dashboard-e9khyy8u1-theframework.vercel.app",
-  "https://dashboard-4xar3wl7e-theframework.vercel.app",
-  "https://dashboard-5057ubz7n-theframework.vercel.app",
-  "https://dashboard-kdpgzr1ic-theframework.vercel.app", // Added for Railway deployment
-  "https://dashboard-ag1sllt22-theframework.vercel.app", // Added for Railway deployment
-  // Patient Portal domains (add your actual Vercel domains here)
+  // Railway production domains
+  "https://framework-production-92f5.up.railway.app",
+  // Production frontend domains
+  "https://backtolife.vercel.app",
+  "https://intake.backtolife.vercel.app", 
+  "https://clinician.backtolife.vercel.app",
   "https://patientportalupdate.vercel.app",
-  "https://patientportalupdate-theframework.vercel.app",
-  // Dashboard domains (add your actual Vercel domains here)
+  "https://back-to-life-f.vercel.app",
   "https://back-to-life-f-3.vercel.app",
-  "https://back-to-life-f-3-theframework.vercel.app",
-  "https://dashboard-theframework.vercel.app",
-  // Additional dashboard domains that might be used
-  "https://dashboard-vercel.vercel.app",
-  "https://dashboard-vercel-theframework.vercel.app",
-  "https://back-to-life-f-3-vercel.vercel.app",
+  "https://dashboard.vercel.app",
+  "https://the-framework.vercel.app",
+  "https://framework-recovery.vercel.app",
+  "https://theframework-app.vercel.app",
+  "https://framework-portal.vercel.app",
   // Environment variable fallbacks
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
   ...(process.env.PATIENT_PORTAL_URL ? [process.env.PATIENT_PORTAL_URL] : []),
   ...(process.env.CLINICIAN_DASHBOARD_URL ? [process.env.CLINICIAN_DASHBOARD_URL] : [])
 ];
 
-// Enhanced CORS configuration with better debugging
-console.log('🚀 CORS Configuration loaded - Updated deployment with multiple dashboard domains including dashboard-kdpgzr1ic-theframework.vercel.app and dashboard-ag1sllt22-theframework.vercel.app');
+// Clean CORS configuration for Railway deployment
+console.log('🚀 Railway CORS Configuration loaded');
+console.log('📋 Allowed origins count:', allowedOrigins.length);
+console.log('🔍 Railway URL included:', allowedOrigins.includes('https://framework-production-92f5.up.railway.app'));
+
+// Environment-based CORS configuration
+const isDevelopment = process.env.NODE_ENV === 'development';
+const isDebugMode = process.env.DEBUG_CORS === 'true';
+
+console.log(`🔧 CORS Mode: ${isDevelopment ? 'Development' : 'Production'}`);
+console.log(`🐛 Debug Mode: ${isDebugMode ? 'Enabled' : 'Disabled'}`);
+
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl requests)
@@ -89,12 +98,20 @@ app.use(cors({
     
     console.log(`🌐 CORS: Checking origin: ${origin}`);
     
+    // In debug mode, allow all origins for troubleshooting
+    if (isDebugMode) {
+      console.log(`🐛 DEBUG MODE: Allowing all origins including ${origin}`);
+      return callback(null, true);
+    }
+    
+    // Check if origin is in allowed list
     if (allowedOrigins.includes(origin)) {
       console.log(`✅ CORS: Allowing origin: ${origin}`);
       callback(null, true);
     } else {
       console.log(`🚫 CORS: Blocking origin: ${origin}`);
       console.log(`📋 Allowed origins:`, allowedOrigins);
+      console.log(`❌ CORS Error: Origin ${origin} not allowed`);
       callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   },
@@ -117,6 +134,19 @@ app.use(cors({
 
 // Note: CORS middleware handles OPTIONS requests automatically
 // No need for explicit OPTIONS handler
+
+// Additional CORS debugging middleware to catch any issues
+app.use((req, res, next) => {
+  // Log CORS-related headers for debugging
+  if (req.headers.origin) {
+    console.log(`🔍 Request CORS Debug:`);
+    console.log(`   - Origin: ${req.headers.origin}`);
+    console.log(`   - Method: ${req.method}`);
+    console.log(`   - Path: ${req.path}`);
+    console.log(`   - Origin in allowed list: ${allowedOrigins.includes(req.headers.origin)}`);
+  }
+  next();
+});
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -189,6 +219,20 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/practitioner-assessment", practitionerAssessmentRoutes);
 app.use("/api/clinical-notes", clinicalNotesRoutes);
 
+// Specific CORS preflight handler for messages endpoint
+app.options('/api/messages/*', (req, res) => {
+  console.log('🔍 CORS Preflight request for messages endpoint');
+  console.log('   - Origin:', req.headers.origin);
+  console.log('   - Method:', req.headers['access-control-request-method']);
+  console.log('   - Headers:', req.headers['access-control-request-headers']);
+  
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.status(200).end();
+});
+
 // Direct route for assigned exercises (for Next.js API proxy compatibility)
 app.get("/api/patient-portal/exercises/:email", async (req: any, res: any) => {
   try {
@@ -206,11 +250,32 @@ app.get("/api/patient-portal/exercises/:email", async (req: any, res: any) => {
 // Global error handler
 app.use((err: any, req: any, res: any, next: any) => {
   console.error('Global error handler:', err);
-  res.status(500).json({ 
-    error: 'Internal server error',
-    message: err.message,
-    timestamp: new Date().toISOString()
-  });
+  
+  // Special handling for CORS errors
+  if (err.message && err.message.includes('CORS')) {
+    console.error('🚫 CORS Error Details:');
+    console.error('   - Error:', err.message);
+    console.error('   - Request Origin:', req.headers.origin);
+    console.error('   - Request Path:', req.path);
+    console.error('   - Request Method:', req.method);
+    console.error('   - Allowed Origins:', allowedOrigins);
+    console.error('   - Origin in allowed list:', req.headers.origin ? allowedOrigins.includes(req.headers.origin) : 'No origin');
+    
+    // Send CORS-specific error response
+    res.status(403).json({ 
+      error: 'CORS Error',
+      message: err.message,
+      origin: req.headers.origin,
+      path: req.path,
+      timestamp: new Date().toISOString()
+    });
+  } else {
+    res.status(500).json({ 
+      error: 'Internal server error',
+      message: err.message,
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // 404 handler
