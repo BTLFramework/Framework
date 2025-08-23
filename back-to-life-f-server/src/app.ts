@@ -74,6 +74,7 @@ const allowedOrigins = [
 
 // Dynamically allow all Vercel preview dashboard URLs
 const dynamicOriginCheck = function (origin: string | undefined, callback: any) {
+  console.log('✅ Running updated CORS middleware');
   console.log('Incoming Origin:', origin);
 
   const vercelDashboardRegex = /^https:\/\/dashboard-[\w-]+-theframework\.vercel\.app$/;
