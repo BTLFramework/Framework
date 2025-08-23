@@ -9,7 +9,7 @@
     "start:railway": "npx prisma generate && node dist/app.js",
     "start:railway:debug": "echo 'Starting Railway deployment...' && npx prisma generate && echo 'Prisma client generated, starting server...' && node dist/app.js",
     "start:railway:simple": "echo 'Simple Railway start - skipping build' && npx prisma generate && echo 'Prisma generated, now starting app...' && node dist/app.js",
-    "build:railway": "tsc --skipLibCheck --noEmitOnError && echo 'TypeScript compilation successful'",
+    "build:railway": "tsc --skipLibCheck --noEmitOnError && echo 'TypeScript compilation successful' && cp src/config/*.js dist/config/ && echo 'Config files copied'",
     "postinstall": "npx prisma generate",
     "build": "tsc && cp src/config/recoveryPointsConfig.js dist/config/ && cp src/config/tdiQuestions.js dist/config/ && cp src/config/regionConfig.js dist/config/ && cp src/config/envValidation.js dist/config/ && cp -r src/routes/*.js dist/routes/ && cp -r src/services/*.js dist/services/ && cp -r node_modules/@prisma dist/ && echo 'Build completed successfully with envValidation.js'",
     "check-env": "node check-env.js",
