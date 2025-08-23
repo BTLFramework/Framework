@@ -17,11 +17,11 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
-const authRoutes = require("./routes/authRoutes");
-const janeRoutes = require("./routes/janeRoutes");
-const patientRoutes = require("./routes/patientRoutes");
-const patientPortalRoutes = require("./routes/patientPortalRoutes2");
-const clinicalNotesRoutes = require("./routes/clinicalNotesRoutes");
+const authRoutes = require("./routes/authRoutes").default;
+const janeRoutes = require("./routes/janeRoutes").default;
+const patientRoutes = require("./routes/patientRoutes").default;
+const patientPortalRoutes = require("./routes/patientPortalRoutes2").default;
+const clinicalNotesRoutes = require("./routes/clinicalNotesRoutes").default;
 const recoveryPointsRoutes = require("./routes/recoveryPointsRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const practitionerAssessmentRoutes = require("./routes/practitionerAssessmentRoutes");
@@ -41,6 +41,14 @@ const { validateEnvironment } = require('./config/envValidation');
 console.log('✅ Environment validation module loaded');
 validateEnvironment();
 console.log('✅ Environment validation completed');
+
+// Prisma runtime check
+console.log('🔌 Testing Prisma connection...');
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
+prisma.$connect()
+  .then(() => console.log('✅ Prisma connected'))
+  .catch(err => console.error('❌ Prisma connection failed:', err));
 
 console.log('🚀 Creating Express app...');
 const app = express();
@@ -277,6 +285,9 @@ app.get("/health", async (req, res) => {
     });
   }
 });
+
+// Health check route for Railway
+app.get('/healthz', (_: any, res: any) => res.status(200).send('ok'));
 
 app.use("/auth", authRoutes);
 app.use("/jane", janeRoutes);
