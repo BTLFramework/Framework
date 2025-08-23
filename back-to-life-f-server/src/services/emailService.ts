@@ -29,10 +29,12 @@ function resolveTemplatesPath(): string {
 
 function loadTemplates(): Templates {
   if (templatesCache) return templatesCache;
+  console.log('🔍 emailService: Starting robust template resolution...');
   const filePath = resolveTemplatesPath();
   console.log(`📧 Loading email templates from: ${filePath}`);
   const raw = fs.readFileSync(filePath, 'utf-8');
   templatesCache = JSON.parse(raw) as Templates;
+  console.log('✅ emailService: Templates loaded successfully');
   return templatesCache;
 }
 
