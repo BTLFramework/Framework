@@ -21,5 +21,8 @@ RUN npm run build:railway
 
 # Config files are already copied during npm run build:railway
 
+# Verify config files are present in final image
+RUN echo "🔍 Final dist/config contents:" && ls -al dist/config
+
 # Start the server
 CMD ["node", "dist/app.js"]
