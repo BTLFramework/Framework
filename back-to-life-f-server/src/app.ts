@@ -1,4 +1,4 @@
-console.log("🟢 app.ts is running");
+console.log("💡 app.ts is running ✅");
 import './config/envValidation';
 
 console.log("🟢 App entrypoint executing:", __dirname);
