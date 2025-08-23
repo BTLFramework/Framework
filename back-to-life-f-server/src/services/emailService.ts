@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 import fs from 'fs';
 import path from 'path';
 
-console.log('📦 emailService loader: ROBUST_RESOLVER_V3'); // bump the suffix when you change code
+console.log('📦 emailService loader MARKER: ROBUST_RESOLVER_V4');
 
 type Templates = Record<string, any>;
 

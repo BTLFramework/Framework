@@ -20,13 +20,14 @@ COPY tsconfig.json ./
 RUN npm run build:railway
 
 # --- prove which code made it into the image ---
-# 1) Stamp the image with a build timestamp
-RUN date -Iseconds > dist/.buildstamp
+# Unique build ID so we can spot the exact image at runtime
+ARG BUILD_ID
+RUN /bin/sh -c "echo \"BUILD_ID=${BUILD_ID:-$(date -Iseconds)}\" > dist/.buildstamp"
 
-# 2) Print first ~120 lines of the compiled emailService.js to the BUILD LOGS
-RUN echo "----- emailService.js (HEAD) -----" \
- && sed -n '1,120p' dist/services/emailService.js \
- && echo "----- /emailService.js (HEAD) -----"
+# Prove the compiled file that is inside THIS image
+RUN echo '----- emailService.js HEAD (build) -----' \
+ && sed -n '1,140p' dist/services/emailService.js \
+ && echo '----- /emailService.js HEAD (build) -----'
 
 # Copy emailTemplates.json to services directory for super robust path resolution
 RUN mkdir -p dist/services

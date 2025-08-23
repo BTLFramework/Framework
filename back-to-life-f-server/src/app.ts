@@ -9,13 +9,27 @@ process.on('unhandledRejection', (reason) => {
 
 console.log("💡 app.ts is running ✅");
 
+// Fail fast if wrong image/environment
+if (!process.env.EXPECT_MARKER || process.env.EXPECT_MARKER !== 'ROBUST_RESOLVER_V4') {
+  console.error('❌ WRONG IMAGE/ENV: EXPECT_MARKER mismatch', process.env.EXPECT_MARKER);
+  process.exit(1);
+}
+
 // Log build stamp at runtime
 try {
-  const stamp = fs.readFileSync(path.resolve(__dirname, '.buildstamp'), 'utf8');
-  console.log('🧾 Build stamp:', stamp.trim());
+  const stamp = fs.readFileSync(path.resolve(__dirname, '.buildstamp'), 'utf8').trim();
+  console.log('🧾 BUILD_STAMP:', stamp);
 } catch {
-  console.log('🧾 Build stamp: (missing)');
+  console.log('🧾 BUILD_STAMP: (missing)');
 }
+
+console.log('💼 RUNTIME_CTX:', {
+  RAILWAY_ENVIRONMENT_NAME: process.env.RAILWAY_ENVIRONMENT_NAME,
+  RAILWAY_PROJECT_ID: process.env.RAILWAY_PROJECT_ID,
+  RAILWAY_SERVICE_NAME: process.env.RAILWAY_SERVICE_NAME,
+  RAILWAY_DEPLOYMENT_ID: process.env.RAILWAY_DEPLOYMENT_ID,
+  NODE_ENV: process.env.NODE_ENV,
+});
 
 // Sanity: print the compiled file at runtime (temporary debug)
 try {

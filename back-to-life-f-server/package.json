@@ -2,7 +2,7 @@
   "name": "back-to-life-f-server",
   "version": "1.0.0",
   "description": "",
-  "buildHash": "cache-bust-2025-01-27-v4-build-proof",
+  "buildHash": "2025-01-27T17:05Z-surgical-debug",
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
