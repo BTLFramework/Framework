@@ -2,10 +2,42 @@ import nodemailer from 'nodemailer';
 import fs from 'fs';
 import path from 'path';
 
-// Email templates
-const emailTemplates = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '../config/emailTemplates.json'), 'utf8')
-);
+type Templates = Record<string, any>;
+
+let templatesCache: Templates | null = null;
+
+function resolveTemplatesPath(): string {
+  const envPath = process.env.EMAIL_TEMPLATES_PATH;
+  const candidates = [
+    envPath && path.resolve(envPath),
+    // most common in prod: compiled file lives in dist/services → dist/config/...
+    path.resolve(__dirname, '../config/emailTemplates.json'),
+    // if someone compiled differently or referenced from a different dir
+    path.resolve(__dirname, '../../config/emailTemplates.json'),
+    // cwd-based fallbacks (local runs, unusual launch dirs)
+    path.resolve(process.cwd(), 'dist/config/emailTemplates.json'),
+    path.resolve(process.cwd(), 'config/emailTemplates.json'),
+  ].filter(Boolean) as string[];
+
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+  throw new Error(
+    `emailTemplates.json not found. Tried:\n${candidates.join('\n')}`
+  );
+}
+
+function loadTemplates(): Templates {
+  if (templatesCache) return templatesCache;
+  const filePath = resolveTemplatesPath();
+  console.log(`📧 Loading email templates from: ${filePath}`);
+  const raw = fs.readFileSync(filePath, 'utf-8');
+  templatesCache = JSON.parse(raw) as Templates;
+  return templatesCache;
+}
+
+// Email templates - now using robust resolver
+const emailTemplates = loadTemplates();
 
 // Create transporter - supports multiple email providers
 const createTransporter = () => {
