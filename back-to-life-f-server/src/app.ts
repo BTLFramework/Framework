@@ -21,7 +21,7 @@ dotenv.config();
 
 // CORS DEBUGGING: To enable debug mode, set DEBUG_CORS=true in environment variables
 // This will allow all origins for troubleshooting CORS issues
-// DEPLOYMENT TIMESTAMP: 2025-01-27 15:35 UTC - Force Railway redeploy with debug logging
+// DEPLOYMENT TIMESTAMP: 2025-01-27 15:45 UTC - Force Railway redeploy with updated compiled code
 
 // Validate environment variables before starting
 console.log('🔍 Starting environment validation...');
