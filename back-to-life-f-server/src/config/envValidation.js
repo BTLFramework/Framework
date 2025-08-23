@@ -1,3 +1,5 @@
+console.log("✅ envValidation.js is running. If you see this, it was successfully imported.");
+
 console.log("✅ envValidation.js is running at runtime");
 
 console.log("✅ envValidation.js loaded and executing");
