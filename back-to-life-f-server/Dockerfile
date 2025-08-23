@@ -19,8 +19,12 @@ COPY tsconfig.json ./
 # Build the project
 RUN npm run build:railway
 
-# Copy config files
-COPY src/config/*.js ./dist/config/
+# Copy config files - be explicit about which files to copy
+COPY src/config/envValidation.js ./dist/config/
+COPY src/config/recoveryPointsConfig.js ./dist/config/
+COPY src/config/regionConfig.js ./dist/config/
+COPY src/config/srsConfig.js ./dist/config/
+COPY src/config/tdiQuestions.js ./dist/config/
 
 # Start the server
 CMD ["npm", "run", "start:railway:simple"]
