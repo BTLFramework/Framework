@@ -1,5 +1,8 @@
 console.log("🟢 App entrypoint executing:", __dirname);
 
+// Explicitly import envValidation to ensure it runs
+import './config/envValidation.js';
+
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
