@@ -4,7 +4,7 @@ import path from 'path';
 
 // Email templates
 const emailTemplates = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '../../config/emailTemplates.json'), 'utf8')
+  fs.readFileSync(path.join(__dirname, '../config/emailTemplates.json'), 'utf8')
 );
 
 // Create transporter - supports multiple email providers

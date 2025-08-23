@@ -1,3 +1,12 @@
+// Global error handlers - MUST be first
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err?.stack || err);
+  process.exit(1);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('UNHANDLED REJECTION:', reason);
+});
+
 console.log("💡 app.ts is running ✅");
 import './config/envValidation';
 
