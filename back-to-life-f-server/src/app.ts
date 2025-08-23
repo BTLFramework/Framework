@@ -69,7 +69,9 @@ const allowedOrigins = [
   'https://the-framework.vercel.app',
   'https://framework-recovery.vercel.app',
   'https://theframework-app.vercel.app',
-  'https://framework-portal.vercel.app'
+  'https://framework-portal.vercel.app',
+  // Current dashboard URL
+  'https://dashboard-kdpgzr1ic-theframework.vercel.app'
 ];
 
 // Dynamically allow all Vercel preview dashboard URLs
