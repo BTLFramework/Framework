@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { API_URL } from "../config/api";
 
 // Helper function to get disability color based on region and score
@@ -187,7 +187,29 @@ function PatientModal({ patient, onClose }) {
   const [clinicalNotes, setClinicalNotes] = useState([]);
   const [showAddNoteModal, setShowAddNoteModal] = useState(false);
   const [newNoteText, setNewNoteText] = useState('');
-  const [newNoteType, setNewNoteType] = useState('general');
+
+
+  // Load clinical notes when modal opens
+  const loadClinicalNotes = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/clinical-notes/${patient.id}`);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setClinicalNotes(result.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading clinical notes:', error);
+    }
+  };
+
+  // Load notes when modal opens
+  useEffect(() => {
+    if (patient && patient.id) {
+      loadClinicalNotes();
+    }
+  }, [patient?.id]);
 
   if (!patient) {
     return null;
@@ -438,38 +460,37 @@ function PatientModal({ patient, onClose }) {
     }
 
     try {
-      const noteData = {
-        patientId: patient.id,
-        text: newNoteText.trim(),
-        type: newNoteType,
-        createdAt: new Date().toISOString(),
-        clinicianId: 'clinician-001',
-        clinicianName: 'Dr. Practitioner'
-      };
 
-      const response = await fetch(`${API_URL}/api/clinical-notes/add`, {
+      const response = await fetch(`${API_URL}/api/clinical-notes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(noteData)
+        body: JSON.stringify({
+          patientId: patient.id,
+          note: newNoteText.trim(),
+          practitionerId: null // Optional for now
+        })
       });
 
       if (response.ok) {
         const result = await response.json();
-        const newNote = {
-          id: result.noteId || Date.now(),
-          text: newNoteText.trim(),
-          type: newNoteType,
-          createdAt: new Date().toISOString(),
-          clinicianName: 'Dr. Practitioner'
-        };
-        
-        setClinicalNotes(prev => [newNote, ...prev]);
-        setNewNoteText('');
-        setNewNoteType('general');
-        setShowAddNoteModal(false);
-        alert('Clinical note added successfully!');
+        if (result.success) {
+          const newNote = {
+            id: result.data.id,
+            note: result.data.note,
+            createdAt: result.data.createdAt,
+            updatedAt: result.data.updatedAt
+          };
+          
+          setClinicalNotes(prev => [newNote, ...prev]);
+          setNewNoteText('');
+  
+          setShowAddNoteModal(false);
+          alert('Clinical note added successfully!');
+        } else {
+          throw new Error(result.message || 'Failed to add clinical note');
+        }
       } else {
         throw new Error('Failed to add clinical note');
       }
@@ -485,12 +506,11 @@ function PatientModal({ patient, onClose }) {
     }
 
     try {
-      const response = await fetch(`${API_URL}/api/clinical-notes/delete`, {
+      const response = await fetch(`${API_URL}/api/clinical-notes/${noteId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ noteId, patientId: patient.id })
+        }
       });
 
       if (response.ok) {
@@ -2012,7 +2032,7 @@ function PatientModal({ patient, onClose }) {
                           </button>
                         </div>
                         <p style={{ fontSize: '0.875rem', color: '#374151', margin: '0 0 8px 0', lineHeight: '1.5' }}>
-                          {note.text}
+                          {note.note}
                         </p>
                         <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
                           Added by: {note.clinicianName}
@@ -2621,30 +2641,7 @@ function PatientModal({ patient, onClose }) {
 
             {/* Modal Content */}
             <div style={{ padding: '24px', flex: 1 }}>
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>
-                  Note Type
-                </label>
-                <select
-                  value={newNoteType}
-                  onChange={(e) => setNewNoteType(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    fontSize: '0.875rem',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    backgroundColor: 'white'
-                  }}
-                >
-                  <option value="general">General Note</option>
-                  <option value="assessment">Assessment</option>
-                  <option value="treatment">Treatment</option>
-                  <option value="progress">Progress Update</option>
-                  <option value="concern">Concern</option>
-                  <option value="recommendation">Recommendation</option>
-                </select>
-              </div>
+
 
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>
