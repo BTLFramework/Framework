@@ -7,13 +7,17 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm ci
 
 # Generate Prisma client
 RUN npx prisma generate
 
-# Copy pre-built dist folder
-COPY dist ./dist
+# Copy source code
+COPY src ./src
+COPY tsconfig.json ./
+
+# Build the project
+RUN npm run build:railway
 
 # Copy config files
 COPY src/config/*.js ./dist/config/
