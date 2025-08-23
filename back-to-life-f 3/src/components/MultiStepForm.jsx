@@ -164,7 +164,7 @@ export default function MultiStepForm() {
       };
 
       // Submit to patient portal API (which forwards to backend)
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://backend-production-3545.up.railway.app';
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://framework-production-92f5.up.railway.app';
       const response = await fetch(`${apiUrl}/api/patient-portal/intake`, {
         method: 'POST',
         headers: {

@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Send to Railway backend to create patient portal account
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-3545.up.railway.app';
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app';
     const backendResponse = await fetch(`${backendUrl}/api/patient-portal/create-account`, {
       method: 'POST',
       headers: {

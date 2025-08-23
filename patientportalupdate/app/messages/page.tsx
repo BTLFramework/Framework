@@ -54,7 +54,7 @@ export default function MessagesPage() {
     const fetchMessages = async () => {
       try {
         setLoading(true)
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-3545.up.railway.app'}/api/messages/patient/${patientId}`)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/api/messages/patient/${patientId}`)
         
         if (!response.ok) {
           throw new Error('Failed to fetch messages')
@@ -92,7 +92,7 @@ export default function MessagesPage() {
           // Mark messages as read when patient views them
           const markAsRead = async () => {
             try {
-              await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-3545.up.railway.app'}/api/messages/patient/${patientId}/mark-read`, {
+              await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/api/messages/patient/${patientId}/mark-read`, {
                 method: 'PATCH'
               })
             } catch (error) {
@@ -131,7 +131,7 @@ export default function MessagesPage() {
     if (!newMessage.trim()) return
 
     try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-3545.up.railway.app'}/api/messages/reply`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/api/messages/reply`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

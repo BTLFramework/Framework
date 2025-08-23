@@ -13,7 +13,7 @@ const fetchPatientsFromAPI = async () => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
     
-    const response = await fetch('https://backend-production-3545.up.railway.app/patients', {
+          const response = await fetch('https://framework-production-92f5.up.railway.app/patients', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

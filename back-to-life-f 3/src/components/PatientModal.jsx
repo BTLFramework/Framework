@@ -1261,7 +1261,7 @@ function PatientModal({ patient, onClose }) {
               }}
               onClick={async () => {
                 try {
-                  const response = await fetch('https://backend-production-3545.up.railway.app/api/messages/send', {
+                  const response = await fetch('https://framework-production-92f5.up.railway.app/api/messages/send', {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
@@ -1525,7 +1525,7 @@ function PatientModal({ patient, onClose }) {
                 <button 
                   onClick={async () => {
                     try {
-                      const response = await fetch('https://backend-production-3545.up.railway.app/api/messages/send', {
+                      const response = await fetch('https://framework-production-92f5.up.railway.app/api/messages/send', {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',

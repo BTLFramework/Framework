@@ -1,42 +1,43 @@
-// API Configuration - Use Environment Variable - CACHE BUSTER v2
+// API Configuration - Railway Backend
 const getApiUrl = () => {
-  console.log('🔥 CACHE BUSTER v2 - This should force a new build!');
+  console.log('🚀 Railway Backend Configuration');
   console.log('🔥 Timestamp:', new Date().toISOString());
+  
   // Check if Vite environment variable is available
   const viteApiUrl = import.meta.env.VITE_API_URL;
   console.log('🔍 Vite Environment Check:');
   console.log('  - VITE_API_URL from env:', viteApiUrl);
   console.log('  - Is defined:', !!viteApiUrl);
   
-  // Use environment variable if available, otherwise fallback to production
+  // Use environment variable if available, otherwise use Railway production
   if (viteApiUrl) {
     console.log('🚀 Using VITE_API_URL from environment:', viteApiUrl);
     return viteApiUrl;
   }
   
-  // Fallback to production URL
-  const productionUrl = 'https://backend-production-3545.up.railway.app';
-  console.log('🚀 Using fallback production URL:', productionUrl);
-  return productionUrl;
+  // Fallback to Railway production URL
+  const railwayUrl = 'https://framework-production-92f5.up.railway.app';
+  console.log('🚀 Using Railway production URL:', railwayUrl);
+  return railwayUrl;
 };
 
 export const API_URL = getApiUrl();
 
-// Force debug logging - FINAL VERSION
-console.log('🔍 FINAL VERSION API Configuration:');
+// Railway deployment logging
+console.log('🔍 Railway API Configuration:');
 console.log('  - Build timestamp:', new Date().toISOString());
 console.log('  - HOSTNAME:', window.location.hostname);
 console.log('  - HOST:', window.location.host);
 console.log('  - Final API_URL:', API_URL);
 console.log('  - VITE_API_URL available:', !!import.meta.env.VITE_API_URL);
-console.log('  - FINAL VERSION: If you see this, it worked!');
+console.log('  - Railway Backend: Ready!');
 
 // Add a unique identifier
-window.BTL_BUILD_VERSION = 'FINAL-v5.1-' + Date.now();
+window.BTL_BUILD_VERSION = 'RAILWAY-v1.0-' + Date.now();
 
 // Global test function for debugging
 window.testApiConfig = () => {
-  console.log('🧪 API Configuration Test - FINAL VERSION:');
+  console.log('🧪 Railway API Configuration Test:');
   console.log('  - API_URL:', API_URL);
   console.log('  - VITE_API_URL:', import.meta.env.VITE_API_URL);
   console.log('  - Will make test request to:', `${API_URL}/patients`);
@@ -56,15 +57,15 @@ window.testApiConfig = () => {
 
 // Global environment test function
 window.testEnvironment = () => {
-  console.log('🧪 Environment Test - FINAL VERSION:');
+  console.log('🧪 Railway Environment Test:');
   console.log('  - Is Localhost:', window.location.hostname === 'localhost');
-  console.log('  - Final API URL:', API_URL);
+  console.log('  - Railway API URL:', API_URL);
   console.log('  - VITE_API_URL:', import.meta.env.VITE_API_URL);
   console.log('  - Build Version:', window.BTL_BUILD_VERSION);
   
   return {
     IS_LOCALHOST: window.location.hostname === 'localhost',
-    FINAL_API_URL: API_URL,
+    RAILWAY_API_URL: API_URL,
     VITE_API_URL: import.meta.env.VITE_API_URL,
     HOSTNAME: window.location.hostname,
     HOST: window.location.host,

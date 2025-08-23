@@ -10,7 +10,7 @@ export async function GET(
     console.log(`📈 Frontend API: Getting task completion stats for patient ${patientId}`);
     
     // Proxy to backend
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-3545.up.railway.app';
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app';
     const response = await fetch(`${backendUrl}/api/recovery-points/task-stats/${patientId}`, {
       method: 'GET',
       headers: {

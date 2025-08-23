@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     console.log('Patient Portal - Received intake form data:', formData);
     
     // Send comprehensive data to backend server
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://backend-production-3545.up.railway.app';
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app';
     const backendResponse = await fetch(`${backendUrl}/patients/submit-intake`, {
       method: 'POST',
       headers: {

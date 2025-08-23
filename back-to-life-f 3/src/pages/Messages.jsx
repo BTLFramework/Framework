@@ -20,7 +20,7 @@ const Messages = () => {
     const fetchConversations = async () => {
       try {
         setLoading(true);
-        const response = await fetch('https://backend-production-3545.up.railway.app/api/messages/conversations');
+        const response = await fetch('https://framework-production-92f5.up.railway.app/api/messages/conversations');
         
         if (!response.ok) {
           throw new Error('Failed to fetch conversations');
@@ -54,7 +54,7 @@ const Messages = () => {
   const fetchConversationMessages = async (patientId) => {
     try {
       setMessagesLoading(true);
-      const response = await fetch(`https://backend-production-3545.up.railway.app/api/messages/conversation/${patientId}`);
+              const response = await fetch(`https://framework-production-92f5.up.railway.app/api/messages/conversation/${patientId}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch messages');
@@ -88,7 +88,7 @@ const Messages = () => {
     if (!newMessage.trim() || !selectedConversation) return;
 
     try {
-      const response = await fetch('https://backend-production-3545.up.railway.app/api/messages/send', {
+      const response = await fetch('https://framework-production-92f5.up.railway.app/api/messages/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ const Messages = () => {
     if (!newMessage.trim() || !messageSubject.trim() || !selectedConversation) return;
 
     try {
-      const response = await fetch('https://backend-production-3545.up.railway.app/api/messages/send', {
+      const response = await fetch('https://framework-production-92f5.up.railway.app/api/messages/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -18,7 +18,7 @@ const DashboardHeader = ({ onLogout, onRefresh, lastUpdated }) => {
   useEffect(() => {
     const fetchUnreadCount = async () => {
       try {
-        const response = await fetch('https://backend-production-3545.up.railway.app/api/messages/conversations');
+        const response = await fetch('https://framework-production-92f5.up.railway.app/api/messages/conversations');
         
         if (response.ok) {
           const result = await response.json();

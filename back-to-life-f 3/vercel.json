@@ -1,16 +1,15 @@
 {
   "version": 2,
-  "routes": [
+  "builds": [
     {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     }
   ],
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://backend-production-3545.up.railway.app"
+    "NEXT_PUBLIC_API_URL": "https://framework-production-92f5.up.railway.app"
   }
 } 

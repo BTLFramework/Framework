@@ -2,7 +2,7 @@
 const fetch = require('node-fetch');
 
 async function testRecoveryPoints() {
-  const baseUrl = 'https://backend-production-3545.up.railway.app/api';
+  const baseUrl = 'https://framework-production-92f5.up.railway.app/api';
   const patientId = 1;
   
   console.log('🧪 Testing Recovery Points System...\n');

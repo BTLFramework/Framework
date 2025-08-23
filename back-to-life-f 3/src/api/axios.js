@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://backend-production-3545.up.railway.app",
+  baseURL: import.meta.env.VITE_API_URL || "https://framework-production-92f5.up.railway.app",
 });
 
 instance.interceptors.request.use((config) => {

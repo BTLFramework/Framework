@@ -43,12 +43,12 @@ app.use((req, res, next) => {
 });
 
 // CORS configuration - Railway deployment focused
-// UPDATED: Railway deployment with dynamic CORS for Vercel preview deployments
-// DEPLOYMENT TIMESTAMP: 2025-01-27 - Railway deployment with dynamic CORS setup
+// UPDATED: Railway deployment with exact drop-in CORS logic for Vercel previews
+// DEPLOYMENT TIMESTAMP: 2025-01-27 - Railway deployment with drop-in CORS setup
 
 const allowedOrigins = [
-  'https://dashboard.theframework.vercel.app', // future production alias
-  'http://localhost:3000', // local dev
+  'https://dashboard.theframework.vercel.app', // custom domain (future)
+  'http://localhost:3000',                     // local dev
   'http://localhost:3001', 
   'http://localhost:5173',
   'http://localhost:5174',
@@ -72,11 +72,16 @@ const allowedOrigins = [
   'https://framework-portal.vercel.app'
 ];
 
+// Dynamically allow all Vercel preview dashboard URLs
 const dynamicOriginCheck = function (origin: string | undefined, callback: any) {
+  console.log('Incoming Origin:', origin);
+
+  const vercelDashboardRegex = /^https:\/\/dashboard-[\w-]+-theframework\.vercel\.app$/;
+
   if (
-    !origin || 
-    allowedOrigins.includes(origin) ||
-    /^https:\/\/dashboard-[\w-]+-theframework\.vercel\.app$/.test(origin)
+    !origin ||                             // Allow non-browser tools
+    allowedOrigins.includes(origin) ||     // Allow exact whitelisted origins
+    vercelDashboardRegex.test(origin)      // Allow all Vercel dashboard builds
   ) {
     callback(null, true);
   } else {
@@ -85,7 +90,7 @@ const dynamicOriginCheck = function (origin: string | undefined, callback: any) 
 };
 
 // Clean CORS configuration for Railway deployment
-console.log('🚀 Railway CORS Configuration loaded with dynamic Vercel support');
+console.log('🚀 Railway CORS Configuration loaded with exact drop-in logic');
 console.log('📋 Allowed origins count:', allowedOrigins.length);
 console.log('🔍 Railway URL included:', allowedOrigins.includes('https://framework-production-92f5.up.railway.app'));
 
