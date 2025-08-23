@@ -1,3 +1,6 @@
+console.log("🟢 app.ts is running");
+import './config/envValidation.js';
+
 console.log("🟢 App entrypoint executing:", __dirname);
 
 // Explicitly import envValidation to ensure it runs
