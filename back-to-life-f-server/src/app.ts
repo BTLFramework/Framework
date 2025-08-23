@@ -78,14 +78,24 @@ const dynamicOriginCheck = function (origin: string | undefined, callback: any) 
   console.log('Incoming Origin:', origin);
 
   const vercelDashboardRegex = /^https:\/\/dashboard-[\w-]+-theframework\.vercel\.app$/;
+  
+  // Debug logging
+  console.log('🔍 CORS Debug Details:');
+  console.log('   - Origin:', origin);
+  console.log('   - No origin check:', !origin);
+  console.log('   - In allowed origins:', allowedOrigins.includes(origin || ''));
+  console.log('   - Regex test result:', vercelDashboardRegex.test(origin || ''));
+  console.log('   - Regex pattern:', vercelDashboardRegex.toString());
 
   if (
     !origin ||                             // Allow non-browser tools
     allowedOrigins.includes(origin) ||     // Allow exact whitelisted origins
     vercelDashboardRegex.test(origin)      // Allow all Vercel dashboard builds
   ) {
+    console.log('✅ CORS: Origin allowed');
     callback(null, true);
   } else {
+    console.log('❌ CORS: Origin rejected');
     callback(new Error(`Not allowed by CORS: ${origin}`));
   }
 };
