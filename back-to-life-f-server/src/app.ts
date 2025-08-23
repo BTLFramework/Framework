@@ -47,68 +47,41 @@ app.use((req, res, next) => {
 // DEPLOYMENT TIMESTAMP: 2025-01-27 - Railway deployment with dynamic CORS setup
 
 const allowedOrigins = [
-  // Local development HTTP (for development only)
-  "http://localhost:3000",
-  "http://localhost:3001", 
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "http://localhost:5175",
-  "http://localhost:5176",
-  "http://localhost:5177",
-  "http://localhost:5178",
+  'https://dashboard.theframework.vercel.app', // future production alias
+  'http://localhost:3000', // local dev
+  'http://localhost:3001', 
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5175',
+  'http://localhost:5176',
+  'http://localhost:5177',
+  'http://localhost:5178',
   // Railway production domains
-  "https://framework-production-92f5.up.railway.app",
+  'https://framework-production-92f5.up.railway.app',
   // Production frontend domains
-  "https://backtolife.vercel.app",
-  "https://intake.backtolife.vercel.app", 
-  "https://clinician.backtolife.vercel.app",
-  "https://patientportalupdate.vercel.app",
-  "https://back-to-life-f.vercel.app",
-  "https://back-to-life-f-3.vercel.app",
-  "https://dashboard.vercel.app",
-  "https://the-framework.vercel.app",
-  "https://framework-recovery.vercel.app",
-  "https://theframework-app.vercel.app",
-  "https://framework-portal.vercel.app",
-  // Environment variable fallbacks
-  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
-  ...(process.env.PATIENT_PORTAL_URL ? [process.env.PATIENT_PORTAL_URL] : []),
-  ...(process.env.CLINICIAN_DASHBOARD_URL ? [process.env.CLINICIAN_DASHBOARD_URL] : [])
+  'https://backtolife.vercel.app',
+  'https://intake.backtolife.vercel.app', 
+  'https://clinician.backtolife.vercel.app',
+  'https://patientportalupdate.vercel.app',
+  'https://back-to-life-f.vercel.app',
+  'https://back-to-life-f-3.vercel.app',
+  'https://dashboard.vercel.app',
+  'https://the-framework.vercel.app',
+  'https://framework-recovery.vercel.app',
+  'https://theframework-app.vercel.app',
+  'https://framework-portal.vercel.app'
 ];
 
-// Dynamic CORS configuration for Vercel preview deployments
 const dynamicOriginCheck = function (origin: string | undefined, callback: any) {
-  // Allow requests with no origin (like mobile apps or curl requests)
-  if (!origin) {
-    console.log('🌐 CORS: Allowing request with no origin');
-    return callback(null, true);
+  if (
+    !origin || 
+    allowedOrigins.includes(origin) ||
+    /^https:\/\/dashboard-[\w-]+-theframework\.vercel\.app$/.test(origin)
+  ) {
+    callback(null, true);
+  } else {
+    callback(new Error(`Not allowed by CORS: ${origin}`));
   }
-  
-  console.log(`🌐 CORS: Checking origin: ${origin}`);
-  
-  // Check if origin is in allowed list
-  if (allowedOrigins.includes(origin)) {
-    console.log(`✅ CORS: Allowing origin: ${origin}`);
-    return callback(null, true);
-  }
-  
-  // Dynamic check for Vercel preview deployments
-  if (/^https:\/\/dashboard-[\w-]+-theframework\.vercel\.app$/.test(origin)) {
-    console.log(`✅ CORS: Allowing Vercel preview deployment: ${origin}`);
-    return callback(null, true);
-  }
-  
-  // Dynamic check for other Vercel preview patterns
-  if (/^https:\/\/[a-z0-9-]+-theframework\.vercel\.app$/.test(origin)) {
-    console.log(`✅ CORS: Allowing Vercel preview deployment: ${origin}`);
-    return callback(null, true);
-  }
-  
-  // Block all other origins
-  console.log(`🚫 CORS: Blocking origin: ${origin}`);
-  console.log(`📋 Allowed origins:`, allowedOrigins);
-  console.log(`❌ CORS Error: Origin ${origin} not allowed`);
-  callback(new Error(`Origin ${origin} not allowed by CORS`));
 };
 
 // Clean CORS configuration for Railway deployment
