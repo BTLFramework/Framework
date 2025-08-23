@@ -1,3 +1,5 @@
+console.log("✅ envValidation.js loaded and executing");
+
 // Environment Variable Validation
 // This ensures all critical variables are present before the app starts
 
