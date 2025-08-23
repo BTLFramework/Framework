@@ -19,8 +19,7 @@ COPY tsconfig.json ./
 # Build the project
 RUN npm run build:railway
 
-# Copy all config files (not just those compiled by tsc)
-COPY src/config ./dist/config
+# Config files are already copied during npm run build:railway
 
 # Start the server
 CMD ["node", "dist/app.js"]
