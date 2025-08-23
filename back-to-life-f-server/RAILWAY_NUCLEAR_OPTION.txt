@@ -1,3 +1,0 @@
-RAILWAY NUCLEAR OPTION - 2025-01-27 17:00 UTC
-This file forces Railway to completely rebuild with NO cache.
-If this doesn't work, we need to delete and recreate the Railway project.

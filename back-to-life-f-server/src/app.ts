@@ -23,22 +23,6 @@ try {
   console.log('🧾 BUILD_STAMP: (missing)');
 }
 
-console.log('💼 RUNTIME_CTX:', {
-  RAILWAY_ENVIRONMENT_NAME: process.env.RAILWAY_ENVIRONMENT_NAME,
-  RAILWAY_PROJECT_ID: process.env.RAILWAY_PROJECT_ID,
-  RAILWAY_SERVICE_NAME: process.env.RAILWAY_SERVICE_NAME,
-  RAILWAY_DEPLOYMENT_ID: process.env.RAILWAY_DEPLOYMENT_ID,
-  NODE_ENV: process.env.NODE_ENV,
-});
-
-// Sanity: print the compiled file at runtime (temporary debug)
-try {
-  const snippet = fs.readFileSync(path.resolve(__dirname, 'services/emailService.js'), 'utf8').slice(0, 400);
-  console.log('🔎 Runtime emailService.js head:\n', snippet);
-} catch (e) {
-  console.log('🔎 Could not read runtime emailService.js:', e);
-}
-
 import './config/envValidation';
 
 console.log("🟢 App entrypoint executing:", __dirname);
