@@ -22,11 +22,17 @@ dotenv.config();
 // DEPLOYMENT TIMESTAMP: 2025-01-27 15:30 UTC - Force Railway redeploy to debug 502 errors
 
 // Validate environment variables before starting
+console.log('🔍 Starting environment validation...');
 const { validateEnvironment } = require('./config/envValidation');
+console.log('✅ Environment validation module loaded');
 validateEnvironment();
+console.log('✅ Environment validation completed');
 
+console.log('🚀 Creating Express app...');
 const app = express();
+console.log('✅ Express app created successfully');
 
+console.log('🔧 Setting up logging middleware...');
 // Enhanced logging middleware
 app.use((req, res, next) => {
   const timestamp = new Date().toISOString();
