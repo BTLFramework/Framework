@@ -3,11 +3,11 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
-import authRoutes from "./routes/authRoutes";
-import janeRoutes from "./routes/janeRoutes";
-import patientRoutes from "./routes/patientRoutes";
-import patientPortalRoutes from "./routes/patientPortalRoutes2";
-import clinicalNotesRoutes from "./routes/clinicalNotesRoutes";
+const authRoutes = require("./routes/authRoutes");
+const janeRoutes = require("./routes/janeRoutes");
+const patientRoutes = require("./routes/patientRoutes");
+const patientPortalRoutes = require("./routes/patientPortalRoutes2");
+const clinicalNotesRoutes = require("./routes/clinicalNotesRoutes");
 const recoveryPointsRoutes = require("./routes/recoveryPointsRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const practitionerAssessmentRoutes = require("./routes/practitionerAssessmentRoutes");
@@ -19,7 +19,7 @@ dotenv.config();
 
 // CORS DEBUGGING: To enable debug mode, set DEBUG_CORS=true in environment variables
 // This will allow all origins for troubleshooting CORS issues
-// DEPLOYMENT TIMESTAMP: 2025-08-22 22:37 UTC - Force Railway redeploy with enhanced CORS debugging
+// DEPLOYMENT TIMESTAMP: 2025-01-27 15:30 UTC - Force Railway redeploy to debug 502 errors
 
 // Validate environment variables before starting
 const { validateEnvironment } = require('./config/envValidation');
@@ -85,33 +85,53 @@ const allowedOrigins = [
   'https://dashboard-theframework.vercel.app',
   'https://dashboard-vercel.vercel.app',
   'https://dashboard-vercel-theframework.vercel.app',
-  'https://back-to-life-f-3-vercel.vercel.app'
+  'https://back-to-life-f-3-vercel.vercel.app',
+  'https://dashboard-three-taupe-47.vercel.app'
 ];
 
-// Dynamically allow all Vercel preview dashboard URLs
+// Comprehensive CORS origin checker for all Vercel deployments
 const dynamicOriginCheck = function (origin: string | undefined, callback: any) {
-  console.log('✅ Running updated CORS middleware');
+  console.log('✅ Running comprehensive CORS middleware');
   console.log('Incoming Origin:', origin);
 
-  const vercelDashboardRegex = /^https:\/\/dashboard-[\w-]+-theframework\.vercel\.app$/;
+  // Multiple regex patterns to catch all Vercel deployment variations
+  const vercelPatterns = [
+    /^https:\/\/dashboard-[\w-]+-[\w-]+\.vercel\.app$/,           // dashboard-xxx-yyy.vercel.app
+    /^https:\/\/dashboard-[\w-]+\.vercel\.app$/,                   // dashboard-xxx.vercel.app
+    /^https:\/\/[\w-]+-[\w-]+\.vercel\.app$/,                      // xxx-yyy.vercel.app
+    /^https:\/\/[\w-]+\.vercel\.app$/,                             // xxx.vercel.app
+    /^https:\/\/[\w-]+-theframework\.vercel\.app$/                 // xxx-theframework.vercel.app
+  ];
   
   // Debug logging
   console.log('🔍 CORS Debug Details:');
   console.log('   - Origin:', origin);
   console.log('   - No origin check:', !origin);
   console.log('   - In allowed origins:', allowedOrigins.includes(origin || ''));
-  console.log('   - Regex test result:', vercelDashboardRegex.test(origin || ''));
-  console.log('   - Regex pattern:', vercelDashboardRegex.toString());
+  
+  // Test against all regex patterns
+  let regexMatch = false;
+  for (let i = 0; i < vercelPatterns.length; i++) {
+    if (vercelPatterns[i].test(origin || '')) {
+      regexMatch = true;
+      console.log(`   - Regex pattern ${i + 1} matched:`, vercelPatterns[i].toString());
+      break;
+    }
+  }
+  console.log('   - Any regex pattern matched:', regexMatch);
 
   if (
     !origin ||                             // Allow non-browser tools
     allowedOrigins.includes(origin) ||     // Allow exact whitelisted origins
-    vercelDashboardRegex.test(origin)      // Allow all Vercel dashboard builds
+    regexMatch                             // Allow any Vercel deployment URL
   ) {
     console.log('✅ CORS: Origin allowed');
     callback(null, true);
   } else {
     console.log('❌ CORS: Origin rejected');
+    console.log('   - Rejected origin:', origin);
+    console.log('   - Allowed origins count:', allowedOrigins.length);
+    console.log('   - Regex patterns tested:', vercelPatterns.length);
     callback(new Error(`Not allowed by CORS: ${origin}`));
   }
 };
@@ -128,24 +148,37 @@ const isDebugMode = process.env.DEBUG_CORS === 'true';
 console.log(`🔧 CORS Mode: ${isDevelopment ? 'Development' : 'Production'}`);
 console.log(`🐛 Debug Mode: ${isDebugMode ? 'Enabled' : 'Disabled'}`);
 
-app.use(cors({
-  origin: dynamicOriginCheck,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: [
-    'Content-Type', 
-    'Authorization', 
-    'Cookie', 
-    'X-Requested-With',
-    'Accept',
-    'Origin',
-    'Access-Control-Request-Method',
-    'Access-Control-Request-Headers'
-  ],
-  exposedHeaders: ['Set-Cookie'],
-  optionsSuccessStatus: 200,
-  preflightContinue: false
-}));
+// Fallback CORS for development or debug mode
+if (isDevelopment || isDebugMode) {
+  console.log('🚨 DEVELOPMENT/DEBUG MODE: Using permissive CORS');
+  app.use(cors({
+    origin: true, // Allow all origins in dev/debug mode
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['*'],
+    exposedHeaders: ['Set-Cookie']
+  }));
+} else {
+  console.log('🔒 PRODUCTION MODE: Using strict CORS with comprehensive pattern matching');
+  app.use(cors({
+    origin: dynamicOriginCheck,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: [
+      'Content-Type', 
+      'Authorization', 
+      'Cookie', 
+      'X-Requested-With',
+      'Accept',
+      'Origin',
+      'Access-Control-Request-Method',
+      'Access-Control-Request-Headers'
+    ],
+    exposedHeaders: ['Set-Cookie'],
+    optionsSuccessStatus: 200,
+    preflightContinue: false
+  }));
+}
 
 // Note: CORS middleware handles OPTIONS requests automatically
 // No need for explicit OPTIONS handler
