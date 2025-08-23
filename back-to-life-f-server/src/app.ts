@@ -208,20 +208,6 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/practitioner-assessment", practitionerAssessmentRoutes);
 app.use("/api/clinical-notes", clinicalNotesRoutes);
 
-// Specific CORS preflight handler for messages endpoint
-app.options('/api/messages/*', (req, res) => {
-  console.log('🔍 CORS Preflight request for messages endpoint');
-  console.log('   - Origin:', req.headers.origin);
-  console.log('   - Method:', req.headers['access-control-request-method']);
-  console.log('   - Headers:', req.headers['access-control-request-headers']);
-  
-  res.header('Access-Control-Allow-Origin', req.headers.origin);
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.status(200).end();
-});
-
 // Direct route for assigned exercises (for Next.js API proxy compatibility)
 app.get("/api/patient-portal/exercises/:email", async (req: any, res: any) => {
   try {
