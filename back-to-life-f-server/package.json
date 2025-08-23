@@ -9,7 +9,7 @@
     "start:railway": "npm run build:railway && npx prisma generate && node dist/app.js",
     "start:railway:debug": "echo 'Starting Railway deployment...' && npm run build:railway && echo 'Build complete, generating Prisma client...' && npx prisma generate && echo 'Prisma client generated, starting server...' && node dist/app.js",
     "start:railway:simple": "echo 'Simple Railway start - skipping build' && npx prisma generate && node dist/app.js",
-    "build:railway": "tsc --skipLibCheck --noEmitOnError && echo 'TypeScript compilation successful' && cp -r src/config/*.js dist/config/ 2>/dev/null || echo 'Config copy completed' && cp -r src/routes/*.js dist/routes/ 2>/dev/null || echo 'Routes copy completed' && cp -r src/services/*.js dist/services/ 2>/dev/null || echo 'Services copy completed' && cp -r node_modules/@prisma dist/ 2>/dev/null || echo 'Prisma copy completed' && echo 'Railway build completed successfully'",
+    "build:railway": "tsc --skipLibCheck --noEmitOnError && echo 'TypeScript compilation successful'",
     "postinstall": "npx prisma generate",
     "build": "tsc && cp src/config/recoveryPointsConfig.js dist/config/ && cp src/config/tdiQuestions.js dist/config/ && cp src/config/regionConfig.js dist/config/ && cp src/config/envValidation.js dist/config/ && cp -r src/routes/*.js dist/routes/ && cp -r src/services/*.js dist/services/ && cp -r node_modules/@prisma dist/ && echo 'Build completed successfully with envValidation.js'",
     "check-env": "node check-env.js",
