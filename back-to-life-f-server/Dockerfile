@@ -22,8 +22,5 @@ RUN npm run build:railway
 # Copy config files
 COPY src/config/*.js ./dist/config/
 
-# Expose port
-EXPOSE 3001
-
 # Start the server
 CMD ["npm", "run", "start:railway:simple"]
