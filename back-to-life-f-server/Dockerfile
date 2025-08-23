@@ -24,9 +24,5 @@ RUN npm run build:railway
 # Verify config files are present in final image
 RUN echo "🔍 Final dist/config contents:" && ls -al dist/config
 
-# Sanity check - confirm the compiled entrypoint is present
-RUN echo "✅ Contents of dist/" && ls -al dist
-
 # Start the server
-# TEMPORARY DEBUG: Test with debug.ts first
-CMD ["node", "dist/debug.js"]
+CMD ["node", "dist/app.js"]
