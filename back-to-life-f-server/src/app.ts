@@ -71,7 +71,21 @@ const allowedOrigins = [
   'https://theframework-app.vercel.app',
   'https://framework-portal.vercel.app',
   // Current dashboard URL
-  'https://dashboard-kdpgzr1ic-theframework.vercel.app'
+  'https://dashboard-kdpgzr1ic-theframework.vercel.app',
+  // Additional dashboard URLs from logs
+  'https://dashboard-ag1sllt22-theframework.vercel.app',
+  'https://dashboard-2awgqzcyj-theframework.vercel.app',
+  'https://dashboard-pddbpp75m-theframework.vercel.app',
+  'https://theframework-dashboard.vercel.app',
+  'https://dashboard-e9khyy8u1-theframework.vercel.app',
+  'https://dashboard-4xar3wl7e-theframework.vercel.app',
+  'https://dashboard-5057ubz7n-theframework.vercel.app',
+  'https://patientportalupdate-theframework.vercel.app',
+  'https://back-to-life-f-3-theframework.vercel.app',
+  'https://dashboard-theframework.vercel.app',
+  'https://dashboard-vercel.vercel.app',
+  'https://dashboard-vercel-theframework.vercel.app',
+  'https://back-to-life-f-3-vercel.vercel.app'
 ];
 
 // Dynamically allow all Vercel preview dashboard URLs
