@@ -19,9 +19,18 @@ COPY tsconfig.json ./
 # Build the project
 RUN npm run build:railway
 
-# Config files are already copied during npm run build:railway
+# --- prove which code made it into the image ---
+# 1) Stamp the image with a build timestamp
+RUN date -Iseconds > dist/.buildstamp
 
-# Verify config files are present in final image
+# 2) Print first ~120 lines of the compiled emailService.js to the BUILD LOGS
+RUN echo "----- emailService.js (HEAD) -----" \
+ && sed -n '1,120p' dist/services/emailService.js \
+ && echo "----- /emailService.js (HEAD) -----"
+
+# Copy emailTemplates.json to services directory for super robust path resolution
+RUN mkdir -p dist/services
+COPY src/config/emailTemplates.json dist/services/emailTemplates.json
 
 # Start the server
 CMD ["node", "dist/app.js"]

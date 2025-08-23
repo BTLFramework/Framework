@@ -2,6 +2,8 @@ import nodemailer from 'nodemailer';
 import fs from 'fs';
 import path from 'path';
 
+console.log('📦 emailService loader: ROBUST_RESOLVER_V3'); // bump the suffix when you change code
+
 type Templates = Record<string, any>;
 
 let templatesCache: Templates | null = null;
@@ -10,6 +12,7 @@ function resolveTemplatesPath(): string {
   const envPath = process.env.EMAIL_TEMPLATES_PATH;
   const candidates = [
     envPath && path.resolve(envPath),
+    path.resolve(__dirname, 'emailTemplates.json'), // Super robust - same directory
     // most common in prod: compiled file lives in dist/services → dist/config/...
     path.resolve(__dirname, '../config/emailTemplates.json'),
     // if someone compiled differently or referenced from a different dir

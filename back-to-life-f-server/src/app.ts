@@ -8,6 +8,23 @@ process.on('unhandledRejection', (reason) => {
 });
 
 console.log("💡 app.ts is running ✅");
+
+// Log build stamp at runtime
+try {
+  const stamp = fs.readFileSync(path.resolve(__dirname, '.buildstamp'), 'utf8');
+  console.log('🧾 Build stamp:', stamp.trim());
+} catch {
+  console.log('🧾 Build stamp: (missing)');
+}
+
+// Sanity: print the compiled file at runtime (temporary debug)
+try {
+  const snippet = fs.readFileSync(path.resolve(__dirname, 'services/emailService.js'), 'utf8').slice(0, 400);
+  console.log('🔎 Runtime emailService.js head:\n', snippet);
+} catch (e) {
+  console.log('🔎 Could not read runtime emailService.js:', e);
+}
+
 import './config/envValidation';
 
 console.log("🟢 App entrypoint executing:", __dirname);
@@ -17,6 +34,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
+import fs from "fs";
 const authRoutes = require("./routes/authRoutes").default;
 const janeRoutes = require("./routes/janeRoutes").default;
 const patientRoutes = require("./routes/patientRoutes").default;
