@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "start": "npx prisma generate && node dist/app.js",
-    "start:railway": "npm run build:railway && npx prisma generate && node dist/app.js",
-    "start:railway:debug": "echo 'Starting Railway deployment...' && npm run build:railway && echo 'Build complete, generating Prisma client...' && npx prisma generate && echo 'Prisma client generated, starting server...' && node dist/app.js",
+    "start:railway": "npx prisma generate && node dist/app.js",
+    "start:railway:debug": "echo 'Starting Railway deployment...' && npx prisma generate && echo 'Prisma client generated, starting server...' && node dist/app.js",
     "start:railway:simple": "echo 'Simple Railway start - skipping build' && npx prisma generate && node dist/app.js",
     "build:railway": "tsc --skipLibCheck --noEmitOnError && echo 'TypeScript compilation successful'",
     "postinstall": "npx prisma generate",
