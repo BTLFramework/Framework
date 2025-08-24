@@ -2,6 +2,7 @@ import { Router } from "express";
 import { submitIntake, getPatientLatestScore, getAllPatientsWithScores, deletePatient, getPatientRecoveryPointsData, getPhaseByScore } from "../controllers/patientController";
 import { findPatientByEmail, getLatestSRSScore } from "../models/patientModel";
 import prisma from "../db";
+import * as clinicianCtrl from "../controllers/clinicianDashboardController";
 
 const router = Router();
 
@@ -526,5 +527,24 @@ router.post("/activity", async (req: any, res: any) => {
     });
   }
 });
+
+// ---------- Clinician Dashboard Routes ----------
+// Clinical notes
+router.get('/:id/notes', clinicianCtrl.listNotes);
+router.post('/:id/notes', clinicianCtrl.addNote);
+router.patch('/:id/notes/:noteId', clinicianCtrl.updateNote);
+router.delete('/:id/notes/:noteId', clinicianCtrl.deleteNote);
+
+// Clinician assessment
+router.post('/:id/assessment', clinicianCtrl.saveClinicianAssessment);
+
+// Mark as reviewed
+router.patch('/:id/review', clinicianCtrl.markReviewed);
+
+// Update treatment plan
+router.patch('/:id/treatment-plan', clinicianCtrl.updateTreatmentPlan);
+
+// Schedule reassessment
+router.post('/:id/reassessment', clinicianCtrl.scheduleReassessment);
 
 export default router;

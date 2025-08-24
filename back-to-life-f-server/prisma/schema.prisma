@@ -21,6 +21,9 @@ model Patient {
   intakeDate        DateTime
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @default(now()) @updatedAt
+  reviewedAt        DateTime?          // When patient was last reviewed by clinician
+  treatmentPlan     String?            // Current treatment plan text
+  nextReassessmentAt DateTime?        // Scheduled reassessment date
   assessmentResults AssessmentResult[]
   messages          Message[]
   mindfulnessLogs   MindfulnessLog[]
@@ -32,6 +35,7 @@ model Patient {
   practitionerAssessments PractitionerAssessment[]
   taskCompletions   TaskCompletion[]
   clinicalNotes    ClinicalNote[]
+  clinicianAssessments ClinicianAssessment[]
 }
 
 model SRSDaily {
@@ -261,6 +265,19 @@ model ClinicalNote {
 
   @@index([patientId, createdAt])
   @@index([practitionerId])
+}
+
+model ClinicianAssessment {
+  id                        Int      @id @default(autoincrement())
+  patientId                 Int
+  recoveryMilestoneAchieved Boolean  @default(false)
+  clinicalProgressVerified  Boolean  @default(false)
+  comments                  String?
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+  patient                   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([patientId, createdAt])
 }
 
 enum RPType {
