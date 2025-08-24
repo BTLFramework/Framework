@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import * as clinicianApi from "../services/clinicianApi";
 
 // Helper function to get disability color based on region and score
 const getDisabilityColor = (region, score) => {
@@ -152,6 +153,108 @@ function PatientModal({ patient, onClose }) {
   const [messageSubject, setMessageSubject] = useState('');
   const [recoveryMilestone, setRecoveryMilestone] = useState(patient?.recoveryMilestone || false);
   const [clinicalProgressVerified, setClinicalProgressVerified] = useState(patient?.clinicalProgressVerified || false);
+  const [clinicalNotes, setClinicalNotes] = useState([]);
+  const [noteInput, setNoteInput] = useState('');
+  const [isAddingNote, setIsAddingNote] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Load clinical notes when modal opens
+  useEffect(() => {
+    if (patient?.id) {
+      loadClinicalNotes();
+    }
+  }, [patient?.id]);
+
+  const loadClinicalNotes = async () => {
+    try {
+      const notes = await clinicianApi.fetchClinicalNotes(patient.id);
+      setClinicalNotes(notes);
+    } catch (error) {
+      console.error('Failed to load notes:', error);
+    }
+  };
+
+  // API Functions
+  const handleSaveAssessment = async () => {
+    try {
+      setIsLoading(true);
+      await clinicianApi.saveClinicianAssessment(patient.id, {
+        recoveryMilestoneAchieved: recoveryMilestone,
+        clinicalProgressVerified: clinicalProgressVerified,
+        comments: assessmentComments || null
+      });
+      
+      alert('Clinician assessment saved successfully!');
+      // Optionally refresh patient data
+    } catch (error) {
+      console.error('Failed to save assessment:', error);
+      alert(`Failed to save assessment: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddNote = async () => {
+    if (!noteInput.trim()) return;
+    
+    setIsAddingNote(true);
+    try {
+      const newNote = await clinicianApi.addClinicalNote(patient.id, noteInput);
+      setClinicalNotes(prev => [newNote, ...prev]);
+      setNoteInput('');
+      alert('Note added successfully!');
+    } catch (error) {
+      console.error('Failed to add note:', error);
+      alert(`Failed to add note: ${error.message}`);
+    } finally {
+      setIsAddingNote(false);
+    }
+  };
+
+  const handleMarkReviewed = async () => {
+    try {
+      setIsLoading(true);
+      await clinicianApi.markPatientReviewed(patient.id);
+      alert('Patient marked as reviewed!');
+    } catch (error) {
+      console.error('Failed to mark as reviewed:', error);
+      alert(`Failed to mark as reviewed: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateTreatmentPlan = async () => {
+    const plan = prompt('Enter new treatment plan:');
+    if (!plan) return;
+    
+    try {
+      setIsLoading(true);
+      await clinicianApi.updateTreatmentPlan(patient.id, plan);
+      alert('Treatment plan updated successfully!');
+    } catch (error) {
+      console.error('Failed to update treatment plan:', error);
+      alert(`Failed to update treatment plan: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleScheduleReassessment = async () => {
+    const date = prompt('Enter reassessment date (YYYY-MM-DD):');
+    if (!date) return;
+    
+    try {
+      setIsLoading(true);
+      await clinicianApi.scheduleReassessment(patient.id, date);
+      alert('Reassessment scheduled successfully!');
+    } catch (error) {
+      console.error('Failed to schedule reassessment:', error);
+      alert(`Failed to schedule reassessment: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (!patient) {
     return null;
@@ -875,11 +978,8 @@ function PatientModal({ patient, onClose }) {
                 {/* Save Button */}
                 <div style={{ marginTop: '16px', textAlign: 'center' }}>
                   <button
-                    onClick={() => {
-                      // Here you would save the clinician input changes to the backend
-                      console.log('Saving clinician input:', { recoveryMilestone, clinicalProgressVerified });
-                      // You could call an API here to update the patient record
-                    }}
+                    onClick={handleSaveAssessment}
+                    disabled={isLoading}
                     style={{
                       padding: '8px 16px',
                       background: 'linear-gradient(135deg, #155e75 0%, #0891b2 100%)',
@@ -893,9 +993,9 @@ function PatientModal({ patient, onClose }) {
                     }}
                     onMouseOver={(e) => e.target.style.transform = 'translateY(-1px)'}
                     onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
-                  >
-                    Save Clinician Assessment
-                  </button>
+                                      >
+                      {isLoading ? 'Saving...' : 'Save Clinician Assessment'}
+                    </button>
                 </div>
 
                 {/* Current SRS Score Display */}
@@ -1096,23 +1196,82 @@ function PatientModal({ patient, onClose }) {
                 <h4 style={{ fontSize: '1rem', fontWeight: 600, color: '#374151', marginBottom: '20px', margin: 0 }}>
                   Clinical Notes
                 </h4>
-                <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6b7280' }}>
-                  <svg 
-                    style={{ width: '48px', height: '48px', margin: '0 auto 16px', color: '#d1d5db' }} 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={1.5} 
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" 
+                {/* Add Note Input */}
+                <div style={{ marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input
+                      type="text"
+                      value={noteInput}
+                      onChange={(e) => setNoteInput(e.target.value)}
+                      placeholder="Add clinical note..."
+                      style={{
+                        flex: 1,
+                        padding: '8px 12px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '6px',
+                        fontSize: '0.875rem'
+                      }}
+                      onKeyPress={(e) => e.key === 'Enter' && handleAddNote()}
                     />
-                  </svg>
-                  <p style={{ fontSize: '1rem', fontWeight: 500, margin: '0 0 8px 0' }}>No clinical notes yet</p>
-                  <p style={{ fontSize: '0.875rem', margin: 0 }}>Click "Add Note" to start documenting patient progress</p>
+                    <button
+                      onClick={handleAddNote}
+                      disabled={isAddingNote || !noteInput.trim()}
+                      style={{
+                        padding: '8px 16px',
+                        background: 'linear-gradient(135deg, #155e75 0%, #0891b2 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        cursor: isAddingNote ? 'not-allowed' : 'pointer',
+                        opacity: isAddingNote ? 0.6 : 1
+                      }}
+                    >
+                      {isAddingNote ? 'Adding...' : 'Add Note'}
+                    </button>
+                  </div>
                 </div>
+
+                {/* Clinical Notes Display */}
+                {clinicalNotes.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6b7280' }}>
+                    <svg 
+                      style={{ width: '48px', height: '48px', margin: '0 auto 16px', color: '#d1d5db' }} 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={1.5} 
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" 
+                      />
+                    </svg>
+                    <p style={{ fontSize: '1rem', fontWeight: 500, margin: '0 0 8px 0' }}>No clinical notes yet</p>
+                    <p style={{ fontSize: '0.875rem', margin: 0 }}>Click "Add Note" to start documenting patient progress</p>
+                  </div>
+                ) : (
+                  <div>
+                    {clinicalNotes.map(note => (
+                      <div key={note.id} style={{ 
+                        padding: '12px', 
+                        border: '1px solid #e5e7eb', 
+                        borderRadius: '6px', 
+                        marginBottom: '8px',
+                        backgroundColor: '#f9fafb'
+                      }}>
+                        <div style={{ fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>
+                          {new Date(note.createdAt).toLocaleDateString()}
+                        </div>
+                        <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                          {note.note}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Quick Actions */}
@@ -1129,6 +1288,8 @@ function PatientModal({ patient, onClose }) {
                 </h4>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                   <button 
+                    onClick={handleScheduleReassessment}
+                    disabled={isLoading}
                     style={{
                       padding: '8px 16px',
                       fontSize: '0.875rem',
@@ -1137,19 +1298,22 @@ function PatientModal({ patient, onClose }) {
                       backgroundColor: 'white',
                       border: '1px solid #155e75',
                       borderRadius: '6px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
+                      cursor: isLoading ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease',
+                      opacity: isLoading ? 0.6 : 1
                     }}
                     onMouseOver={(e) => {
-                      e.target.style.backgroundColor = '#f0fdff';
+                      if (!isLoading) e.target.style.backgroundColor = '#f0fdff';
                     }}
                     onMouseOut={(e) => {
-                      e.target.style.backgroundColor = 'white';
+                      if (!isLoading) e.target.style.backgroundColor = 'white';
                     }}
                   >
-                    Schedule Reassessment
+                    {isLoading ? 'Scheduling...' : 'Schedule Reassessment'}
                   </button>
                   <button 
+                    onClick={handleUpdateTreatmentPlan}
+                    disabled={isLoading}
                     style={{
                       padding: '8px 16px',
                       fontSize: '0.875rem',
@@ -1158,19 +1322,22 @@ function PatientModal({ patient, onClose }) {
                       backgroundColor: 'white',
                       border: '1px solid #155e75',
                       borderRadius: '6px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
+                      cursor: isLoading ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease',
+                      opacity: isLoading ? 0.6 : 1
                     }}
                     onMouseOver={(e) => {
-                      e.target.style.backgroundColor = '#f0fdff';
+                      if (!isLoading) e.target.style.backgroundColor = '#f0fdff';
                     }}
                     onMouseOut={(e) => {
-                      e.target.style.backgroundColor = 'white';
+                      if (!isLoading) e.target.style.backgroundColor = 'white';
                     }}
                   >
-                    Update Treatment Plan
+                    {isLoading ? 'Updating...' : 'Update Treatment Plan'}
                   </button>
                   <button 
+                    onClick={handleMarkReviewed}
+                    disabled={isLoading}
                     style={{
                       padding: '8px 16px',
                       fontSize: '0.875rem',
@@ -1179,17 +1346,18 @@ function PatientModal({ patient, onClose }) {
                       backgroundColor: 'white',
                       border: '1px solid #155e75',
                       borderRadius: '6px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
+                      cursor: isLoading ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease',
+                      opacity: isLoading ? 0.6 : 1
                     }}
                     onMouseOver={(e) => {
-                      e.target.style.backgroundColor = '#f0fdff';
+                      if (!isLoading) e.target.style.backgroundColor = '#f0fdff';
                     }}
                     onMouseOut={(e) => {
-                      e.target.style.backgroundColor = 'white';
+                      if (!isLoading) e.target.style.backgroundColor = 'white';
                     }}
                   >
-                    Mark as Reviewed
+                    {isLoading ? 'Marking...' : 'Mark as Reviewed'}
                   </button>
                 </div>
               </div>
