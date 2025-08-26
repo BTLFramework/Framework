@@ -41,7 +41,8 @@ export default function CreateAccountPage() {
   const handleBack = () => {
     // If we have patient data, go back to intake form results
     if (patientData) {
-      router.push('http://localhost:5175')
+      // Use relative path instead of hardcoded localhost
+      router.push('/intake')
     } else {
       // Otherwise go back to login
       router.push('/')
