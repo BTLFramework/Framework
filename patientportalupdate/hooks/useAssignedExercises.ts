@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Exercise } from '@/types/exercise';
+import { exercises as localExerciseLibrary } from '@/lib/exerciseLibrary';
 
 interface AssignedExercisesData {
   exercises: Exercise[];
@@ -8,6 +9,87 @@ interface AssignedExercisesData {
   phase: string;
   srsScore: number;
 }
+
+// Function to get exercises from local library based on patient data
+const getLocalExercises = async (patientEmail: string): Promise<AssignedExercisesData> => {
+  try {
+    // First try to get patient data to determine region and phase
+    const patientResponse = await fetch(`/api/patients/portal-data/${patientEmail}`);
+    let region = 'Neck'; // Default fallback
+    let phase = 'EDUCATE'; // Default fallback
+    let srsScore = 4; // Default fallback
+    
+    if (patientResponse.ok) {
+      const patientData = await patientResponse.json();
+      if (patientData.success && patientData.data) {
+        region = patientData.data.region || 'Neck';
+        phase = patientData.data.phase || 'EDUCATE';
+        srsScore = patientData.data.srsScore?.srsScore || 4;
+      }
+    }
+    
+    // Map phase names to match exercise library
+    const phaseMap: Record<string, string> = {
+      'RESET': 'Reset',
+      'EDUCATE': 'Educate', 
+      'REBUILD': 'Rebuild'
+    };
+    
+    const mappedPhase = phaseMap[phase] || 'Educate';
+    
+    // Filter exercises by region and phase
+    const filteredExercises = localExerciseLibrary.filter(ex => 
+      ex.region.toLowerCase().includes(region.toLowerCase()) && 
+      ex.phase === mappedPhase
+    );
+    
+    // If no exact matches, try broader matching
+    const fallbackExercises = filteredExercises.length > 0 ? filteredExercises : 
+      localExerciseLibrary.filter(ex => ex.phase === mappedPhase).slice(0, 3);
+    
+    return {
+      exercises: fallbackExercises.map(ex => ({
+        id: ex.id,
+        name: ex.name,
+        difficulty: ex.difficulty,
+        points: ex.points,
+        description: ex.description,
+        duration: ex.duration,
+        instructions: ex.instructions,
+        videoId: ex.videoId,
+        region: ex.region,
+        phase: ex.phase,
+        focus: ex.focus
+      })),
+      totalPoints: fallbackExercises.reduce((sum, ex) => sum + ex.points, 0),
+      region: region,
+      phase: phase,
+      srsScore: srsScore
+    };
+  } catch (error) {
+    console.log('⚠️ Error getting local exercises, using defaults:', error);
+    // Return default exercises
+    return {
+      exercises: localExerciseLibrary.slice(0, 3).map(ex => ({
+        id: ex.id,
+        name: ex.name,
+        difficulty: ex.difficulty,
+        points: ex.points,
+        description: ex.description,
+        duration: ex.duration,
+        instructions: ex.instructions,
+        videoId: ex.videoId,
+        region: ex.region,
+        phase: ex.phase,
+        focus: ex.focus
+      })),
+      totalPoints: 9,
+      region: 'Neck',
+      phase: 'EDUCATE',
+      srsScore: 4
+    };
+  }
+};
 
 export function useAssignedExercises(patientEmail: string) {
   const [data, setData] = useState<AssignedExercisesData | null>(null);
@@ -36,11 +118,11 @@ export function useAssignedExercises(patientEmail: string) {
         const response = await fetch(`/api/patient-portal/exercises/${encodeURIComponent(patientEmail)}`);
         
         if (!response.ok) {
-          // Don't throw error for 404 - just set error and let component handle with mock data
-          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-          console.log(`❌ HTTP Error ${response.status}:`, errorData);
-          setError(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
-          setData(null);
+          // Backend failed, use local exercise library as fallback
+          console.log(`⚠️ Backend exercise fetch failed (${response.status}), using local exercise library`);
+          const localExercises = await getLocalExercises(patientEmail);
+          setData(localExercises);
+          setError(null);
           return;
         }
 
@@ -52,14 +134,18 @@ export function useAssignedExercises(patientEmail: string) {
           setData(result.data);
           setError(null);
         } else {
-          console.log(`❌ API Error:`, result.error);
-          setError(result.error || 'Failed to fetch exercises');
-          setData(null);
+          // Backend returned error, use local exercise library as fallback
+          console.log(`⚠️ Backend exercise data invalid, using local exercise library`);
+          const localExercises = await getLocalExercises(patientEmail);
+          setData(localExercises);
+          setError(null);
         }
-      } catch (err) {
-        console.error('Error fetching assigned exercises:', err);
-        setError(err instanceof Error ? err.message : 'Network error occurred');
-        setData(null);
+      } catch (error) {
+        console.log(`❌ API Error:`, error);
+        // Use local exercise library as fallback on any error
+        const localExercises = await getLocalExercises(patientEmail);
+        setData(localExercises);
+        setError(null);
       } finally {
         setLoading(false);
       }
