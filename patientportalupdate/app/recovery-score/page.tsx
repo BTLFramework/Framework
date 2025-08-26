@@ -5,7 +5,6 @@ import { ArrowLeft, TrendingUp, Award, Info, CheckCircle, XCircle, Shield, Targe
 import { useRouter } from "next/navigation"
 import { RecoveryScoreWheel } from "@/components/recovery-score-wheel"
 import { ScoreBreakdownModal } from "@/components/score-breakdown-modal"
-import { useAuth } from "@/hooks/useAuth"
 
 type BreakdownItem = {
   title: string;
@@ -23,7 +22,7 @@ function ScoreBreakdownSection({ score, intakeData }: { score: number; intakeDat
   const [calculatedScore, setCalculatedScore] = useState<{ score: number; breakdown: BreakdownItem[]; achievedAreas: BreakdownItem[]; totalDomains: number }>({ score: 0, breakdown: [], achievedAreas: [], totalDomains: 0 })
   
   useEffect(() => {
-    // Create breakdown structure based on current patient's actual data
+    // Create breakdown structure based on Amy's actual data
     const displayBreakdown: BreakdownItem[] = [
       {
         title: "Pain Level (0-10 scale)",
@@ -242,25 +241,24 @@ function getPhase(score: number) {
 
 export default function RecoveryScorePage() {
   const router = useRouter()
-  const { patient } = useAuth()
   const [showBreakdown, setShowBreakdown] = useState(false)
   const [currentScore, setCurrentScore] = useState(7)
-  const [patientIntakeData, setPatientIntakeData] = useState<any>(null)
+  const [amyIntakeData, setAmyIntakeData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [scoreHistory, setScoreHistory] = useState<any[]>([])
   const [nextAssessmentLabel, setNextAssessmentLabel] = useState<string>('in 4 weeks')
 
-  // Fetch current patient's real intake data and progress history on component mount
+  // Fetch Amy's real intake data and progress history on component mount
   useEffect(() => {
-    const fetchPatientData = async () => {
+    const fetchAmyData = async () => {
       try {
-        console.log('🔍 Fetching current patient\'s real data for Recovery Score Details...')
+        console.log('🔍 Fetching Amy\'s real data for Recovery Score Details...')
         
-        // Fetch current patient's portal data (intake information)
-        const portalResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/patients/portal-data/${patient?.email}`)
+        // Fetch Amy's portal data (intake information)
+        const portalResponse = await fetch('https://framework-production-92f5.up.railway.app/patients/portal-data/amy@123.com')
         
-        // Fetch current patient's progress history
-        const progressResponse = await fetch(`/api/patients/progress-history/${patient?.email}`)
+        // Fetch Amy's progress history
+        const progressResponse = await fetch('/api/patients/progress-history/amy@123.com')
         
         let intakeData = null;
         let progressData = [];
@@ -268,7 +266,7 @@ export default function RecoveryScorePage() {
         // Process portal data
         if (portalResponse.ok) {
           const portalResult = await portalResponse.json()
-          console.log('📊 Current patient\'s portal data:', portalResult.data)
+          console.log('📊 Amy\'s portal data:', portalResult.data)
           
           // Extract intake data from the portal response
           intakeData = {
@@ -286,7 +284,7 @@ export default function RecoveryScorePage() {
           }
           
           setCurrentScore(portalResult.data.srsScore || 7)
-          console.log('✅ Current patient\'s intake data loaded:', intakeData)
+          console.log('✅ Amy\'s intake data loaded:', intakeData)
 
           // Calculate next assessment date
           const intakeDateStr = portalResult.data.intakeDate || portalResult.data.patient?.intakeDate;
@@ -302,7 +300,7 @@ export default function RecoveryScorePage() {
         // Process progress history
         if (progressResponse.ok) {
           const progressResult = await progressResponse.json()
-          console.log('📈 Current patient\'s progress history:', progressResult.data)
+          console.log('📈 Amy\'s progress history:', progressResult.data)
           
           progressData = progressResult.data.progressHistory.map((entry: any) => ({
             date: new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -324,7 +322,7 @@ export default function RecoveryScorePage() {
         }
 
         // Set state with fetched or fallback data
-        setPatientIntakeData(intakeData || {
+        setAmyIntakeData(intakeData || {
           vas: 3,
           disability: 15,
           psfs: 7.0,
@@ -341,9 +339,9 @@ export default function RecoveryScorePage() {
         setScoreHistory(progressData)
         
       } catch (error) {
-        console.error('❌ Error fetching current patient\'s data:', error)
+        console.error('❌ Error fetching Amy\'s data:', error)
         // Use fallback data on error
-        setPatientIntakeData({
+        setAmyIntakeData({
           vas: 3,
           disability: 15,
           psfs: 7.0,
@@ -369,7 +367,7 @@ export default function RecoveryScorePage() {
       }
     }
 
-    fetchPatientData()
+    fetchAmyData()
   }, [])
 
   const milestones = [
@@ -393,7 +391,7 @@ export default function RecoveryScorePage() {
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-btl-600"></div>
-              <span className="ml-4 text-btl-600 font-medium">Loading recovery data...</span>
+              <span className="ml-4 text-btl-600 font-medium">Loading Amy's recovery data...</span>
             </div>
           ) : (
             <>
@@ -544,7 +542,7 @@ export default function RecoveryScorePage() {
                 </div>
               </div>
               {/* Score Breakdown as full-width section below the cards */}
-              <ScoreBreakdownSection score={currentScore} intakeData={patientIntakeData} />
+              <ScoreBreakdownSection score={currentScore} intakeData={amyIntakeData} />
             </>
           )}
         </div>

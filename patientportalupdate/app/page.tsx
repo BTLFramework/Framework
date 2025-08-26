@@ -38,7 +38,7 @@ const PatientRecoveryDashboard: React.FC = () => {
   const [showInsightsDialog, setShowInsightsDialog] = useState(false)
   const [tasksData, setTasksData] = useState<any>(null)
   const [currentSnapshot, setCurrentSnapshot] = useState({ pain: 5, stress: 5, risk: 'low' })
-  const [patientIntakeData, setPatientIntakeData] = useState<any>(null) // Store current patient's real intake data
+  const [amyIntakeData, setAmyIntakeData] = useState<any>(null) // Store Amy's real intake data
   const [loading, setLoading] = useState(true) // New state for loading
 
   // Function to completely reset portal data
@@ -342,7 +342,7 @@ const PatientRecoveryDashboard: React.FC = () => {
     try {
       if (!patient?.email) {
         console.log('⚠️ No patient email available, using sample data')
-        setPatientIntakeData({
+        setAmyIntakeData({
           vas: 3,
           disability: 15,
           psfs: 7.0,
@@ -377,12 +377,12 @@ const PatientRecoveryDashboard: React.FC = () => {
           objectiveProgress: result.data.objectiveProgress || 'no'
         }
         
-        setPatientIntakeData(intakeData)
+        setAmyIntakeData(intakeData)
         console.log('✅ Patient intake data loaded for SRS breakdown:', intakeData)
       } else {
         console.log('⚠️ Could not fetch patient data, using sample data')
         // Fallback to sample data if fetch fails
-        setPatientIntakeData({
+        setAmyIntakeData({
           vas: 3,
           disability: 15,
           psfs: 7.0,
@@ -397,7 +397,7 @@ const PatientRecoveryDashboard: React.FC = () => {
     } catch (error) {
       console.error('❌ Error fetching patient intake data:', error)
       // Fallback to sample data on error
-      setPatientIntakeData({
+      setAmyIntakeData({
         vas: 3,
         disability: 15,
         psfs: 7.0,
@@ -567,7 +567,7 @@ const PatientRecoveryDashboard: React.FC = () => {
         <ScoreBreakdownModal 
           score={currentScore} 
           onClose={() => setShowScoreModal(false)}
-          intakeData={patientIntakeData} // Pass current patient's real intake data
+          intakeData={amyIntakeData} // Pass Amy's real intake data
         />
       )}
     </div>
