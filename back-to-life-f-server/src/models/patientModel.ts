@@ -198,11 +198,18 @@ export const getAssignedExercisesByEmail = async (email: string) => {
   let exercises: any[] = [];
   try {
     const path = require('path');
-    const candidates = [
+    const baseCandidates = [
       path.resolve(__dirname, '../../config/exerciseConfig'),
       path.resolve(process.cwd(), 'config/exerciseConfig'),
       path.resolve(process.cwd(), 'dist/config/exerciseConfig'),
     ];
+    const candidates: string[] = [];
+    for (const base of baseCandidates) {
+      candidates.push(base);
+      candidates.push(base + '.js');
+      candidates.push(base + '.cjs');
+      candidates.push(base + '.mjs');
+    }
     let loaded: any = null;
     for (const candidate of candidates) {
       try {
@@ -215,7 +222,7 @@ export const getAssignedExercisesByEmail = async (email: string) => {
         // try next candidate
       }
     }
-    const maybeExercises = loaded?.exercises || loaded;
+    const maybeExercises = (loaded && loaded.exercises) ? loaded.exercises : (Array.isArray(loaded) ? loaded : (loaded?.default?.exercises || loaded?.default));
     if (Array.isArray(maybeExercises)) {
       exercises = maybeExercises;
     } else {
