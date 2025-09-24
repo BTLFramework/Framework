@@ -36,9 +36,14 @@ export function useAssignedExercises(patientEmail: string) {
         const response = await fetch(`/api/patient-portal/exercises/${encodeURIComponent(patientEmail)}`);
         
         if (!response.ok) {
-          // Don't throw error for 404 - just set error and let component handle with mock data
           const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
           console.log(`❌ HTTP Error ${response.status}:`, errorData);
+          if (response.status === 404) {
+            // Treat 404 as no exercises assigned rather than an error
+            setData({ exercises: [], totalPoints: 0, region: 'Neck', phase: 'EDUCATE', srsScore: 0 });
+            setError(null);
+            return;
+          }
           setError(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
           setData(null);
           return;

@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ email: string }> }
+  { params }: { params: { email: string } }
 ) {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app';
-    const { email } = await params;
+    const { email } = params;
 
-    const response = await fetch(`${backendUrl}/patients/portal-data/${email}`);
+    const response = await fetch(`${backendUrl}/patients/portal-data/${encodeURIComponent(email)}`);
     const data = await response.json();
 
     return NextResponse.json(data);
@@ -19,4 +21,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}

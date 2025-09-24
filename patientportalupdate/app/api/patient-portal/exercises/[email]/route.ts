@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ email: string }> }
+  { params }: { params: { email: string } }
 ) {
   try {
-    const { email } = await params;
+    const { email } = params;
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app';
     
     // Proxy the request to the backend server
-    const response = await fetch(`${backendUrl}/api/patient-portal/exercises/${email}`, {
+    const response = await fetch(`${backendUrl}/api/patient-portal/exercises/${encodeURIComponent(email)}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -17,7 +19,7 @@ export async function GET(
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
       return NextResponse.json(
         { error: errorData.error || 'Failed to fetch exercises' },
         { status: response.status }
@@ -34,4 +36,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}
