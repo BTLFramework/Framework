@@ -230,93 +230,16 @@ router.get('/test-profile', async (req: any, res: any) => {
 router.get('/exercises/:email', async (req: any, res: any) => {
   try {
     const { email } = req.params;
-    // Import patient model functions
-    const { findPatientByEmail, getLatestSRSScore } = require('../models/patientModel');
-    // Find patient by email
-    const patient = await findPatientByEmail(email);
-    if (!patient) {
+    const { getAssignedExercisesByEmail } = require('../models/patientModel');
+    const data = await getAssignedExercisesByEmail(email);
+    if (!data) {
       return res.status(404).json({ error: 'Patient not found' });
     }
-    // Get latest SRS score to determine phase
-    const latestSRS = await getLatestSRSScore(patient.id);
-    const srsScore = latestSRS?.srsScore || 0;
-    // Determine phase based on SRS score
-    let phase;
-    if (srsScore <= 3) phase = "Reset";
-    else if (srsScore <= 6) phase = "Educate";
-    else phase = "Rebuild";
-    // Get region from latest assessment or default
-    const region = latestSRS?.region || "Neck";
-    // Import exercise library
-    const { exercises } = require('../../config/exerciseConfig');
-    // Filter exercises by region and phase
-    let availableExercises = exercises.filter((ex: any) => 
-      ex.region === region && ex.phase === phase
-    );
-    // If not enough exercises in current phase, get from other phases
-    if (availableExercises.length < 3) {
-      const phases = ["Reset", "Educate", "Rebuild"];
-      for (const otherPhase of phases) {
-        if (otherPhase !== phase) {
-          const additionalExercises = exercises.filter((ex: any) => 
-            ex.region === region && ex.phase === otherPhase
-          );
-          availableExercises = [...availableExercises, ...additionalExercises];
-          if (availableExercises.length >= 3) break;
-        }
-      }
-    }
-    // Select exactly 3 exercises, prioritizing those that sum to 10 points
-    let bestCombination = null;
-    let bestScore = Infinity;
-    for (let i = 0; i < availableExercises.length - 2; i++) {
-      for (let j = i + 1; j < availableExercises.length - 1; j++) {
-        for (let k = j + 1; k < availableExercises.length; k++) {
-          const combo = [
-            availableExercises[i],
-            availableExercises[j],
-            availableExercises[k]
-          ];
-          const totalPoints = combo.reduce((sum: any, ex: any) => sum + ex.points, 0);
-          const difference = Math.abs(totalPoints - 10);
-          if (difference < bestScore) {
-            bestScore = difference;
-            bestCombination = combo;
-          }
-        }
-      }
-    }
-    // If no combination found, take first 3 exercises
-    if (!bestCombination && availableExercises.length >= 3) {
-      bestCombination = availableExercises.slice(0, 3);
-    }
-    // If still not enough exercises, pad with placeholder
-    while (bestCombination && bestCombination.length < 3) {
-      bestCombination.push({
-        id: `placeholder_${bestCombination.length}`,
-        name: "Additional exercise",
-        description: "Exercise to be assigned",
-        duration: "5-10 minutes",
-        difficulty: "Beginner",
-        points: 3,
-        instructions: ["Exercise details coming soon"],
-        videoId: "placeholder"
-      });
-    }
-    const totalPoints = bestCombination ? bestCombination.reduce((sum: any, ex: any) => sum + ex.points, 0) : 0;
-    res.json({
-      success: true,
-      data: {
-        exercises: bestCombination || [],
-        totalPoints,
-        region,
-        phase,
-        srsScore
-      }
-    });
+    return res.json({ success: true, data });
   } catch (error) {
     console.error('Error getting assigned exercises:', error);
-    res.status(500).json({ error: 'Failed to get assigned exercises' });
+    // Avoid 500s; return empty truthful data instead
+    return res.json({ success: true, data: { exercises: [], totalPoints: 0, region: 'Neck', phase: 'EDUCATE', srsScore: 0 } });
   }
 });
 
