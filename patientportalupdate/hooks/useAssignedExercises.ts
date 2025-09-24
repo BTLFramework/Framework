@@ -38,14 +38,9 @@ export function useAssignedExercises(patientEmail: string) {
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
           console.log(`❌ HTTP Error ${response.status}:`, errorData);
-          if (response.status === 404) {
-            // Treat 404 as no exercises assigned rather than an error
-            setData({ exercises: [], totalPoints: 0, region: 'Neck', phase: 'EDUCATE', srsScore: 0 });
-            setError(null);
-            return;
-          }
-          setError(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
-          setData(null);
+          // Graceful fallback for any non-OK: show empty exercises (no red error in UI)
+          setData({ exercises: [], totalPoints: 0, region: 'Neck', phase: 'EDUCATE', srsScore: 0 });
+          setError(null);
           return;
         }
 
@@ -62,9 +57,10 @@ export function useAssignedExercises(patientEmail: string) {
           setData(null);
         }
       } catch (err) {
-        console.error('Error fetching assigned exercises:', err);
-        setError(err instanceof Error ? err.message : 'Network error occurred');
-        setData(null);
+        console.error('Error fetching assigned exercises, using fallback:', err);
+        // Network/unknown error fallback: empty exercises list
+        setData({ exercises: [], totalPoints: 0, region: 'Neck', phase: 'EDUCATE', srsScore: 0 });
+        setError(null);
       } finally {
         setLoading(false);
       }
