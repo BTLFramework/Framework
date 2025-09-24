@@ -194,8 +194,38 @@ export const getAssignedExercisesByEmail = async (email: string) => {
   const region = latestSRS?.region || "Neck";
   console.log(`📍 Region: ${region}`);
 
-  // Import exercise library
-  const { exercises } = require('../../config/exerciseConfig');
+  // Import exercise library with robust path resolution
+  let exercises: any[] = [];
+  try {
+    const path = require('path');
+    const candidates = [
+      path.resolve(__dirname, '../../config/exerciseConfig'),
+      path.resolve(process.cwd(), 'config/exerciseConfig'),
+      path.resolve(process.cwd(), 'dist/config/exerciseConfig'),
+    ];
+    let loaded: any = null;
+    for (const candidate of candidates) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        loaded = require(candidate);
+        if (loaded && (loaded.exercises || Array.isArray(loaded))) {
+          break;
+        }
+      } catch (_) {
+        // try next candidate
+      }
+    }
+    const maybeExercises = loaded?.exercises || loaded;
+    if (Array.isArray(maybeExercises)) {
+      exercises = maybeExercises;
+    } else {
+      console.error('❌ Failed to load exerciseConfig: invalid shape');
+      exercises = [];
+    }
+  } catch (err) {
+    console.error('❌ Error loading exerciseConfig:', err);
+    exercises = [];
+  }
   console.log(`📚 Total exercises in config: ${exercises.length}`);
 
   // Filter exercises by region and phase

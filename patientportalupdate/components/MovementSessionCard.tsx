@@ -13,19 +13,6 @@ export function MovementSessionCard({ onClick }: MovementSessionCardProps) {
   // Fetch assigned exercises from backend using authenticated patient email
   const { data: exerciseData, error: exerciseError, loading: exerciseLoading } = useAssignedExercises(patient?.email || '');
   
-  // Mock data fallback for when patient doesn't exist in database
-  const mockExerciseData = {
-    exercises: [
-      { id: 1, name: "Neck Stretch", difficulty: "Easy", points: 3 },
-      { id: 2, name: "Shoulder Rolls", difficulty: "Easy", points: 3 },
-      { id: 3, name: "Gentle Rotation", difficulty: "Easy", points: 3 }
-    ],
-    totalPoints: 9,
-    region: "Neck",
-    phase: "Educate",
-    srsScore: 4
-  };
-  
   // Show skeleton while loading authentication or exercises
   if (authLoading || (exerciseData === undefined && exerciseLoading)) {
     return (
@@ -41,11 +28,11 @@ export function MovementSessionCard({ onClick }: MovementSessionCardProps) {
     );
   }
   
-  // Use mock data if there's an error (like patient not found) or no data
-  const finalExerciseData = exerciseData || mockExerciseData;
-  const exercises = finalExerciseData?.exercises || [];
-  const totalPoints = finalExerciseData?.totalPoints || 9;
-  const phase = finalExerciseData?.phase || 'EDUCATE';
+  // Never show mock data. If no data, show empty state with zero points.
+  const finalExerciseData = exerciseData || { exercises: [], totalPoints: 0, region: 'Neck', phase: 'EDUCATE', srsScore: 0 };
+  const exercises = finalExerciseData.exercises;
+  const totalPoints = finalExerciseData.totalPoints;
+  const phase = finalExerciseData.phase || 'EDUCATE';
   
   // Define metallic pill classes for Movement Session (gold theme)
   const metallicPills = {
@@ -78,7 +65,7 @@ export function MovementSessionCard({ onClick }: MovementSessionCardProps) {
       </div>
       <h3 className="font-bold text-lg mb-1 text-center text-btl-900">Movement Session</h3>
       <p className="text-[15px] mb-3 text-center text-btl-700">
-        {exercises.length} exercises personalized for your recovery
+        {exercises.length === 0 ? 'No exercises assigned yet' : `${exercises.length} exercises personalized for your recovery`}
       </p>
       <span className="inline-block px-4 py-1 text-xs font-semibold rounded-full bg-btl-100 text-btl-600 mb-3 text-center whitespace-nowrap">
         {exercises.length} exercises • {phase.toUpperCase()} phase
