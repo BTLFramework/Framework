@@ -2,6 +2,6 @@
   "name": "back-to-life-unified",
   "version": 2,
   "env": {
-    "NEXT_PUBLIC_API_URL": "@api-url"
+    "NEXT_PUBLIC_API_URL": "https://framework-production-92f5.up.railway.app"
   }
 } 
