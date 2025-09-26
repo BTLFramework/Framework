@@ -1,16 +1,17 @@
 import { NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ email: string }> }
+  { params }: { params: { email: string } }
 ) {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app';
-    const { email } = await params;
+    const { email } = params;
 
     console.log(`📊 Frontend API: Fetching progress history for ${email}`);
 
-    const response = await fetch(`${backendUrl}/patients/progress-history/${email}`);
+    const response = await fetch(`${backendUrl}/patients/progress-history/${encodeURIComponent(email)}`);
     const data = await response.json();
 
     if (!response.ok) {
