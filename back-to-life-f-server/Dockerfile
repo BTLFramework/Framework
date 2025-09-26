@@ -15,6 +15,7 @@ RUN npx prisma generate
 # Copy source code
 COPY src ./src
 COPY tsconfig.json ./
+COPY config ./config
 
 # Build the project
 RUN npm run build:railway
