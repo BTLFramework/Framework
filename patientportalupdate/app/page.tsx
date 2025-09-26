@@ -161,8 +161,8 @@ const PatientRecoveryDashboard: React.FC = () => {
           const updatedData = {
             ...patient,
             ...result.data.patient,
-            score: `${result.data.srsScore?.srsScore || 7}/11`,
-            phase: result.data.srsScore?.phase || 'RESET',
+            score: result.data.srsScore ?? result.data.patient?.srsScore ?? patient.score,
+            phase: result.data.phase ?? result.data.srsScore?.phase ?? result.data.patient?.phase ?? patient.phase,
             lastUpdated: new Date().toISOString()
           }
           
@@ -284,19 +284,19 @@ const PatientRecoveryDashboard: React.FC = () => {
   // Extract current score number for the wheel
   const currentScore = (() => {
     try {
-      if (!patient) return 7; // Safety check
+      if (!patient) return 0; // Safety check
       if (typeof patient.score === 'number') {
-        return isNaN(patient.score) ? 7 : patient.score;
+        return isNaN(patient.score) ? 0 : patient.score;
       }
       if (typeof patient.score === 'string') {
-        const scoreStr = patient.score.split('/')[0] || '7';
+        const scoreStr = patient.score.split('/')[0] || '0';
         const parsed = parseInt(scoreStr);
-        return isNaN(parsed) ? 7 : parsed;
+        return isNaN(parsed) ? 0 : parsed;
       }
-      return 7; // Default fallback
+      return 0; // Default fallback (unknown)
     } catch (error) {
       console.error('Error parsing score:', error);
-      return 7; // Safe fallback
+      return 0; // Safe fallback
     }
   })()
 

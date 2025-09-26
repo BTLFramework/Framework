@@ -28,12 +28,17 @@ const fetcher = async (url: string) => {
 
   const data = await response.json();
   
-  // Transform the data to include score from srsScores
-  if (data && data.srsScores && data.srsScores.length > 0) {
-    const latestSrs = data.srsScores[data.srsScores.length - 1];
-    data.score = latestSrs.srsScore || 7;
-  } else {
-    data.score = 7; // Default fallback
+  // Normalize: prefer top-level srsScore/phase if backend provides them,
+  // otherwise derive from srsScores without hardcoded defaults
+  if (data) {
+    const latestSrs = Array.isArray(data.srsScores) && data.srsScores.length > 0
+      ? data.srsScores[data.srsScores.length - 1]
+      : undefined;
+    const resolvedScore = typeof data.srsScore === 'number' ? data.srsScore
+      : (latestSrs?.srsScore ?? null);
+    if (resolvedScore !== null && resolvedScore !== undefined) {
+      data.score = resolvedScore;
+    }
   }
   
   return data;
