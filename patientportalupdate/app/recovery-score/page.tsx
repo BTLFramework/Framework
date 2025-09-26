@@ -5,6 +5,7 @@ import { ArrowLeft, TrendingUp, Award, Info, CheckCircle, XCircle, Shield, Targe
 import { useRouter } from "next/navigation"
 import { RecoveryScoreWheel } from "@/components/recovery-score-wheel"
 import { ScoreBreakdownModal } from "@/components/score-breakdown-modal"
+import { useAuth } from "@/hooks/useAuth"
 
 type BreakdownItem = {
   title: string;
@@ -242,23 +243,27 @@ function getPhase(score: number) {
 export default function RecoveryScorePage() {
   const router = useRouter()
   const [showBreakdown, setShowBreakdown] = useState(false)
-  const [currentScore, setCurrentScore] = useState(7)
+  const [currentScore, setCurrentScore] = useState(0)
   const [amyIntakeData, setAmyIntakeData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [scoreHistory, setScoreHistory] = useState<any[]>([])
   const [nextAssessmentLabel, setNextAssessmentLabel] = useState<string>('in 4 weeks')
+  const { patient, loading: authLoading, isAuthenticated } = useAuth()
 
-  // Fetch Amy's real intake data and progress history on component mount
+  // Fetch the logged-in patient's intake data and progress history
   useEffect(() => {
-    const fetchAmyData = async () => {
+    const fetchData = async () => {
       try {
-        console.log('🔍 Fetching Amy\'s real data for Recovery Score Details...')
+        if (!patient?.email) {
+          return
+        }
+        console.log('🔍 Fetching recovery data for', patient.email)
         
-        // Fetch Amy's portal data (intake information)
-        const portalResponse = await fetch('https://framework-production-92f5.up.railway.app/patients/portal-data/amy@123.com')
+        // Fetch portal data (intake information)
+        const portalResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/patients/portal-data/${patient.email}`)
         
-        // Fetch Amy's progress history
-        const progressResponse = await fetch('/api/patients/progress-history/amy@123.com')
+        // Fetch patient's progress history
+        const progressResponse = await fetch(`/api/patients/progress-history/${patient.email}`)
         
         let intakeData = null;
         let progressData = [];
@@ -266,7 +271,7 @@ export default function RecoveryScorePage() {
         // Process portal data
         if (portalResponse.ok) {
           const portalResult = await portalResponse.json()
-          console.log('📊 Amy\'s portal data:', portalResult.data)
+          console.log('📊 Portal data:', portalResult.data)
           
           // Extract intake data from the portal response
           intakeData = {
@@ -283,8 +288,8 @@ export default function RecoveryScorePage() {
             beliefStatus: portalResult.data.beliefStatus || 'Positive'
           }
           
-          setCurrentScore(portalResult.data.srsScore || 7)
-          console.log('✅ Amy\'s intake data loaded:', intakeData)
+          setCurrentScore(portalResult.data.srsScore || portalResult.data.patient?.srsScore || 0)
+          console.log('✅ Intake data loaded:', intakeData)
 
           // Calculate next assessment date
           const intakeDateStr = portalResult.data.intakeDate || portalResult.data.patient?.intakeDate;
@@ -300,7 +305,7 @@ export default function RecoveryScorePage() {
         // Process progress history
         if (progressResponse.ok) {
           const progressResult = await progressResponse.json()
-          console.log('📈 Amy\'s progress history:', progressResult.data)
+          console.log('📈 Progress history:', progressResult.data)
           
           progressData = progressResult.data.progressHistory.map((entry: any) => ({
             date: new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -339,7 +344,7 @@ export default function RecoveryScorePage() {
         setScoreHistory(progressData)
         
       } catch (error) {
-        console.error('❌ Error fetching Amy\'s data:', error)
+        console.error('❌ Error fetching recovery score data:', error)
         // Use fallback data on error
         setAmyIntakeData({
           vas: 3,
@@ -367,8 +372,11 @@ export default function RecoveryScorePage() {
       }
     }
 
-    fetchAmyData()
-  }, [])
+    if (!authLoading && isAuthenticated) {
+      setLoading(true)
+      fetchData()
+    }
+  }, [authLoading, isAuthenticated, patient?.email])
 
   const milestones = [
     { score: 4, title: "Foundation Built", description: "Basic recovery habits established", achieved: true },
@@ -391,7 +399,7 @@ export default function RecoveryScorePage() {
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-btl-600"></div>
-              <span className="ml-4 text-btl-600 font-medium">Loading Amy's recovery data...</span>
+              <span className="ml-4 text-btl-600 font-medium">Loading recovery data...</span>
             </div>
           ) : (
             <>
