@@ -98,57 +98,57 @@ exports.exercises = [
 
   // EDUCATE Phase (SRS 4-7) - Total 19 points for 3 exercises (will be optimized to 10)
   {
-    id: "NECK_EDUCATE_ANCHORED_THORACIC_WALL_GLIDE",
+    id: "NECK_EDUCATE_ISO_WALL_LEAN_MARCH",
     region: "Neck",
     phase: "Educate",
-    name: "Anchored thoracic wall glide",
-    focus: "thoracic mobility",
-    description: "Improve thoracic spine mobility with wall support",
-    duration: "8-12 minutes",
-    difficulty: "Intermediate",
+    name: "Iso Wall Lean with Marching",
+    focus: "upright stack, anti-rotation, cervical control",
+    description: "Train stack and anti-rotation while maintaining long neck.",
+    duration: "5-8 minutes",
+    difficulty: "Beginner",
     instructions: [
-      "Stand with back to wall",
-      "Place hands on wall at shoulder height",
-      "Slide hands up wall while arching back",
-      "Hold for 5 seconds, repeat 8-10 times"
+      "Stand facing wall, palms light at shoulder height; step back 6–8 inches and lean slightly.",
+      "Ribs stacked over pelvis, neck long; inhale wide, exhale tall.",
+      "Lift one knee slowly without twisting; press hands gently into wall.",
+      "Avoid rib flare, shrugging, or shifting toward lifted leg."
     ],
-    videoId: "anchored-thoracic-wall-glide",
+    videoId: "neck-iso-wall-lean-march",
     points: 3
   },
   {
-    id: "NECK_EDUCATE_WALL_ANGEL_DECOMPRESSION_BREATH",
+    id: "NECK_EDUCATE_8_POINT_PLANK_CHIN_NOD",
     region: "Neck",
     phase: "Educate",
-    name: "Wall angel + decompression breath",
-    focus: "shoulder mobility",
-    description: "Wall angels with decompression breathing",
-    duration: "10-15 minutes",
-    difficulty: "Intermediate",
+    name: "8-Point Plank + Chin Nod",
+    focus: "closed-chain cervical control under light load",
+    description: "Build cervical control with stacked breathing in an 8-point plank.",
+    duration: "4-6 minutes",
+    difficulty: "Beginner+",
     instructions: [
-      "Stand with back to wall",
-      "Arms in W position against wall",
-      "Slide arms up and down wall",
-      "Breathe out during upward movement"
+      "On hands, knees, forearms, and toes; spine long, ribs over pelvis.",
+      "Push floor away to widen mid-back; inhale wide, exhale keep stack.",
+      "Gentle chin nods while keeping neck long (not crunching).",
+      "Avoid sagging through ribs, over‑tucking chin, or breath holding."
     ],
-    videoId: "wall-angel-decompression",
+    videoId: "8-point-plank-chin-nod-educate",
     points: 4
   },
   {
-    id: "NECK_EDUCATE_HALF_KNEELING_CROSS_REACH",
+    id: "NECK_EDUCATE_SCAP_CARS_LATERAL_FLEXION",
     region: "Neck",
     phase: "Educate",
-    name: "Half-kneeling cross-reach",
-    focus: "rotational stability",
-    description: "Rotational movement with cervical control",
-    duration: "8-12 minutes",
-    difficulty: "Intermediate",
+    name: "Single‑Sided Scapular CARs with Lateral Flexion",
+    focus: "scapula/neck dissociation, segmental control",
+    description: "Improve scapular control while maintaining tall neck and gentle lateral flexion.",
+    duration: "4-6 minutes",
+    difficulty: "Beginner+",
     instructions: [
-      "Kneel on one knee, other foot forward",
-      "Reach across body with opposite arm",
-      "Rotate trunk while keeping head stable",
-      "Hold for 3 seconds, repeat 10 times each side"
+      "Sit or stand tall; one arm relaxed at side; chin gently tucked.",
+      "Move shoulder in a slow circle — up, forward, down, back.",
+      "Keep neck tall; gently tilt away from moving side; smooth motion.",
+      "Avoid jerky movements, trunk side‑bending, or rib lift."
     ],
-    videoId: "half-kneeling-cross-reach",
+    videoId: "scapular-cars-lateral-flexion",
     points: 3
   },
 
@@ -439,21 +439,20 @@ exports.exercises = [
 
   // EDUCATE Phase (Thoracic)
   {
-    id: "THORACIC_EDUCATE_ANCHORED_WALL_GLIDE",
+    id: "THORACIC_EDUCATE_SPINAL_CARS",
     region: "Mid-Back / Thoracic",
     phase: "Educate",
-    name: "Anchored Thoracic Wall Glide",
-    focus: "pure thoracic motion",
-    description: "Train pure thoracic motion free from lumbar compensation",
-    duration: "8-12 minutes",
-    difficulty: "Intermediate",
+    name: "Spinal CARs",
+    focus: "segmental awareness + rotation control",
+    description: "Restore segmental control through slow, smooth CARs.",
+    duration: "5-8 minutes",
+    difficulty: "Beginner",
     instructions: [
-      "Stand with back to wall, heels lightly anchored",
-      "Pelvis neutral position",
-      "Exhale and draw ribs toward the wall",
-      "Inhale and relax slightly, allowing gentle glide"
+      "Seated or kneeling, hands across chest; spine tall, ribs stacked.",
+      "Move slowly — round, rotate, side bend, extend; keep pelvis stable.",
+      "Breathe as you move; avoid forcing range or rushing."
     ],
-    videoId: "anchored-thoracic-wall-glide",
+    videoId: "thoracic-spinal-cars",
     points: 3
   },
   {
@@ -475,22 +474,38 @@ exports.exercises = [
     points: 4
   },
   {
-    id: "THORACIC_EDUCATE_WALL_90_90_BREATHING",
+    id: "THORACIC_EDUCATE_ANCHORED_WALL_GLIDE",
     region: "Mid-Back / Thoracic",
     phase: "Educate",
-    name: "Wall 90/90 Breathing with Serratus Reach",
-    focus: "posterior rib expansion",
-    description: "Blend posterior rib expansion with serratus activation",
-    duration: "10-15 minutes",
-    difficulty: "Intermediate",
+    name: "Anchored Thoracic Wall Glide",
+    focus: "upright extension + posterior expansion",
+    description: "Teach upright extension with posterior expansion.",
+    duration: "5-8 minutes",
+    difficulty: "Beginner",
     instructions: [
-      "Lie on your back with feet on wall, hips/knees at 90°",
-      "Inhale, press heels into wall and feel ribs expand",
-      "Exhale, lift arms toward ceiling",
-      "Protract shoulder blades on exhale"
+      "Stand with hands at wall, elbows slightly bent; ribs over pelvis.",
+      "Inhale into mid-back; exhale tall as shoulder blades glide down.",
+      "Stay long; avoid arching and rib flare."
     ],
-    videoId: "wall-90-90-breathing",
+    videoId: "anchored-thoracic-wall-glide",
     points: 4
+  },
+  {
+    id: "THORACIC_EDUCATE_SINGLE_ARM_YTWS",
+    region: "Mid-Back / Thoracic",
+    phase: "Educate",
+    name: "Single-Arm YTWs",
+    focus: "scapular control + postural awareness",
+    description: "Pattern Y, T, W with controlled scapular motion.",
+    duration: "4-6 minutes",
+    difficulty: "Beginner+",
+    instructions: [
+      "Chest supported on bench or in prone; one arm moves through Y, T, W.",
+      "Reach long, then draw shoulder blade down; smooth movement.",
+      "Keep ribs heavy; avoid shrugging or over-arching."
+    ],
+    videoId: "thoracic-single-arm-ytw",
+    points: 3
   },
 
   // REBUILD Phase (Thoracic)
