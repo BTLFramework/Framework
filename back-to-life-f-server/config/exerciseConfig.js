@@ -342,39 +342,68 @@ exports.exercises = [
     points: 3
   },
   {
-    id: "BACK_REBUILD_SINGLE_LEG_DEADLIFT",
+    id: "BACK_REBUILD_SINGLE_LEG_HINGE",
     region: "Low Back / SI Joint",
     phase: "Rebuild",
-    name: "Single-leg deadlift",
-    focus: "single leg stability",
-    description: "Single leg deadlift with proper form",
-    duration: "15-20 minutes",
+    name: "Single‑Leg Hinge",
+    focus: "single‑leg balance and hinge control",
+    description: "Hinge on one leg with long spine; opposite leg extends behind.",
+    duration: "6-8 reps/side",
     difficulty: "Advanced",
     instructions: [
-      "Stand on one leg",
-      "Hinge at hips, reach forward",
-      "Keep back straight throughout",
-      "Return to standing with control"
+      "Stand tall, ribs over hips; shift weight to one leg and hinge hips back.",
+      "Keep spine long; extend opposite leg; inhale ribs wide, exhale return tall.",
+      "Perform 6–8 controlled reps per side."
     ],
-    videoId: "single-leg-deadlift",
+    videoId: "single-leg-hinge",
     points: 4
   },
   {
-    id: "BACK_REBUILD_LOADED_CARRY",
+    id: "BACK_REBUILD_WIDE_LEG_FOUNDER",
     region: "Low Back / SI Joint",
     phase: "Rebuild",
-    name: "Loaded carry",
-    focus: "core stability",
-    description: "Carry weight while maintaining posture",
-    duration: "15-20 minutes",
+    name: "Wide‑Leg Founder",
+    focus: "hip stability in wide stance",
+    description: "Wide‑stance founder emphasizing long spine and rib control.",
+    duration: "20-30 seconds (holds)",
     difficulty: "Advanced",
     instructions: [
-      "Hold weight in both hands",
-      "Walk forward with good posture",
-      "Keep core engaged throughout",
-      "Maintain neutral spine position"
+      "Feet wide, toes forward; hinge hips back and reach arms long.",
+      "Keep ribs down, spine long; breathe into ribs and hold 20–30s; 2–3 sets."
     ],
-    videoId: "loaded-carry",
+    videoId: "wide-leg-founder",
+    points: 3
+  },
+  {
+    id: "BACK_REBUILD_GORILLA_LIFT",
+    region: "Low Back / SI Joint",
+    phase: "Rebuild",
+    name: "Gorilla Lift",
+    focus: "hip hinge power with rib stacking",
+    description: "Controlled hinge with hands on thighs or weights; lift tall with breath.",
+    duration: "6-10 reps",
+    difficulty: "Advanced",
+    instructions: [
+      "Feet hip‑width; hinge hips back with hands on thighs or weights.",
+      "Inhale ribs wide; exhale to lift tall; move with breath; controlled tempo."
+    ],
+    videoId: "gorilla-lift",
+    points: 3
+  },
+  {
+    id: "BACK_REBUILD_FARMERS_CARRY_GRIP",
+    region: "Low Back / SI Joint",
+    phase: "Rebuild",
+    name: "Farmer’s Carry (Grip Focus)",
+    focus: "posture + grip endurance",
+    description: "Walk tall with weights at sides; focus on grip and posture.",
+    duration: "20-30 seconds x 3-4 rounds",
+    difficulty: "Advanced",
+    instructions: [
+      "Hold weights at sides; stand tall, ribs over hips; walk slow and steady.",
+      "Focus on grip and posture; maintain stacked position."
+    ],
+    videoId: "farmers-carry-grip",
     points: 3
   },
 
