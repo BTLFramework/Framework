@@ -930,4 +930,4 @@ exports.exercises = [
     videoId: "toe-off-drills",
     points: 2
   }
-];
+]; 
