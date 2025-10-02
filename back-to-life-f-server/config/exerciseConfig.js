@@ -407,6 +407,156 @@ exports.exercises = [
     points: 3
   },
 
+  // ---------- SI JOINT FOCUSED EXERCISES (within Low Back / SI Joint region) ----------
+  // RESET (awareness + integrated adduction)
+  {
+    id: "SIJ_RESET_SUPINE_DECOMP_INNER_LINE",
+    region: "Low Back / SI Joint",
+    phase: "Reset",
+    name: "Supine Decompression w/ Inner‑Line Cue",
+    focus: "breathing + adductor synergy",
+    description: "Supine decompression with gentle inner‑thigh draw to engage deep core.",
+    duration: "5-8 minutes",
+    difficulty: "Beginner",
+    instructions: [
+      "Lie on back, knees bent, feet flat; inhale to expand ribs.",
+      "Exhale while softly drawing thighs toward each other to feel adductors/core.",
+      "Maintain neutral spine and calm breath."
+    ],
+    videoId: "sij-supine-decomp-inner-line",
+    points: 3
+  },
+  {
+    id: "SIJ_RESET_STANDING_DECOMP_FLOOR_TENSION",
+    region: "Low Back / SI Joint",
+    phase: "Reset",
+    name: "Standing Decompression w/ Floor‑Tension Cue",
+    focus: "breathing + ground tension",
+    description: "Create light floor tension to co‑activate adductors and glutes while stacked.",
+    duration: "3-5 minutes",
+    difficulty: "Beginner",
+    instructions: [
+      "Stand tall, feet hip‑width, knees soft; inhale ribs wide.",
+      "Exhale and gently \"pull the floor together\" with feet; stay tall through crown.",
+      "Keep ribs stacked over pelvis."
+    ],
+    videoId: "sij-standing-decomp-floor-tension",
+    points: 3
+  },
+  {
+    id: "SIJ_RESET_SINGLE_LEG_WALL_LEAN",
+    region: "Low Back / SI Joint",
+    phase: "Reset",
+    name: "Single‑Leg Wall Lean",
+    focus: "glute med + adductor co‑activation",
+    description: "Light wall press to co‑activate lateral hip and inner line.",
+    duration: "10-15 seconds x 2-3/side",
+    difficulty: "Beginner",
+    instructions: [
+      "Stand beside wall; press outer knee/foot gently into wall.",
+      "Ribs stacked, pelvis level, steady breath; hold 10–15s, 2–3 rounds/side."
+    ],
+    videoId: "sij-single-leg-wall-lean",
+    points: 4
+  },
+
+  // EDUCATE (skill + single‑limb control)
+  {
+    id: "SIJ_EDUCATE_FOUNDER",
+    region: "Low Back / SI Joint",
+    phase: "Educate",
+    name: "Founder",
+    focus: "hip hinge endurance with inner‑line tension",
+    description: "Static hinge with light adductor engagement and ribs down.",
+    duration: "20-30 seconds (holds)",
+    difficulty: "Beginner+",
+    instructions: [
+      "Hinge hips back, reach arms forward, ribs down; maintain inner‑thigh tension.",
+      "Inhale to expand ribs, exhale to stay long; 20–30s, 2–3 sets."
+    ],
+    videoId: "sij-founder",
+    points: 3
+  },
+  {
+    id: "SIJ_EDUCATE_SINGLE_LEG_HINGE",
+    region: "Low Back / SI Joint",
+    phase: "Educate",
+    name: "Single‑Leg Hinge",
+    focus: "single‑limb hinge skill",
+    description: "Balance on one leg; hinge hips back with long spine and level pelvis.",
+    duration: "6-8 reps/side",
+    difficulty: "Beginner+",
+    instructions: [
+      "Keep pelvis level, ribs stacked, light bend in stance knee.",
+      "Feel stance glute + adductor; 6–8 reps/side."
+    ],
+    videoId: "sij-single-leg-hinge-educate",
+    points: 4
+  },
+  {
+    id: "SIJ_EDUCATE_ANCHORED_BRIDGE",
+    region: "Low Back / SI Joint",
+    phase: "Educate",
+    name: "Anchored Bridge",
+    focus: "glute + adductor integration",
+    description: "Bridge while keeping ribs down, feeling glutes and adductors.",
+    duration: "10-15 seconds (holds)",
+    difficulty: "Beginner",
+    instructions: [
+      "Feet hip‑width; lift hips with ribs down; breathe to maintain height.",
+      "Feel glutes + adductors, not low back; 3 sets."
+    ],
+    videoId: "sij-anchored-bridge",
+    points: 3
+  },
+
+  // REBUILD (resilience + rotation tolerance)
+  {
+    id: "SIJ_REBUILD_LOADED_FOUNDATION_SQUAT",
+    region: "Low Back / SI Joint",
+    phase: "Rebuild",
+    name: "Loaded Foundation Squat",
+    focus: "squat strength with stack",
+    description: "Hold weight close; inhale down stacked; exhale drive tall.",
+    duration: "6-8 reps x 2-3 sets",
+    difficulty: "Advanced",
+    instructions: [
+      "Feet grounded; knees track over feet; maintain decompression throughout."
+    ],
+    videoId: "sij-loaded-foundation-squat",
+    points: 3
+  },
+  {
+    id: "SIJ_REBUILD_FOUNDATION_WINDMILL",
+    region: "Low Back / SI Joint",
+    phase: "Rebuild",
+    name: "Foundation Windmill",
+    focus: "hinge with rotation control",
+    description: "Wide stance; one arm overhead; hinge toward opposite foot with long spine.",
+    duration: "6-8 reps/side",
+    difficulty: "Advanced",
+    instructions: [
+      "Inhale into side ribs; exhale to rise; control rotation tolerance."
+    ],
+    videoId: "sij-foundation-windmill",
+    points: 4
+  },
+  {
+    id: "SIJ_REBUILD_SINGLE_LEG_HINGE_ROTATION",
+    region: "Low Back / SI Joint",
+    phase: "Rebuild",
+    name: "Single‑Leg Hinge with Rotation",
+    focus: "single‑leg hinge + controlled rotation",
+    description: "Hinge on one leg; rotate torso slightly toward stance side; return tall.",
+    duration: "6 reps/side",
+    difficulty: "Advanced",
+    instructions: [
+      "Maintain pelvis control and stacked ribs; move with controlled breath."
+    ],
+    videoId: "sij-single-leg-hinge-rotation",
+    points: 3
+  },
+
   // ---------- THORACIC / MID-BACK EXERCISES ----------
   
   // RESET Phase (Thoracic)
@@ -592,4 +742,192 @@ exports.exercises = [
     videoId: "single-arm-row-reach",
     points: 4
   }
-]; 
+  ,
+
+  // ---------- FOOT / ANKLE EXERCISES ----------
+  // RESET (awareness + mobility)
+  {
+    id: "ANKLE_RESET_ANKLE_CIRCLES",
+    region: "Foot/Ankle",
+    phase: "Reset",
+    name: "Ankle Circles",
+    focus: "gentle ROM",
+    description: "Slow circular motion through comfortable range.",
+    duration: "5-8 reps each direction",
+    difficulty: "Beginner",
+    instructions: [
+      "Move ankle slowly through a full circle; pain‑free; 5–8 each direction."
+    ],
+    videoId: "ankle-circles",
+    points: 2
+  },
+  {
+    id: "ANKLE_RESET_ANKLE_PUMPS",
+    region: "Foot/Ankle",
+    phase: "Reset",
+    name: "Ankle Pumps (DF/PF)",
+    focus: "mobility",
+    description: "Point and flex with steady breath.",
+    duration: "10-12 reps",
+    difficulty: "Beginner",
+    instructions: [
+      "Point and flex slowly, breathing evenly; 10–12 reps."
+    ],
+    videoId: "ankle-pumps",
+    points: 2
+  },
+  {
+    id: "ANKLE_RESET_TOE_SPLAY_DOMING",
+    region: "Foot/Ankle",
+    phase: "Reset",
+    name: "Toe Splay + Doming",
+    focus: "arch control",
+    description: "Spread toes and gently lift arch while tripod stays grounded.",
+    duration: "10 reps, 3s holds",
+    difficulty: "Beginner",
+    instructions: [
+      "Spread toes wide; gently lift arch (doming) keeping heel/ball grounded."
+    ],
+    videoId: "toe-splay-doming",
+    points: 2
+  },
+  {
+    id: "ANKLE_RESET_INVERSION_EVERSION_AM",
+    region: "Foot/Ankle",
+    phase: "Reset",
+    name: "Inversion / Eversion Active Motion",
+    focus: "frontal-plane control",
+    description: "Gentle tilt in and out without forcing range.",
+    duration: "8-10 reps",
+    difficulty: "Beginner",
+    instructions: [
+      "Tilt foot in (inversion) and out (eversion) with smooth control; 8–10 reps."
+    ],
+    videoId: "inversion-eversion-am",
+    points: 2
+  },
+
+  // EDUCATE (skill + control)
+  {
+    id: "ANKLE_EDUCATE_SHORT_FOOT_BALANCE",
+    region: "Foot/Ankle",
+    phase: "Educate",
+    name: "Short Foot with Balance",
+    focus: "arch set + balance",
+    description: "Create tripod and slight arch lift during balance hold.",
+    duration: "10-15 seconds x 2-3",
+    difficulty: "Beginner+",
+    instructions: [
+      "Stand tall; create tripod; lift arch slightly, toes relaxed; hold 10–15s."
+    ],
+    videoId: "short-foot-balance",
+    points: 3
+  },
+  {
+    id: "ANKLE_EDUCATE_BANDED_DF_PF",
+    region: "Foot/Ankle",
+    phase: "Educate",
+    name: "Banded Dorsiflexion / Plantarflexion",
+    focus: "strength through range",
+    description: "Controlled DF/PF against band resistance.",
+    duration: "10 reps each way",
+    difficulty: "Beginner+",
+    instructions: [
+      "Anchor band; move ankle through range with control; 10 reps each."
+    ],
+    videoId: "banded-df-pf",
+    points: 3
+  },
+  {
+    id: "ANKLE_EDUCATE_SINGLE_LEG_BALANCE",
+    region: "Foot/Ankle",
+    phase: "Educate",
+    name: "Single‑Leg Balance",
+    focus: "balance + tripod",
+    description: "Maintain tripod contact while stacked breathing.",
+    duration: "20-30 seconds x 2-3",
+    difficulty: "Beginner+",
+    instructions: [
+      "Stand on one leg; ribs stacked; maintain tripod contact; steady breath."
+    ],
+    videoId: "single-leg-balance-ankle",
+    points: 3
+  },
+  {
+    id: "ANKLE_EDUCATE_DOUBLE_LEG_HEEL_RAISE",
+    region: "Foot/Ankle",
+    phase: "Educate",
+    name: "Double‑Leg Heel Raise",
+    focus: "calf control",
+    description: "Rise tall; control descent; keep weight across tripod.",
+    duration: "10-12 reps",
+    difficulty: "Beginner+",
+    instructions: [
+      "Rise onto balls of feet; control down; keep weight even across tripod."
+    ],
+    videoId: "double-leg-heel-raise",
+    points: 3
+  },
+
+  // REBUILD (resilience + load)
+  {
+    id: "ANKLE_REBUILD_SINGLE_LEG_CALF_RAISE",
+    region: "Foot/Ankle",
+    phase: "Rebuild",
+    name: "Single‑Leg Calf Raises",
+    focus: "calf strength + control",
+    description: "Rise tall and lower slow on one foot; maintain tripod.",
+    duration: "8-10 reps/side",
+    difficulty: "Advanced",
+    instructions: [
+      "Balance on one foot; rise tall; lower slow; keep tripod contact."
+    ],
+    videoId: "single-leg-calf-raise",
+    points: 3
+  },
+  {
+    id: "ANKLE_REBUILD_LOADED_CARRIES",
+    region: "Foot/Ankle",
+    phase: "Rebuild",
+    name: "Loaded Carries (Farmer / Suitcase)",
+    focus: "postural endurance + foot stability",
+    description: "Walk tall with weights; ribs over hips; stable feet.",
+    duration: "20-30 seconds x 2-3",
+    difficulty: "Advanced",
+    instructions: [
+      "Hold weights; walk tall with stacked ribs; focus on grip + foot stability."
+    ],
+    videoId: "ankle-loaded-carries",
+    points: 3
+  },
+  {
+    id: "ANKLE_REBUILD_STEP_UP_HEEL_CONTROL",
+    region: "Foot/Ankle",
+    phase: "Rebuild",
+    name: "Step‑Up with Heel Control",
+    focus: "closed‑chain control",
+    description: "Drive through heel up; control descent; knee tracks over foot.",
+    duration: "6-8 reps/side",
+    difficulty: "Advanced",
+    instructions: [
+      "Step to box; drive through heel; control down; maintain alignment."
+    ],
+    videoId: "step-up-heel-control",
+    points: 3
+  },
+  {
+    id: "ANKLE_REBUILD_TOE_OFF_DRILLS",
+    region: "Foot/Ankle",
+    phase: "Rebuild",
+    name: "Toe‑Off Drills",
+    focus: "gait push‑off mechanics",
+    description: "March or walk emphasizing push‑off through big toe.",
+    duration: "30-60 seconds",
+    difficulty: "Advanced",
+    instructions: [
+      "March/walk slowly emphasizing big‑toe push‑off; stay tall; control contact."
+    ],
+    videoId: "toe-off-drills",
+    points: 2
+  }
+];
