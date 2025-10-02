@@ -9,8 +9,24 @@ const getApiUrl = () => {
   console.log('  - VITE_API_URL from env:', viteApiUrl);
   console.log('  - Is defined:', !!viteApiUrl);
   
-  // Use environment variable if available, otherwise use Railway production
+  // Prefer environment variable, but hard-override known stale domains
   if (viteApiUrl) {
+    // Known bad/stale domain that causes 404s for clinician routes
+    const STALE_BACKEND = 'https://backend-production-3545.up.railway.app';
+    const CORRECT_BACKEND = 'https://framework-production-92f5.up.railway.app';
+
+    if (viteApiUrl.trim() === STALE_BACKEND) {
+      console.warn('⚠️ Detected stale VITE_API_URL; overriding to', CORRECT_BACKEND);
+      return CORRECT_BACKEND;
+    }
+
+    // In production on Vercel, always prefer the framework backend
+    const isVercelHosted = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+    if (isVercelHosted && !viteApiUrl.includes('framework-production-92f5.up.railway.app')) {
+      console.warn('⚠️ Vercel production detected. Forcing framework backend. Was:', viteApiUrl);
+      return CORRECT_BACKEND;
+    }
+
     console.log('🚀 Using VITE_API_URL from environment:', viteApiUrl);
     return viteApiUrl;
   }
