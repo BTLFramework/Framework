@@ -270,7 +270,7 @@ function PatientModal({ patient, onClose }) {
         clinicianName: 'Dr. Practitioner' // TODO: Get from auth context
       };
 
-      const response = await fetch(`${API_URL}/api/practitioner-assessment/save`, {
+      const response = await fetch(`${API_URL}/patients/${patient.id}/assessment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -312,7 +312,7 @@ function PatientModal({ patient, onClose }) {
         clinicianName: 'Dr. Practitioner' // TODO: Get from auth context
       };
 
-      const response = await fetch(`${API_URL}/api/clinician-assessment/save`, {
+      const response = await fetch(`${API_URL}/patients/${patient.id}/assessment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -348,12 +348,12 @@ function PatientModal({ patient, onClose }) {
         clinicianName: 'Dr. Practitioner'
       };
 
-      const response = await fetch(`${API_URL}/api/reassessment/schedule`, {
+      const response = await fetch(`${API_URL}/patients/${patient.id}/reassessment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(reassessmentData)
+        body: JSON.stringify({ scheduledAt: reassessmentData.scheduledDate })
       });
 
       if (response.ok) {
@@ -380,12 +380,12 @@ function PatientModal({ patient, onClose }) {
         clinicianName: 'Dr. Practitioner'
       };
 
-      const response = await fetch(`${API_URL}/api/treatment-plan/update`, {
-        method: 'POST',
+      const response = await fetch(`${API_URL}/patients/${patient.id}/treatment-plan`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(treatmentPlanData)
+        body: JSON.stringify({ plan: treatmentPlanData.recommendations })
       });
 
       if (response.ok) {
@@ -410,12 +410,12 @@ function PatientModal({ patient, onClose }) {
         reviewType: 'clinical_review'
       };
 
-      const response = await fetch(`${API_URL}/api/patient/review`, {
-        method: 'POST',
+      const response = await fetch(`${API_URL}/patients/${patient.id}/review`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(reviewData)
+        body: JSON.stringify({})
       });
 
       if (response.ok) {
@@ -447,12 +447,12 @@ function PatientModal({ patient, onClose }) {
         clinicianName: 'Dr. Practitioner'
       };
 
-      const response = await fetch(`${API_URL}/api/clinical-notes/add`, {
+      const response = await fetch(`${API_URL}/patients/${patient.id}/notes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(noteData)
+        body: JSON.stringify({ text: noteData.text, authorId: null })
       });
 
       if (response.ok) {
@@ -485,12 +485,11 @@ function PatientModal({ patient, onClose }) {
     }
 
     try {
-      const response = await fetch(`${API_URL}/api/clinical-notes/delete`, {
+      const response = await fetch(`${API_URL}/patients/${patient.id}/notes/${noteId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ noteId, patientId: patient.id })
+        }
       });
 
       if (response.ok) {
