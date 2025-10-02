@@ -1712,4 +1712,212 @@ export const exercises = [
     videoId: "single-leg-calf-raises",
     points: 10
   }
+  ,
+  // ===== New/Updated Modules (Synced with backend model) =====
+  // Neck – Educate (updated)
+  {
+    id: "NECK_EDUCATE_ISO_WALL_LEAN_MARCH",
+    region: "Neck",
+    phase: "Educate",
+    name: "Iso Wall Lean with Marching",
+    focus: "upright stack, anti-rotation, cervical control",
+    description: "Train stack and anti-rotation while maintaining long neck.",
+    duration: "5-8 minutes",
+    difficulty: "Intermediate",
+    instructions: [
+      "Stand facing wall, palms light at shoulder height; step back 6–8 inches and lean slightly.",
+      "Ribs stacked over pelvis, neck long; inhale wide, exhale tall.",
+      "Lift one knee slowly without twisting; press hands gently into wall."
+    ],
+    videoId: "neck-iso-wall-lean-march",
+    points: 6
+  },
+  {
+    id: "NECK_EDUCATE_8_POINT_PLANK_CHIN_NOD_EDU",
+    region: "Neck",
+    phase: "Educate",
+    name: "8-Point Plank + Chin Nod",
+    focus: "closed-chain cervical control under light load",
+    description: "Build cervical control with stacked breathing in an 8-point plank.",
+    duration: "4-6 minutes",
+    difficulty: "Intermediate",
+    instructions: [
+      "On hands, knees, forearms, and toes; spine long, ribs over pelvis.",
+      "Push floor away; inhale wide; exhale keep stack; gentle chin nods."
+    ],
+    videoId: "8-point-plank-chin-nod-educate",
+    points: 7
+  },
+  {
+    id: "NECK_EDUCATE_SCAP_CARS_LATERAL_FLEXION",
+    region: "Neck",
+    phase: "Educate",
+    name: "Single‑Sided Scapular CARs with Lateral Flexion",
+    focus: "scapula/neck dissociation, segmental control",
+    description: "Improve scapular control while keeping a tall neck.",
+    duration: "4-6 minutes",
+    difficulty: "Intermediate",
+    instructions: [
+      "Sit/stand tall; one arm relaxed at side; chin gently tucked; shoulder circles slow and smooth."
+    ],
+    videoId: "scapular-cars-lateral-flexion",
+    points: 6
+  },
+
+  // Thoracic – Educate (updated)
+  {
+    id: "THORACIC_EDUCATE_SPINAL_CARS",
+    region: "Mid-Back / Thoracic",
+    phase: "Educate",
+    name: "Spinal CARs",
+    focus: "segmental awareness + rotation control",
+    description: "Restore segmental control through slow, smooth CARs.",
+    duration: "5-8 minutes",
+    difficulty: "Intermediate",
+    instructions: [
+      "Seated or kneeling; round, rotate, side-bend, extend with calm breath."
+    ],
+    videoId: "thoracic-spinal-cars",
+    points: 6
+  },
+  {
+    id: "THORACIC_EDUCATE_ANCHORED_WALL_GLIDE_UPDATED",
+    region: "Mid-Back / Thoracic",
+    phase: "Educate",
+    name: "Anchored Thoracic Wall Glide",
+    focus: "upright extension + posterior expansion",
+    description: "Teach upright extension with posterior expansion.",
+    duration: "5-8 minutes",
+    difficulty: "Intermediate",
+    instructions: [
+      "Hands at wall; inhale into mid-back; exhale tall as shoulder blades glide down."
+    ],
+    videoId: "anchored-thoracic-wall-glide",
+    points: 7
+  },
+  {
+    id: "THORACIC_EDUCATE_SINGLE_ARM_YTWS",
+    region: "Mid-Back / Thoracic",
+    phase: "Educate",
+    name: "Single-Arm YTWs",
+    focus: "scapular control + postural awareness",
+    description: "Pattern Y, T, W with controlled scapular motion.",
+    duration: "4-6 minutes",
+    difficulty: "Intermediate",
+    instructions: [
+      "Chest supported; reach long, then draw shoulder blade down; smooth movement."
+    ],
+    videoId: "thoracic-single-arm-ytw",
+    points: 6
+  },
+
+  // Low Back / SI – Reset (new names)
+  {
+    id: "LB_RESET_STANDING_DECOMP",
+    region: "Low Back / SI Joint",
+    phase: "Reset",
+    name: "Standing Decompression Breathing",
+    focus: "breathing",
+    description: "Stand tall and expand ribs in all directions to reduce compression.",
+    duration: "5-8 minutes",
+    difficulty: "Beginner",
+    instructions: [
+      "Stand tall, feet under hips; inhale 360°; exhale ribs down over pelvis."
+    ],
+    videoId: "standing-decomp-breath",
+    points: 3
+  },
+  {
+    id: "LB_RESET_SUPINE_DECOMP",
+    region: "Low Back / SI Joint",
+    phase: "Reset",
+    name: "Supine Decompression Breathing",
+    focus: "breathing",
+    description: "Supine breathwork to expand ribs laterally and into the floor.",
+    duration: "5-8 minutes",
+    difficulty: "Beginner",
+    instructions: [
+      "Hands on lower ribs; inhale into floor; exhale ribs down toward pelvis."
+    ],
+    videoId: "supine-decompression-breathing-low-back",
+    points: 4
+  },
+  {
+    id: "LB_RESET_PRONE_DECOMP",
+    region: "Low Back / SI Joint",
+    phase: "Reset",
+    name: "Prone Decompression Breathing",
+    focus: "breathing",
+    description: "Prone breathwork to encourage posterior rib expansion.",
+    duration: "5-8 minutes",
+    difficulty: "Beginner",
+    instructions: [
+      "Face down; inhale ribs into floor; exhale maintain long spine."
+    ],
+    videoId: "prone-decompression-breathing-low-back",
+    points: 3
+  },
+  {
+    id: "LB_RESET_SINGLE_LEG_DECOMP",
+    region: "Low Back / SI Joint",
+    phase: "Reset",
+    name: "Single‑Leg Decompression Breathing",
+    focus: "breathing + balance",
+    description: "Standing breath with single‑leg stance to integrate stacking.",
+    duration: "3-5 minutes",
+    difficulty: "Beginner",
+    instructions: [
+      "Shift to one leg; inhale wide; exhale to stay tall; alternate 3–5 breaths/side."
+    ],
+    videoId: "single-leg-decompression-breath",
+    points: 3
+  },
+
+  // Low Back / SI – Educate
+  { id: "LB_EDU_ANCHORED_BACK_EXTENSION_HOLD", region: "Low Back / SI Joint", phase: "Educate", name: "Anchored Back‑Extension Hold", focus: "upright extension with rib control", description: "Prone back‑extension with ribs gently down and neck long.", duration: "5-10 seconds (holds)", difficulty: "Intermediate", instructions: ["Prone; inhale ribs wide; exhale lift chest slightly; neck long; 3–5 reps."], videoId: "anchored-back-extension-hold", points: 6 },
+  { id: "LB_EDU_ANCHORED_BRIDGE_HOLD", region: "Low Back / SI Joint", phase: "Educate", name: "Anchored Bridge Hold", focus: "glute activation", description: "Bridge with ribs down; feel glutes/hamstrings without lumbar extension.", duration: "10-20 seconds (holds)", difficulty: "Intermediate", instructions: ["Feet hip‑width; press heels; hold 10–20s for 3–4 sets."], videoId: "anchored-bridge-hold", points: 6 },
+  { id: "LB_EDU_MOD_SIDE_PLANK_KNEES", region: "Low Back / SI Joint", phase: "Educate", name: "Modified Side Plank (knees)", focus: "lateral core + glute", description: "Side plank on knees to train lateral trunk stability.", duration: "15-30 seconds (holds)", difficulty: "Intermediate", instructions: ["Lift hips to straight line; inhale lower ribs; exhale hold steady."], videoId: "modified-side-plank-knees", points: 6 },
+  { id: "LB_EDU_FOUNDER", region: "Low Back / SI Joint", phase: "Educate", name: "Founder", focus: "hip hinge endurance and postural control", description: "Static hinge pattern reinforcing ribs down and long spine.", duration: "20-30 seconds (holds)", difficulty: "Intermediate", instructions: ["Hinge back; reach long; breathe into ribs; 2–3 sets."], videoId: "founder-hold", points: 6 },
+
+  // Low Back / SI – Rebuild
+  { id: "LB_REBUILD_SINGLE_LEG_HINGE", region: "Low Back / SI Joint", phase: "Rebuild", name: "Single‑Leg Hinge", focus: "single‑leg balance and hinge control", description: "Hinge on one leg with long spine; opposite leg extends behind.", duration: "6-8 reps/side", difficulty: "Advanced", instructions: ["Shift to one leg; hinge; inhale ribs; exhale return tall; 6–8 reps/side."], videoId: "single-leg-hinge", points: 8 },
+  { id: "LB_REBUILD_WIDE_LEG_FOUNDER", region: "Low Back / SI Joint", phase: "Rebuild", name: "Wide‑Leg Founder", focus: "hip stability in wide stance", description: "Wide‑stance founder emphasizing long spine and rib control.", duration: "20-30 seconds (holds)", difficulty: "Advanced", instructions: ["Feet wide; hinge; reach long; ribs down; 2–3 sets."], videoId: "wide-leg-founder", points: 7 },
+  { id: "LB_REBUILD_GORILLA_LIFT", region: "Low Back / SI Joint", phase: "Rebuild", name: "Gorilla Lift", focus: "hip hinge power with rib stacking", description: "Controlled hinge with hands on thighs or weights; lift tall with breath.", duration: "6-10 reps", difficulty: "Advanced", instructions: ["Hinge; inhale ribs wide; exhale lift tall; controlled tempo."], videoId: "gorilla-lift", points: 8 },
+  { id: "LB_REBUILD_FARMERS_CARRY_GRIP", region: "Low Back / SI Joint", phase: "Rebuild", name: "Farmer’s Carry (Grip Focus)", focus: "posture + grip endurance", description: "Walk tall with weights at sides; focus on grip and posture.", duration: "20-30 seconds x 3-4 rounds", difficulty: "Advanced", instructions: ["Stand tall; ribs over hips; slow steady walk; maintain stack."], videoId: "farmers-carry-grip", points: 7 },
+
+  // SIJ Focus (same region key)
+  { id: "SIJ_RESET_SUPINE_DECOMP_INNER_LINE", region: "Low Back / SI Joint", phase: "Reset", name: "Supine Decompression w/ Inner‑Line", focus: "breathing + adductor synergy", description: "Supine decompression with gentle inner‑thigh draw.", duration: "5-8 minutes", difficulty: "Beginner", instructions: ["Inhale ribs wide; exhale softly draw thighs together; neutral spine."], videoId: "sij-supine-decomp-inner-line", points: 3 },
+  { id: "SIJ_RESET_STANDING_DECOMP_FLOOR_TENSION", region: "Low Back / SI Joint", phase: "Reset", name: "Standing Decompression w/ Floor‑Tension", focus: "breathing + ground tension", description: "Create light floor tension to co‑activate adductors and glutes while stacked.", duration: "3-5 minutes", difficulty: "Beginner", instructions: ["Exhale and gently ‘pull the floor together’ with feet; stay tall.",], videoId: "sij-standing-decomp-floor-tension", points: 3 },
+  { id: "SIJ_RESET_SINGLE_LEG_WALL_LEAN", region: "Low Back / SI Joint", phase: "Reset", name: "Single‑Leg Wall Lean", focus: "glute med + adductor co‑activation", description: "Light wall press to co‑activate lateral hip and inner line.", duration: "10-15 seconds x 2-3/side", difficulty: "Beginner", instructions: ["Press outer knee/foot into wall; ribs stacked; pelvis level; steady breath."], videoId: "sij-single-leg-wall-lean", points: 4 },
+  { id: "SIJ_EDUCATE_FOUNDER", region: "Low Back / SI Joint", phase: "Educate", name: "Founder", focus: "hip hinge endurance with inner‑line tension", description: "Static hinge with light adductor engagement and ribs down.", duration: "20-30 seconds (holds)", difficulty: "Intermediate", instructions: ["Hinge back; maintain inner‑thigh tension; breathe; 2–3 sets."], videoId: "sij-founder", points: 6 },
+  { id: "SIJ_EDUCATE_SINGLE_LEG_HINGE", region: "Low Back / SI Joint", phase: "Educate", name: "Single‑Leg Hinge", focus: "single‑limb hinge skill", description: "Balance on one leg; hinge hips back with long spine and level pelvis.", duration: "6-8 reps/side", difficulty: "Intermediate", instructions: ["Keep pelvis level; ribs stacked; feel stance glute + adductor."], videoId: "sij-single-leg-hinge-educate", points: 7 },
+  { id: "SIJ_EDUCATE_ANCHORED_BRIDGE", region: "Low Back / SI Joint", phase: "Educate", name: "Anchored Bridge", focus: "glute + adductor integration", description: "Bridge while keeping ribs down, feeling glutes and adductors.", duration: "10-15 seconds (holds)", difficulty: "Intermediate", instructions: ["Lift hips; ribs down; breathe to maintain height; 3 sets."], videoId: "sij-anchored-bridge", points: 6 },
+  { id: "SIJ_REBUILD_LOADED_FOUNDATION_SQUAT", region: "Low Back / SI Joint", phase: "Rebuild", name: "Loaded Foundation Squat", focus: "squat strength with stack", description: "Hold weight close; inhale down stacked; exhale drive tall.", duration: "6-8 reps x 2-3 sets", difficulty: "Advanced", instructions: ["Knees track; maintain decompression; drive tall."], videoId: "sij-loaded-foundation-squat", points: 8 },
+  { id: "SIJ_REBUILD_FOUNDATION_WINDMILL", region: "Low Back / SI Joint", phase: "Rebuild", name: "Foundation Windmill", focus: "hinge with rotation control", description: "Wide stance; one arm overhead; hinge toward opposite foot with long spine.", duration: "6-8 reps/side", difficulty: "Advanced", instructions: ["Inhale side ribs; exhale rise; control rotation."], videoId: "sij-foundation-windmill", points: 8 },
+  { id: "SIJ_REBUILD_SINGLE_LEG_HINGE_ROTATION", region: "Low Back / SI Joint", phase: "Rebuild", name: "Single‑Leg Hinge with Rotation", focus: "single‑leg hinge + controlled rotation", description: "Hinge on one leg; rotate torso slightly toward stance side; return tall.", duration: "6 reps/side", difficulty: "Advanced", instructions: ["Maintain pelvis control and stacked ribs; move with breath."], videoId: "sij-single-leg-hinge-rotation", points: 8 },
+
+  // Hip Module
+  { id: "HIP_RESET_CARS", region: "Hip / Groin", phase: "Reset", name: "Hip CARs", focus: "controlled articular rotations", description: "Slow full‑circle hip rotations with trunk still.", duration: "3–5 circles each way", difficulty: "Beginner", instructions: ["Stand tall or quadruped; smooth circles; no trunk twist."], videoId: "hip-cars", points: 3 },
+  { id: "HIP_RESET_90_90_SWITCHES", region: "Hip / Groin", phase: "Reset", name: "90/90 Hip Switches", focus: "mobility + control", description: "Switch between 90/90 positions with chest lifted.", duration: "5–6 reps each side", difficulty: "Beginner", instructions: ["Breathe with control; fluid transitions."], videoId: "hip-90-90-switches", points: 3 },
+  { id: "HIP_RESET_SUPINE_DECOMP", region: "Hip / Groin", phase: "Reset", name: "Supine Decompression Breathing", focus: "breathing", description: "Inhale ribs wide into floor; exhale ribs down over pelvis.", duration: "5–8 breaths", difficulty: "Beginner", instructions: ["Keep spine long and calm; steady tempo."], videoId: "hip-supine-decompression", points: 3 },
+  { id: "HIP_EDU_90_90_PAILS_RAILS_IR", region: "Hip / Groin", phase: "Educate", name: "90/90 PAILs / RAILs (IR)", focus: "end‑range control", description: "PAILs 30% 5–10s; RAILs lift 5–10s at end range; 2–3 rounds.", duration: "8–12 minutes", difficulty: "Intermediate", instructions: ["Inhale to expand ribs; maintain posture; stay within mild stretch."], videoId: "hip-90-90-pails-rails-ir", points: 7 },
+  { id: "HIP_EDU_STANDING_LIFT_OFF_OVER_BLOCK", region: "Hip / Groin", phase: "Educate", name: "Standing Hip Lift‑Off (over block)", focus: "end‑range lift‑off", description: "Supported lift‑off over a block with pelvis level.", duration: "6–8 reps/side", difficulty: "Intermediate", instructions: ["Use wall/dowels; ribs stacked; pause 2–3s; lower with control."], videoId: "hip-standing-liftoff-block", points: 7 },
+  { id: "HIP_EDU_SINGLE_LEG_HINGE", region: "Hip / Groin", phase: "Educate", name: "Single‑Leg Hinge", focus: "hinge skill", description: "Balance on one leg; hinge with long spine; pelvis level.", duration: "6–8 reps/side", difficulty: "Intermediate", instructions: ["Slight bend in stance knee; inhale lengthen; exhale return tall."], videoId: "hip-single-leg-hinge", points: 7 },
+  { id: "HIP_REBUILD_90_90_LIFT_OFFS", region: "Hip / Groin", phase: "Rebuild", name: "90/90 Transitions (Lift‑Offs)", focus: "rotational capacity", description: "Lift foot or knee off floor in 90/90; switch sides with control.", duration: "6–8 reps/side", difficulty: "Advanced", instructions: ["Ribs stacked; hold 2–3s; slow switching."], videoId: "hip-90-90-liftoffs", points: 8 },
+  { id: "HIP_REBUILD_END_RANGE_PAILS_RAILS", region: "Hip / Groin", phase: "Rebuild", name: "End‑Range PAILs / RAILs", focus: "range‑specific strength", description: "At end range (flexion or rotation): PAILs 40–60% 10s; RAILs 5–10s; 2 rounds.", duration: "8–12 minutes", difficulty: "Advanced", instructions: ["Control breath; stay tall; protect joints."], videoId: "hip-end-range-pails-rails", points: 9 },
+  { id: "HIP_REBUILD_ROTATIONAL_LUNGE_COSSACK", region: "Hip / Groin", phase: "Rebuild", name: "Loaded Rotational Lunge / Cossack Squat", focus: "resilience + rotation", description: "Step wide; shift into one hip with gentle rotation; return tall.", duration: "6–8 reps/side", difficulty: "Advanced", instructions: ["Ribs stacked; spine long; inhale down; exhale up."], videoId: "hip-rotational-lunge-cossack", points: 9 },
+
+  // Foot / Ankle Module (new region)
+  { id: "ANKLE_FOOT_RESET_ANKLE_CIRCLES", region: "Foot / Ankle", phase: "Reset", name: "Ankle Circles", focus: "gentle ROM", description: "Slow circles through pain‑free range.", duration: "5–8 reps each way", difficulty: "Beginner", instructions: ["Move ankle slowly; breathe evenly."], videoId: "ankle-circles-foot", points: 2 },
+  { id: "ANKLE_FOOT_RESET_ANKLE_PUMPS", region: "Foot / Ankle", phase: "Reset", name: "Ankle Pumps (DF/PF)", focus: "mobility", description: "Point and flex with steady breath.", duration: "10–12 reps", difficulty: "Beginner", instructions: ["Point and flex; smooth tempo."], videoId: "ankle-pumps-foot", points: 2 },
+  { id: "ANKLE_FOOT_RESET_TOE_SPLAY_DOMING", region: "Foot / Ankle", phase: "Reset", name: "Toe Splay + Doming", focus: "arch control", description: "Spread toes; gently lift arch; maintain tripod.", duration: "10 reps, 3s holds", difficulty: "Beginner", instructions: ["Keep heel/ball grounded; lift arch gently."], videoId: "toe-splay-doming-foot", points: 2 },
+  { id: "ANKLE_FOOT_RESET_INVERSION_EVERSION_AM", region: "Foot / Ankle", phase: "Reset", name: "Inversion / Eversion Active Motion", focus: "frontal‑plane control", description: "Gentle tilt in and out without forcing range.", duration: "8–10 reps", difficulty: "Beginner", instructions: ["Smooth tilt in/out; no forcing."], videoId: "inversion-eversion-am-foot", points: 2 },
+  { id: "ANKLE_FOOT_EDU_SHORT_FOOT_BALANCE", region: "Foot / Ankle", phase: "Educate", name: "Short Foot with Balance", focus: "arch set + balance", description: "Create tripod and slight arch lift during balance hold.", duration: "10–15 seconds x 2–3", difficulty: "Intermediate", instructions: ["Stand tall; lift arch slightly; maintain tripod; breathe."], videoId: "short-foot-balance-foot", points: 3 },
+  { id: "ANKLE_FOOT_EDU_BANDED_DF_PF", region: "Foot / Ankle", phase: "Educate", name: "Banded Dorsiflexion / Plantarflexion", focus: "strength through range", description: "Controlled DF/PF against band resistance.", duration: "10 reps each way", difficulty: "Intermediate", instructions: ["Anchor band; controlled movement; avoid compensations."], videoId: "banded-df-pf-foot", points: 3 },
+  { id: "ANKLE_FOOT_EDU_SINGLE_LEG_BALANCE", region: "Foot / Ankle", phase: "Educate", name: "Single‑Leg Balance", focus: "balance + tripod", description: "Maintain tripod contact while stacked breathing.", duration: "20–30 seconds x 2–3", difficulty: "Intermediate", instructions: ["Ribs stacked; foot tripod contact; steady breath."], videoId: "single-leg-balance-foot", points: 3 },
+  { id: "ANKLE_FOOT_EDU_DOUBLE_LEG_HEEL_RAISE", region: "Foot / Ankle", phase: "Educate", name: "Double‑Leg Heel Raise", focus: "calf control", description: "Rise tall; control descent; keep weight across tripod.", duration: "10–12 reps", difficulty: "Intermediate", instructions: ["Even pressure across tripod; slow lowers."], videoId: "double-leg-heel-raise-foot", points: 3 },
+  { id: "ANKLE_FOOT_REBUILD_SINGLE_LEG_CALF", region: "Foot / Ankle", phase: "Rebuild", name: "Single‑Leg Calf Raises", focus: "calf strength + control", description: "Rise tall and lower slow on one foot.", duration: "8–10 reps/side", difficulty: "Advanced", instructions: ["Balance on one foot; maintain tripod; controlled tempo."], videoId: "single-leg-calf-raise-foot", points: 4 },
+  { id: "ANKLE_FOOT_REBUILD_LOADED_CARRIES", region: "Foot / Ankle", phase: "Rebuild", name: "Loaded Carries (Farmer / Suitcase)", focus: "postural endurance + foot stability", description: "Walk tall with weights; ribs over hips; stable feet.", duration: "20–30 seconds x 2–3", difficulty: "Advanced", instructions: ["Grip focus; tall stacked walk; even foot loading."], videoId: "ankle-loaded-carries-foot", points: 4 },
+  { id: "ANKLE_FOOT_REBUILD_STEP_UP_HEEL_CONTROL", region: "Foot / Ankle", phase: "Rebuild", name: "Step‑Up with Heel Control", focus: "closed‑chain control", description: "Drive through heel up; control descent; knee tracks over foot.", duration: "6–8 reps/side", difficulty: "Advanced", instructions: ["Keep knee tracking; control down; tall posture."], videoId: "step-up-heel-control-foot", points: 4 },
+  { id: "ANKLE_FOOT_REBUILD_TOE_OFF_DRILLS", region: "Foot / Ankle", phase: "Rebuild", name: "Toe‑Off Drills", focus: "gait push‑off mechanics", description: "March/walk emphasizing big‑toe push‑off.", duration: "30–60 seconds", difficulty: "Advanced", instructions: ["Stay tall; emphasize push‑off; slow controlled steps."], videoId: "toe-off-drills-foot", points: 3 }
 ]; 
