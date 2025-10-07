@@ -130,8 +130,40 @@ export async function updateTreatmentPlan(req: any, res: any) {
     const updated = await prisma.patient.update({
       where: { id: patientId },
       data: { treatmentPlan: planPayload },
-      select: { id: true, treatmentPlan: true },
+      select: { id: true, treatmentPlan: true, name: true },
     });
+
+    // Auto-create a clinical note documenting the treatment plan update
+    let noteText = `✅ Treatment Plan Updated\n\n${plan}`;
+    if (Array.isArray(exercises) && exercises.length > 0) {
+      noteText += `\n\n📋 Assigned Exercises (${exercises.length}):\n`;
+      // Try to load exercise names for better documentation
+      try {
+        const path = require('path');
+        const exerciseConfigPath = path.resolve(process.cwd(), 'config/exerciseConfig.js');
+        const exerciseConfig = require(exerciseConfigPath);
+        const exerciseList = exerciseConfig.exercises || [];
+        const assignedNames = exercises.map((id: string) => {
+          const ex = exerciseList.find((e: any) => e.id === id);
+          return ex ? `• ${ex.name} (${ex.region} - ${ex.phase})` : `• ${id}`;
+        });
+        noteText += assignedNames.join('\n');
+      } catch (e) {
+        // Fallback: just list IDs if config can't be loaded
+        noteText += exercises.map((id: string) => `• ${id}`).join('\n');
+      }
+    }
+
+    await prisma.clinicalNote.create({
+      data: {
+        patientId,
+        note: noteText,
+        practitionerId: null, // Could be passed from req.body.authorId if needed
+      },
+    });
+
+    console.log(`✅ Auto-created clinical note for treatment plan update: ${updated.name}`);
+
     res.json({ patient: updated });
   } catch (err: any) {
     console.error('updateTreatmentPlan', err);
