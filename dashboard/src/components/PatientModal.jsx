@@ -401,11 +401,23 @@ function PatientModal({ patient, onClose }) {
 
   const handleUpdateTreatmentPlan = async () => {
     try {
-      // Prompt clinician for summary and exercise IDs (comma-separated)
-      const summary = window.prompt('Treatment plan summary (e.g., Biceps tendinopathy progression focus):',
-        `Plan based on SRS ${srsScore}/11 and ${phase} phase`);
+      // Fetch library for quick search
+      const libResp = await fetch(`${API_URL}/patients/exercises/library`);
+      const libJson = await libResp.json().catch(() => ({ exercises: [] }));
+      const lib = Array.isArray(libJson.exercises) ? libJson.exercises : [];
+
+      // Simple prompt-based search flow for speed: search term → select IDs
+      const term = window.prompt('Search exercises (e.g., biceps, tendon, shoulder):', '');
+      const shortlist = term ? lib.filter((e) =>
+        (e.name || '').toLowerCase().includes(term.toLowerCase()) ||
+        (e.region || '').toLowerCase().includes(term.toLowerCase()) ||
+        (e.focus || '').toLowerCase().includes(term.toLowerCase())
+      ).slice(0, 10) : [];
+      const idsFromSearch = shortlist.map(e => e.id).join(', ');
+
+      const summary = window.prompt('Treatment plan summary:', `Plan based on SRS ${srsScore}/11 and ${phase} phase`);
       if (summary === null) return;
-      const idsRaw = window.prompt('Enter exercise IDs (comma-separated). Leave blank to only update summary:', '');
+      const idsRaw = window.prompt('Select exercise IDs (comma-separated). Suggestions: ' + idsFromSearch, idsFromSearch);
       const ids = idsRaw ? idsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
 
       const response = await fetch(`${API_URL}/patients/${patient.id}/treatment-plan`, {
