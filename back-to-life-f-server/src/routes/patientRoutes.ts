@@ -601,7 +601,7 @@ router.get('/exercises/library', async (_req: any, res: any) => {
           }
         }
       } catch (e) {
-        console.warn('Exercises JSON fallback failed:', e?.message);
+        console.warn('Exercises JSON fallback failed:', e instanceof Error ? e.message : String(e));
       }
     }
 
