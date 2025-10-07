@@ -570,6 +570,7 @@ router.get('/exercises/library', async (_req: any, res: any) => {
         const mod = require(c);
         if (mod && (mod.exercises || Array.isArray(mod) || mod?.default?.exercises || Array.isArray(mod?.default))) {
           loaded = mod;
+          console.log('[Exercises Library] Loaded from', c);
           break;
         }
       } catch (_) {}
@@ -577,6 +578,7 @@ router.get('/exercises/library', async (_req: any, res: any) => {
     const list = (loaded && loaded.exercises)
       ? loaded.exercises
       : (Array.isArray(loaded) ? loaded : (loaded?.default?.exercises || loaded?.default || []));
+    console.log('[Exercises Library] Count:', Array.isArray(list) ? list.length : 0);
     return res.json({ success: true, exercises: Array.isArray(list) ? list : [] });
   } catch (err) {
     console.error('Failed to load exercise library:', err);
