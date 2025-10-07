@@ -33,6 +33,8 @@ export default function PatientTable({
   const getPriorityAlert = (patient) => {
     const daysSinceLastContact = getDaysSinceLastContact(patient.lastUpdate);
     const daysSinceIntake = Math.floor((new Date() - new Date(patient.intakeDate)) / (1000 * 60 * 60 * 24));
+    const nextReass = patient.nextReassessmentAt ? new Date(patient.nextReassessmentAt) : null;
+    const now = new Date();
     
     // 🚨 CRITICAL: High Priority - Multiple Risk Factors
     if (patient.painLevel >= 8 && patient.srsScore <= 2) {
@@ -57,6 +59,18 @@ export default function PatientTable({
     // 📅 FOLLOW-UP DUE: No follow-up for 3+ weeks (21+ days)
     if (daysSinceLastContact >= 21) {
       return { type: "follow-up-due", label: "No Follow-up 3+ Weeks", icon: "" };
+    }
+
+    // ⏰ Reassessment flags
+    if (nextReass) {
+      const msDiff = nextReass.getTime() - now.getTime();
+      const daysDiff = Math.ceil(msDiff / (1000 * 60 * 60 * 24));
+      if (daysDiff < 0) {
+        return { type: "reass-overdue", label: "Reassessment Overdue", icon: "" };
+      }
+      if (daysDiff <= 3) {
+        return { type: "reass-soon", label: `Reassessment in ${daysDiff}d`, icon: "" };
+      }
     }
     
     // 🔴 CRITICAL: Very Low SRS (Static Risk)
