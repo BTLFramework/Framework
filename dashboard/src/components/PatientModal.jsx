@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AssignExercisesModal from './AssignExercisesModal';
 import { API_URL } from "../config/api";
 
@@ -186,6 +186,32 @@ function PatientModal({ patient, onClose }) {
 
   // Clinical Notes State
   const [clinicalNotes, setClinicalNotes] = useState([]);
+
+  // Load clinical notes from backend
+  const loadClinicalNotes = async () => {
+    try {
+      const resp = await fetch(`${API_URL}/patients/${patient.id}/notes`);
+      if (!resp.ok) return;
+      const data = await resp.json();
+      const notesArray = Array.isArray(data?.notes) ? data.notes : [];
+      setClinicalNotes(notesArray.map((n) => ({
+        id: n.id ?? n.noteId ?? Date.now(),
+        text: n.note ?? n.text ?? "",
+        type: n.type ?? "general",
+        createdAt: n.createdAt ?? new Date().toISOString(),
+        clinicianName: n.practitioner?.name ?? "Clinician",
+      })));
+    } catch (_) {
+      // no-op; keep existing notes state on failure
+    }
+  };
+
+  // Fetch notes when patient changes (or modal opens)
+  useEffect(() => {
+    if (patient?.id) {
+      loadClinicalNotes();
+    }
+  }, [patient?.id]);
   const [showAddNoteModal, setShowAddNoteModal] = useState(false);
   const [newNoteText, setNewNoteText] = useState('');
   const [newNoteType, setNewNoteType] = useState('general');
@@ -415,13 +441,9 @@ function PatientModal({ patient, onClose }) {
       if (!response.ok) throw new Error('Failed to update treatment plan');
       setQuickActions(prev => ({ ...prev, treatmentPlanUpdated: true }));
       setShowAssignExercises(false);
-      try {
-        await fetch(`${API_URL}/patients/${patient.id}/notes`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: `Treatment plan updated. Assigned exercises: ${(ids||[]).join(', ') || 'none'}. Summary: ${summary}`, authorId: null })
-        });
-      } catch {}
+      // Backend now auto-creates a clinical note when treatment plan updates.
+      // Refresh notes to show the newly created note instantly.
+      await loadClinicalNotes();
       alert('Treatment plan updated. Manual exercises will override auto-selection.');
     } catch (error) {
       alert(`Failed to update treatment plan: ${error.message}`);
