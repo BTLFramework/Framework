@@ -401,27 +401,32 @@ function PatientModal({ patient, onClose }) {
 
   const handleUpdateTreatmentPlan = async () => {
     try {
-      const treatmentPlanData = {
-        patientId: patient.id,
-        updatedAt: new Date().toISOString(),
-        currentPhase: phase,
-        srsScore: srsScore,
-        recommendations: `Treatment plan updated based on current SRS score of ${srsScore}/11 and ${phase} phase.`,
-        clinicianId: 'clinician-001',
-        clinicianName: 'Dr. Practitioner'
-      };
+      // Prompt clinician for summary and exercise IDs (comma-separated)
+      const summary = window.prompt('Treatment plan summary (e.g., Biceps tendinopathy progression focus):',
+        `Plan based on SRS ${srsScore}/11 and ${phase} phase`);
+      if (summary === null) return;
+      const idsRaw = window.prompt('Enter exercise IDs (comma-separated). Leave blank to only update summary:', '');
+      const ids = idsRaw ? idsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
 
       const response = await fetch(`${API_URL}/patients/${patient.id}/treatment-plan`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ plan: treatmentPlanData.recommendations })
+        body: JSON.stringify({ plan: summary || '', exercises: ids })
       });
 
       if (response.ok) {
         setQuickActions(prev => ({ ...prev, treatmentPlanUpdated: true }));
-        alert('Treatment plan updated successfully!');
+        alert('Treatment plan updated. Manual exercises will override auto-selection.');
+        // Create clinical note
+        try {
+          await fetch(`${API_URL}/patients/${patient.id}/notes`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: `Treatment plan updated. Assigned exercises: ${ids.join(', ') || 'none'}. Summary: ${summary}`, authorId: null })
+          });
+        } catch (_) {}
       } else {
         throw new Error('Failed to update treatment plan');
       }
