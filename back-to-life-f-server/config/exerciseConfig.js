@@ -946,7 +946,7 @@ exports.exercises = [
       "Breathe calmly; modulate to pain",
     ],
     videoId: "tendon-biceps-speeds-iso",
-    points: 6
+    points: 4
   },
   {
     id: "SHOULDER_SUPRASPINATUS_EDU_ISO_SCAPTION_THUMB_UP",
@@ -963,7 +963,7 @@ exports.exercises = [
       "Relax traps; smooth breath",
     ],
     videoId: "tendon-supraspinatus-scaption-iso",
-    points: 6
+    points: 4
   },
   {
     id: "SHOULDER_POST_CUFF_EDU_BAND_ER_NEUTRAL",
@@ -980,7 +980,7 @@ exports.exercises = [
       "Hold 10s; no shoulder hike",
     ],
     videoId: "tendon-posterior-cuff-er-neutral",
-    points: 5
+    points: 4
   },
   {
     id: "SHOULDER_INTEGRATED_CUFF_EDU_BAND_ER_WITH_FLEXION",
@@ -997,7 +997,7 @@ exports.exercises = [
       "Maintain ER and scapular control",
     ],
     videoId: "tendon-cuff-er-with-flexion",
-    points: 7
+    points: 4
   },
   {
     id: "SHOULDER_TENDON_EDU_ISOMETRIC_WALL_LEAN",
@@ -1016,7 +1016,7 @@ exports.exercises = [
       "Breathe calmly; avoid shoulder hike"
     ],
     videoId: "tendon-shoulder-wall-lean-iso",
-    points: 6
+    points: 4
   },
 
   // ---------- TENDINOPATHY — HIP / GLUTEAL ----------
@@ -1035,7 +1035,7 @@ exports.exercises = [
       "Lower slow; no trunk roll",
     ],
     videoId: "tendon-glute-med-side-abduction-eir",
-    points: 7
+    points: 4
   },
   {
     id: "HIP_GLUTE_MED_TENDINOPATHY_RESET_WALL_LEAN_ISO",
@@ -1052,7 +1052,7 @@ exports.exercises = [
       "Calm breath throughout",
     ],
     videoId: "tendon-glute-med-wall-lean-iso",
-    points: 5
+    points: 4
   },
   {
     id: "HIP_GLUTE_MED_TENDINOPATHY_REBUILD_HIP_HITCH",
@@ -1068,7 +1068,7 @@ exports.exercises = [
       "Control down; lift via stance glute",
     ],
     videoId: "tendon-hip-loaded-hip-hitch",
-    points: 8
+    points: 4
   },
 
   // ---------- TENDINOPATHY — KNEE ----------
@@ -1086,7 +1086,7 @@ exports.exercises = [
       "Ribs down; breathe steady",
     ],
     videoId: "tendon-knee-spanish-squat-iso",
-    points: 7
+    points: 4
   },
   {
     id: "KNEE_HAMSTRING_TENDON_EDU_NORDIC_ISO_LEAN",
@@ -1102,7 +1102,7 @@ exports.exercises = [
       "Maintain stack; no cramping",
     ],
     videoId: "tendon-hamstring-nordic-iso",
-    points: 6
+    points: 4
   },
 
   // ---------- TENDINOPATHY — FOOT / ANKLE ----------
@@ -1120,7 +1120,7 @@ exports.exercises = [
       "Keep tripod foot; calm breath",
     ],
     videoId: "tendon-achilles-iso-heel-raise",
-    points: 6
+    points: 4
   },
   {
     id: "ANKLE_PERONEAL_EDU_EVERSION_ISO_HOLD",
@@ -1136,6 +1136,6 @@ exports.exercises = [
       "Avoid ankle twist; smooth breath",
     ],
     videoId: "tendon-peroneal-eversion-iso",
-    points: 5
+    points: 4
   }
 ];
