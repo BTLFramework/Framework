@@ -551,16 +551,27 @@ router.post('/:id/reassessment', clinicianCtrl.scheduleReassessment);
 router.get('/exercises/library', async (_req: any, res: any) => {
   try {
     const path = require('path');
-    const bases = [
+    const baseCandidates = [
       path.resolve(__dirname, '../../config/exerciseConfig'),
       path.resolve(process.cwd(), 'config/exerciseConfig'),
       path.resolve(process.cwd(), 'dist/config/exerciseConfig'),
     ];
+    const candidates: string[] = [];
+    for (const base of baseCandidates) {
+      candidates.push(base);
+      candidates.push(base + '.js');
+      candidates.push(base + '.cjs');
+      candidates.push(base + '.mjs');
+    }
     let loaded: any = null;
-    for (const base of bases) {
+    for (const c of candidates) {
       try {
-        loaded = require(base);
-        if (loaded && (loaded.exercises || Array.isArray(loaded))) break;
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const mod = require(c);
+        if (mod && (mod.exercises || Array.isArray(mod) || mod?.default?.exercises || Array.isArray(mod?.default))) {
+          loaded = mod;
+          break;
+        }
       } catch (_) {}
     }
     const list = (loaded && loaded.exercises)
