@@ -340,25 +340,56 @@ function PatientModal({ patient, onClose }) {
   // Quick Actions Handlers
   const handleScheduleReassessment = async () => {
     try {
-      const reassessmentData = {
-        patientId: patient.id,
-        scheduledDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
-        type: 'follow_up',
-        clinicianId: 'clinician-001',
-        clinicianName: 'Dr. Practitioner'
-      };
+      // Pick date (default +7d)
+      const defaultDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+      const dateInput = window.prompt('Enter reassessment date (YYYY-MM-DD):', defaultDate);
+      if (!dateInput) return;
+      const scheduledAt = new Date(dateInput);
+      if (Number.isNaN(scheduledAt.getTime())) {
+        alert('Invalid date. Please use YYYY-MM-DD.');
+        return;
+      }
+
+      const sendReminder = window.confirm('Send a patient reminder ~48h before the reassessment?');
 
       const response = await fetch(`${API_URL}/patients/${patient.id}/reassessment`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ scheduledAt: reassessmentData.scheduledDate })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scheduledAt: scheduledAt.toISOString() })
       });
 
       if (response.ok) {
         setQuickActions(prev => ({ ...prev, reassessmentScheduled: true }));
-        alert('Reassessment scheduled successfully for 7 days from now!');
+        const scheduledStr = scheduledAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        alert(`Reassessment scheduled for ${scheduledStr}`);
+
+        // Auto clinical note
+        try {
+          await fetch(`${API_URL}/patients/${patient.id}/notes`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: `Reassessment scheduled for ${scheduledStr}. Reminder: ${sendReminder ? 'YES' : 'NO'}`, authorId: null })
+          });
+        } catch (e) {
+          console.warn('Failed to create clinical note for reassessment:', e);
+        }
+
+        // Send immediate reminder if within 48h
+        if (sendReminder) {
+          const msUntil = scheduledAt.getTime() - Date.now();
+          if (msUntil <= 48 * 60 * 60 * 1000) {
+            try {
+              const msg = `Hi ${patient.name},\n\nThis is a reminder for your reassessment around ${scheduledStr}. Please log in to your patient portal to confirm or message us if you need to adjust.\n\n– Back to Life Team`;
+              await fetch(`${API_URL}/api/messages/send`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ patientId: patient.id, subject: 'Reassessment Reminder', content: msg, senderName: 'Clinician', senderEmail: 'clinician@backtolife.ca' })
+              });
+            } catch (e) {
+              console.warn('Failed to send immediate reassessment reminder:', e);
+            }
+          }
+        }
       } else {
         throw new Error('Failed to schedule reassessment');
       }
