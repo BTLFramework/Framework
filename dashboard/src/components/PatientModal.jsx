@@ -1,4 +1,5 @@
 import { useState } from "react";
+import AssignExercisesModal from './AssignExercisesModal';
 import { API_URL } from "../config/api";
 
 // Helper function to get disability color based on region and score
@@ -399,51 +400,30 @@ function PatientModal({ patient, onClose }) {
     }
   };
 
+  const [showAssignExercises, setShowAssignExercises] = useState(false);
   const handleUpdateTreatmentPlan = async () => {
+    setShowAssignExercises(true);
+  };
+
+  const handleAssignSave = async ({ summary, ids }) => {
     try {
-      // Fetch library for quick search
-      const libResp = await fetch(`${API_URL}/patients/exercises/library`);
-      const libJson = await libResp.json().catch(() => ({ exercises: [] }));
-      const lib = Array.isArray(libJson.exercises) ? libJson.exercises : [];
-
-      // Simple prompt-based search flow for speed: search term → select IDs
-      const term = window.prompt('Search exercises (e.g., biceps, tendon, shoulder):', '');
-      const shortlist = term ? lib.filter((e) =>
-        (e.name || '').toLowerCase().includes(term.toLowerCase()) ||
-        (e.region || '').toLowerCase().includes(term.toLowerCase()) ||
-        (e.focus || '').toLowerCase().includes(term.toLowerCase())
-      ).slice(0, 10) : [];
-      const idsFromSearch = shortlist.map(e => e.id).join(', ');
-
-      const summary = window.prompt('Treatment plan summary:', `Plan based on SRS ${srsScore}/11 and ${phase} phase`);
-      if (summary === null) return;
-      const idsRaw = window.prompt('Select exercise IDs (comma-separated). Suggestions: ' + idsFromSearch, idsFromSearch);
-      const ids = idsRaw ? idsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
-
       const response = await fetch(`${API_URL}/patients/${patient.id}/treatment-plan`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ plan: summary || '', exercises: ids })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: summary || '', exercises: ids || [] })
       });
-
-      if (response.ok) {
-        setQuickActions(prev => ({ ...prev, treatmentPlanUpdated: true }));
-        alert('Treatment plan updated. Manual exercises will override auto-selection.');
-        // Create clinical note
-        try {
-          await fetch(`${API_URL}/patients/${patient.id}/notes`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: `Treatment plan updated. Assigned exercises: ${ids.join(', ') || 'none'}. Summary: ${summary}`, authorId: null })
-          });
-        } catch (_) {}
-      } else {
-        throw new Error('Failed to update treatment plan');
-      }
+      if (!response.ok) throw new Error('Failed to update treatment plan');
+      setQuickActions(prev => ({ ...prev, treatmentPlanUpdated: true }));
+      setShowAssignExercises(false);
+      try {
+        await fetch(`${API_URL}/patients/${patient.id}/notes`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: `Treatment plan updated. Assigned exercises: ${(ids||[]).join(', ') || 'none'}. Summary: ${summary}`, authorId: null })
+        });
+      } catch {}
+      alert('Treatment plan updated. Manual exercises will override auto-selection.');
     } catch (error) {
-      console.error('Error updating treatment plan:', error);
       alert(`Failed to update treatment plan: ${error.message}`);
     }
   };
@@ -2300,6 +2280,15 @@ function PatientModal({ patient, onClose }) {
           </div>
         </div>
       </div>
+
+      {showAssignExercises && (
+        <AssignExercisesModal
+          isOpen={showAssignExercises}
+          onClose={() => setShowAssignExercises(false)}
+          patient={patient}
+          onSave={handleAssignSave}
+        />
+      )}
 
       {/* Message Composition Modal */}
       {showMessageModal && (
