@@ -575,9 +575,35 @@ router.get('/exercises/library', async (_req: any, res: any) => {
         }
       } catch (_) {}
     }
-    const list = (loaded && loaded.exercises)
+    let list: any = (loaded && loaded.exercises)
       ? loaded.exercises
       : (Array.isArray(loaded) ? loaded : (loaded?.default?.exercises || loaded?.default || []));
+
+    if (!Array.isArray(list) || list.length === 0) {
+      // Fallback: read prebuilt JSON if available
+      try {
+        const fs = require('fs');
+        const jsonCandidates = [
+          path.resolve(__dirname, '../../dist/config/exercises.json'),
+          path.resolve(process.cwd(), 'dist/config/exercises.json'),
+          path.resolve(process.cwd(), 'config/exercises.json'),
+        ];
+        for (const jc of jsonCandidates) {
+          if (fs.existsSync(jc)) {
+            const raw = fs.readFileSync(jc, 'utf8');
+            const arr = JSON.parse(raw);
+            if (Array.isArray(arr) && arr.length > 0) {
+              list = arr;
+              console.log('[Exercises Library] Loaded from JSON', jc);
+              break;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Exercises JSON fallback failed:', e?.message);
+      }
+    }
+
     console.log('[Exercises Library] Count:', Array.isArray(list) ? list.length : 0);
     return res.json({ success: true, exercises: Array.isArray(list) ? list : [] });
   } catch (err) {
