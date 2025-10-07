@@ -555,6 +555,7 @@ router.get('/exercises/library', async (_req: any, res: any) => {
       path.resolve(__dirname, '../../config/exerciseConfig'),
       path.resolve(process.cwd(), 'config/exerciseConfig'),
       path.resolve(process.cwd(), 'dist/config/exerciseConfig'),
+      '/app/config/exerciseConfig',
     ];
     const candidates: string[] = [];
     for (const base of baseCandidates) {
