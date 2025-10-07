@@ -118,12 +118,18 @@ export async function markReviewed(req: any, res: any) {
 export async function updateTreatmentPlan(req: any, res: any) {
   try {
     const patientId = parseId(req.params.id);
-    const { plan } = req.body ?? {};
+    const { plan, exercises } = req.body ?? {};
     if (!plan || typeof plan !== 'string') return res.status(400).json({ error: 'plan required' });
+
+    // If exercises are provided, store a JSON payload inside treatmentPlan for now
+    // { summary: string, assignedExercises: string[] }
+    const planPayload = Array.isArray(exercises) && exercises.length > 0
+      ? JSON.stringify({ summary: plan, assignedExercises: exercises, updatedAt: new Date().toISOString() })
+      : plan;
 
     const updated = await prisma.patient.update({
       where: { id: patientId },
-      data: { treatmentPlan: plan },
+      data: { treatmentPlan: planPayload },
       select: { id: true, treatmentPlan: true },
     });
     res.json({ patient: updated });

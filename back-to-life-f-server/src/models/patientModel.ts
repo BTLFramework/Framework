@@ -194,6 +194,41 @@ export const getAssignedExercisesByEmail = async (email: string) => {
   const region = latestSRS?.region || "Neck";
   console.log(`📍 Region: ${region}`);
 
+  // Check if clinician stored manual assignments inside patient.treatmentPlan JSON
+  try {
+    // Re-fetch minimal patient fields to avoid circular include
+    const p = await prisma.patient.findUnique({ where: { email }, select: { treatmentPlan: true } as any });
+    if (p?.treatmentPlan) {
+      let parsed: any = null;
+      try { parsed = JSON.parse(p.treatmentPlan as any); } catch (_) {}
+      if (parsed && Array.isArray(parsed.assignedExercises) && parsed.assignedExercises.length > 0) {
+        console.log('📝 Using manually assigned exercises from treatmentPlan');
+        // Load library to map ids → full records
+        const lib = await (async () => {
+          const path = require('path');
+          const base = path.resolve(__dirname, '../../config/exerciseConfig');
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const loaded = require(base);
+            return loaded.exercises || loaded.default?.exercises || [];
+          } catch { return []; }
+        })();
+        const chosen = parsed.assignedExercises
+          .map((id: string) => lib.find((e: any) => e.id === id))
+          .filter(Boolean);
+        return {
+          exercises: chosen,
+          totalPoints: chosen.reduce((s: number, e: any) => s + (e.points || 0), 0),
+          region,
+          phase,
+          srsScore
+        };
+      }
+    }
+  } catch (e) {
+    console.warn('Manual assignment check failed:', e);
+  }
+
   // Import exercise library with robust path resolution
   let exercises: any[] = [];
   try {
