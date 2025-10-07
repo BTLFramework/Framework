@@ -929,7 +929,7 @@ exports.exercises = [
     ],
     videoId: "toe-off-drills",
     points: 2
-  }
+  },
   // ---------- TENDINOPATHY — SHOULDER ----------
   {
     id: "SHOULDER_BICEPS_EDU_SPEEDS_ISO_BAND_HOLD",
