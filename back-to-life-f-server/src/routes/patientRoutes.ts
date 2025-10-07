@@ -547,4 +547,30 @@ router.patch('/:id/treatment-plan', clinicianCtrl.updateTreatmentPlan);
 // Schedule reassessment
 router.post('/:id/reassessment', clinicianCtrl.scheduleReassessment);
 
+// Exercises library (for clinician dashboard assignment UI)
+router.get('/exercises/library', async (_req: any, res: any) => {
+  try {
+    const path = require('path');
+    const bases = [
+      path.resolve(__dirname, '../../config/exerciseConfig'),
+      path.resolve(process.cwd(), 'config/exerciseConfig'),
+      path.resolve(process.cwd(), 'dist/config/exerciseConfig'),
+    ];
+    let loaded: any = null;
+    for (const base of bases) {
+      try {
+        loaded = require(base);
+        if (loaded && (loaded.exercises || Array.isArray(loaded))) break;
+      } catch (_) {}
+    }
+    const list = (loaded && loaded.exercises)
+      ? loaded.exercises
+      : (Array.isArray(loaded) ? loaded : (loaded?.default?.exercises || loaded?.default || []));
+    return res.json({ success: true, exercises: Array.isArray(list) ? list : [] });
+  } catch (err) {
+    console.error('Failed to load exercise library:', err);
+    return res.json({ success: true, exercises: [] });
+  }
+});
+
 export default router;
