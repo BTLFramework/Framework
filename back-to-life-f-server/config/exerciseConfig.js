@@ -999,6 +999,25 @@ exports.exercises = [
     videoId: "tendon-cuff-er-with-flexion",
     points: 7
   },
+  {
+    id: "SHOULDER_TENDON_EDU_ISOMETRIC_WALL_LEAN",
+    region: "Shoulder",
+    phase: "Educate",
+    name: "Isometric Wall Lean",
+    focus: "rotator cuff isometric stability",
+    description: "Elbow flexed to 90°, shoulder blade engaged, lean into wall with controlled tension for 15–30 seconds.",
+    duration: "Hold 15–30 sec, 3–4 rounds",
+    difficulty: "Intermediate",
+    instructions: [
+      "Stand facing wall, elbow bent to 90°",
+      "Engage shoulder blade down and back",
+      "Lean into wall with forearm/hand",
+      "Hold steady pressure 15–30 seconds",
+      "Breathe calmly; avoid shoulder hike"
+    ],
+    videoId: "tendon-shoulder-wall-lean-iso",
+    points: 6
+  },
 
   // ---------- TENDINOPATHY — HIP / GLUTEAL ----------
   {
