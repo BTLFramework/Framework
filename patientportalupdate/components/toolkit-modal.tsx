@@ -36,6 +36,7 @@ interface ToolkitModalProps {
 export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightComplete }: ToolkitModalProps) {
   const [selectedExercise, setSelectedExercise] = useState(null)
   const [selectedInsight, setSelectedInsight] = useState<number | null>(null)
+  const [selectedMindfulness, setSelectedMindfulness] = useState<any>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedRegion, setSelectedRegion] = useState("all")
   const [selectedPhase, setSelectedPhase] = useState("all")
@@ -737,7 +738,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             duration: "5-10 min",
             difficulty: "Beginner",
             type: "mindfulness",
-            topic: "pain-management"
+            topic: "pain-management",
+            url: "https://www.youtube.com/watch?v=lcUlprEmMtA"
           },
           {
             title: "Progressive Muscle Relaxation",
@@ -745,7 +747,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             duration: "15-20 min", 
             difficulty: "Beginner",
             type: "mindfulness",
-            topic: "pain-management"
+            topic: "pain-management",
+            url: "https://www.va.gov/PAINMANAGEMENT/Veteran_Public/Veteran_docs/FUMP.pdf"
           },
           {
             title: "Body Scan Meditation",
@@ -753,7 +756,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             duration: "10-15 min",
             difficulty: "Beginner", 
             type: "mindfulness",
-            topic: "mindfulness"
+            topic: "mindfulness",
+            url: "https://palousemindfulness.com/meditations/bodyscan20min.html"
           },
           {
             title: "Visualization for Recovery",
@@ -761,7 +765,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             duration: "8-12 min",
             difficulty: "Intermediate",
             type: "mindfulness", 
-            topic: "mindset"
+            topic: "mindset",
+            url: "https://www.noigroup.com/graded-motor-imagery/"
           },
           {
             title: "Loving-Kindness Meditation",
@@ -769,7 +774,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             duration: "10-15 min",
             difficulty: "Intermediate",
             type: "mindfulness",
-            topic: "mindset"
+            topic: "mindset",
+            url: "https://www.uclahealth.org/programs/marc/free-guided-meditations/loving-kindness"
           },
           {
             title: "Mindful Movement Awareness",
@@ -777,7 +783,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             duration: "5-8 min",
             difficulty: "Beginner",
             type: "mindfulness",
-            topic: "movement"
+            topic: "movement",
+            url: "https://www.youtube.com/watch?v=9hSL89IgRg4"
           },
           {
             title: "Stress Response Regulation",
@@ -785,7 +792,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             duration: "8-12 min",
             difficulty: "Intermediate",
             type: "mindfulness",
-            topic: "flare-ups"
+            topic: "flare-ups",
+            url: "https://www.youtube.com/watch?v=9fEo9my03Ks"
           },
           {
             title: "Mindful Pain Observation",
@@ -793,7 +801,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             duration: "10-15 min",
             difficulty: "Advanced",
             type: "mindfulness",
-            topic: "pain-management"
+            topic: "pain-management",
+            url: "https://www.tarabrach.com/rain-meditation/"
           },
         ]
 
@@ -1092,6 +1101,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                               <div
                                 key={index}
                                 className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg hover:border-btl-200 hover:shadow-md transition-all duration-200 cursor-pointer"
+                                onClick={() => setSelectedMindfulness(guide)}
                               >
                                 <div className="p-2 bg-btl-100 rounded-full border-2 border-btl-600">
                                   <BookOpen className="w-5 h-5 text-btl-600" />
@@ -1105,7 +1115,10 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                                     <span className="px-2 py-0.5 rounded-full bg-gray-100">{guide.difficulty}</span>
                                   </p>
                                 </div>
-                                <button className="px-3 py-1 bg-btl-600 text-white text-sm rounded-full hover:bg-btl-700 transition-colors">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setSelectedMindfulness(guide) }}
+                                  className="px-3 py-1 bg-btl-600 text-white text-sm rounded-full hover:bg-btl-700 transition-colors"
+                                >
                                   Start
                                 </button>
                               </div>
@@ -1207,6 +1220,51 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                           <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Guided Prompts</span>
                           <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Sleep Correlation</span>
                         </div>
+          ) : null}
+          {/* Mindfulness Modal */}
+          {selectedMindfulness && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[120] p-4">
+              <div className="bg-white rounded-xl max-w-2xl w-full overflow-hidden shadow-2xl border border-gray-200">
+                <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">{selectedMindfulness.title}</h3>
+                    <p className="text-sm text-gray-600">{selectedMindfulness.description}</p>
+                  </div>
+                  <button onClick={() => setSelectedMindfulness(null)} className="text-gray-500 hover:text-gray-700">
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+                <div className="p-6 space-y-4">
+                  {selectedMindfulness.url && (selectedMindfulness.url.includes('youtube.com') || selectedMindfulness.url.includes('youtu.be')) ? (
+                    <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                      <iframe
+                        src={`https://www.youtube.com/embed/${(selectedMindfulness.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)?.[1]) || ''}`}
+                        title={selectedMindfulness.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="absolute top-0 left-0 w-full h-full rounded-lg"
+                      />
+                    </div>
+                  ) : (
+                    <a
+                      href={selectedMindfulness.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-btl-600 text-white rounded-full hover:bg-btl-700"
+                    >
+                      Open Resource
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  )}
+                  <div className="text-xs text-gray-500">
+                    Source: educational resource used for patient education.
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
                       </div>
                       <button 
                         onClick={() => setShowPainJournalPopup(true)}
