@@ -69,18 +69,21 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
           )}
         </div>
 
-        {/* Stacked sections for remaining slides */}
+        {/* Stacked sections for remaining slides (cortisol-style callouts) */}
         <div className="p-8 space-y-6">
           {data.slides.slice(1).map((s) => (
-            <div key={s.id} className="bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-2xl p-6 shadow-sm">
-              <h4 className="text-xl font-bold text-gray-900 mb-2">{s.title}</h4>
-              <p className="text-btl-800 leading-relaxed">{s.content}</p>
+            <div
+              key={s.id}
+              className="bg-btl-50 border border-btl-200 rounded-2xl p-6 shadow-sm"
+            >
+              <h4 className="text-xl font-bold text-btl-900 mb-2">{s.title}</h4>
+              <p className="text-btl-700 leading-relaxed">{s.content}</p>
             </div>
           ))}
 
           {/* Bottom CTA and Key Takeaway */}
           {resourceSlide && (
-            <div className="bg-gradient-to-br from-btl-50 to-white border-2 border-btl-200 rounded-2xl p-6 shadow-sm">
+            <div className="bg-btl-50 border border-btl-200 rounded-2xl p-6 shadow-sm">
               <h4 className="text-lg font-bold text-btl-900 mb-3">Learn More</h4>
               <a
                 href={resourceSlide.resourceLink}
