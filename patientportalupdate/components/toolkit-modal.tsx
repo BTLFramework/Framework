@@ -4,6 +4,7 @@ import { X, Play, Download, BookOpen, Search, Filter, Target, Activity, FileText
 import { useState, useRef } from "react"
 import { exercises as allExercises } from "@/lib/exerciseLibrary"
 import { insightLibrary } from "@/lib/InsightLibrary"
+import { BUILD_TAG } from "@/lib/buildInfo"
 import { ExerciseVideoModal } from "@/components/exercise-video-modal"
 import InsightDialog from "@/components/InsightDialog"
 import { generatePainJournalPDF, generateSMARTGoalsPDF } from "@/utils/pdfGenerator"
@@ -38,6 +39,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedRegion, setSelectedRegion] = useState("all")
   const [selectedPhase, setSelectedPhase] = useState("all")
+  console.log('🧩 Toolkit build:', BUILD_TAG, 'insights:', Array.isArray(insightLibrary) ? insightLibrary.length : 'n/a')
   
   // Support Tools State
   const [showTimer, setShowTimer] = useState(false)

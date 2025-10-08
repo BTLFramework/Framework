@@ -19,12 +19,14 @@ import { MindfulnessSessionDialog } from "@/components/MindfulnessSessionDialog"
 import { RecoveryInsightDialog } from "@/components/RecoveryInsightDialog"
 import { useAuth } from "@/hooks/useAuth"
 import { LoginForm } from "@/components/LoginForm"
+import { BUILD_TAG, BUILD_HINT } from "@/lib/buildInfo"
 
 const PatientRecoveryDashboard: React.FC = () => {
   // Use proper authentication
   const { patient, loading: authLoading, isAuthenticated } = useAuth()
   
   console.log('🎯 Dashboard render state:', { patient, authLoading, isAuthenticated })
+  console.log('🧩 Build marker:', { BUILD_TAG, BUILD_HINT })
   
   const [showScoreModal, setShowScoreModal] = useState(false)
   const [selectedTask, setSelectedTask] = useState<any>(null)
