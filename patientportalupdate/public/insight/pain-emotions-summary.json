@@ -1,4 +1,7 @@
 {
+  "timeMinutes": 2,
+  "level": "Intermediate",
+  "why": "Managing emotions can lower pain intensity by reducing threat signaling.",
   "slides": [
     {
       "id": 1,
@@ -23,8 +26,15 @@
     },
     {
       "id": 4,
-      "title": "Learn More",
-      "content": "Read the full MedlinePlus article on the complex relationship between pain and emotions",
+      "title": "Myth vs Fact",
+      "content": "Myth: Pain is purely physical. Fact: Emotions and thoughts modulate pain perception.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#075985"
+    },
+    {
+      "id": 5,
+      "title": "Try this today",
+      "content": "2 minutes of slow nasal breathing (4‑6 breaths/min) during a flare.",
       "backgroundColor": "#eff6ff",
       "textColor": "#1e40af",
       "resourceLink": "https://medlineplus.gov/ency/patientinstructions/000417.htm",

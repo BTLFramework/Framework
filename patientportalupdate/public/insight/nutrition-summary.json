@@ -1,4 +1,7 @@
 {
+  "timeMinutes": 2,
+  "level": "Beginner",
+  "why": "Anti-inflammatory eating supports healing and reduces pain sensitivity.",
   "slides": [
     {
       "id": 1,
@@ -23,8 +26,15 @@
     },
     {
       "id": 4,
-      "title": "Learn More",
-      "content": "Ready to dive deeper? Access the full Harvard Health guide for comprehensive nutrition strategies",
+      "title": "Myth vs Fact",
+      "content": "Myth: All fats are bad. Fact: Omega‑3 fats are anti‑inflammatory and beneficial.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#075985"
+    },
+    {
+      "id": 5,
+      "title": "Try this today",
+      "content": "Swap one processed snack for a handful of nuts and berries.",
       "backgroundColor": "#eff6ff",
       "textColor": "#1e40af",
       "resourceLink": "https://www.health.harvard.edu/staying-healthy/foods-that-fight-inflammation",

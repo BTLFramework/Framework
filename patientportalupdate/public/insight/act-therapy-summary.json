@@ -1,4 +1,7 @@
 {
+  "timeMinutes": 3,
+  "level": "Intermediate",
+  "why": "ACT helps you live by values while reducing pain‑related distress.",
   "slides": [
     {
       "id": 1,
@@ -23,8 +26,15 @@
     },
     {
       "id": 4,
-      "title": "Learn More",
-      "content": "Explore the comprehensive ACT manual for detailed techniques and exercises",
+      "title": "Myth vs Fact",
+      "content": "Myth: Acceptance means giving up. Fact: It frees energy to pursue what matters.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#075985"
+    },
+    {
+      "id": 5,
+      "title": "Try this today",
+      "content": "Notice‑Name‑Nurture: label a tough thought, breathe, and take one valued action.",
       "backgroundColor": "#eff6ff",
       "textColor": "#1e40af",
       "resourceLink": "https://www.div12.org/wp-content/uploads/2015/06/ACT-for-Chronic-Pain-manual-McCracken.pdf",

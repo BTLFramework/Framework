@@ -1,4 +1,7 @@
 {
+  "timeMinutes": 2,
+  "level": "Beginner",
+  "why": "Better sleep reduces pain sensitivity and speeds tissue repair.",
   "slides": [
     {
       "id": 1,
@@ -23,8 +26,15 @@
     },
     {
       "id": 4,
-      "title": "Learn More",
-      "content": "Access the NHS sleep guide for comprehensive strategies to improve sleep quality",
+      "title": "Myth vs Fact",
+      "content": "Myth: You can catch up on weekends. Fact: Irregular patterns still impair recovery.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#075985"
+    },
+    {
+      "id": 5,
+      "title": "Try this tonight",
+      "content": "Dim lights 60 minutes pre‑bed and park your phone outside the bedroom.",
       "backgroundColor": "#eff6ff",
       "textColor": "#1e40af",
       "resourceLink": "https://www.nhsinform.scot/illnesses-and-conditions/mental-health/mental-health-self-help-guides/sleep-problems-and-insomnia-self-help-guide/",

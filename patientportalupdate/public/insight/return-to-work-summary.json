@@ -1,4 +1,7 @@
 {
+  "timeMinutes": 2,
+  "level": "Intermediate",
+  "why": "Paced return prevents boom‑bust cycles and supports durable recovery.",
   "slides": [
     {
       "id": 1,
@@ -23,8 +26,15 @@
     },
     {
       "id": 4,
-      "title": "Learn More",
-      "content": "Access the complete guide for detailed strategies on managing pain while returning to work",
+      "title": "Myth vs Fact",
+      "content": "Myth: Wait until pain is 0/10. Fact: Graded exposure is safe and effective.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#075985"
+    },
+    {
+      "id": 5,
+      "title": "Try this next shift",
+      "content": "Plan two 3‑minute movement breaks per hour; track how you feel after.",
       "backgroundColor": "#eff6ff",
       "textColor": "#1e40af",
       "resourceLink": "https://www.hamiltonhealthsciences.ca/wp-content/uploads/2019/03/Patient-Education-Chronic-pain-work-Pain-Clinic.pdf",

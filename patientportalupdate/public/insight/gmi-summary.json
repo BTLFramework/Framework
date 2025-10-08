@@ -1,4 +1,7 @@
 {
+  "timeMinutes": 3,
+  "level": "Intermediate",
+  "why": "GMI reduces pain by retraining the brain's movement maps.",
   "slides": [
     {
       "id": 1,
@@ -23,8 +26,15 @@
     },
     {
       "id": 4,
-      "title": "Learn More",
-      "content": "Explore the NOI Group's comprehensive GMI resources and training programs",
+      "title": "Myth vs Fact",
+      "content": "Myth: Only hard exercise helps pain. Fact: Imagery and mapping can reduce pain too.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#075985"
+    },
+    {
+      "id": 5,
+      "title": "Try this today",
+      "content": "10 left/right recognition taps: is this a left or right hand?",
       "backgroundColor": "#eff6ff",
       "textColor": "#1e40af",
       "resourceLink": "https://www.noigroup.com/graded-motor-imagery/",
