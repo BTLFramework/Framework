@@ -2,6 +2,7 @@
 
 import { Video, FileText, Wrench, Eye, ArrowRight } from "lucide-react"
 import { exercises as allExercises } from "@/lib/exerciseLibrary"
+import { insightLibrary } from "@/lib/InsightLibrary"
 
 interface RecoveryToolkitSectionProps {
   onToolkitClick: (toolkit: any) => void
@@ -24,7 +25,7 @@ export function RecoveryToolkitSection({ onToolkitClick }: RecoveryToolkitSectio
       icon: FileText,
       iconBg: "bg-gradient-to-br from-btl-50 to-btl-200",
       iconColor: "text-btl-700",
-      count: 49,
+      count: Array.isArray(insightLibrary) ? insightLibrary.length : 0,
       category: "guides",
     },
     {
@@ -53,7 +54,12 @@ export function RecoveryToolkitSection({ onToolkitClick }: RecoveryToolkitSectio
           <div
             key={index}
             className="flex items-center space-x-4 p-4 rounded-xl hover:bg-btl-50 cursor-pointer transition-all duration-200 border border-btl-100 hover:border-btl-200 hover:shadow-md group"
-            onClick={() => onToolkitClick(item)}
+            onClick={() => {
+              try {
+                console.log('🖱️ RecoveryToolkitSection click:', { title: item.title, category: item.category, count: item.count })
+              } catch {}
+              onToolkitClick(item)
+            }}
           >
             <div className={`w-12 h-12 ${item.iconBg} rounded-xl flex items-center justify-center shadow-md`}>
               <item.icon className={`w-6 h-6 ${item.iconColor}`} />
