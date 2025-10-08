@@ -17,6 +17,7 @@ import { CheckCircle, XCircle, Play, Award, BarChart3, X, Brain } from "lucide-r
 import { Insight, getInsightById } from "@/lib/InsightLibrary";
 import FlarePlan, { FlarePlanData } from "./FlarePlan";
 import JsonFormRenderer from "./JsonFormRenderer";
+import { SummaryCarousel } from "./SummaryCarousel";
 import { addRecoveryPoints } from "@/lib/recoveryPointsApi";
 import { completeInsight } from "@/services/insights.service";
 import { useToast } from "@/hooks/use-toast";
@@ -540,8 +541,13 @@ export default function InsightDialog({
         );
       }
 
-      // Handle specific content files
-      if (assetPath.includes('sleep-carousel')) {
+      // Handle summary carousel cards (nutrition, sleep, ACT, etc.)
+      if (assetPath.includes('-summary.json') || assetPath.includes('sleep-carousel')) {
+        return <SummaryCarousel assetPath={assetPath} />;
+      }
+
+      // Handle specific content files (DEPRECATED - now using SummaryCarousel)
+      if (assetPath.includes('sleep-carousel-OLD')) {
         return (
           <div className="w-full max-w-4xl mx-auto">
             <div className="bg-white rounded-xl shadow-lg border border-gray-200">
