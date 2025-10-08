@@ -1451,6 +1451,49 @@ export default function InsightDialog({
             )}
 
             <div className="px-8 pb-8">
+              {/* Attribution Section */}
+              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4">
+                <p className="text-xs text-gray-600">
+                  <span className="font-semibold">Source:</span>{' '}
+                  {isYouTube && assetPath.includes('youtube.com') && (
+                    <span>Video hosted on YouTube. Content is used for educational purposes in accordance with fair use guidelines.</span>
+                  )}
+                  {isPDF && assetPath.includes('.gov') && (
+                    <span>U.S. Government public domain resource. Free for educational use.</span>
+                  )}
+                  {isPDF && assetPath.includes('nhs.uk') && (
+                    <span>NHS resource licensed under the Open Government Licence. Free for educational use.</span>
+                  )}
+                  {isPDF && assetPath.includes('va.gov') && (
+                    <span>U.S. Department of Veterans Affairs public resource. Free for educational use.</span>
+                  )}
+                  {assetPath.includes('harvard.edu') && (
+                    <span>Harvard Health Publishing. Used for educational purposes.</span>
+                  )}
+                  {assetPath.includes('berkeley.edu') && (
+                    <span>UC Berkeley Greater Good Science Center. Used for educational purposes.</span>
+                  )}
+                  {assetPath.includes('noigroup.com') && (
+                    <span>NOI Group educational resource. Used for clinical education purposes.</span>
+                  )}
+                  {assetPath.includes('ncbi.nlm.nih.gov') && (
+                    <span>National Institutes of Health public domain research. Free for educational use.</span>
+                  )}
+                  {assetPath.includes('pain-ed.com') && (
+                    <span>Content by Greg Lehman. Used for educational purposes.</span>
+                  )}
+                  {assetPath.includes('palousemindfulness.com') && (
+                    <span>Palouse Mindfulness free MBSR course. Used with permission for educational purposes.</span>
+                  )}
+                  {!isYouTube && !isPDF && !assetPath.includes('harvard.edu') && !assetPath.includes('berkeley.edu') && 
+                   !assetPath.includes('noigroup.com') && !assetPath.includes('ncbi.nlm.nih.gov') && 
+                   !assetPath.includes('pain-ed.com') && !assetPath.includes('palousemindfulness.com') && (
+                    <span>External educational resource. Used for clinical education purposes.</span>
+                  )}
+                  {' '}All content is provided for educational purposes to support patient recovery.
+                </p>
+              </div>
+
               <div className="bg-gradient-to-br from-btl-600 to-btl-700 border-2 border-btl-500 rounded-2xl p-6 shadow-lg">
                 <div className="flex items-center gap-3 mb-3">
                   <Award className="w-6 h-6 text-white" />
