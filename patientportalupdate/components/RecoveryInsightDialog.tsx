@@ -66,7 +66,10 @@ export function RecoveryInsightDialog({
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      setDebugUnlockAll(params.get('unlockInsights') === '1');
+      const unlockParam = params.get('unlockInsights');
+      const shouldUnlock = unlockParam === '1';
+      console.log('🔓 Debug unlock check:', { unlockParam, shouldUnlock, url: window.location.href });
+      setDebugUnlockAll(shouldUnlock);
     }
   }, []);
 
@@ -601,6 +604,10 @@ export function RecoveryInsightDialog({
                       const isToday = debugUnlockAll ? true : offset === 0; // Only today's insight is available (unless debug mode)
                       const isFuture = debugUnlockAll ? false : offset > 0; // Future insights are locked (unless debug mode)
                       const isCompleted = completedInsights.includes(Number(insight.id));
+                      
+                      if (i === 0) {
+                        console.log('🔓 First insight unlock status:', { debugUnlockAll, isToday, isFuture, offset });
+                      }
                       
                       // Calculate week and day labels
                       const getDayLabel = (offset: number) => {
