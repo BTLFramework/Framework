@@ -243,234 +243,597 @@ export const insightLibrary: Insight[] = [
     id: 30,
     week: 2,
     track: "PainScience",
-    title: "Week 2, Day 1",
-    subtitle: "PainScience insight",
-    assetPath: "/insight/week2-day1.mp4",
-    quizQ: "Week 2, Day 1 question?",
-    quizA: "Week 2, Day 1 answer",
-    releaseOffset: 0
+    title: "Understanding Your Pain",
+    subtitle: "Pain neuroscience basics to reframe pain safely",
+    assetPath: "/insight/understanding-pain.json",
+    quizQ: "Pain is always a sign of tissue damage. (T/F)",
+    quizA: "F",
+    releaseOffset: 0,
+    points: 5,
+    questions: [
+      {
+        question: "Pain is always a sign of tissue damage. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 1
+      },
+      {
+        question: "What is the primary role of pain?",
+        options: [
+          "To punish you for injury",
+          "To protect you from perceived threats",
+          "To limit all movement",
+          "To indicate weakness"
+        ],
+        correctAnswer: 1
+      }
+    ]
   },
   {
     id: 31,
     week: 2,
     track: "StressMood",
-    title: "Week 2, Day 2",
-    subtitle: "StressMood insight",
-    assetPath: "/insight/week2-day2.mp4",
-    quizQ: "Week 2, Day 2 question?",
-    quizA: "Week 2, Day 2 answer",
-    releaseOffset: 1
+    title: "The Science of Pain",
+    subtitle: "How pain is produced and why it can change",
+    assetPath: "/insight/science-of-pain.json",
+    quizQ: "The brain can amplify or reduce pain signals based on context. (T/F)",
+    quizA: "T",
+    releaseOffset: 1,
+    points: 5,
+    questions: [
+      {
+        question: "The brain can amplify or reduce pain signals based on context. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0
+      },
+      {
+        question: "Which factor does NOT influence pain perception?",
+        options: [
+          "Stress levels",
+          "Past experiences",
+          "Your shoe size",
+          "Current mood"
+        ],
+        correctAnswer: 2
+      }
+    ]
   },
   {
     id: 32,
     week: 2,
     track: "Lifestyle",
-    title: "Week 2, Day 3",
-    subtitle: "Lifestyle insight",
-    assetPath: "/insight/week2-day3.json",
-    quizQ: "Week 2, Day 3 question?",
-    quizA: "Week 2, Day 3 answer",
-    releaseOffset: 2
+    title: "Flare-Up Management",
+    subtitle: "Practical strategies for managing pain spikes",
+    assetPath: "/insight/flare-up-management.json",
+    quizQ: "Flare-ups are a normal part of recovery. (T/F)",
+    quizA: "T",
+    releaseOffset: 2,
+    points: 5,
+    questions: [
+      {
+        question: "Flare-ups are a normal part of recovery. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0
+      },
+      {
+        question: "What is the best first response to a flare-up?",
+        options: [
+          "Panic and stop all activity",
+          "Stay calm and use your flare-up plan",
+          "Push through the pain",
+          "Ignore it completely"
+        ],
+        correctAnswer: 1
+      }
+    ]
   },
   {
     id: 33,
     week: 2,
     track: "SuccessStory",
-    title: "Week 2, Day 4",
-    subtitle: "SuccessStory insight",
-    assetPath: "/insight/week2-day4.mp4",
-    quizQ: "Week 2, Day 4 question?",
-    quizA: "Week 2, Day 4 answer",
-    releaseOffset: 3
+    title: "Recovery Success Stories",
+    subtitle: "Real patients who turned their pain around",
+    assetPath: "/insight/success-stories.mp4",
+    quizQ: "Success stories can increase your confidence in recovery. (T/F)",
+    quizA: "T",
+    releaseOffset: 3,
+    points: 5,
+    questions: [
+      {
+        question: "Success stories can increase your confidence in recovery. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0
+      },
+      {
+        question: "What is a key factor in most recovery success stories?",
+        options: [
+          "Expensive treatments",
+          "Consistent effort and belief",
+          "Avoiding all movement",
+          "Quick fixes"
+        ],
+        correctAnswer: 1
+      }
+    ]
   },
   {
     id: 34,
     week: 2,
     track: "PainScience",
-    title: "Week 2, Day 5",
-    subtitle: "PainScience insight",
-    assetPath: "/insight/week2-day5.mp4",
-    quizQ: "Week 2, Day 5 question?",
-    quizA: "Week 2, Day 5 answer",
-    releaseOffset: 4
+    title: "Pacing Strategies",
+    subtitle: "Finding the right balance between rest and activity",
+    assetPath: "/insight/pacing-strategies.json",
+    quizQ: "Pacing means gradually increasing activity without overloading. (T/F)",
+    quizA: "T",
+    releaseOffset: 4,
+    points: 5,
+    questions: [
+      {
+        question: "Pacing means gradually increasing activity without overloading. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0
+      },
+      {
+        question: "What is the 'boom-bust cycle'?",
+        options: [
+          "Doing too much on good days, then crashing",
+          "Explosive workout routines",
+          "Sudden loud noises",
+          "A healthy recovery pattern"
+        ],
+        correctAnswer: 0
+      }
+    ]
   },
   {
     id: 35,
     week: 2,
     track: "SelfEfficacy",
-    title: "Week 2, Day 6",
-    subtitle: "SelfEfficacy insight",
-    assetPath: "/insight/week2-day6.json",
-    quizQ: "Week 2, Day 6 question?",
-    quizA: "Week 2, Day 6 answer",
-    releaseOffset: 5
+    title: "Sleep & Recovery",
+    subtitle: "How quality sleep accelerates healing",
+    assetPath: "/insight/sleep-recovery.json",
+    quizQ: "Quality sleep is essential for tissue repair. (T/F)",
+    quizA: "T",
+    releaseOffset: 5,
+    points: 5,
+    questions: [
+      {
+        question: "Quality sleep is essential for tissue repair. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0
+      },
+      {
+        question: "What is the ideal sleep duration for recovery?",
+        options: [
+          "4-5 hours",
+          "6-7 hours",
+          "7-9 hours",
+          "10-12 hours"
+        ],
+        correctAnswer: 2
+      }
+    ]
   },
   {
     id: 36,
     week: 2,
     track: "Recap",
-    title: "Week 2, Day 7",
-    subtitle: "Weekly reflection",
+    title: "Weekly reflection",
+    subtitle: "Reflect on your week",
     assetPath: "/insight/recap-week2.json",
     quizQ: "What was your biggest learning this week?",
     quizA: "(user input)",
-    releaseOffset: 6
+    releaseOffset: 6,
+    points: 5,
+    questions: [
+      {
+        question: "What was your biggest learning this week?",
+        options: [
+          "Understanding pain neuroscience",
+          "Flare-up management",
+          "Pacing strategies",
+          "Sleep importance"
+        ],
+        correctAnswer: 0
+      }
+    ]
   },
   // WEEK 3
   {
     id: 37,
     week: 3,
     track: "PainScience",
-    title: "Week 3, Day 1",
-    subtitle: "PainScience insight",
-    assetPath: "/insight/week3-day1.mp4",
-    quizQ: "Week 3, Day 1 question?",
-    quizA: "Week 3, Day 1 answer",
-    releaseOffset: 0
+    title: "Nutrition for Recovery",
+    subtitle: "Anti-inflammatory foods that support healing",
+    assetPath: "/insight/nutrition-recovery.json",
+    quizQ: "Anti-inflammatory foods can support tissue healing. (T/F)",
+    quizA: "T",
+    releaseOffset: 0,
+    points: 5,
+    questions: [
+      {
+        question: "Anti-inflammatory foods can support tissue healing. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0
+      },
+      {
+        question: "Which food is known for anti-inflammatory properties?",
+        options: [
+          "Processed sugar",
+          "Leafy greens",
+          "Fried foods",
+          "White bread"
+        ],
+        correctAnswer: 1
+      }
+    ]
   },
   {
     id: 38,
     week: 3,
     track: "StressMood",
-    title: "Week 3, Day 2",
-    subtitle: "StressMood insight",
-    assetPath: "/insight/week3-day2.mp4",
-    quizQ: "Week 3, Day 2 question?",
-    quizA: "Week 3, Day 2 answer",
-    releaseOffset: 1
+    title: "Posture & Pain",
+    subtitle: "How posture affects pain perception",
+    assetPath: "/insight/posture-pain.json",
+    quizQ: "Poor posture alone causes chronic pain. (T/F)",
+    quizA: "F",
+    releaseOffset: 1,
+    points: 5,
+    questions: [
+      {
+        question: "Poor posture alone causes chronic pain. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 1
+      },
+      {
+        question: "What is more important than 'perfect posture'?",
+        options: [
+          "Staying rigid",
+          "Movement variability",
+          "Never slouching",
+          "Sitting perfectly straight"
+        ],
+        correctAnswer: 1
+      }
+    ]
   },
   {
     id: 39,
     week: 3,
     track: "Lifestyle",
-    title: "Week 3, Day 3",
-    subtitle: "Lifestyle insight",
-    assetPath: "/insight/week3-day3.json",
-    quizQ: "Week 3, Day 3 question?",
-    quizA: "Week 3, Day 3 answer",
-    releaseOffset: 2
+    title: "Return to Work Strategies",
+    subtitle: "Managing pain while returning to daily activities",
+    assetPath: "/insight/return-to-work.json",
+    quizQ: "Gradual exposure to work tasks is safer than avoiding them. (T/F)",
+    quizA: "T",
+    releaseOffset: 2,
+    points: 5,
+    questions: [
+      {
+        question: "Gradual exposure to work tasks is safer than avoiding them. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0
+      },
+      {
+        question: "What is the best approach for returning to work?",
+        options: [
+          "All or nothing",
+          "Gradual, paced return",
+          "Wait until 100% pain-free",
+          "Push through severe pain"
+        ],
+        correctAnswer: 1
+      }
+    ]
   },
   {
     id: 40,
     week: 3,
     track: "SuccessStory",
-    title: "Week 3, Day 4",
-    subtitle: "SuccessStory insight",
-    assetPath: "/insight/week3-day4.mp4",
-    quizQ: "Week 3, Day 4 question?",
-    quizA: "Week 3, Day 4 answer",
-    releaseOffset: 3
+    title: "Patient Success: Chronic Pain Overcome",
+    subtitle: "How John went from bedridden to active",
+    assetPath: "/insight/john-success.mp4",
+    quizQ: "Chronic pain recovery is possible with the right approach. (T/F)",
+    quizA: "T",
+    releaseOffset: 3,
+    points: 5,
+    questions: [
+      {
+        question: "Chronic pain recovery is possible with the right approach. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0
+      },
+      {
+        question: "What was key to John's recovery?",
+        options: [
+          "Surgery",
+          "Expensive medication",
+          "Gradual movement and education",
+          "Complete rest"
+        ],
+        correctAnswer: 2
+      }
+    ]
   },
   {
     id: 41,
     week: 3,
     track: "PainScience",
-    title: "Week 3, Day 5",
-    subtitle: "PainScience insight",
-    assetPath: "/insight/week3-day5.mp4",
-    quizQ: "Week 3, Day 5 question?",
-    quizA: "Week 3, Day 5 answer",
-    releaseOffset: 4
+    title: "CBT for Pain",
+    subtitle: "Cognitive Behavioral Therapy basics",
+    assetPath: "/insight/cbt-pain.json",
+    quizQ: "CBT can help change pain-related thoughts and behaviors. (T/F)",
+    quizA: "T",
+    releaseOffset: 4,
+    points: 5,
+    questions: [
+      {
+        question: "CBT can help change pain-related thoughts and behaviors. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0
+      },
+      {
+        question: "What does CBT focus on?",
+        options: [
+          "Only physical symptoms",
+          "Thoughts, emotions, and behaviors",
+          "Medication only",
+          "Ignoring pain"
+        ],
+        correctAnswer: 1
+      }
+    ]
   },
   {
     id: 42,
     week: 3,
     track: "SelfEfficacy",
-    title: "Week 3, Day 6",
-    subtitle: "SelfEfficacy insight",
-    assetPath: "/insight/week3-day6.json",
-    quizQ: "Week 3, Day 6 question?",
-    quizA: "Week 3, Day 6 answer",
-    releaseOffset: 5
+    title: "ACT for Chronic Pain",
+    subtitle: "Acceptance and Commitment Therapy principles",
+    assetPath: "/insight/act-pain.json",
+    quizQ: "ACT teaches acceptance of pain while living a valued life. (T/F)",
+    quizA: "T",
+    releaseOffset: 5,
+    points: 5,
+    questions: [
+      {
+        question: "ACT teaches acceptance of pain while living a valued life. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0
+      },
+      {
+        question: "What is a core principle of ACT?",
+        options: [
+          "Fighting pain constantly",
+          "Psychological flexibility",
+          "Avoiding all discomfort",
+          "Ignoring values"
+        ],
+        correctAnswer: 1
+      }
+    ]
   },
   {
     id: 43,
     week: 3,
     track: "Recap",
-    title: "Week 3, Day 7",
-    subtitle: "Weekly reflection",
+    title: "Weekly reflection",
+    subtitle: "Reflect on your week",
     assetPath: "/insight/recap-week3.json",
     quizQ: "What was your biggest learning this week?",
     quizA: "(user input)",
-    releaseOffset: 6
+    releaseOffset: 6,
+    points: 5,
+    questions: [
+      {
+        question: "What was your biggest learning this week?",
+        options: [
+          "Nutrition for recovery",
+          "Posture myths",
+          "CBT and ACT principles",
+          "Return to work strategies"
+        ],
+        correctAnswer: 2
+      }
+    ]
   },
   // WEEK 4
   {
     id: 44,
     week: 4,
     track: "PainScience",
-    title: "Week 4, Day 1",
-    subtitle: "PainScience insight",
-    assetPath: "/insight/week4-day1.mp4",
-    quizQ: "Week 4, Day 1 question?",
-    quizA: "Week 4, Day 1 answer",
-    releaseOffset: 0
+    title: "MBSR for Pain",
+    subtitle: "Mindfulness-Based Stress Reduction techniques",
+    assetPath: "/insight/mbsr-pain.json",
+    quizQ: "Mindfulness can reduce pain intensity and distress. (T/F)",
+    quizA: "T",
+    releaseOffset: 0,
+    points: 5,
+    questions: [
+      {
+        question: "Mindfulness can reduce pain intensity and distress. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0
+      },
+      {
+        question: "What is a key aspect of mindfulness practice?",
+        options: [
+          "Ignoring pain",
+          "Non-judgmental awareness",
+          "Distraction",
+          "Avoidance"
+        ],
+        correctAnswer: 1
+      }
+    ]
   },
   {
     id: 45,
     week: 4,
     track: "StressMood",
-    title: "Week 4, Day 2",
-    subtitle: "StressMood insight",
-    assetPath: "/insight/week4-day2.mp4",
-    quizQ: "Week 4, Day 2 question?",
-    quizA: "Week 4, Day 2 answer",
-    releaseOffset: 1
+    title: "Graded Motor Imagery",
+    subtitle: "Using your mind to retrain movement",
+    assetPath: "/insight/graded-motor-imagery.json",
+    quizQ: "Mental imagery can help reduce pain and improve movement. (T/F)",
+    quizA: "T",
+    releaseOffset: 1,
+    points: 5,
+    questions: [
+      {
+        question: "Mental imagery can help reduce pain and improve movement. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0
+      },
+      {
+        question: "What is the first step in Graded Motor Imagery?",
+        options: [
+          "Mirror therapy",
+          "Left/right discrimination",
+          "Physical movement",
+          "Surgery"
+        ],
+        correctAnswer: 1
+      }
+    ]
   },
   {
     id: 46,
     week: 4,
     track: "Lifestyle",
-    title: "Week 4, Day 3",
-    subtitle: "Lifestyle insight",
-    assetPath: "/insight/week4-day3.json",
-    quizQ: "Week 4, Day 3 question?",
-    quizA: "Week 4, Day 3 answer",
-    releaseOffset: 2
+    title: "Movement Variability",
+    subtitle: "Why changing positions matters",
+    assetPath: "/insight/movement-variability.json",
+    quizQ: "Staying in one position for long periods increases stiffness. (T/F)",
+    quizA: "T",
+    releaseOffset: 2,
+    points: 5,
+    questions: [
+      {
+        question: "Staying in one position for long periods increases stiffness. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0
+      },
+      {
+        question: "What is the benefit of movement variability?",
+        options: [
+          "It confuses your body",
+          "It prevents tissue adaptation to one position",
+          "It causes more pain",
+          "It's not beneficial"
+        ],
+        correctAnswer: 1
+      }
+    ]
   },
   {
     id: 47,
     week: 4,
     track: "SuccessStory",
-    title: "Week 4, Day 4",
-    subtitle: "SuccessStory insight",
-    assetPath: "/insight/week4-day4.mp4",
-    quizQ: "Week 4, Day 4 question?",
-    quizA: "Week 4, Day 4 answer",
-    releaseOffset: 3
+    title: "Patient Success: From Surgery to Strength",
+    subtitle: "Maria's post-op recovery story",
+    assetPath: "/insight/maria-success.mp4",
+    quizQ: "Post-surgical rehabilitation is key to full recovery. (T/F)",
+    quizA: "T",
+    releaseOffset: 3,
+    points: 5,
+    questions: [
+      {
+        question: "Post-surgical rehabilitation is key to full recovery. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0
+      },
+      {
+        question: "What helped Maria recover fully?",
+        options: [
+          "Surgery alone",
+          "Complete rest for months",
+          "Progressive rehabilitation",
+          "Avoiding all exercise"
+        ],
+        correctAnswer: 2
+      }
+    ]
   },
   {
     id: 48,
     week: 4,
     track: "PainScience",
-    title: "Week 4, Day 5",
-    subtitle: "PainScience insight",
-    assetPath: "/insight/week4-day5.mp4",
-    quizQ: "Week 4, Day 5 question?",
-    quizA: "Week 4, Day 5 answer",
-    releaseOffset: 4
+    title: "Pain and Emotions",
+    subtitle: "The bidirectional relationship",
+    assetPath: "/insight/pain-emotions.json",
+    quizQ: "Emotions can influence pain perception. (T/F)",
+    quizA: "T",
+    releaseOffset: 4,
+    points: 5,
+    questions: [
+      {
+        question: "Emotions can influence pain perception. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0
+      },
+      {
+        question: "Which emotion is most commonly linked to increased pain?",
+        options: [
+          "Joy",
+          "Anxiety",
+          "Curiosity",
+          "Excitement"
+        ],
+        correctAnswer: 1
+      }
+    ]
   },
   {
     id: 49,
     week: 4,
     track: "SelfEfficacy",
-    title: "Week 4, Day 6",
-    subtitle: "SelfEfficacy insight",
-    assetPath: "/insight/week4-day6.json",
-    quizQ: "Week 4, Day 6 question?",
-    quizA: "Week 4, Day 6 answer",
-    releaseOffset: 5
+    title: "Movement Quality vs. Quantity",
+    subtitle: "Why how you move matters",
+    assetPath: "/insight/movement-quality.json",
+    quizQ: "Quality movement is more important than sheer volume. (T/F)",
+    quizA: "T",
+    releaseOffset: 5,
+    points: 5,
+    questions: [
+      {
+        question: "Quality movement is more important than sheer volume. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0
+      },
+      {
+        question: "What defines movement quality?",
+        options: [
+          "Speed only",
+          "How much it hurts",
+          "Control, awareness, and intention",
+          "Doing as many reps as possible"
+        ],
+        correctAnswer: 2
+      }
+    ]
   },
   {
     id: 50,
     week: 4,
     track: "Recap",
-    title: "Week 4, Day 7",
-    subtitle: "Weekly reflection",
+    title: "Weekly reflection",
+    subtitle: "Reflect on your week",
     assetPath: "/insight/recap-week4.json",
     quizQ: "What was your biggest learning this week?",
     quizA: "(user input)",
-    releaseOffset: 6
+    releaseOffset: 6,
+    points: 5,
+    questions: [
+      {
+        question: "What was your biggest learning this week?",
+        options: [
+          "Mindfulness techniques",
+          "Movement variability",
+          "Pain-emotion connection",
+          "Movement quality"
+        ],
+        correctAnswer: 3
+      }
+    ]
   },
   // WEEK 5
   {
@@ -482,7 +845,8 @@ export const insightLibrary: Insight[] = [
     assetPath: "/insight/neurotags-101.mp4",
     quizQ: "Neurotags are networks in your brain that can create pain. (T/F)",
     quizA: "T",
-    releaseOffset: 0
+    releaseOffset: 0,
+    points: 5
   },
   {
     id: 52,
@@ -493,7 +857,8 @@ export const insightLibrary: Insight[] = [
     assetPath: "/insight/gratitude-pain.mp4",
     quizQ: "Gratitude practice can help reduce pain sensitivity. (T/F)",
     quizA: "T",
-    releaseOffset: 1
+    releaseOffset: 1,
+    points: 5
   },
   {
     id: 53,
@@ -504,7 +869,8 @@ export const insightLibrary: Insight[] = [
     assetPath: "/insight/caffeine-sleep.json",
     quizQ: "You should stop caffeine by 2 pm for better sleep. (T/F)",
     quizA: "T",
-    releaseOffset: 2
+    releaseOffset: 2,
+    points: 5
   },
   {
     id: 54,
@@ -515,7 +881,8 @@ export const insightLibrary: Insight[] = [
     assetPath: "/insight/nina-postpartum.mp4",
     quizQ: "Nina's story shows the importance of postpartum core rehab. (T/F)",
     quizA: "T",
-    releaseOffset: 3
+    releaseOffset: 3,
+    points: 5
   },
   {
     id: 55,
@@ -526,7 +893,8 @@ export const insightLibrary: Insight[] = [
     assetPath: "/insight/reassure-reload.mp4",
     quizQ: "The 'safe to move test' helps build confidence in movement. (T/F)",
     quizA: "T",
-    releaseOffset: 4
+    releaseOffset: 4,
+    points: 5
   },
   {
     id: 56,
@@ -537,7 +905,8 @@ export const insightLibrary: Insight[] = [
     assetPath: "/insight/sleep-winddown.json",
     quizQ: "What is one item on your sleep wind-down checklist?",
     quizA: "(user input)",
-    releaseOffset: 5
+    releaseOffset: 5,
+    points: 5
   },
   {
     id: 57,
@@ -548,7 +917,8 @@ export const insightLibrary: Insight[] = [
     assetPath: "/insight/recap-week5.json",
     quizQ: "What was your biggest learning this week?",
     quizA: "(user input)",
-    releaseOffset: 6
+    releaseOffset: 6,
+    points: 5
   },
   // WEEK 6
   {
@@ -560,7 +930,8 @@ export const insightLibrary: Insight[] = [
     assetPath: "/insight/sticky-thoughts.mp4",
     quizQ: "Catastrophising can make pain feel worse than tissue damage. (T/F)",
     quizA: "T",
-    releaseOffset: 0
+    releaseOffset: 0,
+    points: 5
   },
   {
     id: 59,
@@ -571,7 +942,8 @@ export const insightLibrary: Insight[] = [
     assetPath: "/insight/stress-breath.mp4",
     quizQ: "Box breathing can help reduce stress and pain. (T/F)",
     quizA: "T",
-    releaseOffset: 1
+    releaseOffset: 1,
+    points: 5
   },
   {
     id: 60,
@@ -582,7 +954,8 @@ export const insightLibrary: Insight[] = [
     assetPath: "/insight/hydration-fascia.json",
     quizQ: "Proper hydration helps maintain healthy fascia. (T/F)",
     quizA: "T",
-    releaseOffset: 2
+    releaseOffset: 2,
+    points: 5
   },
   {
     id: 61,
@@ -593,7 +966,8 @@ export const insightLibrary: Insight[] = [
     assetPath: "/insight/future-story.mp4",
     quizQ: "Success stories can inspire and motivate recovery. (T/F)",
     quizA: "T",
-    releaseOffset: 3
+    releaseOffset: 3,
+    points: 5
   },
   {
     id: 62,
@@ -604,7 +978,8 @@ export const insightLibrary: Insight[] = [
     assetPath: "/insight/protectometer.json",
     quizQ: "The protectometer helps identify safety vs. danger signals. (T/F)",
     quizA: "T",
-    releaseOffset: 4
+    releaseOffset: 4,
+    points: 5
   },
   {
     id: 63,
@@ -615,7 +990,8 @@ export const insightLibrary: Insight[] = [
     assetPath: "/insight/goal-ladder.json",
     quizQ: "What is one small step toward your recovery goal?",
     quizA: "(user input)",
-    releaseOffset: 5
+    releaseOffset: 5,
+    points: 5
   },
   {
     id: 64,
@@ -626,7 +1002,8 @@ export const insightLibrary: Insight[] = [
     assetPath: "/insight/monthly-deepdive.md",
     quizQ: "What was the main takeaway from this month's deep dive?",
     quizA: "(user input)",
-    releaseOffset: 6
+    releaseOffset: 6,
+    points: 5
   }
 ];
 
