@@ -42,6 +42,7 @@ const PatientRecoveryDashboard: React.FC = () => {
   const [currentSnapshot, setCurrentSnapshot] = useState({ pain: 5, stress: 5, risk: 'low' })
   const [amyIntakeData, setAmyIntakeData] = useState<any>(null) // Store Amy's real intake data
   const [loading, setLoading] = useState(true) // New state for loading
+  const [debugToolkit, setDebugToolkit] = useState(false)
 
   // Function to completely reset portal data
   const resetPortalData = () => {
@@ -135,6 +136,10 @@ const PatientRecoveryDashboard: React.FC = () => {
     } catch (error) {
       localStorage.removeItem('btl_patient_data')
     }
+    try {
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('debugToolkit') === '1') setDebugToolkit(true)
+    } catch {}
   }, [])
 
   // Fetch current snapshot when patient data changes
@@ -577,6 +582,22 @@ const PatientRecoveryDashboard: React.FC = () => {
           onClose={() => setShowScoreModal(false)}
           intakeData={amyIntakeData} // Pass Amy's real intake data
         />
+      )}
+      {debugToolkit && (
+        <button
+          onClick={() => {
+            console.log('🧪 Debug: Forcing open Toolkit Guides modal')
+            setSelectedToolkit({
+              title: 'Recovery Guides',
+              description: 'Educational resources',
+              category: 'guides',
+              count: 0
+            })
+          }}
+          className="fixed bottom-4 right-4 z-[100] px-3 py-2 text-xs font-semibold bg-btl-600 text-white rounded-md shadow-md hover:bg-btl-700"
+        >
+          Open Guides (Debug)
+        </button>
       )}
     </div>
   )
