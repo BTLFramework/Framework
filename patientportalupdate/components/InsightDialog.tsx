@@ -1349,7 +1349,122 @@ export default function InsightDialog({
       );
     }
 
+    // Handle external URLs (YouTube, PDFs, articles, etc.)
+    if (assetPath.startsWith('http://') || assetPath.startsWith('https://')) {
+      const isYouTube = assetPath.includes('youtube.com') || assetPath.includes('youtu.be');
+      const isPDF = assetPath.toLowerCase().endsWith('.pdf');
+      
+      // Extract YouTube video ID for embed
+      let youtubeEmbedUrl = '';
+      if (isYouTube) {
+        const videoId = assetPath.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)?.[1];
+        if (videoId) {
+          youtubeEmbedUrl = `https://www.youtube.com/embed/${videoId}`;
+        }
+      }
 
+      return (
+        <div className="w-full max-w-4xl mx-auto">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">{insight.title}</h3>
+              <p className="text-gray-600">{insight.subtitle}</p>
+            </div>
+            
+            {/* YouTube Embed */}
+            {isYouTube && youtubeEmbedUrl && (
+              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                <iframe
+                  src={youtubeEmbedUrl}
+                  title={insight.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="absolute top-0 left-0 w-full h-full"
+                />
+              </div>
+            )}
+            
+            {/* PDF or Article Link */}
+            {!isYouTube && (
+              <div className="p-8">
+                <div className="bg-gradient-to-br from-btl-50 to-white border-2 border-btl-200 rounded-2xl p-6 shadow-sm mb-6">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="w-12 h-12 bg-btl-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                      {isPDF ? (
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                      ) : (
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-xl font-bold text-btl-900 mb-2">
+                        {isPDF ? 'PDF Resource' : 'Web Resource'}
+                      </h4>
+                      <p className="text-btl-700 mb-4">
+                        {isPDF 
+                          ? 'Click below to view the PDF guide in a new tab. Take your time to read through the material.' 
+                          : 'Click below to access the article or resource. Review the content and return here to complete the quiz.'}
+                      </p>
+                      <a
+                        href={assetPath}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-btl-600 text-white font-semibold rounded-full hover:bg-btl-700 transition-colors shadow-lg hover:shadow-xl"
+                      >
+                        <span>Open Resource</span>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-btl-50 to-white border-2 border-btl-200 rounded-2xl p-6 shadow-sm">
+                  <h4 className="text-xl font-bold text-btl-900 mb-3 flex items-center gap-2">
+                    <span className="w-2 h-2 bg-btl-600 rounded-full"></span>
+                    Key Learning Points
+                  </h4>
+                  <p className="text-btl-700 mb-4">
+                    After reviewing the resource, you'll be able to:
+                  </p>
+                  <ul className="space-y-2 text-sm text-btl-700">
+                    <li className="flex items-start gap-2">
+                      <span className="text-btl-600">•</span>
+                      <span>Understand evidence-based strategies for pain management</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-btl-600">•</span>
+                      <span>Apply practical techniques to your recovery journey</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-btl-600">•</span>
+                      <span>Gain confidence through knowledge and education</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            <div className="px-8 pb-8">
+              <div className="bg-gradient-to-br from-btl-600 to-btl-700 border-2 border-btl-500 rounded-2xl p-6 shadow-lg">
+                <div className="flex items-center gap-3 mb-3">
+                  <Award className="w-6 h-6 text-white" />
+                  <h4 className="text-xl font-bold text-white">Complete the Quiz</h4>
+                </div>
+                <p className="text-btl-100 font-medium leading-relaxed">
+                  After reviewing the resource, test your understanding to earn recovery points and reinforce your learning.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
 
     // Handle video files
     if (assetPath.endsWith('.mp4')) {

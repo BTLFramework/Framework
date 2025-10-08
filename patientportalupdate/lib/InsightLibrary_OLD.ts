@@ -19,7 +19,7 @@ export interface QuizQuestion {
 }
 
 export const insightLibrary: Insight[] = [
-  // --- Week 1 (Keep existing Week 1 content) ---
+  // --- Week 1 ---
   {
     id: 21,
     week: 1,
@@ -207,7 +207,7 @@ export const insightLibrary: Insight[] = [
   {
     id: 29,
     week: 1,
-    track: "Recap",
+    track: "Recap", // Recap/reflection day
     title: "Weekly Insight Recap & reflection",
     subtitle: "Reflect on your week",
     assetPath: "/insight/recap-week1.json",
@@ -238,15 +238,14 @@ export const insightLibrary: Insight[] = [
       }
     ]
   },
-  
-  // ========= WEEK 2 - UPDATED WITH REAL RESOURCES =========
+  // WEEK 2
   {
     id: 30,
     week: 2,
     track: "PainScience",
     title: "Understanding Your Pain",
     subtitle: "Pain neuroscience basics to reframe pain safely",
-    assetPath: "https://www.youtube.com/watch?v=C_3phB93rvI", // Brainman explains pain
+    assetPath: "https://www.youtube.com/watch?v=C_3phB93rvI",
     quizQ: "Pain is always a sign of tissue damage. (T/F)",
     quizA: "F",
     releaseOffset: 0,
@@ -268,12 +267,12 @@ export const insightLibrary: Insight[] = [
         correctAnswer: 1
       },
       {
-        question: "According to pain neuroscience, pain is an output of the:",
+        question: "According to the video, pain is an output of the:",
         options: [
-          "Spinal cord only",
+          "Spinal cord",
           "Brain",
           "Muscles",
-          "Damaged tissues"
+          "Nerves"
         ],
         correctAnswer: 1
       }
@@ -285,7 +284,7 @@ export const insightLibrary: Insight[] = [
     track: "StressMood",
     title: "The Science of Pain",
     subtitle: "How pain is produced and why it can change",
-    assetPath: "https://www.youtube.com/watch?v=03U7tn6xkHo", // TEDx talk on pain science
+    assetPath: "/insight/science-of-pain.json",
     quizQ: "The brain can amplify or reduce pain signals based on context. (T/F)",
     quizA: "T",
     releaseOffset: 1,
@@ -305,16 +304,6 @@ export const insightLibrary: Insight[] = [
           "Current mood"
         ],
         correctAnswer: 2
-      },
-      {
-        question: "Pain can persist even after tissues have healed because:",
-        options: [
-          "The brain is broken",
-          "The nervous system remains sensitized",
-          "You're imagining it",
-          "You need more medication"
-        ],
-        correctAnswer: 1
       }
     ]
   },
@@ -324,7 +313,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Flare-Up Management",
     subtitle: "Practical strategies for managing pain spikes",
-    assetPath: "https://www.va.gov/PAINMANAGEMENT/Veteran_Public/Veteran_docs/FUMP.pdf", // VA Flare-Up Management Plan
+    assetPath: "/insight/flare-up-management.json",
     quizQ: "Flare-ups are a normal part of recovery. (T/F)",
     quizA: "T",
     releaseOffset: 2,
@@ -344,16 +333,6 @@ export const insightLibrary: Insight[] = [
           "Ignore it completely"
         ],
         correctAnswer: 1
-      },
-      {
-        question: "A flare-up plan should include:",
-        options: [
-          "Only medication",
-          "Complete bed rest",
-          "Multiple self-management strategies",
-          "Ignoring symptoms"
-        ],
-        correctAnswer: 2
       }
     ]
   },
@@ -392,7 +371,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Pacing Strategies",
     subtitle: "Finding the right balance between rest and activity",
-    assetPath: "https://www.wsh.nhs.uk/CMS-Documents/Patient-leaflets/PainService/6290-1c-Chronic-pain-self-management-pacing-and-goal-setting.pdf", // NHS Pacing Guide
+    assetPath: "/insight/pacing-strategies.json",
     quizQ: "Pacing means gradually increasing activity without overloading. (T/F)",
     quizA: "T",
     releaseOffset: 4,
@@ -412,16 +391,6 @@ export const insightLibrary: Insight[] = [
           "A healthy recovery pattern"
         ],
         correctAnswer: 0
-      },
-      {
-        question: "The goal of pacing is to:",
-        options: [
-          "Do as little as possible",
-          "Push through pain every day",
-          "Maintain consistent activity levels",
-          "Only move on pain-free days"
-        ],
-        correctAnswer: 2
       }
     ]
   },
@@ -431,7 +400,7 @@ export const insightLibrary: Insight[] = [
     track: "SelfEfficacy",
     title: "Sleep & Recovery",
     subtitle: "How quality sleep accelerates healing",
-    assetPath: "https://www.nhsinform.scot/illnesses-and-conditions/mental-health/mental-health-self-help-guides/sleep-problems-and-insomnia-self-help-guide/", // NHS Sleep Guide
+    assetPath: "/insight/sleep-recovery.json",
     quizQ: "Quality sleep is essential for tissue repair. (T/F)",
     quizA: "T",
     releaseOffset: 5,
@@ -449,16 +418,6 @@ export const insightLibrary: Insight[] = [
           "6-7 hours",
           "7-9 hours",
           "10-12 hours"
-        ],
-        correctAnswer: 2
-      },
-      {
-        question: "Poor sleep can:",
-        options: [
-          "Increase pain sensitivity",
-          "Slow healing",
-          "Both of the above",
-          "Neither of the above"
         ],
         correctAnswer: 2
       }
@@ -488,15 +447,14 @@ export const insightLibrary: Insight[] = [
       }
     ]
   },
-  
-  // ========= WEEK 3 - UPDATED WITH REAL RESOURCES =========
+  // WEEK 3
   {
     id: 37,
     week: 3,
     track: "PainScience",
     title: "Nutrition for Recovery",
     subtitle: "Anti-inflammatory foods that support healing",
-    assetPath: "https://www.health.harvard.edu/staying-healthy/foods-that-fight-inflammation", // Harvard nutrition guide
+    assetPath: "/insight/nutrition-recovery.json",
     quizQ: "Anti-inflammatory foods can support tissue healing. (T/F)",
     quizA: "T",
     releaseOffset: 0,
@@ -516,16 +474,6 @@ export const insightLibrary: Insight[] = [
           "White bread"
         ],
         correctAnswer: 1
-      },
-      {
-        question: "Foods that can increase inflammation include:",
-        options: [
-          "Berries and nuts",
-          "Vegetables",
-          "Processed foods and refined sugars",
-          "Fatty fish"
-        ],
-        correctAnswer: 2
       }
     ]
   },
@@ -535,7 +483,7 @@ export const insightLibrary: Insight[] = [
     track: "StressMood",
     title: "Posture & Pain",
     subtitle: "How posture affects pain perception",
-    assetPath: "https://www.pain-ed.com/blog/2019/08/02/postureinfographic/", // Greg Lehman posture article
+    assetPath: "/insight/posture-pain.json",
     quizQ: "Poor posture alone causes chronic pain. (T/F)",
     quizA: "F",
     releaseOffset: 1,
@@ -555,16 +503,6 @@ export const insightLibrary: Insight[] = [
           "Sitting perfectly straight"
         ],
         correctAnswer: 1
-      },
-      {
-        question: "The best posture is:",
-        options: [
-          "The one you hold the longest",
-          "The next posture",
-          "Military-style rigid",
-          "Completely relaxed"
-        ],
-        correctAnswer: 1
       }
     ]
   },
@@ -574,7 +512,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Return to Work Strategies",
     subtitle: "Managing pain while returning to daily activities",
-    assetPath: "https://www.hamiltonhealthsciences.ca/wp-content/uploads/2019/03/Patient-Education-Chronic-pain-work-Pain-Clinic.pdf", // Return to work guide
+    assetPath: "/insight/return-to-work.json",
     quizQ: "Gradual exposure to work tasks is safer than avoiding them. (T/F)",
     quizA: "T",
     releaseOffset: 2,
@@ -592,16 +530,6 @@ export const insightLibrary: Insight[] = [
           "Gradual, paced return",
           "Wait until 100% pain-free",
           "Push through severe pain"
-        ],
-        correctAnswer: 1
-      },
-      {
-        question: "Avoiding work due to pain can lead to:",
-        options: [
-          "Faster recovery",
-          "Increased fear and disability",
-          "Complete healing",
-          "Stronger muscles"
         ],
         correctAnswer: 1
       }
@@ -642,7 +570,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "CBT for Pain",
     subtitle: "Cognitive Behavioral Therapy basics",
-    assetPath: "https://www.va.gov/PAINMANAGEMENT/CBT_CP/docs/Brief_CBT-CP_Patient_Guidebook-4-13-2021.pdf", // VA CBT for Chronic Pain Guide
+    assetPath: "/insight/cbt-pain.json",
     quizQ: "CBT can help change pain-related thoughts and behaviors. (T/F)",
     quizA: "T",
     releaseOffset: 4,
@@ -662,16 +590,6 @@ export const insightLibrary: Insight[] = [
           "Ignoring pain"
         ],
         correctAnswer: 1
-      },
-      {
-        question: "CBT for pain helps you:",
-        options: [
-          "Eliminate all pain immediately",
-          "Ignore your pain",
-          "Change how you think about and respond to pain",
-          "Avoid all activities"
-        ],
-        correctAnswer: 2
       }
     ]
   },
@@ -681,7 +599,7 @@ export const insightLibrary: Insight[] = [
     track: "SelfEfficacy",
     title: "ACT for Chronic Pain",
     subtitle: "Acceptance and Commitment Therapy principles",
-    assetPath: "https://www.div12.org/wp-content/uploads/2015/06/ACT-for-Chronic-Pain-manual-McCracken.pdf", // ACT manual
+    assetPath: "/insight/act-pain.json",
     quizQ: "ACT teaches acceptance of pain while living a valued life. (T/F)",
     quizA: "T",
     releaseOffset: 5,
@@ -699,16 +617,6 @@ export const insightLibrary: Insight[] = [
           "Psychological flexibility",
           "Avoiding all discomfort",
           "Ignoring values"
-        ],
-        correctAnswer: 1
-      },
-      {
-        question: "ACT encourages you to:",
-        options: [
-          "Control all thoughts and feelings",
-          "Take action toward your values despite pain",
-          "Wait until pain is gone to live",
-          "Avoid anything difficult"
         ],
         correctAnswer: 1
       }
@@ -738,15 +646,14 @@ export const insightLibrary: Insight[] = [
       }
     ]
   },
-  
-  // ========= WEEK 4 - UPDATED WITH REAL RESOURCES =========
+  // WEEK 4
   {
     id: 44,
     week: 4,
     track: "PainScience",
     title: "MBSR for Pain",
     subtitle: "Mindfulness-Based Stress Reduction techniques",
-    assetPath: "https://palousemindfulness.com/index.html", // Free MBSR course
+    assetPath: "/insight/mbsr-pain.json",
     quizQ: "Mindfulness can reduce pain intensity and distress. (T/F)",
     quizA: "T",
     releaseOffset: 0,
@@ -766,16 +673,6 @@ export const insightLibrary: Insight[] = [
           "Avoidance"
         ],
         correctAnswer: 1
-      },
-      {
-        question: "MBSR was developed by:",
-        options: [
-          "A pharmaceutical company",
-          "Jon Kabat-Zinn",
-          "A yoga instructor",
-          "A physical therapist"
-        ],
-        correctAnswer: 1
       }
     ]
   },
@@ -785,7 +682,7 @@ export const insightLibrary: Insight[] = [
     track: "StressMood",
     title: "Graded Motor Imagery",
     subtitle: "Using your mind to retrain movement",
-    assetPath: "https://www.noigroup.com/graded-motor-imagery/", // NOI Group GMI
+    assetPath: "/insight/graded-motor-imagery.json",
     quizQ: "Mental imagery can help reduce pain and improve movement. (T/F)",
     quizA: "T",
     releaseOffset: 1,
@@ -805,16 +702,6 @@ export const insightLibrary: Insight[] = [
           "Surgery"
         ],
         correctAnswer: 1
-      },
-      {
-        question: "GMI helps retrain your:",
-        options: [
-          "Muscles only",
-          "Joints",
-          "Brain's movement maps",
-          "Bones"
-        ],
-        correctAnswer: 2
       }
     ]
   },
@@ -824,7 +711,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Movement Variability",
     subtitle: "Why changing positions matters",
-    assetPath: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8169474/", // Research article
+    assetPath: "/insight/movement-variability.json",
     quizQ: "Staying in one position for long periods increases stiffness. (T/F)",
     quizA: "T",
     releaseOffset: 2,
@@ -842,16 +729,6 @@ export const insightLibrary: Insight[] = [
           "It prevents tissue adaptation to one position",
           "It causes more pain",
           "It's not beneficial"
-        ],
-        correctAnswer: 1
-      },
-      {
-        question: "The best posture is:",
-        options: [
-          "Perfect alignment",
-          "The next one",
-          "Complete stillness",
-          "Maximum slouching"
         ],
         correctAnswer: 1
       }
@@ -892,7 +769,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Pain and Emotions",
     subtitle: "The bidirectional relationship",
-    assetPath: "https://medlineplus.gov/ency/patientinstructions/000417.htm", // MedlinePlus article
+    assetPath: "/insight/pain-emotions.json",
     quizQ: "Emotions can influence pain perception. (T/F)",
     quizA: "T",
     releaseOffset: 4,
@@ -912,16 +789,6 @@ export const insightLibrary: Insight[] = [
           "Excitement"
         ],
         correctAnswer: 1
-      },
-      {
-        question: "The relationship between pain and emotions is:",
-        options: [
-          "One-way (pain affects emotions)",
-          "Non-existent",
-          "Bidirectional (they affect each other)",
-          "Random"
-        ],
-        correctAnswer: 2
       }
     ]
   },
@@ -931,7 +798,7 @@ export const insightLibrary: Insight[] = [
     track: "SelfEfficacy",
     title: "Movement Quality vs. Quantity",
     subtitle: "Why how you move matters",
-    assetPath: "https://www.pain-ed.com/blog/2019/08/02/postureinfographic/", // Greg Lehman
+    assetPath: "/insight/movement-quality.json",
     quizQ: "Quality movement is more important than sheer volume. (T/F)",
     quizA: "T",
     releaseOffset: 5,
@@ -949,16 +816,6 @@ export const insightLibrary: Insight[] = [
           "How much it hurts",
           "Control, awareness, and intention",
           "Doing as many reps as possible"
-        ],
-        correctAnswer: 2
-      },
-      {
-        question: "High-quality movement emphasizes:",
-        options: [
-          "Maximum weight",
-          "Pain tolerance",
-          "Proper form and control",
-          "Speed and intensity"
         ],
         correctAnswer: 2
       }
@@ -988,8 +845,7 @@ export const insightLibrary: Insight[] = [
       }
     ]
   },
-  
-  // WEEK 5 (Keep existing Week 5 content - mostly good)
+  // WEEK 5
   {
     id: 51,
     week: 5,
@@ -1008,7 +864,7 @@ export const insightLibrary: Insight[] = [
     track: "StressMood",
     title: "Gratitude & pain",
     subtitle: "Simple journal practice",
-    assetPath: "https://ggia.berkeley.edu/practice/gratitude_journal", // Berkeley Gratitude Journal
+    assetPath: "/insight/gratitude-pain.mp4",
     quizQ: "Gratitude practice can help reduce pain sensitivity. (T/F)",
     quizA: "T",
     releaseOffset: 1,
@@ -1074,46 +930,18 @@ export const insightLibrary: Insight[] = [
     releaseOffset: 6,
     points: 5
   },
-  
-  // WEEK 6 - UPDATED WITH REAL RESOURCES
+  // WEEK 6
   {
     id: 58,
     week: 6,
     track: "PainScience",
     title: "Sticky thoughts vs. sticky tissues",
     subtitle: "Catastrophising",
-    assetPath: "https://www.va.gov/WHOLEHEALTHLIBRARY/docs/Working-with-Pain-Related-Thoughts.pdf", // VA catastrophizing guide
+    assetPath: "/insight/sticky-thoughts.mp4",
     quizQ: "Catastrophising can make pain feel worse than tissue damage. (T/F)",
     quizA: "T",
     releaseOffset: 0,
-    points: 5,
-    questions: [
-      {
-        question: "Catastrophising can make pain feel worse than tissue damage. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0
-      },
-      {
-        question: "Pain catastrophizing involves:",
-        options: [
-          "Realistic thinking",
-          "Magnifying pain threats",
-          "Ignoring pain",
-          "Accepting pain"
-        ],
-        correctAnswer: 1
-      },
-      {
-        question: "To reduce catastrophizing, you should:",
-        options: [
-          "Focus only on worst-case scenarios",
-          "Challenge unhelpful thoughts",
-          "Avoid thinking about pain",
-          "Blame yourself"
-        ],
-        correctAnswer: 1
-      }
-    ]
+    points: 5
   },
   {
     id: 59,
@@ -1121,38 +949,11 @@ export const insightLibrary: Insight[] = [
     track: "StressMood",
     title: "Stress-breath connection",
     subtitle: "Box breathing basics",
-    assetPath: "https://www.youtube.com/watch?v=9fEo9my03Ks", // Kitaro box breathing
+    assetPath: "/insight/stress-breath.mp4",
     quizQ: "Box breathing can help reduce stress and pain. (T/F)",
     quizA: "T",
     releaseOffset: 1,
-    points: 5,
-    questions: [
-      {
-        question: "Box breathing can help reduce stress and pain. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0
-      },
-      {
-        question: "Box breathing involves equal counts for:",
-        options: [
-          "Inhale only",
-          "Exhale only",
-          "Inhale, hold, exhale, hold",
-          "Random breathing"
-        ],
-        correctAnswer: 2
-      },
-      {
-        question: "Box breathing activates the:",
-        options: [
-          "Sympathetic nervous system",
-          "Parasympathetic nervous system",
-          "Neither system",
-          "Both equally"
-        ],
-        correctAnswer: 1
-      }
-    ]
+    points: 5
   },
   {
     id: 60,
@@ -1226,5 +1027,4 @@ export const getInsightsByTrack = (track: string): Insight[] => {
 
 export const getAllTracks = (): string[] => {
   return [...new Set(insightLibrary.map(insight => insight.track))];
-};
-
+}; 
