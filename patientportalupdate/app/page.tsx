@@ -559,7 +559,13 @@ const PatientRecoveryDashboard: React.FC = () => {
         />
       )}
       {showChatAssistant && <ChatAssistant onClose={() => setShowChatAssistant(false)} />}
-      {selectedToolkit && <ToolkitModal toolkit={selectedToolkit} onClose={() => setSelectedToolkit(null)} />}
+      {selectedToolkit && (
+        <ToolkitModal 
+          toolkit={selectedToolkit} 
+          onClose={() => setSelectedToolkit(null)} 
+          patientId={patient?.id?.toString() || patient?.email || "1"}
+        />
+      )}
       {selectedAssessment && (
         <AssessmentModal assessment={selectedAssessment} onClose={() => setSelectedAssessment(null)} />
       )}

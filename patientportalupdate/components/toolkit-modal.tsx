@@ -3,7 +3,9 @@
 import { X, Play, Download, BookOpen, Search, Filter, Target, Activity, FileText, Wrench, Clock, Moon } from "lucide-react"
 import { useState, useRef } from "react"
 import { exercises as allExercises } from "@/lib/exerciseLibrary"
+import { insightLibrary } from "@/lib/InsightLibrary"
 import { ExerciseVideoModal } from "@/components/exercise-video-modal"
+import InsightDialog from "@/components/InsightDialog"
 import { generatePainJournalPDF, generateSMARTGoalsPDF } from "@/utils/pdfGenerator"
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
@@ -26,10 +28,13 @@ interface ToolkitModalProps {
     count: number
   }
   onClose: () => void
+  patientId?: string
+  onInsightComplete?: (insightId: number, points?: number) => void
 }
 
-export function ToolkitModal({ toolkit, onClose }: ToolkitModalProps) {
+export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightComplete }: ToolkitModalProps) {
   const [selectedExercise, setSelectedExercise] = useState(null)
+  const [selectedInsight, setSelectedInsight] = useState<number | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedRegion, setSelectedRegion] = useState("all")
   const [selectedPhase, setSelectedPhase] = useState("all")
@@ -698,9 +703,32 @@ export function ToolkitModal({ toolkit, onClose }: ToolkitModalProps) {
 
         return grouped
       case "guides":
-        // Define the guides content array
-        const guidesContent = [
-          // Mindfulness Practices
+        // Map InsightLibrary to guides format with difficulty levels
+        const insightGuides = insightLibrary.map(insight => {
+          // Determine difficulty based on week (simplified mapping)
+          let difficulty = "Beginner"
+          if (insight.week >= 3 && insight.week <= 4) difficulty = "Intermediate"
+          if (insight.week >= 5) difficulty = "Advanced"
+          
+          // Estimate page count based on complexity
+          const pageCount = insight.week === 1 ? "8-12 pages" : 
+                           insight.week <= 3 ? "10-15 pages" : "15-20 pages"
+          
+          return {
+            id: insight.id,
+            title: insight.title,
+            description: insight.subtitle,
+            duration: pageCount,
+            difficulty,
+            type: "insight",
+            topic: insight.track.toLowerCase().replace(/\s+/g, '-'),
+            week: insight.week,
+            track: insight.track
+          }
+        })
+
+        // Static mindfulness practices (keep these as they are)
+        const mindfulnessPractices = [
           {
             title: "Mindful Breathing for Pain Relief",
             description: "Deep breathing techniques to reduce pain and stress",
@@ -765,337 +793,10 @@ export function ToolkitModal({ toolkit, onClose }: ToolkitModalProps) {
             type: "mindfulness",
             topic: "pain-management"
           },
-          
-          // Recovery Insights & Education
-          {
-            title: "Understanding Your Pain",
-            description: "Educational guide to pain science and recovery principles",
-            duration: "12 pages",
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "education"
-          },
-          {
-            title: "Movement Confidence Building",
-            description: "Strategies to overcome fear and build movement trust",
-            duration: "8 pages", 
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "movement"
-          },
-          {
-            title: "Recovery Mindset Mastery",
-            description: "Developing a positive, resilient approach to recovery",
-            duration: "10 pages",
-            difficulty: "Intermediate",
-            type: "insight", 
-            topic: "mindset"
-          },
-          {
-            title: "Flare-Up Management",
-            description: "How to handle pain flares and setbacks effectively",
-            duration: "6 pages",
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "flare-ups"
-          },
-          {
-            title: "The Science of Pain",
-            description: "Understanding how pain works and why it persists",
-            duration: "15 pages",
-            difficulty: "Intermediate",
-            type: "insight",
-            topic: "education"
-          },
-          {
-            title: "Building Movement Tolerance",
-            description: "Gradually increasing your capacity for movement",
-            duration: "10 pages",
-            difficulty: "Intermediate",
-            type: "insight",
-            topic: "movement"
-          },
-          {
-            title: "Sleep and Recovery",
-            description: "Optimizing sleep for better pain management and healing",
-            duration: "8 pages",
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "pain-management"
-          },
-          {
-            title: "Nutrition for Pain Relief",
-            description: "Anti-inflammatory foods and supplements for recovery",
-            duration: "12 pages",
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "pain-management"
-          },
-          {
-            title: "Stress and Pain Connection",
-            description: "Understanding how stress affects your pain experience",
-            duration: "10 pages",
-            difficulty: "Intermediate",
-            type: "insight",
-            topic: "education"
-          },
-          {
-            title: "Graded Exposure to Movement",
-            description: "Systematic approach to reintroducing feared movements",
-            duration: "14 pages",
-            difficulty: "Advanced",
-            type: "insight",
-            topic: "movement"
-          },
-          {
-            title: "Cognitive Behavioral Techniques",
-            description: "Practical tools for changing pain-related thoughts",
-            duration: "16 pages",
-            difficulty: "Advanced",
-            type: "insight",
-            topic: "mindset"
-          },
-          {
-            title: "Pacing Strategies",
-            description: "Learning to balance activity and rest for optimal recovery",
-            duration: "8 pages",
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "movement"
-          },
-          {
-            title: "Goal Setting for Recovery",
-            description: "Creating meaningful, achievable recovery milestones",
-            duration: "6 pages",
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "mindset"
-          },
-          {
-            title: "Social Support in Recovery",
-            description: "Building a support network for your recovery journey",
-            duration: "7 pages",
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "mindset"
-          },
-          {
-            title: "Return to Work Strategies",
-            description: "Managing pain while maintaining productivity",
-            duration: "12 pages",
-            difficulty: "Intermediate",
-            type: "insight",
-            topic: "movement"
-          },
-          {
-            title: "Exercise Modification Principles",
-            description: "Adapting activities to work with your current limitations",
-            duration: "10 pages",
-            difficulty: "Intermediate",
-            type: "insight",
-            topic: "movement"
-          },
-          {
-            title: "Pain Catastrophizing Reduction",
-            description: "Techniques to reduce catastrophic thinking about pain",
-            duration: "14 pages",
-            difficulty: "Advanced",
-            type: "insight",
-            topic: "mindset"
-          },
-          {
-            title: "Acceptance and Commitment Therapy",
-            description: "Living a meaningful life despite pain",
-            duration: "18 pages",
-            difficulty: "Advanced",
-            type: "insight",
-            topic: "mindset"
-          },
-          {
-            title: "Breathing Techniques for Pain",
-            description: "Specific breathing patterns to reduce pain intensity",
-            duration: "8 pages",
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "pain-management"
-          },
-          {
-            title: "Posture and Pain",
-            description: "How posture affects pain and strategies for improvement",
-            duration: "10 pages",
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "movement"
-          },
-          {
-            title: "Pain Neuroscience Education",
-            description: "Advanced concepts in pain science and treatment",
-            duration: "20 pages",
-            difficulty: "Advanced",
-            type: "insight",
-            topic: "education"
-          },
-          {
-            title: "Mindfulness-Based Stress Reduction",
-            description: "Comprehensive mindfulness program for chronic pain",
-            duration: "25 pages",
-            difficulty: "Advanced",
-            type: "insight",
-            topic: "mindfulness"
-          },
-          {
-            title: "Graded Motor Imagery",
-            description: "Using mental imagery to improve movement and reduce pain",
-            duration: "12 pages",
-            difficulty: "Advanced",
-            type: "insight",
-            topic: "movement"
-          },
-          {
-            title: "Pain Self-Management Skills",
-            description: "Essential skills for managing pain independently",
-            duration: "15 pages",
-            difficulty: "Intermediate",
-            type: "insight",
-            topic: "pain-management"
-          },
-          {
-            title: "Recovery Plateaus and Progress",
-            description: "Understanding and navigating recovery plateaus",
-            duration: "8 pages",
-            difficulty: "Intermediate",
-            type: "insight",
-            topic: "mindset"
-          },
-          {
-            title: "Fear Avoidance Cycle",
-            description: "Breaking the cycle of fear, avoidance, and increased pain",
-            duration: "12 pages",
-            difficulty: "Intermediate",
-            type: "insight",
-            topic: "education"
-          },
-          {
-            title: "Movement Variability",
-            description: "The importance of movement variety in recovery",
-            duration: "9 pages",
-            difficulty: "Intermediate",
-            type: "insight",
-            topic: "movement"
-          },
-          {
-            title: "Pain and Emotions",
-            description: "Understanding the emotional aspects of chronic pain",
-            duration: "14 pages",
-            difficulty: "Intermediate",
-            type: "insight",
-            topic: "education"
-          },
-          {
-            title: "Recovery Timeline Expectations",
-            description: "Setting realistic expectations for your recovery journey",
-            duration: "6 pages",
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "mindset"
-          },
-          {
-            title: "Activity Pacing Techniques",
-            description: "Practical strategies for managing daily activities",
-            duration: "10 pages",
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "movement"
-          },
-          {
-            title: "Pain and Sleep Hygiene",
-            description: "Creating optimal sleep conditions for pain relief",
-            duration: "8 pages",
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "pain-management"
-          },
-          {
-            title: "Movement Confidence Exercises",
-            description: "Specific exercises to build confidence in movement",
-            duration: "12 pages",
-            difficulty: "Intermediate",
-            type: "insight",
-            topic: "movement"
-          },
-          {
-            title: "Cognitive Distraction Techniques",
-            description: "Using mental strategies to reduce pain focus",
-            duration: "7 pages",
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "pain-management"
-          },
-          {
-            title: "Recovery Journaling",
-            description: "Using writing to track progress and process emotions",
-            duration: "5 pages",
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "mindset"
-          },
-          {
-            title: "Pain and Weather Changes",
-            description: "Managing pain during weather-related flare-ups",
-            duration: "6 pages",
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "flare-ups"
-          },
-          {
-            title: "Movement and Breathing Coordination",
-            description: "Coordinating breath with movement for better function",
-            duration: "8 pages",
-            difficulty: "Intermediate",
-            type: "insight",
-            topic: "movement"
-          },
-          {
-            title: "Recovery Setbacks and Resilience",
-            description: "Building resilience to handle recovery setbacks",
-            duration: "10 pages",
-            difficulty: "Intermediate",
-            type: "insight",
-            topic: "mindset"
-          },
-          {
-            title: "Pain and Social Relationships",
-            description: "Maintaining relationships while managing chronic pain",
-            duration: "11 pages",
-            difficulty: "Intermediate",
-            type: "insight",
-            topic: "mindset"
-          },
-          {
-            title: "Movement Quality vs Quantity",
-            description: "Focusing on movement quality over quantity in recovery",
-            duration: "9 pages",
-            difficulty: "Intermediate",
-            type: "insight",
-            topic: "movement"
-          },
-          {
-            title: "Pain and Work-Life Balance",
-            description: "Balancing work demands with pain management needs",
-            duration: "13 pages",
-            difficulty: "Intermediate",
-            type: "insight",
-            topic: "movement"
-          },
-          {
-            title: "Recovery Celebration and Gratitude",
-            description: "Celebrating progress and practicing gratitude in recovery",
-            duration: "6 pages",
-            difficulty: "Beginner",
-            type: "insight",
-            topic: "mindset"
-          }
         ]
+
+        // Combine mindfulness practices and insights
+        const guidesContent = [...mindfulnessPractices, ...insightGuides]
 
         // Filter guides based on search and filters
         let filteredGuides = guidesContent.filter(guide => {
@@ -1441,6 +1142,7 @@ export function ToolkitModal({ toolkit, onClose }: ToolkitModalProps) {
                               <div
                                 key={index}
                                 className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg hover:border-btl-200 hover:shadow-md transition-all duration-200 cursor-pointer"
+                                onClick={() => insight.id ? setSelectedInsight(insight.id) : null}
                               >
                                 <div className="p-2 bg-btl-100 rounded-full border-2 border-btl-600">
                                   <FileText className="w-5 h-5 text-btl-600" />
@@ -1454,7 +1156,13 @@ export function ToolkitModal({ toolkit, onClose }: ToolkitModalProps) {
                                     <span className="px-2 py-0.5 rounded-full bg-gray-100">{insight.difficulty}</span>
                                   </p>
                                 </div>
-                                <button className="px-3 py-1 bg-btl-600 text-white text-sm rounded-full hover:bg-btl-700 transition-colors">
+                                <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (insight.id) setSelectedInsight(insight.id);
+                                  }}
+                                  className="px-3 py-1 bg-btl-600 text-white text-sm rounded-full hover:bg-btl-700 transition-colors"
+                                >
                                   Read
                                 </button>
                               </div>
@@ -1780,6 +1488,20 @@ export function ToolkitModal({ toolkit, onClose }: ToolkitModalProps) {
               exercise={selectedExercise}
               open={!!selectedExercise}
               onClose={() => setSelectedExercise(null)}
+            />
+          )}
+          {selectedInsight && (
+            <InsightDialog
+              insightId={selectedInsight}
+              isOpen={!!selectedInsight}
+              onClose={() => setSelectedInsight(null)}
+              onComplete={(insightId, points) => {
+                if (onInsightComplete) {
+                  onInsightComplete(insightId, points);
+                }
+                setSelectedInsight(null);
+              }}
+              patientId={patientId}
             />
           )}
         </div>
