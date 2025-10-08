@@ -18,6 +18,7 @@ import { Insight, getInsightById } from "@/lib/InsightLibrary";
 import FlarePlan, { FlarePlanData } from "./FlarePlan";
 import JsonFormRenderer from "./JsonFormRenderer";
 import { SummaryCarousel } from "./SummaryCarousel";
+import InsightSummaryCard from "./InsightSummaryCard";
 import { addRecoveryPoints } from "@/lib/recoveryPointsApi";
 import { completeInsight } from "@/services/insights.service";
 import { useToast } from "@/hooks/use-toast";
@@ -541,8 +542,13 @@ export default function InsightDialog({
         );
       }
 
-      // Handle summary carousel cards (nutrition, sleep, ACT, etc.)
-      if (assetPath.includes('-summary.json') || assetPath.includes('sleep-carousel')) {
+      // Handle summary cards with cortisol-style single page
+      if (assetPath.includes('-summary.json')) {
+        return <InsightSummaryCard assetPath={assetPath} />;
+      }
+
+      // Legacy sleep carousel support (kept for Week 1 sleep card)
+      if (assetPath.includes('sleep-carousel')) {
         return <SummaryCarousel assetPath={assetPath} />;
       }
 
