@@ -15,6 +15,11 @@ interface SummarySlide {
 
 interface SummaryData {
   slides: SummarySlide[];
+  timeMinutes?: number;
+  level?: string;
+  why?: string;
+  sectionTitle?: string;
+  sectionIntro?: string;
 }
 
 export default function InsightSummaryCard({ assetPath }: { assetPath: string }) {
@@ -48,6 +53,8 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
   const metaTime: number | undefined = (data as any)?.timeMinutes;
   const metaLevel: string | undefined = (data as any)?.level;
   const why: string | undefined = (data as any)?.why;
+  const sectionTitle: string | undefined = (data as any)?.sectionTitle;
+  const sectionIntro: string | undefined = (data as any)?.sectionIntro;
 
   // Top CTA if present on any slide
   const resourceSlide = data.slides.find(s => s.resourceLink && s.resourceLabel);
@@ -95,29 +102,28 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
         */}
         <div className="p-8 space-y-6">
           {(() => {
+            // Build a single 2x2 grid section like cortisol
             const remaining = data.slides.slice(1);
-            const groups: SummarySlide[][] = [];
-            for (let i = 0; i < remaining.length; i += 4) {
-              groups.push(remaining.slice(i, i + 4));
+            // Exclude the action slide (with resourceLink) from the grid
+            const contentTiles = remaining.filter(s => !(s.resourceLink && /try this/i.test(s.title || '')));
+            // Take first 4; if fewer, pad by repeating last tile for symmetry
+            const tiles: SummarySlide[] = contentTiles.slice(0, 4);
+            while (tiles.length > 0 && tiles.length < 4) {
+              tiles.push(tiles[tiles.length - 1]);
             }
-            return groups.map((group, idx) => (
-              <div key={idx} className="bg-btl-50 border border-btl-200 rounded-2xl p-6 shadow-sm">
-                {/* Section header = first tile title + sentence (if present) */}
+            if (tiles.length === 0) return null;
+
+            return (
+              <div className="bg-btl-50 border border-btl-200 rounded-2xl p-6 shadow-sm">
                 <div className="mb-4">
-                  <h4 className="text-lg font-bold text-btl-900">
-                    {group[0]?.title || 'Key Points'}
-                  </h4>
-                  {group[0]?.content && (
-                    <p className="text-btl-700 mt-1">{group[0].content}</p>
+                  <h4 className="text-lg font-bold text-btl-900">{sectionTitle || 'Key Insights'}</h4>
+                  {(sectionIntro || '') && (
+                    <p className="text-btl-700 mt-1">{sectionIntro}</p>
                   )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {group.map((tile, tileIdx) => (
-                    <div
-                      key={tile.id ?? tileIdx}
-                      className="bg-white rounded-xl p-4 border border-btl-200"
-                    >
-                      {/* For tile 0 we already used its text as section header; still render concise version */}
+                  {tiles.map((tile, tileIdx) => (
+                    <div key={tile.id ?? tileIdx} className="bg-white rounded-xl p-4 border border-btl-200">
                       <h5 className="font-semibold text-btl-800 mb-1">{tile.title}</h5>
                       {tile.content && (
                         <p className="text-sm text-btl-700 leading-relaxed">{tile.content}</p>
@@ -126,7 +132,7 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
                   ))}
                 </div>
               </div>
-            ));
+            );
           })()}
 
           {/* Micro-action callout */}
