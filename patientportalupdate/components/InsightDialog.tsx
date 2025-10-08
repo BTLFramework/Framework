@@ -547,9 +547,9 @@ export default function InsightDialog({
         return <InsightSummaryCard assetPath={assetPath} />;
       }
 
-      // Legacy sleep carousel support (kept for Week 1 sleep card)
+      // Sleep debt card should also use cortisol-style single page
       if (assetPath.includes('sleep-carousel')) {
-        return <SummaryCarousel assetPath={assetPath} />;
+        return <InsightSummaryCard assetPath={assetPath} />;
       }
 
       // Handle specific content files (DEPRECATED - now using SummaryCarousel)
