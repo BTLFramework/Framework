@@ -122,6 +122,188 @@ const insightLibrary: RecoveryInsight[] = [
     completed: false,
     conditions: { maxVAS: 2, minConfidence: 8, maxPCS4: 4, maxFearAvoidance: 20 }
   }
+  ,
+  // ---------------- Additional Education Guides (same card formatting) ----------------
+  {
+    id: "31",
+    title: "Understanding Your Pain",
+    description: "Pain neuroscience basics to reframe pain safely",
+    category: "Pain Science",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "32",
+    title: "The Science of Pain",
+    description: "How pain is produced and why it can change",
+    category: "Pain Science",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "33",
+    title: "Flare‑Up Management",
+    description: "Create a plan to ride out flares with control",
+    category: "Self Efficacy",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "34",
+    title: "Pacing Strategies",
+    description: "Do a little, often—so you can do more over time",
+    category: "Self Efficacy",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "35",
+    title: "Sleep and Recovery",
+    description: "CBT‑I and sleep hygiene that support healing",
+    category: "Lifestyle",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "36",
+    title: "Nutrition for Pain Relief",
+    description: "What nutrition has evidence for pain and recovery",
+    category: "Lifestyle",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "37",
+    title: "Posture and Pain",
+    description: "Myth‑busting and modern management",
+    category: "Movement",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "38",
+    title: "Return to Work Strategies",
+    description: "Stepwise plan to resume meaningful activity",
+    category: "Function",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "39",
+    title: "Cognitive Distraction Techniques",
+    description: "Tools to unhook from unhelpful pain thoughts",
+    category: "Cognitive Skills",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "40",
+    title: "Recovery Journaling",
+    description: "SMART goals and brief logs that drive progress",
+    category: "Self Efficacy",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "41",
+    title: "Cognitive Behavioral Techniques",
+    description: "Practical CBT tools for pain coping",
+    category: "Cognitive Skills",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "42",
+    title: "Pain Catastrophizing Reduction",
+    description: "Identify and reframe PC thoughts",
+    category: "Cognitive Skills",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "43",
+    title: "Acceptance & Commitment Therapy",
+    description: "Values‑based skills to move well with pain",
+    category: "ACT",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "44",
+    title: "Mindfulness‑Based Stress Reduction",
+    description: "8‑week program evidence for pain and mood",
+    category: "Mindfulness",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "45",
+    title: "Graded Motor Imagery",
+    description: "Laterality → Imagery → Mirror therapy roadmap",
+    category: "GMI",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "46",
+    title: "Movement Variability",
+    description: "Why variety improves resilience",
+    category: "Movement",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "47",
+    title: "Pain and Emotions",
+    description: "Links between mood, stress, and pain",
+    category: "Stress & Mood",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  },
+  {
+    id: "48",
+    title: "Movement Quality vs Quantity",
+    description: "Skillful movement over chasing reps",
+    category: "Movement",
+    date: new Date().toISOString(),
+    points: 5,
+    viewed: false,
+    completed: false
+  }
 ];
 
 /**
