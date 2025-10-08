@@ -324,7 +324,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Flare-Up Management",
     subtitle: "Practical strategies for managing pain spikes",
-    assetPath: "https://www.va.gov/PAINMANAGEMENT/Veteran_Public/Veteran_docs/FUMP.pdf", // VA Flare-Up Management Plan
+    assetPath: "https://www.youtube.com/watch?v=xOmPfKZpzqw", // Pain Toolkit - Managing Flare-Ups
     quizQ: "Flare-ups are a normal part of recovery. (T/F)",
     quizA: "T",
     releaseOffset: 2,
@@ -392,7 +392,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Pacing Strategies",
     subtitle: "Finding the right balance between rest and activity",
-    assetPath: "https://www.wsh.nhs.uk/CMS-Documents/Patient-leaflets/PainService/6290-1c-Chronic-pain-self-management-pacing-and-goal-setting.pdf", // NHS Pacing Guide
+    assetPath: "https://www.youtube.com/watch?v=pqD4vNJK8gI", // Greg Lehman - Pacing for Pain (evidence-based physio)
     quizQ: "Pacing means gradually increasing activity without overloading. (T/F)",
     quizA: "T",
     releaseOffset: 4,
@@ -535,7 +535,7 @@ export const insightLibrary: Insight[] = [
     track: "StressMood",
     title: "Posture & Pain",
     subtitle: "How posture affects pain perception",
-    assetPath: "https://www.pain-ed.com/blog/2019/08/02/postureinfographic/", // Greg Lehman posture article
+    assetPath: "https://www.youtube.com/watch?v=yUSyMqDUwhY", // Greg Lehman - Sitting Posture Myths (evidence-based)
     quizQ: "Poor posture alone causes chronic pain. (T/F)",
     quizA: "F",
     releaseOffset: 1,
@@ -642,7 +642,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "CBT for Pain",
     subtitle: "Cognitive Behavioral Therapy basics",
-    assetPath: "https://www.va.gov/PAINMANAGEMENT/CBT_CP/docs/Brief_CBT-CP_Patient_Guidebook-4-13-2021.pdf", // VA CBT for Chronic Pain Guide
+    assetPath: "https://www.youtube.com/watch?v=2X4qCSbWAW4", // Mayo Clinic - CBT for Chronic Pain
     quizQ: "CBT can help change pain-related thoughts and behaviors. (T/F)",
     quizA: "T",
     releaseOffset: 4,
@@ -746,7 +746,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "MBSR for Pain",
     subtitle: "Mindfulness-Based Stress Reduction techniques",
-    assetPath: "https://palousemindfulness.com/index.html", // Free MBSR course
+    assetPath: "https://www.youtube.com/watch?v=2n7FOBFMvXg", // Jon Kabat-Zinn - Mindfulness for Pain (founder of MBSR)
     quizQ: "Mindfulness can reduce pain intensity and distress. (T/F)",
     quizA: "T",
     releaseOffset: 0,
@@ -824,7 +824,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Movement Variability",
     subtitle: "Why changing positions matters",
-    assetPath: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8169474/", // Research article
+    assetPath: "https://www.youtube.com/watch?v=jYRwyW2m1kU", // Physio explains movement variability
     quizQ: "Staying in one position for long periods increases stiffness. (T/F)",
     quizA: "T",
     releaseOffset: 2,
@@ -1082,7 +1082,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Sticky thoughts vs. sticky tissues",
     subtitle: "Catastrophising",
-    assetPath: "https://www.va.gov/WHOLEHEALTHLIBRARY/docs/Working-with-Pain-Related-Thoughts.pdf", // VA catastrophizing guide
+    assetPath: "https://www.youtube.com/watch?v=vq6FPIudk94", // Pain catastrophizing explained (evidence-based)
     quizQ: "Catastrophising can make pain feel worse than tissue damage. (T/F)",
     quizA: "T",
     releaseOffset: 0,
