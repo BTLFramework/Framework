@@ -59,6 +59,16 @@ export function RecoveryInsightDialog({
   const [completedInsights, setCompletedInsights] = useState<number[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [dailyCompletedInsights, setDailyCompletedInsights] = useState<number>(0);
+  
+  // Debug mode: Check for ?unlockInsights=1 in URL
+  const [debugUnlockAll, setDebugUnlockAll] = useState(false);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      setDebugUnlockAll(params.get('unlockInsights') === '1');
+    }
+  }, []);
 
   // Load completed insights from localStorage
   useEffect(() => {
@@ -577,16 +587,19 @@ export function RecoveryInsightDialog({
                 <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border border-gray-200 shadow-lg p-6 hover:shadow-xl transition-all duration-300">
                   <h3 className="text-xl font-semibold text-gray-900 mb-6">
                     Recovery Insights
-                    <span className="ml-2 text-sm font-normal text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
-                      DEV MODE: All Unlocked
-                    </span>
+                    {debugUnlockAll && (
+                      <span className="ml-2 text-sm font-normal text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
+                        🔓 DEBUG MODE: All Unlocked
+                      </span>
+                    )}
                   </h3>
                   <div className="space-y-4" key={refreshKey}>
                     {filteredInsights.map((insight, i) => {
                       if (!insight) return null;
                       const offset = insight.releaseOffset;
-                                              const isToday = offset === 0; // Only today's insight is available
-                      const isFuture = offset > 0; // Future insights are locked
+                      // In debug mode, all insights are unlocked
+                      const isToday = debugUnlockAll ? true : offset === 0; // Only today's insight is available (unless debug mode)
+                      const isFuture = debugUnlockAll ? false : offset > 0; // Future insights are locked (unless debug mode)
                       const isCompleted = completedInsights.includes(Number(insight.id));
                       
                       // Calculate week and day labels
