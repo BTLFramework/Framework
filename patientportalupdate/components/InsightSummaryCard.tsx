@@ -44,8 +44,14 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
     return <div className="flex justify-center items-center h-32 text-gray-500">No summary available</div>;
   }
 
+  // Meta and helper fields
+  const metaTime: number | undefined = (data as any)?.timeMinutes;
+  const metaLevel: string | undefined = (data as any)?.level;
+  const why: string | undefined = (data as any)?.why;
+
   // Top CTA if present on any slide
   const resourceSlide = data.slides.find(s => s.resourceLink && s.resourceLabel);
+  const actionSlide = data.slides.find(s => /try this/i.test(s.title || ''));
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -53,7 +59,21 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
         {/* Header (use first slide as hero) */}
         <div className="bg-gradient-to-r from-btl-50 to-btl-100 p-6 border-b border-btl-200">
           <h3 className="text-2xl font-bold text-btl-900">{data.slides[0]?.title || "Overview"}</h3>
-          <p className="text-btl-700 mt-1">{data.slides[0]?.content || "Evidence-based recovery insight"}</p>
+          <p className="text-btl-700 mt-1">{why || data.slides[0]?.content || "Evidence-based recovery insight"}</p>
+
+          {/* Meta chips */}
+          <div className="mt-2 flex items-center gap-2">
+            {typeof metaTime === 'number' && (
+              <span className="text-xs font-semibold text-btl-700 bg-btl-100 border border-btl-200 rounded-full px-2 py-0.5">
+                {metaTime}–{metaTime + 1} min
+              </span>
+            )}
+            {metaLevel && (
+              <span className="text-xs font-semibold text-btl-700 bg-btl-100 border border-btl-200 rounded-full px-2 py-0.5">
+                {metaLevel}
+              </span>
+            )}
+          </div>
           {resourceSlide && (
             <div className="mt-4">
               <a
@@ -108,6 +128,14 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
               </div>
             ));
           })()}
+
+          {/* Micro-action callout */}
+          {actionSlide && (
+            <div className="bg-btl-50 border border-btl-200 rounded-2xl p-6 shadow-sm">
+              <h4 className="text-lg font-bold text-btl-900 mb-1">{actionSlide.title}</h4>
+              <p className="text-btl-700 leading-relaxed">{actionSlide.content}</p>
+            </div>
+          )}
 
           {/* Bottom CTA and Key Takeaway */}
           {resourceSlide && (
