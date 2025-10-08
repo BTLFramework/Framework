@@ -841,6 +841,13 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
   }
 
   const content = getContent()
+  try {
+    console.log('🪟 ToolkitModal open:', {
+      title: toolkit?.title,
+      category: toolkit?.category,
+      guidesCount: Array.isArray((content as any)?.insight) ? (content as any).insight.length : undefined
+    })
+  } catch {}
 
   // Get unique regions and phases for filters
   const regions = ["all", ...Array.from(new Set(allExercises.map(ex => ex.region)))]

@@ -43,7 +43,22 @@ export function RecoveryToolkitSection({ onToolkitClick }: RecoveryToolkitSectio
     <div className="card-gradient rounded-xl shadow-lg p-6 border border-btl-200 hover:card-hover-gradient hover:shadow-xl transition-all duration-300">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold gradient-text">Recovery Toolkit</h2>
-        <button className="flex items-center space-x-1 text-btl-600 hover:text-btl-700 text-sm font-medium hover:bg-btl-50 px-3 py-1 rounded-lg transition-all duration-200">
+        <button
+          onClick={() => {
+            const guidesItem = {
+              title: "Recovery Guides",
+              description: "Educational resources",
+              icon: FileText,
+              iconBg: "bg-gradient-to-br from-btl-50 to-btl-200",
+              iconColor: "text-btl-700",
+              count: Array.isArray(insightLibrary) ? insightLibrary.length : 0,
+              category: "guides",
+            }
+            try { console.log('🖱️ View All clicked:', guidesItem) } catch {}
+            onToolkitClick(guidesItem)
+          }}
+          className="flex items-center space-x-1 text-btl-600 hover:text-btl-700 text-sm font-medium hover:bg-btl-50 px-3 py-1 rounded-lg transition-all duration-200"
+        >
           <Eye className="w-4 h-4" />
           <span>View All</span>
         </button>
