@@ -1,0 +1,39 @@
+{
+  "slides": [
+    {
+      "id": 1,
+      "title": "Pain-Emotion Connection",
+      "content": "Emotions and pain influence each other through shared brain pathways",
+      "backgroundColor": "#fce7f3",
+      "textColor": "#be185d"
+    },
+    {
+      "id": 2,
+      "title": "Anxiety Amplifies Pain",
+      "content": "Stress and anxiety can increase pain sensitivity by activating threat responses",
+      "backgroundColor": "#fbcfe8",
+      "textColor": "#9f1239"
+    },
+    {
+      "id": 3,
+      "title": "Emotional Regulation",
+      "content": "Managing emotions through mindfulness and CBT can help reduce pain intensity",
+      "backgroundColor": "#fdf2f8",
+      "textColor": "#831843"
+    },
+    {
+      "id": 4,
+      "title": "Learn More",
+      "content": "Read the full MedlinePlus article on the complex relationship between pain and emotions",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://medlineplus.gov/ency/patientinstructions/000417.htm",
+      "resourceLabel": "Read Full MedlinePlus Article"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}
+

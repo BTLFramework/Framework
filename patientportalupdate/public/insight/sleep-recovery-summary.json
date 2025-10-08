@@ -1,0 +1,39 @@
+{
+  "slides": [
+    {
+      "id": 1,
+      "title": "Sleep & Healing",
+      "content": "Quality sleep is when your body does most of its tissue repair and recovery work",
+      "backgroundColor": "#dbeafe",
+      "textColor": "#1e3a8a"
+    },
+    {
+      "id": 2,
+      "title": "7-9 Hours Target",
+      "content": "Most adults need 7-9 hours of quality sleep for optimal recovery and pain management",
+      "backgroundColor": "#bfdbfe",
+      "textColor": "#1e40af"
+    },
+    {
+      "id": 3,
+      "title": "Sleep Hygiene Basics",
+      "content": "Consistent schedule, cool dark room, no screens before bed, and limiting caffeine after 2pm",
+      "backgroundColor": "#93c5fd",
+      "textColor": "#1e40af"
+    },
+    {
+      "id": 4,
+      "title": "Learn More",
+      "content": "Access the NHS sleep guide for comprehensive strategies to improve sleep quality",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://www.nhsinform.scot/illnesses-and-conditions/mental-health/mental-health-self-help-guides/sleep-problems-and-insomnia-self-help-guide/",
+      "resourceLabel": "Read Full NHS Sleep Guide"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}
+

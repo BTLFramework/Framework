@@ -1,0 +1,39 @@
+{
+  "slides": [
+    {
+      "id": 1,
+      "title": "Gradual Return is Safer",
+      "content": "A phased return to work prevents re-injury and builds confidence through progressive exposure",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#1e40af"
+    },
+    {
+      "id": 2,
+      "title": "Modify Tasks Early",
+      "content": "Start with lighter duties and shorter hours, gradually building up as your body adapts",
+      "backgroundColor": "#fef3c7",
+      "textColor": "#92400e"
+    },
+    {
+      "id": 3,
+      "title": "Communicate with Employer",
+      "content": "Open dialogue about your capabilities helps create a supportive return-to-work plan",
+      "backgroundColor": "#e0e7ff",
+      "textColor": "#3730a3"
+    },
+    {
+      "id": 4,
+      "title": "Learn More",
+      "content": "Access the complete guide for detailed strategies on managing pain while returning to work",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://www.hamiltonhealthsciences.ca/wp-content/uploads/2019/03/Patient-Education-Chronic-pain-work-Pain-Clinic.pdf",
+      "resourceLabel": "Read Full Clinical Guide"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}
+

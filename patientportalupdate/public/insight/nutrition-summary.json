@@ -1,0 +1,39 @@
+{
+  "slides": [
+    {
+      "id": 1,
+      "title": "Anti-Inflammatory Foods",
+      "content": "Foods rich in omega-3s, antioxidants, and fiber can help reduce inflammation and support tissue healing",
+      "backgroundColor": "#f0fdf4",
+      "textColor": "#166534"
+    },
+    {
+      "id": 2,
+      "title": "Foods That Fight Inflammation",
+      "content": "Leafy greens, berries, fatty fish, nuts, and olive oil are powerful anti-inflammatory foods",
+      "backgroundColor": "#ecfdf5",
+      "textColor": "#065f46"
+    },
+    {
+      "id": 3,
+      "title": "Foods to Limit",
+      "content": "Processed foods, refined sugars, and trans fats can increase inflammation and slow recovery",
+      "backgroundColor": "#fef2f2",
+      "textColor": "#991b1b"
+    },
+    {
+      "id": 4,
+      "title": "Learn More",
+      "content": "Ready to dive deeper? Access the full Harvard Health guide for comprehensive nutrition strategies",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://www.health.harvard.edu/staying-healthy/foods-that-fight-inflammation",
+      "resourceLabel": "Read Full Harvard Guide"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}
+

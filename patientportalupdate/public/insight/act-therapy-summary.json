@@ -1,0 +1,39 @@
+{
+  "slides": [
+    {
+      "id": 1,
+      "title": "Acceptance & Values",
+      "content": "ACT teaches accepting pain while taking action toward what matters most in your life",
+      "backgroundColor": "#faf5ff",
+      "textColor": "#6b21a8"
+    },
+    {
+      "id": 2,
+      "title": "Psychological Flexibility",
+      "content": "Learn to observe thoughts and feelings without being controlled by them",
+      "backgroundColor": "#f5f3ff",
+      "textColor": "#5b21b6"
+    },
+    {
+      "id": 3,
+      "title": "Living with Purpose",
+      "content": "Focus on meaningful activities and values rather than waiting for pain to disappear",
+      "backgroundColor": "#ede9fe",
+      "textColor": "#6b21a8"
+    },
+    {
+      "id": 4,
+      "title": "Learn More",
+      "content": "Explore the comprehensive ACT manual for detailed techniques and exercises",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://www.div12.org/wp-content/uploads/2015/06/ACT-for-Chronic-Pain-manual-McCracken.pdf",
+      "resourceLabel": "Read Full ACT Manual"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}
+

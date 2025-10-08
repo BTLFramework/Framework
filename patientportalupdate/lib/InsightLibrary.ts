@@ -431,7 +431,7 @@ export const insightLibrary: Insight[] = [
     track: "SelfEfficacy",
     title: "Sleep & Recovery",
     subtitle: "How quality sleep accelerates healing",
-    assetPath: "https://www.nhsinform.scot/illnesses-and-conditions/mental-health/mental-health-self-help-guides/sleep-problems-and-insomnia-self-help-guide/", // NHS Sleep Guide
+    assetPath: "/insight/sleep-recovery-summary.json", // Summary card with link to NHS guide
     quizQ: "Quality sleep is essential for tissue repair. (T/F)",
     quizA: "T",
     releaseOffset: 5,
@@ -496,7 +496,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Nutrition for Recovery",
     subtitle: "Anti-inflammatory foods that support healing",
-    assetPath: "https://www.health.harvard.edu/staying-healthy/foods-that-fight-inflammation", // Harvard nutrition guide
+    assetPath: "/insight/nutrition-summary.json", // Summary card with link to Harvard guide
     quizQ: "Anti-inflammatory foods can support tissue healing. (T/F)",
     quizA: "T",
     releaseOffset: 0,
@@ -574,7 +574,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Return to Work Strategies",
     subtitle: "Managing pain while returning to daily activities",
-    assetPath: "https://www.hamiltonhealthsciences.ca/wp-content/uploads/2019/03/Patient-Education-Chronic-pain-work-Pain-Clinic.pdf", // Return to work guide
+    assetPath: "/insight/return-to-work-summary.json", // Summary card with link to clinical guide
     quizQ: "Gradual exposure to work tasks is safer than avoiding them. (T/F)",
     quizA: "T",
     releaseOffset: 2,
@@ -681,7 +681,7 @@ export const insightLibrary: Insight[] = [
     track: "SelfEfficacy",
     title: "ACT for Chronic Pain",
     subtitle: "Acceptance and Commitment Therapy principles",
-    assetPath: "https://www.div12.org/wp-content/uploads/2015/06/ACT-for-Chronic-Pain-manual-McCracken.pdf", // ACT manual
+    assetPath: "/insight/act-therapy-summary.json", // Summary card with link to ACT manual
     quizQ: "ACT teaches acceptance of pain while living a valued life. (T/F)",
     quizA: "T",
     releaseOffset: 5,
@@ -785,7 +785,7 @@ export const insightLibrary: Insight[] = [
     track: "StressMood",
     title: "Graded Motor Imagery",
     subtitle: "Using your mind to retrain movement",
-    assetPath: "https://www.noigroup.com/graded-motor-imagery/", // NOI Group GMI
+    assetPath: "/insight/gmi-summary.json", // Summary card with link to NOI Group
     quizQ: "Mental imagery can help reduce pain and improve movement. (T/F)",
     quizA: "T",
     releaseOffset: 1,
@@ -892,7 +892,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Pain and Emotions",
     subtitle: "The bidirectional relationship",
-    assetPath: "https://medlineplus.gov/ency/patientinstructions/000417.htm", // MedlinePlus article
+    assetPath: "/insight/pain-emotions-summary.json", // Summary card with link to MedlinePlus
     quizQ: "Emotions can influence pain perception. (T/F)",
     quizA: "T",
     releaseOffset: 4,

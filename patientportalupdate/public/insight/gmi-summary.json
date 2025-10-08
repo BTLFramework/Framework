@@ -1,0 +1,39 @@
+{
+  "slides": [
+    {
+      "id": 1,
+      "title": "Retrain Your Brain",
+      "content": "Graded Motor Imagery uses mental practice to reduce pain and improve movement",
+      "backgroundColor": "#fef3c7",
+      "textColor": "#92400e"
+    },
+    {
+      "id": 2,
+      "title": "Three Stages",
+      "content": "Progress through left/right discrimination, motor imagery, then mirror therapy",
+      "backgroundColor": "#fed7aa",
+      "textColor": "#9a3412"
+    },
+    {
+      "id": 3,
+      "title": "Brain Mapping",
+      "content": "GMI helps normalize your brain's movement maps, reducing protective pain responses",
+      "backgroundColor": "#ffedd5",
+      "textColor": "#7c2d12"
+    },
+    {
+      "id": 4,
+      "title": "Learn More",
+      "content": "Explore the NOI Group's comprehensive GMI resources and training programs",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://www.noigroup.com/graded-motor-imagery/",
+      "resourceLabel": "Visit NOI Group GMI Hub"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}
+
