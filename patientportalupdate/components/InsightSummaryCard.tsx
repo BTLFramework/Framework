@@ -122,14 +122,33 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
                   )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {tiles.map((tile, tileIdx) => (
-                    <div key={tile.id ?? tileIdx} className="bg-white rounded-xl p-4 border border-btl-200">
-                      <h5 className="font-semibold text-btl-800 mb-1">{tile.title}</h5>
-                      {tile.content && (
-                        <p className="text-sm text-btl-700 leading-relaxed">{tile.content}</p>
-                      )}
-                    </div>
-                  ))}
+                  {tiles.map((tile, tileIdx) => {
+                    const parts = (tile.content || '')
+                      .split(/\s*[•;·\-\u2022]|\.\s+/)
+                      .map(s => s.trim())
+                      .filter(Boolean)
+                      .slice(0, 2); // keep it tight like cortisol
+                    const showBullets = parts.length > 1;
+                    return (
+                      <div key={tile.id ?? tileIdx} className="bg-white rounded-xl p-4 border border-btl-200">
+                        <h5 className="font-semibold text-btl-900 mb-1">{tile.title}</h5>
+                        {tile.content && (
+                          showBullets ? (
+                            <ul className="text-sm text-btl-700 space-y-1">
+                              {parts.map((p, i) => (
+                                <li key={i} className="flex items-start">
+                                  <span className="w-1.5 h-1.5 bg-btl-600 rounded-full mt-2 mr-2"></span>
+                                  <span className="leading-relaxed">{p}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-sm text-btl-700 leading-relaxed">{tile.content}</p>
+                          )
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );
