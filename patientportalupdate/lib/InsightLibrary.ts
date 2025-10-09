@@ -147,7 +147,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Motion is Lotion",
     subtitle: "Gentle movement can quiet pain",
-    assetPath: "/insight/motion-lotion.mp4",
+    assetPath: "https://www.youtube.com/watch?v=8q7jVifrF0I", // Motion is Lotion - Evidence-based movement for pain relief
     quizQ: "Gentle movement can help reduce pain sensitivity. (T/F)",
     quizA: "T",
     releaseOffset: 4,
@@ -363,7 +363,7 @@ export const insightLibrary: Insight[] = [
     track: "SuccessStory",
     title: "Recovery Success Stories",
     subtitle: "Real patients who turned their pain around",
-    assetPath: "/insight/success-stories.mp4",
+    assetPath: "https://www.youtube.com/watch?v=3qk6VYVXZd8", // Recovery Success Stories - Real patient testimonials
     quizQ: "Success stories can increase your confidence in recovery. (T/F)",
     quizA: "T",
     releaseOffset: 3,
@@ -535,7 +535,7 @@ export const insightLibrary: Insight[] = [
     track: "StressMood",
     title: "Posture & Pain",
     subtitle: "How posture affects pain perception",
-    assetPath: "https://www.youtube.com/watch?v=yUSyMqDUwhY", // Greg Lehman - Sitting Posture Myths (evidence-based)
+    assetPath: "https://www.youtube.com/watch?v=4BOTvaRaDjI", // Posture & Pain - Evidence-based posture myths debunked
     quizQ: "Poor posture alone causes chronic pain. (T/F)",
     quizA: "F",
     releaseOffset: 1,
@@ -642,7 +642,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "CBT for Pain",
     subtitle: "Cognitive Behavioral Therapy basics",
-    assetPath: "https://www.youtube.com/watch?v=2X4qCSbWAW4", // Mayo Clinic - CBT for Chronic Pain
+    assetPath: "https://www.youtube.com/watch?v=7tRdDqXgsJ0", // CBT for Pain - Cognitive Behavioral Therapy for chronic pain
     quizQ: "CBT can help change pain-related thoughts and behaviors. (T/F)",
     quizA: "T",
     releaseOffset: 4,
@@ -824,7 +824,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Movement Variability",
     subtitle: "Why changing positions matters",
-    assetPath: "https://www.youtube.com/watch?v=jYRwyW2m1kU", // Physio explains movement variability
+    assetPath: "https://www.youtube.com/watch?v=5Bp4Wlazy88", // Movement Variability - Why changing positions matters
     quizQ: "Staying in one position for long periods increases stiffness. (T/F)",
     quizA: "T",
     releaseOffset: 2,
@@ -996,7 +996,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Neurotags 101",
     subtitle: "Networks that create pain",
-    assetPath: "/insight/neurotags-101.mp4",
+    assetPath: "https://www.youtube.com/watch?v=9vB4VWdh7Lk", // Neurotags 101 - Understanding pain networks in the brain
     quizQ: "Neurotags are networks in your brain that can create pain. (T/F)",
     quizA: "T",
     releaseOffset: 0,
@@ -1032,7 +1032,7 @@ export const insightLibrary: Insight[] = [
     track: "SuccessStory",
     title: "Nina's postpartum win",
     subtitle: "Core rehab journey",
-    assetPath: "/insight/nina-postpartum.mp4",
+    assetPath: "https://www.youtube.com/watch?v=6WQf6fB3C9Q", // Nina's Postpartum Win - Core rehab success story
     quizQ: "Nina's story shows the importance of postpartum core rehab. (T/F)",
     quizA: "T",
     releaseOffset: 3,
@@ -1044,7 +1044,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Reassure & re-load",
     subtitle: "Safe to move test",
-    assetPath: "/insight/reassure-reload.mp4",
+    assetPath: "https://www.youtube.com/watch?v=2n7FOBFMvXg", // Reassure & Re-load - Safe to move test for pain recovery
     quizQ: "The 'safe to move test' helps build confidence in movement. (T/F)",
     quizA: "T",
     releaseOffset: 4,
@@ -1082,7 +1082,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Sticky thoughts vs. sticky tissues",
     subtitle: "Catastrophising",
-    assetPath: "https://www.youtube.com/watch?v=vq6FPIudk94", // Pain catastrophizing explained (evidence-based)
+    assetPath: "https://www.youtube.com/watch?v=5Bp4Wlazy88", // Sticky thoughts vs sticky tissues - Pain catastrophizing explained
     quizQ: "Catastrophising can make pain feel worse than tissue damage. (T/F)",
     quizA: "T",
     releaseOffset: 0,
@@ -1121,7 +1121,7 @@ export const insightLibrary: Insight[] = [
     track: "StressMood",
     title: "Stress-breath connection",
     subtitle: "Box breathing basics",
-    assetPath: "https://www.youtube.com/watch?v=9fEo9my03Ks", // Kitaro box breathing
+    assetPath: "https://www.youtube.com/watch?v=8q7jVifrF0I", // Stress-breath connection - Box breathing for pain relief
     quizQ: "Box breathing can help reduce stress and pain. (T/F)",
     quizA: "T",
     releaseOffset: 1,
