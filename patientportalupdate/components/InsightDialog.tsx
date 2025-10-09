@@ -1365,13 +1365,39 @@ export default function InsightDialog({
     if (assetPath.startsWith('http://') || assetPath.startsWith('https://')) {
       const isYouTube = assetPath.includes('youtube.com') || assetPath.includes('youtu.be');
       const isPDF = assetPath.toLowerCase().endsWith('.pdf');
-      
-      // Extract YouTube video ID for embed
+
+      // Extract YouTube video ID for embed (support watch, youtu.be, embed, shorts, live)
       let youtubeEmbedUrl = '';
       if (isYouTube) {
-        const videoId = assetPath.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)?.[1];
+        const extractYouTubeId = (url: string): string | null => {
+          try {
+            // Try URL API first
+            const u = new URL(url);
+            // Standard watch URL
+            const v = u.searchParams.get('v');
+            if (v) return v;
+            // Shorts, embed, live, youtu.be
+            const path = u.pathname.split('/').filter(Boolean);
+            // youtu.be/<id>
+            if (u.hostname === 'youtu.be' && path[0]) return path[0];
+            // /embed/<id>
+            const embedIdx = path.indexOf('embed');
+            if (embedIdx !== -1 && path[embedIdx + 1]) return path[embedIdx + 1];
+            // /shorts/<id>
+            const shortsIdx = path.indexOf('shorts');
+            if (shortsIdx !== -1 && path[shortsIdx + 1]) return path[shortsIdx + 1];
+            // /live/<id>
+            const liveIdx = path.indexOf('live');
+            if (liveIdx !== -1 && path[liveIdx + 1]) return path[liveIdx + 1];
+          } catch {}
+          // Regex fallback
+          const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([^&\s?/]+)/);
+          return m?.[1] || null;
+        };
+
+        const videoId = extractYouTubeId(assetPath);
         if (videoId) {
-          youtubeEmbedUrl = `https://www.youtube.com/embed/${videoId}`;
+          youtubeEmbedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
         }
       }
 
@@ -1393,6 +1419,25 @@ export default function InsightDialog({
                   allowFullScreen
                   className="absolute top-0 left-0 w-full h-full"
                 />
+              </div>
+            )}
+            {/* Fallback: Open on YouTube if we couldn't extract an embeddable ID */}
+            {isYouTube && !youtubeEmbedUrl && (
+              <div className="p-8">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+                  <p className="text-yellow-800 mb-3 font-medium">Video embedding is unavailable for this link.</p>
+                  <a
+                    href={assetPath}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-btl-600 text-white font-semibold rounded-full hover:bg-btl-700 transition-colors shadow-lg hover:shadow-xl"
+                  >
+                    <span>Open on YouTube</span>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
               </div>
             )}
             
