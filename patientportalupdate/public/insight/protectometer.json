@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "time": "6 min",
+    "level": "Intermediate",
+    "why": "Understanding your body's protection system helps you distinguish between real danger and false alarms. This knowledge can reduce fear and increase confidence in movement."
+  },
+  "hero": {
+    "title": "Protectometer",
+    "subtitle": "Finding safety cues vs danger signals",
+    "description": "Your brain has a sophisticated protection system that can sometimes overreact. Learning to identify safety cues helps calm your nervous system and reduce unnecessary pain signals."
+  },
+  "tiles": [
+    {
+      "title": "**Danger Signals**",
+      "content": [
+        "Sudden, sharp pain with movement",
+        "Pain that worsens with activity",
+        "Swelling, redness, or heat",
+        "Loss of function or strength"
+      ]
+    },
+    {
+      "title": "**Safety Cues**",
+      "content": [
+        "Pain that improves with movement",
+        "Stiffness that warms up with activity",
+        "Pain that changes with position",
+        "No swelling or signs of inflammation"
+      ]
+    },
+    {
+      "title": "**Context Matters**",
+      "content": [
+        "Stress amplifies pain signals",
+        "Past experiences influence perception",
+        "Mood affects pain sensitivity",
+        "Social support can reduce pain"
+      ]
+    },
+    {
+      "title": "**Building Safety**",
+      "content": [
+        "Gradual exposure to feared movements",
+        "Positive movement experiences",
+        "Education about pain science",
+        "Supportive social environment"
+      ]
+    }
+  ],
+  "microAction": {
+    "title": "Safety Check",
+    "description": "Think of a movement you've been avoiding. Rate your fear level (1-10) and try a very gentle version. Notice if it's actually dangerous or just uncomfortable.",
+    "action": "Practice one 'scary' movement with 50% effort"
+  },
+  "resourceLink": "https://www.noigroup.com/protectometer/",
+  "resourceLabel": "Explore the NOI Group Protectometer tool"
+}

@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "time": "5 min",
+    "level": "Beginner",
+    "why": "Poor sleep quality can significantly worsen pain sensitivity and slow recovery. A structured wind-down routine helps signal to your body that it's time to rest and repair."
+  },
+  "hero": {
+    "title": "Sleep Wind-Down Checklist",
+    "subtitle": "CBT-I starter routine for better sleep",
+    "description": "Create a consistent pre-sleep routine that helps your body transition from wakefulness to restorative sleep. This evidence-based approach can improve sleep quality and reduce pain sensitivity."
+  },
+  "tiles": [
+    {
+      "title": "**Environment Setup**",
+      "content": [
+        "Keep bedroom cool (65-68°F)",
+        "Remove all screens 1 hour before bed",
+        "Use blackout curtains or eye mask",
+        "Keep room quiet or use white noise"
+      ]
+    },
+    {
+      "title": "**Wind-Down Activities**",
+      "content": [
+        "Gentle stretching or yoga",
+        "Reading (physical book, not screen)",
+        "Meditation or deep breathing",
+        "Journaling or gratitude practice"
+      ]
+    },
+    {
+      "title": "**Avoid Before Bed**",
+      "content": [
+        "Caffeine after 2 PM",
+        "Heavy meals within 3 hours",
+        "Intense exercise within 4 hours",
+        "Stressful conversations or work"
+      ]
+    },
+    {
+      "title": "**Consistency is Key**",
+      "content": [
+        "Same bedtime every night",
+        "Same wake time every morning",
+        "Weekend sleep-ins limited to 1 hour",
+        "Stick to routine even on difficult nights"
+      ]
+    }
+  ],
+  "microAction": {
+    "title": "Tonight's Wind-Down",
+    "description": "Choose 2-3 items from the checklist above and commit to doing them for the next 3 nights. Track how you feel in the morning.",
+    "action": "Set a phone reminder for 1 hour before your target bedtime"
+  },
+  "resourceLink": "https://www.sleepfoundation.org/sleep-hygiene",
+  "resourceLabel": "Learn more about sleep hygiene"
+}

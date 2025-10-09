@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "time": "4 min",
+    "level": "Beginner", 
+    "why": "Proper hydration is essential for maintaining healthy fascia - the connective tissue that surrounds muscles and organs. Dehydrated fascia becomes stiff and can contribute to pain and restricted movement."
+  },
+  "hero": {
+    "title": "Hydration & Fascia",
+    "subtitle": "Why water counts for pain relief",
+    "description": "Your fascia is 70% water. When dehydrated, it becomes sticky and restrictive, leading to pain and limited mobility. Proper hydration keeps fascia supple and functional."
+  },
+  "tiles": [
+    {
+      "title": "**Fascia Needs Water**",
+      "content": [
+        "Fascia is 70% water by weight",
+        "Dehydration makes fascia sticky and stiff",
+        "Well-hydrated fascia glides smoothly",
+        "Water helps remove metabolic waste"
+      ]
+    },
+    {
+      "title": "**Hydration Guidelines**",
+      "content": [
+        "Aim for 0.5-1 oz per pound body weight",
+        "Drink consistently throughout the day",
+        "Monitor urine color (pale yellow ideal)",
+        "Increase intake during exercise or heat"
+      ]
+    },
+    {
+      "title": "**Signs of Dehydration**",
+      "content": [
+        "Dark yellow or amber urine",
+        "Dry mouth and thirst",
+        "Headaches or fatigue",
+        "Muscle cramps or stiffness"
+      ]
+    },
+    {
+      "title": "**Hydration Tips**",
+      "content": [
+        "Start each day with 16-20 oz water",
+        "Keep water bottle visible and accessible",
+        "Eat water-rich foods (cucumber, watermelon)",
+        "Limit dehydrating drinks (alcohol, excess caffeine)"
+      ]
+    }
+  ],
+  "microAction": {
+    "title": "Hydration Check",
+    "description": "Check your urine color right now. If it's darker than pale yellow, drink 16-20 oz of water immediately.",
+    "action": "Set hourly water reminders on your phone"
+  },
+  "resourceLink": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3577506/",
+  "resourceLabel": "Read the research on fascia and hydration"
+}

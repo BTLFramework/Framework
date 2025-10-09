@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "time": "5 min",
+    "level": "Beginner",
+    "why": "Breaking big goals into small, achievable steps prevents overwhelm and builds confidence. This systematic approach increases your chances of success and reduces fear of failure."
+  },
+  "hero": {
+    "title": "Goal Ladder Mini-Tool",
+    "subtitle": "Break big steps down into manageable rungs",
+    "description": "Recovery goals can feel overwhelming when viewed as one big leap. A goal ladder helps you climb step by step, building confidence and momentum along the way."
+  },
+  "tiles": [
+    {
+      "title": "**Start Small**",
+      "content": [
+        "Make first step so easy you can't fail",
+        "Success builds confidence and momentum",
+        "Small wins create positive feedback loops",
+        "Each step prepares you for the next"
+      ]
+    },
+    {
+      "title": "**Make It Specific**",
+      "content": [
+        "Vague: 'Get stronger'",
+        "Specific: 'Hold a 30-second plank'",
+        "Include measurable criteria",
+        "Set clear timeframes"
+      ]
+    },
+    {
+      "title": "**Celebrate Progress**",
+      "content": [
+        "Acknowledge each completed step",
+        "Track progress visually",
+        "Share wins with support system",
+        "Use rewards that motivate you"
+      ]
+    },
+    {
+      "title": "**Adjust as Needed**",
+      "content": [
+        "Steps too hard? Make them smaller",
+        "Steps too easy? Add challenge",
+        "Life changes? Modify timeline",
+        "Stay flexible, stay committed"
+      ]
+    }
+  ],
+  "microAction": {
+    "title": "Build Your Ladder",
+    "description": "Think of one recovery goal. Break it into 5 small steps, starting with something you can do today. Write them down and commit to step 1.",
+    "action": "Complete your first ladder step within 24 hours"
+  },
+  "resourceLink": "https://www.psychologytoday.com/us/blog/the-power-prime/201201/goal-setting-why-smart-goals-are-dumb",
+  "resourceLabel": "Learn more about effective goal setting"
+}
