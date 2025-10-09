@@ -124,11 +124,11 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {tiles.map((tile, tileIdx) => {
                     const parts = (tile.content || '')
-                      .split(/\s*[•;·\-\u2022]|\.\s+/)
+                      .split(/\s*[•;·\u2022]|\.\s+/)
                       .map(s => s.trim())
                       .filter(Boolean)
                       .slice(0, 2); // keep it tight like cortisol
-                    const showBullets = parts.length > 1;
+                    const showBullets = parts.length >= 1;
                     return (
                       <div key={tile.id ?? tileIdx} className="bg-white rounded-xl p-4 border border-btl-200">
                         <h5 className="font-semibold text-btl-900 mb-1">{tile.title}</h5>
