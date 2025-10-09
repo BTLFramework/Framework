@@ -2,6 +2,7 @@
 
 import { ExternalLink, Award } from "lucide-react";
 import { useEffect, useState } from "react";
+import { BUILD_TAG } from "@/lib/buildInfo";
 
 interface SummarySlide {
   id: number;
@@ -30,7 +31,9 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(assetPath);
+        // Cache-bust to ensure we fetch latest JSON after deploy
+        const url = assetPath.includes('?') ? `${assetPath}&_b=${encodeURIComponent(BUILD_TAG)}` : `${assetPath}?_b=${encodeURIComponent(BUILD_TAG)}`;
+        const res = await fetch(url, { cache: 'no-store' });
         const json = await res.json();
         setData(json);
       } catch (e: any) {
