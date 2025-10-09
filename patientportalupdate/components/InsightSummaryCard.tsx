@@ -105,11 +105,23 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
             // Build a single 2x2 grid section like cortisol
             const remaining = data.slides.slice(1);
             // Exclude the action slide (with resourceLink) from the grid
-            const contentTiles = remaining.filter(s => !(s.resourceLink && /try this/i.test(s.title || '')));
-            // Take first 4; if fewer, pad by repeating last tile for symmetry
+            let contentTiles = remaining.filter(s => !(s.resourceLink && /try this/i.test(s.title || '')));
+            // De-duplicate by title to avoid repeated Myth vs Fact entries from source data
+            const seen = new Set<string>();
+            contentTiles = contentTiles.filter(s => {
+              const key = (s.title || '').trim().toLowerCase();
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
+            // Take up to 4 tiles
             const tiles: SummarySlide[] = contentTiles.slice(0, 4);
+            // Pad to 4 without repeating the last tile when possible (prefer duplicating a non-Myth tile)
+            const isMyth = (t?: SummarySlide) => (t?.title || '').toLowerCase().includes('myth vs fact');
             while (tiles.length > 0 && tiles.length < 4) {
-              tiles.push(tiles[tiles.length - 1]);
+              const nonMyth = tiles.find(t => !isMyth(t)) || tiles[0];
+              const candidate = nonMyth || tiles[0];
+              tiles.push({ ...candidate, id: (candidate?.id as number) + tiles.length });
             }
             if (tiles.length === 0) return null;
 
