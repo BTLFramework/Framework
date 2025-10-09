@@ -33,6 +33,13 @@
     },
     {
       "id": 5,
+      "title": "Myth vs Fact",
+      "content": "Myth: Imagery is just placebo. Fact: GMI changes brain maps and reduces pain.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#075985"
+    },
+    {
+      "id": 6,
       "title": "Try this today",
       "content": "10 left/right recognition taps: is this a left or right hand?",
       "backgroundColor": "#eff6ff",

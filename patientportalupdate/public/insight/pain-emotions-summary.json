@@ -33,6 +33,13 @@
     },
     {
       "id": 5,
+      "title": "Myth vs Fact",
+      "content": "Myth: Relaxation is avoidance. Fact: Down‑regulating threat reduces pain amplification.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#075985"
+    },
+    {
+      "id": 6,
       "title": "Try this today",
       "content": "2 minutes of slow nasal breathing (4‑6 breaths/min) during a flare.",
       "backgroundColor": "#eff6ff",
