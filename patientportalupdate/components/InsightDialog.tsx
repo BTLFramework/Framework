@@ -1397,7 +1397,7 @@ export default function InsightDialog({
 
         const videoId = extractYouTubeId(assetPath);
         if (videoId) {
-          youtubeEmbedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
+          youtubeEmbedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
         }
       }
 
