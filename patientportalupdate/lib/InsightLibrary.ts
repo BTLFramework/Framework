@@ -931,7 +931,7 @@ export const insightLibrary: Insight[] = [
     track: "SelfEfficacy",
     title: "Movement Quality vs. Quantity",
     subtitle: "Why how you move matters",
-    assetPath: "https://www.pain-ed.com/blog/2019/08/02/postureinfographic/", // Greg Lehman
+    assetPath: "/insight/movement-quality-summary.json", // Summary card replacement
     quizQ: "Quality movement is more important than sheer volume. (T/F)",
     quizA: "T",
     releaseOffset: 5,
@@ -1008,7 +1008,7 @@ export const insightLibrary: Insight[] = [
     track: "StressMood",
     title: "Gratitude & pain",
     subtitle: "Simple journal practice",
-    assetPath: "https://ggia.berkeley.edu/practice/gratitude_journal", // Berkeley Gratitude Journal
+    assetPath: "/insight/gratitude-summary.json", // Summary card replacement
     quizQ: "Gratitude practice can help reduce pain sensitivity. (T/F)",
     quizA: "T",
     releaseOffset: 1,
@@ -1020,7 +1020,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Caffeine & sleep",
     subtitle: "The 2 pm cutoff rule",
-    assetPath: "/insight/caffeine-sleep.json",
+    assetPath: "/insight/caffeine-summary.json",
     quizQ: "You should stop caffeine by 2 pm for better sleep. (T/F)",
     quizA: "T",
     releaseOffset: 2,

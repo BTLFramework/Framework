@@ -1,0 +1,17 @@
+{
+  "timeMinutes": 2,
+  "level": "Beginner",
+  "why": "Caffeine late in the day disrupts sleep architecture and recovery.",
+  "slides": [
+    { "id": 1, "title": "2 pm Cutoff", "content": "Avoid caffeine after ~2 pm to protect deep sleep quality.", "backgroundColor": "#fef9c3", "textColor": "#854d0e" },
+    { "id": 2, "title": "Dose & Drift", "content": "Caffeine half‑life ~5–6 h; quarter‑life ~10–12 h.", "backgroundColor": "#fde68a", "textColor": "#92400e" },
+    { "id": 3, "title": "Swap Smart", "content": "Choose herbal tea or decaf after lunch; hydrate steadily.", "backgroundColor": "#ffedd5", "textColor": "#9a3412" },
+    { "id": 4, "title": "Myth vs Fact", "content": "Myth: I can sleep fine after espresso. Fact: Sleep depth still suffers.", "backgroundColor": "#e0f2fe", "textColor": "#075985" },
+    { "id": 5, "title": "Try this week", "content": "Set a daily cutoff alarm; track energy and sleep over 3 days.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "/insight/caffeine-sleep.json", "resourceLabel": "View: Caffeine & Sleep Tips" }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}
+

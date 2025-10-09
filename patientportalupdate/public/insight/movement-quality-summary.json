@@ -1,0 +1,49 @@
+{
+  "timeMinutes": 2,
+  "level": "Advanced",
+  "why": "Moving with control and awareness improves outcomes more than sheer volume.",
+  "slides": [
+    {
+      "id": 1,
+      "title": "Movement Quality",
+      "content": "Quality beats quantity: focus on control, awareness, and intention.",
+      "backgroundColor": "#ecfeff",
+      "textColor": "#0e7490"
+    },
+    {
+      "id": 2,
+      "title": "Key Elements",
+      "content": "Neutral stack; smooth tempo; pain‑free range; steady breath.",
+      "backgroundColor": "#cffafe",
+      "textColor": "#155e75"
+    },
+    {
+      "id": 3,
+      "title": "Common Pitfalls",
+      "content": "Racing reps; holding breath; chasing soreness instead of control.",
+      "backgroundColor": "#bae6fd",
+      "textColor": "#0ea5e9"
+    },
+    {
+      "id": 4,
+      "title": "Myth vs Fact",
+      "content": "Myth: More reps = better. Fact: Better reps = better.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#075985"
+    },
+    {
+      "id": 5,
+      "title": "Try this today",
+      "content": "Film one set; score control 1–5; repeat set slower with steadier breath.",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://www.pain-ed.com/blog/2019/08/02/postureinfographic/",
+      "resourceLabel": "Read Greg Lehman: Posture/Myths"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}
+
