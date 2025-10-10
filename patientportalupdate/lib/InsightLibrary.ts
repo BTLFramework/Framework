@@ -324,7 +324,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Flare-Up Management",
     subtitle: "Practical strategies for managing pain spikes",
-    assetPath: "https://www.youtube.com/watch?v=JZXQYfVJ5BI", // Managing Pain Flare-Ups - Hunter Integrated Pain Service
+    assetPath: "https://www.paintoolkit.org/resources/flare-up-management/", // Pain Toolkit - Flare-Up Management Guide
     quizQ: "Flare-ups are a normal part of recovery. (T/F)",
     quizA: "T",
     releaseOffset: 2,
@@ -392,7 +392,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Pacing Strategies",
     subtitle: "Finding the right balance between rest and activity",
-    assetPath: "https://www.youtube.com/watch?v=gwd-wLdIHjs", // Pacing for Chronic Pain - NHS Grampian
+    assetPath: "https://www.painconcern.org.uk/pacing/", // NHS Pain Concern - Pacing Guide
     quizQ: "Pacing means gradually increasing activity without overloading. (T/F)",
     quizA: "T",
     releaseOffset: 4,
@@ -535,7 +535,7 @@ export const insightLibrary: Insight[] = [
     track: "StressMood",
     title: "Posture & Pain",
     subtitle: "How posture affects pain perception",
-    assetPath: "https://www.youtube.com/watch?v=yUSyMqDUwhY", // Greg Lehman - Sitting Posture Myths
+    assetPath: "https://www.pain-ed.com/blog/2019/08/02/postureinfographic/", // Greg Lehman - Posture Myths PDF
     quizQ: "Poor posture alone causes chronic pain. (T/F)",
     quizA: "F",
     releaseOffset: 1,
@@ -824,7 +824,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Movement Variability",
     subtitle: "Why changing positions matters",
-    assetPath: "https://www.youtube.com/watch?v=KQCg1sxtAy0", // Movement Variability and Pain - Evidence-based explanation
+    assetPath: "https://www.physio-pedia.com/Movement_Variability", // Physiopedia - Movement Variability in Pain Management
     quizQ: "Staying in one position for long periods increases stiffness. (T/F)",
     quizA: "T",
     releaseOffset: 2,
@@ -996,7 +996,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Neurotags 101",
     subtitle: "Networks that create pain",
-    assetPath: "https://www.youtube.com/watch?v=hQDnMUpoS2I", // Neurotags and Pain - NOI Group explanation
+    assetPath: "https://noigroup.com/neurotags/", // NOI Group - Neurotags Educational Resource
     quizQ: "Neurotags are networks in your brain that can create pain. (T/F)",
     quizA: "T",
     releaseOffset: 0,
@@ -1032,7 +1032,7 @@ export const insightLibrary: Insight[] = [
     track: "SuccessStory",
     title: "Nina's postpartum win",
     subtitle: "Core rehab journey",
-    assetPath: "https://www.youtube.com/watch?v=q9vn8aVx0bc", // Postpartum Core Rehab - Success story
+    assetPath: "https://www.physio-pedia.com/Postpartum_Core_Rehabilitation", // Physiopedia - Postpartum Core Rehabilitation Guide
     quizQ: "Nina's story shows the importance of postpartum core rehab. (T/F)",
     quizA: "T",
     releaseOffset: 3,
@@ -1082,7 +1082,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Sticky thoughts vs. sticky tissues",
     subtitle: "Catastrophising",
-    assetPath: "https://www.youtube.com/watch?v=MDhL_JRwqiQ", // Pain Catastrophizing - Clinical explanation
+    assetPath: "https://www.apa.org/ptsd-guideline/patients-and-families/cognitive-behavioral", // APA - CBT for Pain Management
     quizQ: "Catastrophising can make pain feel worse than tissue damage. (T/F)",
     quizA: "T",
     releaseOffset: 0,
