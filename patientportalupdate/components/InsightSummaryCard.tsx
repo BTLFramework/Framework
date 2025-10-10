@@ -109,7 +109,7 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
             const remaining = data.slides.slice(1);
             // Exclude the action slide (with resourceLink) from the grid
             let contentTiles = remaining.filter(s => !(s.resourceLink && /try this/i.test(s.title || '')));
-            // De-duplicate by title to avoid repeated Myth vs Fact entries from source data
+            // De-duplicate by title to avoid repeated entries from source data
             const seen = new Set<string>();
             contentTiles = contentTiles.filter(s => {
               const key = (s.title || '').trim().toLowerCase();
@@ -117,15 +117,8 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
               seen.add(key);
               return true;
             });
-            // Take up to 4 tiles
+            // Take up to 4 tiles, no padding - show exactly what we have
             const tiles: SummarySlide[] = contentTiles.slice(0, 4);
-            // Pad to 4 without repeating the last tile when possible (prefer duplicating a non-Myth tile)
-            const isMyth = (t?: SummarySlide) => (t?.title || '').toLowerCase().includes('myth vs fact');
-            while (tiles.length > 0 && tiles.length < 4) {
-              const nonMyth = tiles.find(t => !isMyth(t)) || tiles[0];
-              const candidate = nonMyth || tiles[0];
-              tiles.push({ ...candidate, id: (candidate?.id as number) + tiles.length });
-            }
             if (tiles.length === 0) return null;
 
             return (
