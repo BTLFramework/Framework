@@ -1412,27 +1412,41 @@ export default function InsightDialog({
             {/* YouTube Embed */}
             {isYouTube && youtubeEmbedUrl && (
               <>
-                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                <div className="relative w-full bg-gray-100" style={{ paddingBottom: '56.25%' }}>
                   <iframe
                     src={youtubeEmbedUrl}
                     title={insight.title}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
-                    className="absolute top-0 left-0 w-full h-full"
+                    className="absolute top-0 left-0 w-full h-full border-0"
                   />
                 </div>
-                <div className="p-4">
-                  <a
-                    href={assetPath}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-btl-600 text-white font-semibold rounded-full hover:bg-btl-700 transition-colors shadow"
-                  >
-                    <span>Open on YouTube</span>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </a>
+                {/* Always show prominent YouTube button */}
+                <div className="p-6 bg-gradient-to-br from-btl-50 to-white border-t border-btl-100">
+                  <div className="flex items-center justify-between gap-4 flex-wrap">
+                    <div className="flex-1 min-w-[200px]">
+                      <p className="text-sm text-btl-700 mb-1 font-medium">
+                        Video not loading? Some videos require viewing directly on YouTube.
+                      </p>
+                      <p className="text-xs text-btl-600">
+                        Click the button to open in a new tab →
+                      </p>
+                    </div>
+                    <a
+                      href={assetPath}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-all shadow-lg hover:shadow-xl"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                      </svg>
+                      <span>Watch on YouTube</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  </div>
                 </div>
               </>
             )}
