@@ -1121,7 +1121,7 @@ export const insightLibrary: Insight[] = [
     track: "StressMood",
     title: "Stress-breath connection",
     subtitle: "Box breathing basics",
-    assetPath: "https://www.youtube.com/watch?v=tybOi4hjZFQ", // Box Breathing Technique - Cleveland Clinic
+    assetPath: "https://www.youtube.com/watch?v=HhUoQ6gx6kE", // Kitaro Waga - How breathing affects the nervous system (science-based)
     quizQ: "Box breathing can help reduce stress and pain. (T/F)",
     quizA: "T",
     releaseOffset: 1,
