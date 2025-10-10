@@ -26,10 +26,17 @@
     },
     {
       "id": 4,
-      "title": "Myth vs Fact",
-      "content": "Myth: More reps = better. Fact: Better reps = better.",
+      "title": "Progressive Loading",
+      "content": "Start with bodyweight control; add load only when form is consistent and pain-free.",
       "backgroundColor": "#e0f2fe",
       "textColor": "#075985"
+    },
+    {
+      "id": 6,
+      "title": "Myth vs Fact",
+      "content": "Myth: More reps = better. Fact: Better reps = better.",
+      "backgroundColor": "#ecfeff",
+      "textColor": "#0e7490"
     },
     {
       "id": 5,

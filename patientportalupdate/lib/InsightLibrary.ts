@@ -324,7 +324,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Flare-Up Management",
     subtitle: "Practical strategies for managing pain spikes",
-    assetPath: "https://www.youtube.com/watch?v=xOmPfKZpzqw", // Pain Toolkit - Managing Flare-Ups
+    assetPath: "https://www.youtube.com/watch?v=JZXQYfVJ5BI", // Managing Pain Flare-Ups - Hunter Integrated Pain Service
     quizQ: "Flare-ups are a normal part of recovery. (T/F)",
     quizA: "T",
     releaseOffset: 2,
@@ -392,7 +392,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Pacing Strategies",
     subtitle: "Finding the right balance between rest and activity",
-    assetPath: "https://www.youtube.com/watch?v=pqD4vNJK8gI", // Greg Lehman - Pacing for Pain (evidence-based physio)
+    assetPath: "https://www.youtube.com/watch?v=gwd-wLdIHjs", // Pacing for Chronic Pain - NHS Grampian
     quizQ: "Pacing means gradually increasing activity without overloading. (T/F)",
     quizA: "T",
     releaseOffset: 4,
@@ -535,7 +535,7 @@ export const insightLibrary: Insight[] = [
     track: "StressMood",
     title: "Posture & Pain",
     subtitle: "How posture affects pain perception",
-    assetPath: "https://www.youtube.com/watch?v=4BOTvaRaDjI", // Posture & Pain - Evidence-based posture myths debunked
+    assetPath: "https://www.youtube.com/watch?v=yUSyMqDUwhY", // Greg Lehman - Sitting Posture Myths
     quizQ: "Poor posture alone causes chronic pain. (T/F)",
     quizA: "F",
     releaseOffset: 1,
@@ -824,7 +824,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Movement Variability",
     subtitle: "Why changing positions matters",
-    assetPath: "https://www.youtube.com/watch?v=5Bp4Wlazy88", // Movement Variability - Why changing positions matters
+    assetPath: "https://www.youtube.com/watch?v=KQCg1sxtAy0", // Movement Variability and Pain - Evidence-based explanation
     quizQ: "Staying in one position for long periods increases stiffness. (T/F)",
     quizA: "T",
     releaseOffset: 2,
@@ -996,7 +996,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Neurotags 101",
     subtitle: "Networks that create pain",
-    assetPath: "https://www.youtube.com/watch?v=9vB4VWdh7Lk", // Neurotags 101 - Understanding pain networks in the brain
+    assetPath: "https://www.youtube.com/watch?v=hQDnMUpoS2I", // Neurotags and Pain - NOI Group explanation
     quizQ: "Neurotags are networks in your brain that can create pain. (T/F)",
     quizA: "T",
     releaseOffset: 0,
@@ -1032,7 +1032,7 @@ export const insightLibrary: Insight[] = [
     track: "SuccessStory",
     title: "Nina's postpartum win",
     subtitle: "Core rehab journey",
-    assetPath: "https://www.youtube.com/watch?v=6WQf6fB3C9Q", // Nina's Postpartum Win - Core rehab success story
+    assetPath: "https://www.youtube.com/watch?v=q9vn8aVx0bc", // Postpartum Core Rehab - Success story
     quizQ: "Nina's story shows the importance of postpartum core rehab. (T/F)",
     quizA: "T",
     releaseOffset: 3,
@@ -1082,7 +1082,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Sticky thoughts vs. sticky tissues",
     subtitle: "Catastrophising",
-    assetPath: "https://www.youtube.com/watch?v=5Bp4Wlazy88", // Sticky thoughts vs sticky tissues - Pain catastrophizing explained
+    assetPath: "https://www.youtube.com/watch?v=MDhL_JRwqiQ", // Pain Catastrophizing - Clinical explanation
     quizQ: "Catastrophising can make pain feel worse than tissue damage. (T/F)",
     quizA: "T",
     releaseOffset: 0,
@@ -1121,7 +1121,7 @@ export const insightLibrary: Insight[] = [
     track: "StressMood",
     title: "Stress-breath connection",
     subtitle: "Box breathing basics",
-    assetPath: "https://www.youtube.com/watch?v=8q7jVifrF0I", // Stress-breath connection - Box breathing for pain relief
+    assetPath: "https://www.youtube.com/watch?v=tybOi4hjZFQ", // Box Breathing Technique - Cleveland Clinic
     quizQ: "Box breathing can help reduce stress and pain. (T/F)",
     quizA: "T",
     releaseOffset: 1,

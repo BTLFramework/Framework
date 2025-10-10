@@ -6,7 +6,8 @@
     { "id": 1, "title": "Why Gratitude?", "content": "Shifts attention to safety and support; reduces stress load.", "backgroundColor": "#f0fdf4", "textColor": "#166534" },
     { "id": 2, "title": "How to Start", "content": "Write 2–3 specifics; include why they mattered today.", "backgroundColor": "#dcfce7", "textColor": "#166534" },
     { "id": 3, "title": "Make it Stick", "content": "Same time daily; small wins; share with a partner.", "backgroundColor": "#bbf7d0", "textColor": "#15803d" },
-    { "id": 4, "title": "Myth vs Fact", "content": "Myth: Toxic positivity. Fact: Honest gratitude can co‑exist with pain.", "backgroundColor": "#e0f2fe", "textColor": "#075985" },
+    { "id": 4, "title": "Research Evidence", "content": "Studies show gratitude practice activates reward pathways and reduces inflammatory markers.", "backgroundColor": "#e0f2fe", "textColor": "#075985" },
+    { "id": 6, "title": "Myth vs Fact", "content": "Myth: Toxic positivity. Fact: Honest gratitude can co‑exist with pain.", "backgroundColor": "#f0fdf4", "textColor": "#166534" },
     { "id": 5, "title": "Try this tonight", "content": "Jot 3 lines: what happened; why it mattered; what it helps you do tomorrow.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://ggia.berkeley.edu/practice/gratitude_journal", "resourceLabel": "Berkeley: Gratitude Journal" }
   ],
   "autoplay": false,
