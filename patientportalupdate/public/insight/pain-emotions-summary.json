@@ -26,8 +26,8 @@
     },
     {
       "id": 4,
-      "title": "Myth vs Fact",
-      "content": "Myth: Pain is purely physical. Fact: Emotions and thoughts modulate pain perception.",
+      "title": "Shared Brain Pathways",
+      "content": "Pain and emotional processing share brain regions, explaining why stress, anxiety, and depression amplify pain signals.",
       "backgroundColor": "#e0f2fe",
       "textColor": "#075985"
     },
@@ -37,6 +37,13 @@
       "content": "Emotional regulation techniques like deep breathing and mindfulness can be used during pain flares to reduce intensity.",
       "backgroundColor": "#f0fdf4",
       "textColor": "#166534"
+    },
+    {
+      "id": 7,
+      "title": "Myth vs Fact",
+      "content": "Myth: Pain is purely physical. Fact: Emotions and thoughts modulate pain perception.",
+      "backgroundColor": "#fce7f3",
+      "textColor": "#be185d"
     },
     {
       "id": 6,

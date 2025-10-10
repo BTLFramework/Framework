@@ -26,10 +26,17 @@
     },
     {
       "id": 4,
-      "title": "Myth vs Fact",
-      "content": "Myth: You can catch up on weekends. Fact: Irregular patterns still impair recovery.",
+      "title": "Sleep Architecture",
+      "content": "Deep sleep and REM cycles are crucial for tissue repair and memory consolidation during recovery.",
       "backgroundColor": "#e0f2fe",
       "textColor": "#075985"
+    },
+    {
+      "id": 6,
+      "title": "Myth vs Fact",
+      "content": "Myth: You can catch up on weekends. Fact: Irregular patterns still impair recovery.",
+      "backgroundColor": "#dbeafe",
+      "textColor": "#1e40af"
     },
     {
       "id": 5,

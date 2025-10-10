@@ -26,10 +26,17 @@
     },
     {
       "id": 4,
-      "title": "Myth vs Fact",
-      "content": "Myth: All fats are bad. Fact: Omega‑3 fats are anti‑inflammatory and beneficial.",
+      "title": "Omega-3 Benefits",
+      "content": "Fatty fish, walnuts, and flaxseeds provide omega-3s that reduce inflammatory markers and support healing.",
       "backgroundColor": "#e0f2fe",
       "textColor": "#075985"
+    },
+    {
+      "id": 6,
+      "title": "Myth vs Fact",
+      "content": "Myth: All fats are bad. Fact: Omega‑3 fats are anti‑inflammatory and beneficial.",
+      "backgroundColor": "#f0fdf4",
+      "textColor": "#166534"
     },
     {
       "id": 5,

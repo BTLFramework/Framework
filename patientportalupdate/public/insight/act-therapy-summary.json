@@ -26,10 +26,17 @@
     },
     {
       "id": 4,
-      "title": "Myth vs Fact",
-      "content": "Myth: Acceptance means giving up. Fact: It frees energy to pursue what matters.",
+      "title": "Values-Based Action",
+      "content": "ACT helps you take meaningful action aligned with your values, even when pain is present.",
       "backgroundColor": "#e0f2fe",
       "textColor": "#075985"
+    },
+    {
+      "id": 6,
+      "title": "Myth vs Fact",
+      "content": "Myth: Acceptance means giving up. Fact: It frees energy to pursue what matters.",
+      "backgroundColor": "#faf5ff",
+      "textColor": "#6b21a8"
     },
     {
       "id": 5,

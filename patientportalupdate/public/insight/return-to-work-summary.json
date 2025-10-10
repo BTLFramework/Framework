@@ -26,10 +26,17 @@
     },
     {
       "id": 4,
-      "title": "Myth vs Fact",
-      "content": "Myth: Wait until pain is 0/10. Fact: Graded exposure is safe and effective.",
+      "title": "Fear-Avoidance Cycle",
+      "content": "Avoiding work can increase fear and disability. Gradual return builds confidence and breaks the pain-fear cycle.",
       "backgroundColor": "#e0f2fe",
       "textColor": "#075985"
+    },
+    {
+      "id": 6,
+      "title": "Myth vs Fact",
+      "content": "Myth: Wait until pain is 0/10. Fact: Graded exposure is safe and effective.",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#1e40af"
     },
     {
       "id": 5,

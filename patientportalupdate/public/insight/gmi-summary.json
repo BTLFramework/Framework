@@ -26,8 +26,8 @@
     },
     {
       "id": 4,
-      "title": "Myth vs Fact",
-      "content": "Myth: Only hard exercise helps pain. Fact: Imagery and mapping can reduce pain too.",
+      "title": "Clinical Applications",
+      "content": "GMI is effective for complex regional pain syndrome, phantom limb pain, and chronic musculoskeletal conditions.",
       "backgroundColor": "#e0f2fe",
       "textColor": "#075985"
     },
@@ -37,6 +37,13 @@
       "content": "GMI is supported by neuroscience research showing measurable brain changes and pain reduction in clinical trials.",
       "backgroundColor": "#f0fdf4",
       "textColor": "#166534"
+    },
+    {
+      "id": 7,
+      "title": "Myth vs Fact",
+      "content": "Myth: Only hard exercise helps pain. Fact: Imagery and mapping can reduce pain too.",
+      "backgroundColor": "#fef3c7",
+      "textColor": "#92400e"
     },
     {
       "id": 6,
