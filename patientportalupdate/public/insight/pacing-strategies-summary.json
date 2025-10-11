@@ -1,0 +1,55 @@
+{
+  "timeMinutes": 3,
+  "level": "Intermediate",
+  "why": "Pacing helps you build activity tolerance gradually without triggering flare-ups or setbacks.",
+  "slides": [
+    {
+      "id": 1,
+      "title": "Pacing Strategies",
+      "content": "Pacing means gradually increasing activity while staying within your body's current tolerance levels",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#075985"
+    },
+    {
+      "id": 2,
+      "title": "The 50% Rule",
+      "content": "Start with 50% of what you think you can do, then gradually increase by 10-20% weekly if no flare-ups",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#0c4a6e"
+    },
+    {
+      "id": 3,
+      "title": "Activity Planning",
+      "content": "Break activities into smaller chunks; take regular breaks; alternate between different types of tasks",
+      "backgroundColor": "#bae6fd",
+      "textColor": "#075985"
+    },
+    {
+      "id": 4,
+      "title": "Flare-Up Prevention",
+      "content": "Listen to early warning signs; stop before you're exhausted; plan rest periods throughout the day",
+      "backgroundColor": "#7dd3fc",
+      "textColor": "#0c4a6e"
+    },
+    {
+      "id": 6,
+      "title": "Myth vs Fact",
+      "content": "Myth: Push through pain to build tolerance. Fact: Gradual pacing prevents setbacks and builds confidence.",
+      "backgroundColor": "#38bdf8",
+      "textColor": "#075985"
+    },
+    {
+      "id": 5,
+      "title": "Try this today",
+      "content": "Plan tomorrow's activities using the 50% rule; schedule regular breaks every 30-45 minutes",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://www.painconcern.org.uk/pacing/",
+      "resourceLabel": "Read NHS Pacing Guide"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}

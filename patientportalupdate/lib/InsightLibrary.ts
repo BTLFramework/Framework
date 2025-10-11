@@ -392,7 +392,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Pacing Strategies",
     subtitle: "Finding the right balance between rest and activity",
-    assetPath: "https://www.painconcern.org.uk/pacing/", // NHS Pain Concern - Pacing Guide
+    assetPath: "/insight/pacing-strategies-summary.json", // Summary card with link to NHS pacing guide
     quizQ: "Pacing means gradually increasing activity without overloading. (T/F)",
     quizA: "T",
     releaseOffset: 4,
@@ -535,7 +535,7 @@ export const insightLibrary: Insight[] = [
     track: "StressMood",
     title: "Posture & Pain",
     subtitle: "How posture affects pain perception",
-    assetPath: "https://www.pain-ed.com/blog/2019/08/02/postureinfographic/", // Greg Lehman - Posture Myths PDF
+    assetPath: "/insight/posture-pain-summary.json", // Summary card with link to Greg Lehman guide
     quizQ: "Poor posture alone causes chronic pain. (T/F)",
     quizA: "F",
     releaseOffset: 1,
@@ -824,7 +824,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Movement Variability",
     subtitle: "Why changing positions matters",
-    assetPath: "https://www.physio-pedia.com/Movement_Variability", // Physiopedia - Movement Variability in Pain Management
+    assetPath: "/insight/movement-variability-summary.json", // Summary card with link to Physiopedia guide
     quizQ: "Staying in one position for long periods increases stiffness. (T/F)",
     quizA: "T",
     releaseOffset: 2,
@@ -996,7 +996,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Neurotags 101",
     subtitle: "Networks that create pain",
-    assetPath: "https://noigroup.com/neurotags/", // NOI Group - Neurotags Educational Resource
+    assetPath: "/insight/neurotags-summary.json", // Summary card with link to NOI Group guide
     quizQ: "Neurotags are networks in your brain that can create pain. (T/F)",
     quizA: "T",
     releaseOffset: 0,
@@ -1082,7 +1082,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Sticky thoughts vs. sticky tissues",
     subtitle: "Catastrophising",
-    assetPath: "https://www.apa.org/ptsd-guideline/patients-and-families/cognitive-behavioral", // APA - CBT for Pain Management
+    assetPath: "/insight/sticky-thoughts-summary.json", // Summary card with link to APA CBT guide
     quizQ: "Catastrophising can make pain feel worse than tissue damage. (T/F)",
     quizA: "T",
     releaseOffset: 0,

@@ -1,0 +1,55 @@
+{
+  "timeMinutes": 2,
+  "level": "Intermediate",
+  "why": "Changing positions regularly prevents stiffness and reduces pain by keeping tissues mobile and circulation flowing.",
+  "slides": [
+    {
+      "id": 1,
+      "title": "Movement Variability",
+      "content": "Varying your positions and movements throughout the day prevents stiffness and reduces pain",
+      "backgroundColor": "#ecfdf5",
+      "textColor": "#065f46"
+    },
+    {
+      "id": 2,
+      "title": "Why It Matters",
+      "content": "Staying in one position for too long can increase stiffness, reduce circulation, and amplify pain signals",
+      "backgroundColor": "#d1fae5",
+      "textColor": "#047857"
+    },
+    {
+      "id": 3,
+      "title": "Practical Tips",
+      "content": "Set hourly reminders to change positions; alternate sitting and standing; take micro-breaks every 30 minutes",
+      "backgroundColor": "#a7f3d0",
+      "textColor": "#059669"
+    },
+    {
+      "id": 4,
+      "title": "Evidence Base",
+      "content": "Research shows that movement variability reduces musculoskeletal pain and improves function in office workers",
+      "backgroundColor": "#6ee7b7",
+      "textColor": "#10b981"
+    },
+    {
+      "id": 6,
+      "title": "Myth vs Fact",
+      "content": "Myth: Rest is always best for pain. Fact: Gentle movement often reduces stiffness and pain.",
+      "backgroundColor": "#34d399",
+      "textColor": "#059669"
+    },
+    {
+      "id": 5,
+      "title": "Try this today",
+      "content": "Set 3 phone alarms for position changes; do 2-minute movement breaks at each alarm",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://www.physio-pedia.com/Movement_Variability",
+      "resourceLabel": "Read Physiopedia Guide"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}

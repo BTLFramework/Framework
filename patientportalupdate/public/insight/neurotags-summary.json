@@ -1,0 +1,55 @@
+{
+  "timeMinutes": 3,
+  "level": "Advanced",
+  "why": "Understanding neurotags helps you recognize how your brain creates pain patterns and how to change them.",
+  "slides": [
+    {
+      "id": 1,
+      "title": "Neurotags 101",
+      "content": "Neurotags are networks in your brain that can create pain even when tissues are healing",
+      "backgroundColor": "#f3e8ff",
+      "textColor": "#6b21a8"
+    },
+    {
+      "id": 2,
+      "title": "Brain Networks",
+      "content": "Your brain has millions of connections that can amplify or reduce pain signals based on context and experience",
+      "backgroundColor": "#e9d5ff",
+      "textColor": "#7c3aed"
+    },
+    {
+      "id": 3,
+      "title": "Changing Patterns",
+      "content": "Through movement, education, and positive experiences, you can rewire these networks to reduce pain sensitivity",
+      "backgroundColor": "#ddd6fe",
+      "textColor": "#8b5cf6"
+    },
+    {
+      "id": 4,
+      "title": "Clinical Applications",
+      "content": "Neurotag training is used in chronic pain management, phantom limb pain, and complex regional pain syndrome",
+      "backgroundColor": "#c4b5fd",
+      "textColor": "#a855f7"
+    },
+    {
+      "id": 6,
+      "title": "Myth vs Fact",
+      "content": "Myth: Only hard exercise helps pain. Fact: Imagery and mapping can reduce pain too.",
+      "backgroundColor": "#a78bfa",
+      "textColor": "#c084fc"
+    },
+    {
+      "id": 5,
+      "title": "Try this today",
+      "content": "10 left/right recognition taps: is this a left or right hand?",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://noigroup.com/neurotags/",
+      "resourceLabel": "Read NOI Group Guide"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}

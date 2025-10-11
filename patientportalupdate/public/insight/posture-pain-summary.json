@@ -1,0 +1,55 @@
+{
+  "timeMinutes": 3,
+  "level": "Intermediate",
+  "why": "Understanding the real relationship between posture and pain helps you move with confidence instead of fear.",
+  "slides": [
+    {
+      "id": 1,
+      "title": "Posture & Pain",
+      "content": "Poor posture alone rarely causes chronic pain; movement patterns and stress play bigger roles",
+      "backgroundColor": "#fef3c7",
+      "textColor": "#92400e"
+    },
+    {
+      "id": 2,
+      "title": "The Real Story",
+      "content": "Research shows that 'perfect' posture doesn't prevent pain, but movement variability and strength do",
+      "backgroundColor": "#fde68a",
+      "textColor": "#b45309"
+    },
+    {
+      "id": 3,
+      "title": "Movement Matters",
+      "content": "Focus on moving frequently, varying positions, and building strength rather than maintaining 'perfect' posture",
+      "backgroundColor": "#fcd34d",
+      "textColor": "#d97706"
+    },
+    {
+      "id": 4,
+      "title": "Stress Connection",
+      "content": "Psychological stress and tension often contribute more to 'posture pain' than actual spinal alignment",
+      "backgroundColor": "#fbbf24",
+      "textColor": "#ea580c"
+    },
+    {
+      "id": 6,
+      "title": "Myth vs Fact",
+      "content": "Myth: Perfect posture prevents all pain. Fact: Movement variability and stress management matter more.",
+      "backgroundColor": "#f59e0b",
+      "textColor": "#dc2626"
+    },
+    {
+      "id": 5,
+      "title": "Try this today",
+      "content": "Set hourly reminders to change positions; focus on comfort over 'perfect' posture",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://www.pain-ed.com/blog/2019/08/02/postureinfographic/",
+      "resourceLabel": "Read Greg Lehman Guide"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}

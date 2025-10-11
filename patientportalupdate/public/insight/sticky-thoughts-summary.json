@@ -1,0 +1,55 @@
+{
+  "timeMinutes": 3,
+  "level": "Intermediate",
+  "why": "Understanding catastrophizing helps you recognize when your thoughts are amplifying pain and how to manage them.",
+  "slides": [
+    {
+      "id": 1,
+      "title": "Sticky Thoughts vs. Sticky Tissues",
+      "content": "Catastrophizing thoughts can make pain feel worse than the actual tissue damage",
+      "backgroundColor": "#fef2f2",
+      "textColor": "#991b1b"
+    },
+    {
+      "id": 2,
+      "title": "What is Catastrophizing?",
+      "content": "Rumination on pain sensations, magnification of pain meaning, and helplessness about pain management",
+      "backgroundColor": "#fee2e2",
+      "textColor": "#dc2626"
+    },
+    {
+      "id": 3,
+      "title": "The Impact",
+      "content": "Catastrophizing increases pain intensity, disability, and emotional distress; it's a stronger predictor than physical factors",
+      "backgroundColor": "#fecaca",
+      "textColor": "#ef4444"
+    },
+    {
+      "id": 4,
+      "title": "Breaking the Cycle",
+      "content": "CBT techniques like thought challenging, mindfulness, and activity pacing can reduce catastrophizing",
+      "backgroundColor": "#fca5a5",
+      "textColor": "#f87171"
+    },
+    {
+      "id": 6,
+      "title": "Myth vs Fact",
+      "content": "Myth: Pain is purely physical. Fact: Thoughts and emotions significantly influence pain perception.",
+      "backgroundColor": "#f87171",
+      "textColor": "#dc2626"
+    },
+    {
+      "id": 5,
+      "title": "Try this today",
+      "content": "Notice when thoughts spiral; ask 'Is this thought helpful?' and gently redirect to present moment",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://www.apa.org/ptsd-guideline/patients-and-families/cognitive-behavioral",
+      "resourceLabel": "Read APA CBT Guide"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}
