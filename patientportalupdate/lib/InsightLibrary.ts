@@ -246,7 +246,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Understanding Your Pain",
     subtitle: "Pain neuroscience basics to reframe pain safely",
-    assetPath: "https://www.youtube.com/watch?v=C_3phB93rvI", // Brainman explains pain
+    assetPath: "https://ed.ted.com/lessons/understanding-pain-in-less-than-5-minutes", // TED-Ed: Understanding Pain in less than 5 minutes
     quizQ: "Pain is always a sign of tissue damage. (T/F)",
     quizA: "F",
     releaseOffset: 0,
