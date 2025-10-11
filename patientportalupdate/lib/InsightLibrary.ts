@@ -147,7 +147,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Motion is Lotion",
     subtitle: "Gentle movement can quiet pain",
-    assetPath: "https://www.youtube.com/watch?v=8q7jVifrF0I", // Motion is Lotion - Evidence-based movement for pain relief
+    assetPath: "https://news.va.gov/120682/live-whole-health-174-motion-is-lotion/", // VA Live Whole Health - Motion is Lotion (article + follow-along video)
     quizQ: "Gentle movement can help reduce pain sensitivity. (T/F)",
     quizA: "T",
     releaseOffset: 4,
@@ -535,7 +535,7 @@ export const insightLibrary: Insight[] = [
     track: "StressMood",
     title: "Posture & Pain",
     subtitle: "How posture affects pain perception",
-    assetPath: "/insight/posture-pain-summary.json", // Summary card with link to Greg Lehman guide
+    assetPath: "https://www.youtube.com/watch?v=HvKXdbZA5Gg", // Body Logic Physio - Posture and Pain (test embedding)
     quizQ: "Poor posture alone causes chronic pain. (T/F)",
     quizA: "F",
     releaseOffset: 1,
@@ -824,7 +824,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Movement Variability",
     subtitle: "Why changing positions matters",
-    assetPath: "/insight/movement-variability-summary.json", // Summary card with link to Physiopedia guide
+    assetPath: "https://www.youtube.com/watch?v=pxEVBVlHpQE", // Greg Lehman - When Biomechanics Doesn't Matter (SD Pain Summit)
     quizQ: "Staying in one position for long periods increases stiffness. (T/F)",
     quizA: "T",
     releaseOffset: 2,
@@ -996,7 +996,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Neurotags 101",
     subtitle: "Networks that create pain",
-    assetPath: "/insight/neurotags-summary.json", // Summary card with link to NOI Group guide
+    assetPath: "https://vimeo.com/1088966471", // Pain Neuroscience Education - Vimeo (embedding-friendly)
     quizQ: "Neurotags are networks in your brain that can create pain. (T/F)",
     quizA: "T",
     releaseOffset: 0,
@@ -1082,7 +1082,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Sticky thoughts vs. sticky tissues",
     subtitle: "Catastrophising",
-    assetPath: "/insight/sticky-thoughts-summary.json", // Summary card with link to APA CBT guide
+    assetPath: "https://www.youtube.com/watch?v=OhNm7ZSiZls", // Russ Harris - Cognitive Defusion for Pain Management
     quizQ: "Catastrophising can make pain feel worse than tissue damage. (T/F)",
     quizA: "T",
     releaseOffset: 0,
