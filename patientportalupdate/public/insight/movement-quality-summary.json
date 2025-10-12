@@ -5,29 +5,29 @@
   "slides": [
     {
       "id": 1,
-      "title": "Movement Quality",
-      "content": "Research shows that movement quality (control, awareness, intention) often matters more than sheer volume or intensity.",
+      "title": "Movement Optimism",
+      "content": "Greg Lehman's approach: the body has amazing ability to adapt to different positions and stresses - there's no single 'correct' way to move.",
       "backgroundColor": "#ecfeff",
       "textColor": "#0e7490"
     },
     {
       "id": 2,
-      "title": "Evidence-Based Approach",
-      "content": "Focus on pain-free movement patterns, smooth tempo, and maintaining good form rather than pushing through pain.",
+      "title": "Quality vs. Quantity",
+      "content": "Focus on movement that feels good and pain-free rather than chasing perfect form or high volume - respect your body's natural adaptations.",
       "backgroundColor": "#cffafe",
       "textColor": "#155e75"
     },
     {
       "id": 3,
-      "title": "Common Mistakes",
-      "content": "Racing through reps, ignoring pain signals, prioritizing quantity over control, and holding breath during movement.",
+      "title": "Individual Variability",
+      "content": "Factors like foot pronation are natural load-absorbing mechanisms, not flaws to fix - embrace your body's unique movement patterns.",
       "backgroundColor": "#bae6fd",
       "textColor": "#0ea5e9"
     },
     {
       "id": 4,
-      "title": "Progressive Approach",
-      "content": "Start with bodyweight control and pain-free range; gradually increase load only when movement quality is consistent.",
+      "title": "Adaptive Capacity",
+      "content": "The body is resilient and can adapt to different stresses without inherent risk - movement quality means working with your body, not against it.",
       "backgroundColor": "#e0f2fe",
       "textColor": "#075985"
     },
@@ -44,8 +44,8 @@
       "content": "Film one set; score control 1–5; repeat set slower with steadier breath.",
       "backgroundColor": "#eff6ff",
       "textColor": "#1e40af",
-      "resourceLink": "https://www.physio-pedia.com/Movement_Quality",
-      "resourceLabel": "Read Physiopedia: Movement Quality"
+      "resourceLink": "https://www.practicehuman.com/podcast-episodes/ep-046-greg-lehman-building-a-healthy-movement-ecosystem/",
+      "resourceLabel": "Listen: Greg Lehman on Movement Optimism"
     }
   ],
   "autoplay": false,
