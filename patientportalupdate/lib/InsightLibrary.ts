@@ -89,7 +89,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Sleep debt + pain sensitivity",
     subtitle: "Less sleep, louder pain",
-    assetPath: "/insight/sleep-carousel.json",
+    assetPath: "/insight/sleep-recovery-summary.json",
     quizQ: "Sleeping < 6 h raises pain sensitivity by about 20 %. (T/F)",
     quizA: "T",
     releaseOffset: 2,
