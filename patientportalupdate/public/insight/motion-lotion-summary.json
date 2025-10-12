@@ -1,0 +1,55 @@
+{
+  "timeMinutes": 2,
+  "level": "Beginner",
+  "why": "Gentle movement helps reduce pain sensitivity and keeps tissues mobile without overloading.",
+  "slides": [
+    {
+      "id": 1,
+      "title": "Motion is Lotion",
+      "content": "Gentle movement helps reduce pain sensitivity and keeps tissues mobile without overloading",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#075985"
+    },
+    {
+      "id": 2,
+      "title": "Why It Works",
+      "content": "Movement increases circulation, reduces stiffness, and can calm the nervous system's pain response",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#0c4a6e"
+    },
+    {
+      "id": 3,
+      "title": "Gentle Movement",
+      "content": "Start slow and small; pain-free range only; focus on quality over quantity; listen to your body",
+      "backgroundColor": "#bae6fd",
+      "textColor": "#075985"
+    },
+    {
+      "id": 4,
+      "title": "Evidence Base",
+      "content": "Research shows that gentle movement can reduce pain sensitivity and improve function in chronic pain conditions",
+      "backgroundColor": "#7dd3fc",
+      "textColor": "#0c4a6e"
+    },
+    {
+      "id": 6,
+      "title": "Myth vs Fact",
+      "content": "Myth: Movement makes pain worse. Fact: Gentle movement often reduces pain and stiffness.",
+      "backgroundColor": "#38bdf8",
+      "textColor": "#075985"
+    },
+    {
+      "id": 5,
+      "title": "Try this today",
+      "content": "5 minutes of gentle movement every hour; walking, stretching, or simple range of motion exercises",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://www.arthritis.ca/treatment/physical-activity-guide/",
+      "resourceLabel": "Read Arthritis Society Guide"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}

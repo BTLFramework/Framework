@@ -147,7 +147,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Motion is Lotion",
     subtitle: "Gentle movement can quiet pain",
-    assetPath: "https://news.va.gov/120682/live-whole-health-174-motion-is-lotion/", // VA Live Whole Health - Motion is Lotion (article + follow-along video)
+    assetPath: "/insight/motion-lotion-summary.json", // Summary card with movement science content
     quizQ: "Gentle movement can help reduce pain sensitivity. (T/F)",
     quizA: "T",
     releaseOffset: 4,
@@ -824,7 +824,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Movement Variability",
     subtitle: "Why changing positions matters",
-    assetPath: "https://www.youtube.com/watch?v=pxEVBVlHpQE", // Greg Lehman - When Biomechanics Doesn't Matter (SD Pain Summit)
+    assetPath: "/insight/movement-variability-summary.json", // Summary card with link to Physiopedia guide
     quizQ: "Staying in one position for long periods increases stiffness. (T/F)",
     quizA: "T",
     releaseOffset: 2,
@@ -996,7 +996,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Neurotags 101",
     subtitle: "Networks that create pain",
-    assetPath: "https://vimeo.com/1088966471", // Pain Neuroscience Education - Vimeo (embedding-friendly)
+    assetPath: "/insight/neurotags-summary.json", // Summary card with link to NOI Group guide
     quizQ: "Neurotags are networks in your brain that can create pain. (T/F)",
     quizA: "T",
     releaseOffset: 0,
