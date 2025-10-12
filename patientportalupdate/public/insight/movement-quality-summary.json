@@ -6,28 +6,28 @@
     {
       "id": 1,
       "title": "Movement Quality",
-      "content": "Quality beats quantity: focus on control, awareness, and intention.",
+      "content": "Research shows that movement quality (control, awareness, intention) often matters more than sheer volume or intensity.",
       "backgroundColor": "#ecfeff",
       "textColor": "#0e7490"
     },
     {
       "id": 2,
-      "title": "Key Elements",
-      "content": "Neutral stack; smooth tempo; pain‑free range; steady breath.",
+      "title": "Evidence-Based Approach",
+      "content": "Focus on pain-free movement patterns, smooth tempo, and maintaining good form rather than pushing through pain.",
       "backgroundColor": "#cffafe",
       "textColor": "#155e75"
     },
     {
       "id": 3,
-      "title": "Common Pitfalls",
-      "content": "Racing reps; holding breath; chasing soreness instead of control.",
+      "title": "Common Mistakes",
+      "content": "Racing through reps, ignoring pain signals, prioritizing quantity over control, and holding breath during movement.",
       "backgroundColor": "#bae6fd",
       "textColor": "#0ea5e9"
     },
     {
       "id": 4,
-      "title": "Progressive Loading",
-      "content": "Start with bodyweight control; add load only when form is consistent and pain-free.",
+      "title": "Progressive Approach",
+      "content": "Start with bodyweight control and pain-free range; gradually increase load only when movement quality is consistent.",
       "backgroundColor": "#e0f2fe",
       "textColor": "#075985"
     },
@@ -44,8 +44,8 @@
       "content": "Film one set; score control 1–5; repeat set slower with steadier breath.",
       "backgroundColor": "#eff6ff",
       "textColor": "#1e40af",
-      "resourceLink": "https://www.greglehman.ca/",
-      "resourceLabel": "Visit Greg Lehman's Website"
+      "resourceLink": "https://www.physio-pedia.com/Movement_Quality",
+      "resourceLabel": "Read Physiopedia: Movement Quality"
     }
   ],
   "autoplay": false,
