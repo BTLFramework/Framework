@@ -246,7 +246,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "Understanding Your Pain",
     subtitle: "Pain neuroscience basics to reframe pain safely",
-    assetPath: "https://www.youtube.com/watch?v=gkswC8Y2pYY", // TED-Ed: The Mysterious Science of Pain - Joshua W. Pate (embeddable)
+    assetPath: "https://vimeo.com/245179549", // Understanding Pain in less than 5 minutes - Vimeo (reliable embedding)
     quizQ: "Pain is always a sign of tissue damage. (T/F)",
     quizA: "F",
     releaseOffset: 0,
