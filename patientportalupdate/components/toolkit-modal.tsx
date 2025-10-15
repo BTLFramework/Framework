@@ -740,7 +740,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             type: "mindfulness",
             topic: "pain-management",
             url: "https://www.youtube.com/watch?v=lcUlprEmMtA",
-            backupUrl: "https://www.youtube.com/watch?v=BqLDxLzw6Pk"
+            backupUrl: "https://www.youtube.com/watch?v=11MlZ_XxGOY"
           },
           {
             title: "Progressive Muscle Relaxation",
@@ -760,7 +760,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             type: "mindfulness",
             topic: "mindfulness",
             url: "https://www.youtube.com/playlist?list=PLbiVpU59JkVaFMGi0A8Im_hfSh-SWsFwg",
-            backupUrl: "https://palousemindfulness.com/meditations/bodyscan20min.html"
+            backupUrl: "https://www.youtube.com/watch?v=OHRfUWdgflM"
           },
           {
             title: "Visualization for Recovery",
@@ -773,14 +773,14 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             backupUrl: "https://www.youtube.com/watch?v=fWYUJscRBRw"
           },
           {
-            title: "Positive Affirmations Breathwork (Kitaro)",
-            description: "Breath-led self-compassion and positive affirmations to shift state",
+            title: "Gratitude & Kindness Breathwork (Kitaro)",
+            description: "Guided breathwork flow to build gratitude and kindness",
             duration: "10-15 min",
             difficulty: "Intermediate",
             type: "mindfulness",
             topic: "mindset",
-            url: "https://www.youtube.com/watch?v=CgYl8P4rTU0",
-            backupUrl: "https://www.uclahealth.org/uclamindful/guided-meditations"
+            url: "https://www.youtube.com/watch?v=YiALs5nSoQU",
+            backupUrl: "https://www.youtube.com/watch?v=CgYl8P4rTU0"
           },
           {
             title: "Mindful Movement Awareness",
@@ -790,7 +790,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             type: "mindfulness",
             topic: "movement",
             url: "https://www.youtube.com/watch?v=9hSL89IgRg4",
-            backupUrl: "https://www.youtube.com/playlist?list=PLFv7LsNjAzXjitsgPh_MdmCuqh9FJYHUs"
+            backupUrl: "https://www.youtube.com/watch?v=Ac2T1RzG6as"
           },
           {
             title: "Stress Response Regulation",
@@ -799,8 +799,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             difficulty: "Intermediate",
             type: "mindfulness",
             topic: "flare-ups",
-            url: "https://www.youtube.com/watch?v=9fEo9my03Ks",
-            backupUrl: "https://www.youtube.com/playlist?list=PLFv7LsNjAzXjitsgPh_MdmCuqh9FJYHUs"
+            url: "https://www.youtube.com/watch?v=HhUoQ6gx6kE",
+            backupUrl: "https://www.youtube.com/watch?v=9fEo9my03Ks"
           },
           {
             title: "Mindful Pain Observation",
