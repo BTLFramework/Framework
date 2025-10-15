@@ -773,13 +773,13 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             backupUrl: "https://www.youtube.com/watch?v=fWYUJscRBRw"
           },
           {
-            title: "Loving-Kindness Meditation",
-            description: "Cultivating compassion for yourself and your recovery journey",
+            title: "Positive Affirmations Breathwork (Kitaro)",
+            description: "Breath-led self-compassion and positive affirmations to shift state",
             duration: "10-15 min",
             difficulty: "Intermediate",
             type: "mindfulness",
             topic: "mindset",
-            url: "https://www.youtube.com/playlist?list=PLFv7LsNjAzXjitsgPh_MdmCuqh9FJYHUs",
+            url: "https://www.youtube.com/watch?v=CgYl8P4rTU0",
             backupUrl: "https://www.uclahealth.org/uclamindful/guided-meditations"
           },
           {
@@ -800,7 +800,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             type: "mindfulness",
             topic: "flare-ups",
             url: "https://www.youtube.com/watch?v=9fEo9my03Ks",
-            backupUrl: "https://www.youtube.com/watch?v=CgYl8P4rTU0"
+            backupUrl: "https://www.youtube.com/playlist?list=PLFv7LsNjAzXjitsgPh_MdmCuqh9FJYHUs"
           },
           {
             title: "Mindful Pain Observation",
