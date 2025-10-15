@@ -1551,7 +1551,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                 <div className="p-6 space-y-4">
                   {(() => {
                     const url = selectedMindfulness.url || ''
-                    const videoMatch = url.match(/(?:youtu\\.be\/|youtube\\.com\/(?:watch\\?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{6,})/)
+                    const videoMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{6,})/)
                     const listMatch = url.match(/[?&]list=([A-Za-z0-9_-]+)/)
                     const videoId = videoMatch?.[1]
                     const listId = listMatch?.[1]
