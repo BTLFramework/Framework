@@ -739,7 +739,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             difficulty: "Beginner",
             type: "mindfulness",
             topic: "pain-management",
-            url: "https://www.youtube.com/watch?v=lcUlprEmMtA"
+            url: "https://www.youtube.com/watch?v=lcUlprEmMtA",
+            backupUrl: "https://www.youtube.com/watch?v=BqLDxLzw6Pk"
           },
           {
             title: "Progressive Muscle Relaxation",
@@ -748,7 +749,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             difficulty: "Beginner",
             type: "mindfulness",
             topic: "pain-management",
-            url: "https://www.va.gov/PAINMANAGEMENT/Veteran_Public/Veteran_docs/FUMP.pdf"
+            url: "https://www.youtube.com/watch?v=Z95gPdFC7GM",
+            backupUrl: "https://www.youtube.com/watch?v=JyRoju2Rscs"
           },
           {
             title: "Body Scan Meditation",
@@ -757,7 +759,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             difficulty: "Beginner", 
             type: "mindfulness",
             topic: "mindfulness",
-            url: "https://palousemindfulness.com/meditations/bodyscan20min.html"
+            url: "https://palousemindfulness.com/meditations/bodyscan20min.html",
+            backupUrl: "https://www.youtube.com/playlist?list=PLbiVpU59JkVaFMGi0A8Im_hfSh-SWsFwg"
           },
           {
             title: "Visualization for Recovery",
@@ -766,7 +769,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             difficulty: "Intermediate",
             type: "mindfulness", 
             topic: "mindset",
-            url: "https://www.noigroup.com/graded-motor-imagery/"
+            url: "https://www.youtube.com/watch?v=Gv3Z_RnLAO8",
+            backupUrl: "https://www.youtube.com/watch?v=fWYUJscRBRw"
           },
           {
             title: "Loving-Kindness Meditation",
@@ -775,7 +779,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             difficulty: "Intermediate",
             type: "mindfulness",
             topic: "mindset",
-            url: "https://www.uclahealth.org/programs/marc/free-guided-meditations/loving-kindness"
+            url: "https://www.youtube.com/watch?v=qLbcJwS8V6g",
+            backupUrl: "https://www.uclahealth.org/uclamindful/guided-meditations"
           },
           {
             title: "Mindful Movement Awareness",
@@ -784,7 +789,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             difficulty: "Beginner",
             type: "mindfulness",
             topic: "movement",
-            url: "https://www.youtube.com/watch?v=9hSL89IgRg4"
+            url: "https://www.youtube.com/watch?v=9hSL89IgRg4",
+            backupUrl: "https://www.youtube.com/playlist?list=PLFv7LsNjAzXjitsgPh_MdmCuqh9FJYHUs"
           },
           {
             title: "Stress Response Regulation",
@@ -793,7 +799,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             difficulty: "Intermediate",
             type: "mindfulness",
             topic: "flare-ups",
-            url: "https://www.youtube.com/watch?v=9fEo9my03Ks"
+            url: "https://www.youtube.com/watch?v=9fEo9my03Ks",
+            backupUrl: "https://www.youtube.com/watch?v=CgYl8P4rTU0"
           },
           {
             title: "Mindful Pain Observation",
@@ -802,7 +809,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             difficulty: "Advanced",
             type: "mindfulness",
             topic: "pain-management",
-            url: "https://www.tarabrach.com/rain-meditation/"
+            url: "https://www.youtube.com/watch?v=W8e_tAEM80k",
+            backupUrl: "https://www.youtube.com/watch?v=wm1t5FyK5Ek"
           },
         ]
 
@@ -1572,7 +1580,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             />
           )}
           {/* Ensure Mindfulness modal renders for Guides category clicks */}
-          {selectedMindfulness && toolkit.category !== "tools" && (
+          {selectedMindfulness && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[120] p-4">
               <div className="bg-white rounded-xl max-w-2xl w-full overflow-hidden shadow-2xl border border-gray-200">
                 <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
@@ -1603,6 +1611,19 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                       className="inline-flex items-center gap-2 px-4 py-2 bg-btl-600 text-white rounded-full hover:bg-btl-700"
                     >
                       Open Resource
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  )}
+                  {selectedMindfulness.backupUrl && (
+                    <a
+                      href={selectedMindfulness.backupUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-btl-100 text-btl-700 rounded-full hover:bg-btl-200"
+                    >
+                      Open Backup
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                       </svg>
