@@ -1229,50 +1229,6 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                           <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Sleep Correlation</span>
                         </div>
           ) : null}
-          {/* Mindfulness Modal */}
-          {selectedMindfulness && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[120] p-4">
-              <div className="bg-white rounded-xl max-w-2xl w-full overflow-hidden shadow-2xl border border-gray-200">
-                <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900">{selectedMindfulness.title}</h3>
-                    <p className="text-sm text-gray-600">{selectedMindfulness.description}</p>
-                  </div>
-                  <button onClick={() => setSelectedMindfulness(null)} className="text-gray-500 hover:text-gray-700">
-                    <X className="w-6 h-6" />
-                  </button>
-                </div>
-                <div className="p-6 space-y-4">
-                  {selectedMindfulness.url && (selectedMindfulness.url.includes('youtube.com') || selectedMindfulness.url.includes('youtu.be')) ? (
-                    <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                      <iframe
-                        src={`https://www.youtube.com/embed/${(selectedMindfulness.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)?.[1]) || ''}`}
-                        title={selectedMindfulness.title}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        className="absolute top-0 left-0 w-full h-full rounded-lg"
-                      />
-                    </div>
-                  ) : (
-                    <a
-                      href={selectedMindfulness.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-btl-600 text-white rounded-full hover:bg-btl-700"
-                    >
-                      Open Resource
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </a>
-                  )}
-                  <div className="text-xs text-gray-500">
-                    Source: educational resource used for patient education.
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
                       </div>
                       <button 
                         onClick={() => setShowPainJournalPopup(true)}
