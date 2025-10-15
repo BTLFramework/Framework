@@ -779,7 +779,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             difficulty: "Intermediate",
             type: "mindfulness",
             topic: "mindset",
-            url: "https://www.youtube.com/watch?v=qLbcJwS8V6g",
+            url: "https://www.youtube.com/playlist?list=PLFv7LsNjAzXjitsgPh_MdmCuqh9FJYHUs",
             backupUrl: "https://www.uclahealth.org/uclamindful/guided-meditations"
           },
           {
