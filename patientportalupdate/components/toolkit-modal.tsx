@@ -759,8 +759,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             difficulty: "Beginner", 
             type: "mindfulness",
             topic: "mindfulness",
-            url: "https://palousemindfulness.com/meditations/bodyscan20min.html",
-            backupUrl: "https://www.youtube.com/playlist?list=PLbiVpU59JkVaFMGi0A8Im_hfSh-SWsFwg"
+            url: "https://www.youtube.com/playlist?list=PLbiVpU59JkVaFMGi0A8Im_hfSh-SWsFwg",
+            backupUrl: "https://palousemindfulness.com/meditations/bodyscan20min.html"
           },
           {
             title: "Visualization for Recovery",
@@ -1595,13 +1595,18 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                 <div className="p-6 space-y-4">
                   {(() => {
                     const url = selectedMindfulness.url || ''
-                    const match = url.match(/(?:youtu\\.be\/|youtube\\.com\/(?:watch\\?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{6,})/)
-                    const videoId = match?.[1]
-                    if (videoId) {
+                    const videoMatch = url.match(/(?:youtu\\.be\/|youtube\\.com\/(?:watch\\?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{6,})/)
+                    const listMatch = url.match(/[?&]list=([A-Za-z0-9_-]+)/)
+                    const videoId = videoMatch?.[1]
+                    const listId = listMatch?.[1]
+                    const embedSrc = videoId
+                      ? `https://www.youtube-nocookie.com/embed/${videoId}`
+                      : (listId ? `https://www.youtube-nocookie.com/embed/videoseries?list=${listId}` : null)
+                    if (embedSrc) {
                       return (
                         <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                           <iframe
-                            src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+                            src={embedSrc}
                             title={selectedMindfulness.title}
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
