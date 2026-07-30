@@ -21,8 +21,9 @@ const TOOL_CONTENT: Record<string, { title: string; description: string; content
   }
 };
 
-export default function RecoveryToolPage({ params }: { params: { id: string } }) {
-  const tool = TOOL_CONTENT[params.id];
+export default async function RecoveryToolPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const tool = TOOL_CONTENT[id];
 
   if (!tool) {
     return (
@@ -44,4 +45,4 @@ export default function RecoveryToolPage({ params }: { params: { id: string } })
       </div>
     </div>
   );
-} 
+}
