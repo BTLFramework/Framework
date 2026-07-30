@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { TodaysTasksSection } from "@/components/todays-tasks-section"
 import { MovementSessionDialog } from "@/components/MovementSessionDialog"
-import { PainAssessmentDialog } from "@/components/PainAssessmentDialog"
+import { PainStressCheckDialog } from "@/components/PainStressCheckDialog"
 import { MindfulnessSessionDialog } from "@/components/MindfulnessSessionDialog"
 import { RecoveryInsightDialog } from "@/components/RecoveryInsightDialog"
 import { useToast } from "@/hooks/use-toast"
@@ -98,10 +98,11 @@ export default function TodaysTasksPage() {
         onTaskComplete={handleTaskComplete}
       />
 
-      <PainAssessmentDialog
+      <PainStressCheckDialog
         open={painDrawerOpen}
-        onClose={() => setPainDrawerOpen(false)}
+        onOpenChange={setPainDrawerOpen}
         patientId={patientId}
+        onComplete={() => setPainDrawerOpen(false)}
         onTaskComplete={handleTaskComplete}
       />
 

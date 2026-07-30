@@ -77,6 +77,7 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
   const [stressFactors, setStressFactors] = useState<string[]>([]);
   const [customStressFactor, setCustomStressFactor] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [showCelebration, setShowCelebration] = useState<boolean>(false);
   const [patientData, setPatientData] = useState<any>(null);
   const [result, setResult] = useState<null | { tier: 1|2|3|4; debugInfo?: { pain: number; stress: number; mood: string; painConverted: number; stressConverted: number; tier: number; } }>(null);
@@ -115,7 +116,7 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
   const phaseLabel = patientData?.phase ?? patientData?.patient?.phase ?? "Unavailable";
   const regionLabel = clinicalRegionFromProfile(patientData) ?? "Focus unavailable";
 
-  const canSubmit = pain > 0 && painArea && functionLikert && stress > 0;
+  const canSubmit = Boolean(painArea && functionLikert);
   const totalPoints = 3;
 
   const handleChipToggle = (arr: string[], setArr: (v: string[]) => void, value: string) => {
@@ -155,6 +156,7 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    setSubmitError(null);
 
     try {
       const patientResponse = await fetch(`/api/patients/portal-data/${patientId}`)
@@ -182,10 +184,11 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
         })
       });
 
-      if (dailyAssessmentResponse.ok) {
-        const assessmentResult = await dailyAssessmentResponse.json();
-        console.log('✅ Daily assessment stored:', assessmentResult);
+      if (!dailyAssessmentResponse.ok) {
+        throw new Error('Failed to save daily assessment');
       }
+      const assessmentResult = await dailyAssessmentResponse.json();
+      console.log('✅ Daily assessment stored:', assessmentResult);
 
       // Call real backend for recovery points
       const result = await addRecoveryPoints(
@@ -194,25 +197,27 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
         'Pain & Stress Check-in completed',
         totalPoints
       );
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to add recovery points');
+      }
 
       // Record task completion to backend
-      try {
-        await fetch('/api/recovery-points/task-completion', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            patientId: numericPatientId,
-            taskType: 'PAIN_ASSESSMENT',
-            sessionDuration: null,
-            pointsEarned: totalPoints
-          }),
-        });
-        console.log('✅ Task completion recorded for pain assessment');
-      } catch (taskError) {
-        console.error('❌ Failed to record task completion:', taskError);
+      const taskCompletionResponse = await fetch('/api/recovery-points/task-completion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          patientId: numericPatientId,
+          taskType: 'PAIN_ASSESSMENT',
+          sessionDuration: null,
+          pointsEarned: totalPoints
+        }),
+      });
+      if (!taskCompletionResponse.ok) {
+        throw new Error('Failed to record task completion');
       }
+      console.log('✅ Task completion recorded for pain assessment');
 
       // Use real escalate value from backend
       setShowCelebration(true);
@@ -256,69 +261,7 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
       });
     } catch (error) {
       console.error('❌ Error completing pain assessment:', error);
-
-      // Still record task completion to backend even if everything else failed
-      try {
-        const patientResponse = await fetch(`/api/patients/portal-data/${patientId}`)
-        if (patientResponse.ok) {
-          const patientData = await patientResponse.json()
-          const numericPatientId = patientData.data.patient.id
-
-          await fetch('/api/recovery-points/task-completion', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              patientId: numericPatientId,
-              taskType: 'PAIN_ASSESSMENT',
-              sessionDuration: null,
-              pointsEarned: totalPoints
-            }),
-          });
-          console.log('✅ Task completion recorded for pain assessment (despite error)');
-        }
-      } catch (taskError) {
-        console.error('❌ Failed to record task completion:', taskError);
-      }
-
-      setShowCelebration(true);
-      setTimeout(() => {
-        setShowCelebration(false);
-        const painConverted = Math.floor((pain / 6) * 3) as 0|1|2|3;
-        const stressConverted = Math.floor((stress / 10) * 3) as 0|1|2|3;
-        const tier = classifyTier({ pain: painConverted, stress: stressConverted, mood: 'neutral' });
-        const debugInfo = {
-          pain,
-          stress,
-          mood,
-          painConverted,
-          stressConverted,
-          tier
-        };
-        setResult({ tier, debugInfo });
-        setEscalate(false);
-      }, 2000);
-
-      if (onTaskComplete) {
-        onTaskComplete({
-          taskId: 'pain-assessment',
-          taskTitle: 'Pain & Stress Check-in',
-          pointsEarned: totalPoints,
-          newSRSScore: srsScore,
-          phase: phaseLabel
-        });
-      }
-
-      onComplete?.({
-        pain,
-        painArea,
-        functionLikert,
-        triggers,
-        stress,
-        stressFactors,
-        pointsEarned: totalPoints
-      });
+      setSubmitError("We couldn't confirm the full check-in. Please refresh before trying again so points aren't duplicated.");
     }
 
     setIsSubmitting(false);
@@ -610,6 +553,11 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
         )}
 
         <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-200">
+          {submitError && (
+            <p className="mb-3 text-sm font-medium text-red-700" role="alert">
+              {submitError}
+            </p>
+          )}
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-3">
               <div className="px-4 py-2 font-medium text-sm bg-gradient-to-br from-[#b08d57] via-[#a97142] to-[#7c5c36] text-white shadow-lg border border-[#a97142] rounded-2xl">
