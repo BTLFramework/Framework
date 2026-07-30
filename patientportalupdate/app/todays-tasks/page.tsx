@@ -14,8 +14,8 @@ export const dynamic = 'force-dynamic'
 
 export default function TodaysTasksPage() {
   const { toast } = useToast()
-  const { patient, isAuthenticated } = useAuth()
-  const [completedTasks, setCompletedTasks] = useState<any[]>([])
+  const { patient } = useAuth()
+  const [taskRefreshKey, setTaskRefreshKey] = useState(0)
 
   // Drawer states
   const [movementDrawerOpen, setMovementDrawerOpen] = useState(false)
@@ -55,8 +55,17 @@ export default function TodaysTasksPage() {
   const handleTaskComplete = (taskData: any) => {
     console.log('🎯 Task completed:', taskData)
 
-    // Add to completed tasks
-    setCompletedTasks(prev => [...prev, taskData])
+    const taskId =
+      taskData.taskId === 'recovery-insight' ? 'recovery-insights' :
+      taskData.taskId ||
+      taskData.id ||
+      (typeof taskData.pain === 'number' ? 'pain-assessment' : null)
+
+    if (patient?.email && taskId) {
+      const today = new Date().toISOString().slice(0, 10)
+      localStorage.setItem(`dailyTaskCompleted_${patient.email}_${today}_${taskId}`, 'true')
+      setTaskRefreshKey((key) => key + 1)
+    }
 
     // Show success toast
     toast({
@@ -77,7 +86,7 @@ export default function TodaysTasksPage() {
 
         <TodaysTasksSection
           onTaskClick={handleTaskClick}
-          onTaskComplete={handleTaskComplete}
+          refreshKey={taskRefreshKey}
         />
       </div>
 
@@ -86,6 +95,7 @@ export default function TodaysTasksPage() {
         open={movementDrawerOpen}
         onClose={() => setMovementDrawerOpen(false)}
         patientId={patientId}
+        onTaskComplete={handleTaskComplete}
       />
 
       <PainAssessmentDialog
@@ -99,9 +109,6 @@ export default function TodaysTasksPage() {
         open={mindfulnessDrawerOpen}
         onOpenChange={setMindfulnessDrawerOpen}
         patientId={patientId}
-        onComplete={(data) => {
-          handleTaskComplete({ id: 'mindfulness-session', pointsEarned: data.pointsEarned });
-        }}
         onTaskComplete={handleTaskComplete}
       />
 
@@ -109,9 +116,6 @@ export default function TodaysTasksPage() {
         open={insightsDrawerOpen}
         onOpenChange={setInsightsDrawerOpen}
         patientId={patientId}
-        onComplete={(data) => {
-          handleTaskComplete({ id: 'recovery-insights', pointsEarned: data.pointsEarned });
-        }}
         onTaskComplete={handleTaskComplete}
         snapshot={{ pain: null, stress: null, risk: null }}
         painDelta={0}

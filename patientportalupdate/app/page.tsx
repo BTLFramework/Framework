@@ -201,6 +201,17 @@ const PatientRecoveryDashboard: React.FC = () => {
     console.log('🎯 Task completed:', taskData)
 
     try {
+      const taskId =
+        taskData.taskId === 'recovery-insight' ? 'recovery-insights' :
+        taskData.taskId ||
+        taskData.id ||
+        (typeof taskData.pain === 'number' ? 'pain-assessment' : null)
+
+      if (taskId) {
+        const today = new Date().toISOString().slice(0, 10)
+        localStorage.setItem(`dailyTaskCompleted_${patient.email}_${today}_${taskId}`, 'true')
+      }
+
       // Update local patient data immediately (but don't persist since useAuth manages it)
       const updatedData = {
         ...patient,
@@ -454,10 +465,6 @@ const PatientRecoveryDashboard: React.FC = () => {
         {patient && (
           <TodaysTasksSection
             onTaskClick={handleTaskDialogOpen}
-            onTaskComplete={(taskData) => {
-              console.log('Task completed:', taskData)
-              setRefreshKey(prev => prev + 1)
-            }}
             refreshKey={refreshKey}
           />
         )}

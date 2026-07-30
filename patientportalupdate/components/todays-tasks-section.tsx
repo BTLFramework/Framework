@@ -10,15 +10,13 @@ import { useAuth } from "@/hooks/useAuth"
 
 interface TodaysTasksSectionProps {
   onTaskClick: (task: any) => void
-  onTaskComplete?: (taskData: any) => void
   refreshKey?: number
 }
 
-export function TodaysTasksSection({ onTaskClick, onTaskComplete, refreshKey }: TodaysTasksSectionProps) {
+export function TodaysTasksSection({ onTaskClick, refreshKey }: TodaysTasksSectionProps) {
   // Use proper authentication
   const { patient, loading: authLoading, isAuthenticated } = useAuth()
   
-  const [movementSessionCompleted, setMovementSessionCompleted] = useState(false)
   const [completedTaskIds, setCompletedTaskIds] = useState<Set<string>>(new Set())
 
   // Define metallic pill classes
@@ -58,61 +56,19 @@ export function TodaysTasksSection({ onTaskClick, onTaskComplete, refreshKey }: 
   const completedTasks = completedTaskIds.size;
   const remainingTasks = totalTasks - completedTasks;
 
-  // Load movement session completion from localStorage
+  // Daily completion is intentionally date-scoped. The backend endpoint
+  // currently exposes weekly totals, which cannot truthfully answer whether a
+  // task was completed today.
   useEffect(() => {
     if (!patient?.email) return;
-    
+
     const today = new Date().toISOString().slice(0, 10);
-    const key = `movementSessionCompleted_${patient.email}_${today}`;
-    const completed = localStorage.getItem(key) === 'true';
-    setMovementSessionCompleted(completed);
-  }, [patient?.email]);
-
-  // Load task completion status from backend
-  useEffect(() => {
-    const loadTaskCompletionStatus = async () => {
-      if (!patient?.email) return;
-      
-      try {
-        // Get patient data to get patient ID
-        const patientResponse = await fetch(`/api/patients/portal-data/${encodeURIComponent(patient.email)}`);
-        if (!patientResponse.ok) return;
-        
-        const patientData = await patientResponse.json();
-        const patientId = patientData.data.patient.id;
-        
-        // Get task completion stats for today
-        const taskStatsResponse = await fetch(`/api/recovery-points/task-stats/${patientId}`);
-        if (taskStatsResponse.ok) {
-          const taskStats = await taskStatsResponse.json();
-          const today = new Date().toISOString().slice(0, 10);
-          
-          // Check if tasks were completed today
-          const completedToday = new Set<string>();
-          
-          // Check each task type for today's completion
-          if (taskStats.data?.thisWeek?.MOVEMENT > 0) {
-            completedToday.add('movement-session');
-          }
-          if (taskStats.data?.thisWeek?.PAIN_ASSESSMENT > 0) {
-            completedToday.add('pain-assessment');
-          }
-          if (taskStats.data?.thisWeek?.MINDFULNESS > 0) {
-            completedToday.add('mindfulness-session');
-          }
-          if (taskStats.data?.thisWeek?.RECOVERY_INSIGHTS > 0) {
-            completedToday.add('recovery-insights');
-          }
-          
-          setCompletedTaskIds(completedToday);
-          console.log('✅ Loaded task completion status:', completedToday);
-        }
-      } catch (error) {
-        console.error('❌ Error loading task completion status:', error);
-      }
-    };
-
-    loadTaskCompletionStatus();
+    const taskIds = ['movement-session', 'pain-assessment', 'mindfulness-session', 'recovery-insights'];
+    setCompletedTaskIds(new Set(
+      taskIds.filter((taskId) =>
+        localStorage.getItem(`dailyTaskCompleted_${patient.email}_${today}_${taskId}`) === 'true'
+      )
+    ));
   }, [patient?.email, refreshKey]);
 
   // Hooks must run in the same order while authentication resolves.
@@ -139,78 +95,11 @@ export function TodaysTasksSection({ onTaskClick, onTaskComplete, refreshKey }: 
   }
 
   const handleTaskClick = (task: any) => {
-    onTaskClick({
-      ...task,
-      onTaskComplete: (taskData: any) => {
-        console.log('🎯 Task completed in section:', taskData)
-        
-        // Mark task as completed using proper state update
-        setCompletedTaskIds(prev => new Set([...prev, task.id]));
-        
-        // Trigger a refresh of the task completion status
-        setTimeout(() => {
-          const loadTaskCompletionStatus = async () => {
-            if (!patient?.email) return;
-            
-            try {
-              const patientResponse = await fetch(`/api/patients/portal-data/${encodeURIComponent(patient.email)}`);
-              if (!patientResponse.ok) return;
-              
-              const patientData = await patientResponse.json();
-              const patientId = patientData.data.patient.id;
-              
-              const taskStatsResponse = await fetch(`/api/recovery-points/task-stats/${patientId}`);
-              if (taskStatsResponse.ok) {
-                const taskStats = await taskStatsResponse.json();
-                const completedToday = new Set<string>();
-                
-                if (taskStats.data?.thisWeek?.MOVEMENT > 0) {
-                  completedToday.add('movement-session');
-                }
-                if (taskStats.data?.thisWeek?.PAIN_ASSESSMENT > 0) {
-                  completedToday.add('pain-assessment');
-                }
-                if (taskStats.data?.thisWeek?.MINDFULNESS > 0) {
-                  completedToday.add('mindfulness-session');
-                }
-                if (taskStats.data?.thisWeek?.RECOVERY_INSIGHTS > 0) {
-                  completedToday.add('recovery-insights');
-                }
-                
-                setCompletedTaskIds(completedToday);
-                console.log('✅ Refreshed task completion status:', completedToday);
-              }
-            } catch (error) {
-              console.error('❌ Error refreshing task completion status:', error);
-            }
-          };
-          
-          loadTaskCompletionStatus();
-        }, 1000); // Wait 1 second for backend to process
-        
-        if (onTaskComplete) {
-          onTaskComplete(taskData)
-        }
-      }
-    })
+    onTaskClick(task)
   }
 
   const handleMovementSessionClick = () => {
-    onTaskClick({
-      id: "movement-session",
-      title: "Movement Session",
-      onTaskComplete: (taskData: any) => {
-        // Persist completion in localStorage
-        if (!patient?.email) return;
-        const today = new Date().toISOString().slice(0, 10);
-        const key = `movementSessionCompleted_${patient.email}_${today}`;
-        localStorage.setItem(key, 'true');
-        setMovementSessionCompleted(true);
-        if (onTaskComplete) {
-          onTaskComplete(taskData)
-        }
-      }
-    })
+    onTaskClick({ id: "movement-session", title: "Movement Session" })
   }
 
   // Helper function to get badge colors

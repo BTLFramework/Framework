@@ -14,6 +14,7 @@ import { MindfulnessVideoModal } from "@/components/MindfulnessVideoModal";
 import { MoodModal } from "@/components/MoodModal";
 import { useToast } from "@/hooks/use-toast";
 import { clinicalRegionFromProfile } from "@/lib/clinicalState";
+import { useAuth } from "@/hooks/useAuth";
 
 interface MindfulnessSessionDialogProps {
   open: boolean;
@@ -68,6 +69,7 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
   const [showMoodModal, setShowMoodModal] = useState(false);
   const [numericPatientId, setNumericPatientId] = useState<string | null>(null);
   const { toast } = useToast();
+  const { patient: authenticatedPatient } = useAuth();
 
   // Fetch patient data to get correct SRS score and numeric ID
   useEffect(() => {
@@ -99,9 +101,9 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
   }, [showMoodModal]);
 
   // Get actual patient data instead of hardcoded values
-  const srsScore = patientData?.srsScore ?? patientData?.patient?.srsScore ?? "—";
-  const phaseLabel = patientData?.phase ?? patientData?.patient?.phase ?? "Unavailable";
-  const regionLabel = clinicalRegionFromProfile(patientData) ?? "Focus unavailable";
+  const srsScore = patientData?.srsScore ?? patientData?.patient?.srsScore ?? authenticatedPatient?.srsScore ?? authenticatedPatient?.score ?? "—";
+  const phaseLabel = patientData?.phase ?? patientData?.patient?.phase ?? authenticatedPatient?.phase ?? "Unavailable";
+  const regionLabel = clinicalRegionFromProfile(patientData) ?? clinicalRegionFromProfile(authenticatedPatient) ?? "Focus unavailable";
 
   // Smart suggestion logic based on patient data
   const getSuggestedTrack = () => {
