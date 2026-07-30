@@ -30,7 +30,7 @@ function ScoreBreakdownSection({ score, intakeData }: { score: number; intakeDat
         description: "Low pain that doesn't limit your daily activities",
         points: (intakeData && intakeData.vas <= 2) ? 1 : 0,
         achieved: intakeData && intakeData.vas <= 2,
-        details: intakeData ? `Your score: ${intakeData.vas || 0}/10` : "Assessment data loading...",
+        details: intakeData && typeof intakeData.vas === 'number' ? `Your score: ${intakeData.vas}/10` : "Not yet assessed",
         icon: <Heart className="w-5 h-5" />,
         category: 'assessment'
       },
@@ -57,7 +57,7 @@ function ScoreBreakdownSection({ score, intakeData }: { score: number; intakeDat
           return false;
         })(),
         details: (() => {
-          if (!intakeData || !intakeData.ndi || !Array.isArray(intakeData.ndi)) return "Assessment data loading...";
+          if (!intakeData || !intakeData.ndi || !Array.isArray(intakeData.ndi)) return "Not yet assessed";
           const ndiTotal = intakeData.ndi.reduce((sum: number, score: number) => sum + score, 0);
           const ndiPercentage = Math.round((ndiTotal / 50) * 100);
           return `Your score: ${ndiPercentage}%`;
@@ -79,7 +79,7 @@ function ScoreBreakdownSection({ score, intakeData }: { score: number; intakeDat
           return avgScore >= 4;
         })(),
         details: (() => {
-          if (!intakeData || !intakeData.psfs || !Array.isArray(intakeData.psfs)) return "Assessment data loading...";
+          if (!intakeData || !intakeData.psfs || !Array.isArray(intakeData.psfs)) return "Not yet assessed";
           const avgScore = (intakeData.psfs.reduce((sum: number, item: any) => sum + (item.score || 0), 0) / intakeData.psfs.length).toFixed(1);
           return `Your score: ${avgScore}/10`;
         })(),
@@ -91,7 +91,7 @@ function ScoreBreakdownSection({ score, intakeData }: { score: number; intakeDat
         description: "Feeling confident about your recovery journey",
         points: (intakeData && intakeData.confidence >= 8) ? 2 : (intakeData && intakeData.confidence >= 5) ? 1 : 0,
         achieved: intakeData && intakeData.confidence >= 5,
-        details: intakeData ? `Your score: ${intakeData.confidence || 0}/10` : "Assessment data loading...",
+        details: intakeData && typeof intakeData.confidence === 'number' ? `Your score: ${intakeData.confidence}/10` : "Not yet assessed",
         icon: <TrendingUp className="w-5 h-5" />,
         category: 'mindset'
       },
@@ -100,7 +100,7 @@ function ScoreBreakdownSection({ score, intakeData }: { score: number; intakeDat
         description: "Maintaining positive outlook on recovery",
         points: (intakeData && intakeData.beliefStatus === "Positive") ? 1 : 0,
         achieved: intakeData && intakeData.beliefStatus === "Positive",
-        details: intakeData ? `Your outlook: ${intakeData.beliefStatus || "Not assessed"}` : "Assessment data loading...",
+        details: intakeData?.beliefStatus ? `Your outlook: ${intakeData.beliefStatus}` : "Not yet assessed",
         icon: <Shield className="w-5 h-5" />,
         category: 'mindset'
       },
@@ -118,7 +118,7 @@ function ScoreBreakdownSection({ score, intakeData }: { score: number; intakeDat
           return pcsTotal <= 6;
         })(),
         details: (() => {
-          if (!intakeData || !intakeData.pcs4) return "Assessment data loading...";
+          if (!intakeData || !intakeData.pcs4) return "Not yet assessed";
           const pcsTotal = Object.values(intakeData.pcs4).reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
           return `Your score: ${pcsTotal}/16`;
         })(),
@@ -139,7 +139,7 @@ function ScoreBreakdownSection({ score, intakeData }: { score: number; intakeDat
   return tskTotal <= 8; // TSK-7 threshold: ≤8 points (30% of 28)
         })(),
         details: (() => {
-            if (!intakeData || !intakeData.tsk7) return "Assessment data loading...";
+            if (!intakeData || !intakeData.tsk7) return "Not yet assessed";
   const tskTotal = Object.values(intakeData.tsk7).reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
   return `Your score: ${tskTotal}/28`;
         })(),
