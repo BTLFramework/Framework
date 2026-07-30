@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { TodaysTasksSection } from "@/components/todays-tasks-section"
 import { MovementSessionDialog } from "@/components/MovementSessionDialog"
 import { PainStressCheckDialog } from "@/components/PainStressCheckDialog"
@@ -16,6 +16,11 @@ export default function TodaysTasksPage() {
   const { toast } = useToast()
   const { patient } = useAuth()
   const [taskRefreshKey, setTaskRefreshKey] = useState(0)
+  const [currentSnapshot, setCurrentSnapshot] = useState<{
+    pain: number | null
+    stress: number | null
+    risk: string | null
+  }>({ pain: null, stress: null, risk: null })
 
   // Drawer states
   const [movementDrawerOpen, setMovementDrawerOpen] = useState(false)
@@ -25,6 +30,49 @@ export default function TodaysTasksPage() {
 
   // Get patient ID from auth context
   const patientId = patient?.email || ""
+
+  useEffect(() => {
+    const loadRecoverySnapshot = async () => {
+      if (!patientId) return
+
+      try {
+        const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'
+        const portalResponse = await fetch(`${backendUrl}/patients/portal-data/${encodeURIComponent(patientId)}`)
+        if (!portalResponse.ok) throw new Error('Failed to load baseline recovery data')
+
+        const portalData = await portalResponse.json()
+        let pain: number | null =
+          typeof portalData?.data?.vas === 'number' ? portalData.data.vas : null
+        let stress: number | null = null
+
+        const dailyResponse = await fetch(`${backendUrl}/patients/daily-data/${encodeURIComponent(patientId)}`)
+        if (dailyResponse.ok) {
+          const dailyData = await dailyResponse.json()
+          if (dailyData?.success && dailyData.data) {
+            if (typeof dailyData.data.pain === 'number') {
+              pain = Math.round((dailyData.data.pain / 100) * 10)
+            }
+            if (typeof dailyData.data.psychLoad === 'number') {
+              stress = Math.round((dailyData.data.psychLoad / 100) * 10)
+            }
+          }
+        }
+
+        const risk =
+          pain === null || stress === null ? null :
+          pain >= 7 || stress >= 7 ? 'high' :
+          pain >= 5 || stress >= 5 ? 'moderate' :
+          'low'
+
+        setCurrentSnapshot({ pain, stress, risk })
+      } catch (error) {
+        console.error('Failed to load recovery snapshot:', error)
+        setCurrentSnapshot({ pain: null, stress: null, risk: null })
+      }
+    }
+
+    loadRecoverySnapshot()
+  }, [patientId, taskRefreshKey])
 
   const handleTaskClick = (task: any) => {
     console.log('🎯 Task clicked:', task)
@@ -118,7 +166,7 @@ export default function TodaysTasksPage() {
         onOpenChange={setInsightsDrawerOpen}
         patientId={patientId}
         onTaskComplete={handleTaskComplete}
-        snapshot={{ pain: null, stress: null, risk: null }}
+        snapshot={currentSnapshot}
         painDelta={0}
         stressDelta={0}
         showActionPrompt={false}
