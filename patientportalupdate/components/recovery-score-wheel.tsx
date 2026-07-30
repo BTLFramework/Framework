@@ -1,7 +1,5 @@
 "use client"
 
-import { useEffect, useState } from "react"
-
 interface RecoveryScoreWheelProps {
   score: number
   maxScore: number
@@ -9,17 +7,9 @@ interface RecoveryScoreWheelProps {
 }
 
 export function RecoveryScoreWheel({ score, maxScore, phase }: RecoveryScoreWheelProps) {
-  const [animatedScore, setAnimatedScore] = useState(0)
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setAnimatedScore(score)
-    }, 500)
-    return () => clearTimeout(timer)
-  }, [score])
-
-  // Ensure we have valid numeric values
-  const validScore = typeof animatedScore === 'number' && !isNaN(animatedScore) ? animatedScore : 0
+  // The numeric score is clinical information, so it must never animate through
+  // a different patient state. The SVG ring still transitions visually.
+  const validScore = typeof score === 'number' && !isNaN(score) ? score : 0
   const validMaxScore = typeof maxScore === 'number' && !isNaN(maxScore) && maxScore > 0 ? maxScore : 11
   
   const percentage = (validScore / validMaxScore) * 100

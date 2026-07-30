@@ -13,7 +13,14 @@ export async function GET(
     const response = await fetch(`${backendUrl}/patients/portal-data/${encodeURIComponent(email)}`);
     const data = await response.json();
 
-    return NextResponse.json(data);
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: data?.error || 'Verified patient portal data is unavailable' },
+        { status: response.status }
+      );
+    }
+
+    return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error('Error fetching patient portal data:', error);
     return NextResponse.json(

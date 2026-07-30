@@ -21,30 +21,6 @@ export function TodaysTasksSection({ onTaskClick, onTaskComplete, refreshKey }: 
   const [movementSessionCompleted, setMovementSessionCompleted] = useState(false)
   const [completedTaskIds, setCompletedTaskIds] = useState<Set<string>>(new Set())
 
-  // Show loading state while authenticating
-  if (authLoading) {
-    return (
-      <div className="card-gradient rounded-xl shadow-lg p-6 border border-btl-200 animate-pulse">
-        <div className="h-6 bg-btl-200 rounded mb-4 w-32"></div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-80 bg-btl-200 rounded-2xl"></div>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
-  // Show message if not authenticated
-  if (!isAuthenticated || !patient) {
-    return (
-      <div className="card-gradient rounded-xl shadow-lg p-6 border border-btl-200">
-        <h2 className="text-xl font-semibold gradient-text mb-4">Today's Tasks</h2>
-        <p className="text-btl-600">Please log in to view your daily tasks.</p>
-      </div>
-    )
-  }
-
   // Define metallic pill classes
   const metallicPills = {
     gold: 'bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-yellow-900 shadow border border-yellow-500',
@@ -90,7 +66,7 @@ export function TodaysTasksSection({ onTaskClick, onTaskComplete, refreshKey }: 
     const key = `movementSessionCompleted_${patient.email}_${today}`;
     const completed = localStorage.getItem(key) === 'true';
     setMovementSessionCompleted(completed);
-  }, [patient.email]);
+  }, [patient?.email]);
 
   // Load task completion status from backend
   useEffect(() => {
@@ -99,7 +75,7 @@ export function TodaysTasksSection({ onTaskClick, onTaskComplete, refreshKey }: 
       
       try {
         // Get patient data to get patient ID
-        const patientResponse = await fetch(`/api/patients/portal-data/${patient.email}`);
+        const patientResponse = await fetch(`/api/patients/portal-data/${encodeURIComponent(patient.email)}`);
         if (!patientResponse.ok) return;
         
         const patientData = await patientResponse.json();
@@ -139,6 +115,29 @@ export function TodaysTasksSection({ onTaskClick, onTaskComplete, refreshKey }: 
     loadTaskCompletionStatus();
   }, [patient?.email, refreshKey]);
 
+  // Hooks must run in the same order while authentication resolves.
+  if (authLoading) {
+    return (
+      <div className="card-gradient rounded-xl shadow-lg p-6 border border-btl-200 animate-pulse">
+        <div className="h-6 bg-btl-200 rounded mb-4 w-32"></div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-80 bg-btl-200 rounded-2xl"></div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated || !patient) {
+    return (
+      <div className="card-gradient rounded-xl shadow-lg p-6 border border-btl-200">
+        <h2 className="text-xl font-semibold gradient-text mb-4">Today's Tasks</h2>
+        <p className="text-btl-600">Please log in to view your daily tasks.</p>
+      </div>
+    )
+  }
+
   const handleTaskClick = (task: any) => {
     onTaskClick({
       ...task,
@@ -154,7 +153,7 @@ export function TodaysTasksSection({ onTaskClick, onTaskComplete, refreshKey }: 
             if (!patient?.email) return;
             
             try {
-              const patientResponse = await fetch(`/api/patients/portal-data/${patient.email}`);
+              const patientResponse = await fetch(`/api/patients/portal-data/${encodeURIComponent(patient.email)}`);
               if (!patientResponse.ok) return;
               
               const patientData = await patientResponse.json();
@@ -359,4 +358,3 @@ export function TodaysTasksSection({ onTaskClick, onTaskComplete, refreshKey }: 
     </div>
   )
 }
-

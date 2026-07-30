@@ -243,9 +243,10 @@ function getPhase(score: number) {
 export default function RecoveryScorePage() {
   const router = useRouter()
   const [showBreakdown, setShowBreakdown] = useState(false)
-  const [currentScore, setCurrentScore] = useState(0)
+  const [currentScore, setCurrentScore] = useState<number | null>(null)
   const [amyIntakeData, setAmyIntakeData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [dataError, setDataError] = useState<string | null>(null)
   const [scoreHistory, setScoreHistory] = useState<any[]>([])
   const [nextAssessmentLabel, setNextAssessmentLabel] = useState<string>('in 4 weeks')
   const { patient, loading: authLoading, isAuthenticated } = useAuth()
@@ -257,13 +258,14 @@ export default function RecoveryScorePage() {
         if (!patient?.email) {
           return
         }
+        setDataError(null)
         console.log('🔍 Fetching recovery data for', patient.email)
         
         // Fetch portal data (intake information)
-        const portalResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/patients/portal-data/${patient.email}`)
+        const portalResponse = await fetch(`/api/patients/portal-data/${encodeURIComponent(patient.email)}`)
         
         // Fetch patient's progress history
-        const progressResponse = await fetch(`/api/patients/progress-history/${patient.email}`)
+        const progressResponse = await fetch(`/api/patients/progress-history/${encodeURIComponent(patient.email)}`)
         
         let intakeData = null;
         let progressData = [];
@@ -275,20 +277,23 @@ export default function RecoveryScorePage() {
           
           // Extract intake data from the portal response
           intakeData = {
-            vas: portalResult.data.vas || 3,
-            disability: portalResult.data.disability || 15,
-            psfs: portalResult.data.psfs || 7.0,
-            confidence: portalResult.data.confidence || 6,
-            negativeBeliefs: portalResult.data.negativeBeliefs || 'no',
-            pcs4: portalResult.data.pcs4 || 5,
-            tsk7: portalResult.data.tsk7 || 18,
-            milestoneAchieved: portalResult.data.milestoneAchieved || 'no',
-            objectiveProgress: portalResult.data.objectiveProgress || 'no',
-            ndi: portalResult.data.ndi || [],
-            beliefStatus: portalResult.data.beliefStatus || 'Positive'
+            vas: portalResult.data.vas ?? null,
+            disability: portalResult.data.disability ?? null,
+            psfs: portalResult.data.psfs ?? null,
+            confidence: portalResult.data.confidence ?? null,
+            negativeBeliefs: portalResult.data.negativeBeliefs ?? null,
+            pcs4: portalResult.data.pcs4 ?? null,
+            tsk7: portalResult.data.tsk7 ?? null,
+            milestoneAchieved: portalResult.data.milestoneAchieved ?? null,
+            objectiveProgress: portalResult.data.objectiveProgress ?? null,
+            ndi: portalResult.data.ndi ?? null,
+            beliefStatus: portalResult.data.beliefStatus ?? null
           }
           
-          setCurrentScore(portalResult.data.srsScore || portalResult.data.patient?.srsScore || 0)
+          const portalScore = portalResult.data.srsScore ?? portalResult.data.patient?.srsScore
+          if (typeof portalScore === 'number' && Number.isFinite(portalScore)) {
+            setCurrentScore(portalScore)
+          }
           console.log('✅ Intake data loaded:', intakeData)
 
           // Calculate next assessment date
@@ -307,66 +312,39 @@ export default function RecoveryScorePage() {
           const progressResult = await progressResponse.json()
           console.log('📈 Progress history:', progressResult.data)
           
-          progressData = progressResult.data.progressHistory.map((entry: any) => ({
+          const verifiedHistory = Array.isArray(progressResult.data?.progressHistory)
+            ? progressResult.data.progressHistory
+            : []
+          progressData = verifiedHistory.map((entry: any) => ({
             date: new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
             score: entry.score,
             phase: entry.phase,
             formType: entry.formType
           }))
+
+          const latestVerifiedScore = [...verifiedHistory]
+            .reverse()
+            .find((entry: any) => typeof entry?.score === 'number' && Number.isFinite(entry.score))
+            ?.score
+          if (typeof latestVerifiedScore === 'number') {
+            setCurrentScore((existingScore) => existingScore ?? latestVerifiedScore)
+          }
           
           console.log('✅ Progress history processed:', progressData)
         } else {
-          console.log('⚠️ Could not fetch progress history, using fallback data')
-          // Fallback to sample data if progress history fails
-          progressData = [
-            { date: "Dec 1", score: 3, phase: "RESET", formType: "Intake" },
-            { date: "Dec 8", score: 5, phase: "EDUCATE", formType: "Follow-Up" },
-            { date: "Dec 15", score: 7, phase: "EDUCATE", formType: "Follow-Up" },
-            { date: "Dec 22", score: 7, phase: "EDUCATE", formType: "Follow-Up" },
-          ]
+          console.warn('Could not fetch verified progress history')
         }
 
-        // Set state with fetched or fallback data
-        setAmyIntakeData(intakeData || {
-          vas: 3,
-          disability: 15,
-          psfs: 7.0,
-          confidence: 6,
-          negativeBeliefs: 'no',
-          pcs4: 5,
-          tsk11: 18,
-          milestoneAchieved: 'no',
-          objectiveProgress: 'no',
-          ndi: [],
-          beliefStatus: 'Positive'
-        })
-
+        setAmyIntakeData(intakeData)
         setScoreHistory(progressData)
+
+        if (!portalResponse.ok && !progressResponse.ok) {
+          setDataError('Your verified recovery score is temporarily unavailable. Please try again.')
+        }
         
       } catch (error) {
         console.error('❌ Error fetching recovery score data:', error)
-        // Use fallback data on error
-        setAmyIntakeData({
-          vas: 3,
-          disability: 15,
-          psfs: 7.0,
-          confidence: 6,
-          negativeBeliefs: 'no',
-          pcs4: 5,
-          tsk11: 18,
-          milestoneAchieved: 'no',
-          objectiveProgress: 'no',
-          ndi: [],
-          beliefStatus: 'Positive'
-        })
-        
-        setScoreHistory([
-          { date: "Dec 1", score: 3, phase: "RESET", formType: "Intake" },
-          { date: "Dec 8", score: 5, phase: "EDUCATE", formType: "Follow-Up" },
-          { date: "Dec 15", score: 7, phase: "EDUCATE", formType: "Follow-Up" },
-          { date: "Dec 22", score: 7, phase: "EDUCATE", formType: "Follow-Up" },
-        ])
-        setNextAssessmentLabel('in 4 weeks')
+        setDataError('Your verified recovery score is temporarily unavailable. Please try again.')
       } finally {
         setLoading(false)
       }
@@ -400,6 +378,14 @@ export default function RecoveryScorePage() {
             <div className="flex items-center justify-center py-16">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-btl-600"></div>
               <span className="ml-4 text-btl-600 font-medium">Loading recovery data...</span>
+            </div>
+          ) : currentScore === null ? (
+            <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200 text-center">
+              <Info className="w-10 h-10 text-btl-600 mx-auto mb-3" />
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Recovery score unavailable</h2>
+              <p className="text-gray-600">
+                {dataError || 'We could not verify your recovery score. Please refresh and try again.'}
+              </p>
             </div>
           ) : (
             <>
@@ -556,7 +542,7 @@ export default function RecoveryScorePage() {
         </div>
       </div>
 
-      {showBreakdown && <ScoreBreakdownModal score={currentScore} onClose={() => setShowBreakdown(false)} />}
+      {showBreakdown && currentScore !== null && <ScoreBreakdownModal score={currentScore} onClose={() => setShowBreakdown(false)} />}
     </div>
   )
 }
