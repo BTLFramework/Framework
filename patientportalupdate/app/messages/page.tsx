@@ -34,7 +34,7 @@ export default function MessagesPage() {
   }, [messages])
 
   // Get patient ID from auth context
-  const patientId = patient?.id || 1; // Fallback to 1 if not authenticated
+  const patientId = patient?.id;
 
   const conversations = [
     {
@@ -51,6 +51,11 @@ export default function MessagesPage() {
 
   // Fetch messages from API
   useEffect(() => {
+    if (!isAuthenticated || !patientId) {
+      setLoading(false)
+      return
+    }
+
     const fetchMessages = async () => {
       try {
         setLoading(true)
@@ -108,27 +113,17 @@ export default function MessagesPage() {
       } catch (err: any) {
         console.error('Error fetching messages:', err)
         setError(err.message || 'An error occurred')
-        // Fallback to sample messages if API fails
-        setMessages([
-    {
-      id: 1,
-      senderId: 1,
-      senderName: "Dr. Spencer Barber",
-            content: "Welcome to your patient portal! I'll be sending you updates and check-ins here.",
-      timestamp: "2:30 PM",
-      isOwn: false,
-          }
-        ])
+        setMessages([])
       } finally {
         setLoading(false)
       }
     }
 
     fetchMessages()
-  }, [patientId])
+  }, [isAuthenticated, patientId])
 
   const handleSendMessage = async () => {
-    if (!newMessage.trim()) return
+    if (!newMessage.trim() || !patientId) return
 
     try {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/api/messages/reply`, {
