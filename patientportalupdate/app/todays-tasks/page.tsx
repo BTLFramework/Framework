@@ -21,6 +21,11 @@ export default function TodaysTasksPage() {
     stress: number | null
     risk: string | null
   }>({ pain: null, stress: null, risk: null })
+  const [currentClinical, setCurrentClinical] = useState<{
+    srsScore: number | null
+    phase: string | null
+    region: string | null
+  }>({ srsScore: null, phase: null, region: null })
 
   // Drawer states
   const [movementDrawerOpen, setMovementDrawerOpen] = useState(false)
@@ -36,38 +41,19 @@ export default function TodaysTasksPage() {
       if (!patientId) return
 
       try {
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'
-        const portalResponse = await fetch(`${backendUrl}/patients/portal-data/${encodeURIComponent(patientId)}`)
-        if (!portalResponse.ok) throw new Error('Failed to load baseline recovery data')
+        const response = await fetch(
+          `/api/patients/${encodeURIComponent(patientId)}/recovery/snapshot`,
+          { cache: 'no-store' }
+        )
+        if (!response.ok) throw new Error('Failed to load recovery snapshot')
 
-        const portalData = await portalResponse.json()
-        let pain: number | null =
-          typeof portalData?.data?.vas === 'number' ? portalData.data.vas : null
-        let stress: number | null = null
-
-        const dailyResponse = await fetch(`${backendUrl}/patients/daily-data/${encodeURIComponent(patientId)}`)
-        if (dailyResponse.ok) {
-          const dailyData = await dailyResponse.json()
-          if (dailyData?.success && dailyData.data) {
-            if (typeof dailyData.data.pain === 'number') {
-              pain = Math.round((dailyData.data.pain / 100) * 10)
-            }
-            if (typeof dailyData.data.psychLoad === 'number') {
-              stress = Math.round((dailyData.data.psychLoad / 100) * 10)
-            }
-          }
-        }
-
-        const risk =
-          pain === null || stress === null ? null :
-          pain >= 7 || stress >= 7 ? 'high' :
-          pain >= 5 || stress >= 5 ? 'moderate' :
-          'low'
-
-        setCurrentSnapshot({ pain, stress, risk })
+        const result = await response.json()
+        setCurrentSnapshot(result.snapshot ?? { pain: null, stress: null, risk: null })
+        setCurrentClinical(result.clinical ?? { srsScore: null, phase: null, region: null })
       } catch (error) {
         console.error('Failed to load recovery snapshot:', error)
         setCurrentSnapshot({ pain: null, stress: null, risk: null })
+        setCurrentClinical({ srsScore: null, phase: null, region: null })
       }
     }
 
@@ -167,6 +153,7 @@ export default function TodaysTasksPage() {
         patientId={patientId}
         onTaskComplete={handleTaskComplete}
         snapshot={currentSnapshot}
+        clinical={currentClinical}
         painDelta={0}
         stressDelta={0}
         showActionPrompt={false}

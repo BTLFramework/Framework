@@ -68,6 +68,43 @@ export async function GET(
           },
         });
 
+      case 'snapshot': {
+        let pain =
+          typeof portalData?.vas === 'number' ? portalData.vas : null;
+        let stress = null;
+
+        const dailyResponse = await fetch(
+          `${backendUrl}/patients/daily-data/${encodeURIComponent(id)}`,
+          { cache: 'no-store' }
+        );
+
+        if (dailyResponse.ok) {
+          const dailyResult = await dailyResponse.json();
+          const dailyData = dailyResult?.data ?? dailyResult;
+
+          if (typeof dailyData?.pain === 'number') {
+            pain = Math.round((dailyData.pain / 100) * 10);
+          }
+          if (typeof dailyData?.psychLoad === 'number') {
+            stress = Math.round((dailyData.psychLoad / 100) * 10);
+          }
+        }
+
+        const risk =
+          pain === null || stress === null
+            ? null
+            : pain >= 7 || stress >= 7
+              ? 'high'
+              : pain >= 5 || stress >= 5
+                ? 'moderate'
+                : 'low';
+
+        return NextResponse.json({
+          clinical: patientData,
+          snapshot: { pain, stress, risk },
+        });
+      }
+
       case 'mindfulness':
         return NextResponse.json({
           mindfulness: {

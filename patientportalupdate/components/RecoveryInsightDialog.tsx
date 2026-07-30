@@ -29,6 +29,11 @@ interface RecoveryInsightDialogProps {
     stress: number | null;
     risk: string | null;
   };
+  clinical?: {
+    srsScore: number | null;
+    phase: string | null;
+    region: string | null;
+  };
   painDelta: number;
   stressDelta: number;
   showActionPrompt: boolean;
@@ -46,6 +51,7 @@ export function RecoveryInsightDialog({
   onComplete,
   onTaskComplete,
   snapshot,
+  clinical,
   painDelta,
   stressDelta,
   showActionPrompt,
@@ -108,9 +114,20 @@ export function RecoveryInsightDialog({
   }, [open, patientId]);
 
   // Get actual patient data instead of hardcoded values
-  const srsScore = patientData?.srsScore ?? patientData?.patient?.srsScore ?? "—";
-  const phaseLabel = patientData?.phase ?? patientData?.patient?.phase ?? "Unavailable";
-  const regionLabel = clinicalRegionFromProfile(patientData) ?? "Focus unavailable";
+  const srsScore =
+    clinical?.srsScore ??
+    patientData?.srsScore ??
+    patientData?.patient?.srsScore ??
+    "—";
+  const phaseLabel =
+    clinical?.phase ??
+    patientData?.phase ??
+    patientData?.patient?.phase ??
+    "Unavailable";
+  const regionLabel =
+    clinical?.region ??
+    clinicalRegionFromProfile(patientData) ??
+    "Focus unavailable";
 
   const canSubmit = selectedInsightId !== null || actionTaken;
 

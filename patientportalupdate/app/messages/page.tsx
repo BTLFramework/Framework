@@ -37,15 +37,16 @@ export default function MessagesPage() {
   // Get patient ID from auth context
   const patientId = patient?.id;
 
+  const latestMessage = messages[0]
   const conversations = [
     {
       id: 1,
       name: "Dr. Spencer Barber",
       role: "Primary Healthcare Provider",
       avatar: "/placeholder.svg?height=40&width=40",
-      lastMessage: "Loading...",
-      timestamp: "Loading...",
-      unread: 0,
+      lastMessage: latestMessage?.content || (loading ? "Loading..." : "No messages yet"),
+      timestamp: latestMessage?.timestamp || "",
+      unread: messages.filter((message) => !message.isRead && !message.isOwn).length,
       online: true,
     },
   ]
@@ -60,7 +61,9 @@ export default function MessagesPage() {
     const fetchMessages = async () => {
       try {
         setLoading(true)
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/api/messages/patient/${patientId}`)
+        const response = await fetch(`/api/messages/patient/${patientId}`, {
+          cache: 'no-store',
+        })
 
         if (!response.ok) {
           throw new Error('Failed to fetch messages')
@@ -87,18 +90,10 @@ export default function MessagesPage() {
 
           setMessages(formattedMessages)
 
-          // Update conversation with latest message
-          if (formattedMessages.length > 0) {
-            const latestMessage = formattedMessages[0]
-            conversations[0].lastMessage = latestMessage.content
-            conversations[0].timestamp = latestMessage.timestamp
-            conversations[0].unread = formattedMessages.filter((m: Message) => !m.isRead && !m.isOwn).length
-          }
-
           // Mark messages as read when patient views them
           const markAsRead = async () => {
             try {
-              await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/api/messages/patient/${patientId}/mark-read`, {
+              await fetch(`/api/messages/patient/${patientId}/mark-read`, {
                 method: 'PATCH'
               })
             } catch (error) {
@@ -127,7 +122,7 @@ export default function MessagesPage() {
     if (!newMessage.trim() || !patientId) return
 
     try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/api/messages/reply`, {
+      const response = await fetch('/api/messages/reply', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,7 +137,7 @@ export default function MessagesPage() {
 
       const result = await response.json()
 
-      if (result.success) {
+      if (response.ok && result.success) {
         // Add the new message to the list
         const newMsg = {
           id: result.data.id,
@@ -164,7 +159,7 @@ export default function MessagesPage() {
       }
     } catch (error) {
       console.error('Error sending message:', error)
-      alert('Failed to send message. Please try again.')
+      setError('Failed to send message. Please try again.')
     }
   }
 
