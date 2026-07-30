@@ -1,4 +1,5 @@
 import useSWR from 'swr';
+import { normalizeClinicalProfile } from '@/lib/clinicalState';
 
 interface Patient {
   id: number;
@@ -27,21 +28,8 @@ const fetcher = async (url: string) => {
   }
 
   const data = await response.json();
-  
-  // Normalize: prefer top-level srsScore/phase if backend provides them,
-  // otherwise derive from srsScores without hardcoded defaults
-  if (data) {
-    const latestSrs = Array.isArray(data.srsScores) && data.srsScores.length > 0
-      ? data.srsScores[data.srsScores.length - 1]
-      : undefined;
-    const resolvedScore = typeof data.srsScore === 'number' ? data.srsScore
-      : (latestSrs?.srsScore ?? null);
-    if (resolvedScore !== null && resolvedScore !== undefined) {
-      data.score = resolvedScore;
-    }
-  }
-  
-  return data;
+
+  return normalizeClinicalProfile(data);
 };
 
 export function useAuth() {
@@ -95,4 +83,4 @@ export function useAuth() {
     refetch,
     login,
   };
-} 
+}

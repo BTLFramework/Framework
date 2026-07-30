@@ -13,6 +13,7 @@ export function useAssignedExercises(patientEmail: string) {
   const [data, setData] = useState<AssignedExercisesData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isStale, setIsStale] = useState(false);
 
   console.log(`🏃 useAssignedExercises called with email: "${patientEmail}" (type: ${typeof patientEmail}, length: ${patientEmail?.length})`);
 
@@ -21,11 +22,17 @@ export function useAssignedExercises(patientEmail: string) {
     console.log(`🔍 useEffect dependency check - patientEmail: "${patientEmail}", length: ${patientEmail?.length}`);
     
     if (!patientEmail) {
-      console.log('❌ No patient email provided to useAssignedExercises');
+      setData(null);
+      setIsStale(false);
       setLoading(false);
-      setError('No patient email provided');
+      setError(null);
       return;
     }
+
+    // The dependency only changes when the authenticated patient changes.
+    // Clear the prior patient's plan before loading the new one.
+    setData(null);
+    setIsStale(false);
 
     const fetchAssignedExercises = async () => {
       try {
@@ -38,9 +45,10 @@ export function useAssignedExercises(patientEmail: string) {
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
           console.log(`❌ HTTP Error ${response.status}:`, errorData);
-          // Graceful fallback for any non-OK: show empty exercises (no red error in UI)
-          setData({ exercises: [], totalPoints: 0, region: 'Neck', phase: 'EDUCATE', srsScore: 0 });
-          setError(null);
+          // Preserve the last verified plan during a transient failure.
+          // Never replace it with fabricated region/phase/SRS values.
+          setIsStale(true);
+          setError(errorData.error || 'Assigned exercises are temporarily unavailable');
           return;
         }
 
@@ -50,6 +58,7 @@ export function useAssignedExercises(patientEmail: string) {
         if (result.success) {
           console.log(`✅ Setting exercise data:`, result.data);
           setData(result.data);
+          setIsStale(false);
           setError(null);
         } else {
           console.log(`❌ API Error:`, result.error);
@@ -57,10 +66,9 @@ export function useAssignedExercises(patientEmail: string) {
           setData(null);
         }
       } catch (err) {
-        console.error('Error fetching assigned exercises, using fallback:', err);
-        // Network/unknown error fallback: empty exercises list
-        setData({ exercises: [], totalPoints: 0, region: 'Neck', phase: 'EDUCATE', srsScore: 0 });
-        setError(null);
+        console.error('Error fetching assigned exercises:', err);
+        setIsStale(true);
+        setError('Assigned exercises are temporarily unavailable');
       } finally {
         setLoading(false);
       }
@@ -70,5 +78,5 @@ export function useAssignedExercises(patientEmail: string) {
   }, [patientEmail]);
 
   console.log(`📤 useAssignedExercises returning:`, { data, loading, error });
-  return { data, loading, error };
-} 
+  return { data, loading, error, isStale };
+}
