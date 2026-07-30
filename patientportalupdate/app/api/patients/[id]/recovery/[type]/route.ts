@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest, context: { params: { id: string, type: string } }) {
+export async function GET(req: NextRequest, context: { params: Promise<{ id: string, type: string }> }) {
   const params = await context.params;
   const { id, type } = params;
 
@@ -64,4 +64,4 @@ export async function GET(req: NextRequest, context: { params: { id: string, typ
     default:
       return NextResponse.json({ error: 'Unknown recovery type' }, { status: 404 });
   }
-} 
+}
