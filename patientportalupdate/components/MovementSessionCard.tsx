@@ -9,10 +9,10 @@ interface MovementSessionCardProps {
 export function MovementSessionCard({ onClick }: MovementSessionCardProps) {
   // Get authenticated patient data
   const { patient, loading: authLoading, isAuthenticated } = useAuth();
-  
+
   // Fetch assigned exercises from backend using authenticated patient email
-  const { data: exerciseData, error: exerciseError, loading: exerciseLoading } = useAssignedExercises(patient?.email || '');
-  
+  const { data: exerciseData, error: exerciseError, loading: exerciseLoading, isStale } = useAssignedExercises(patient?.email || '');
+
   // Show skeleton while loading authentication or exercises
   if (authLoading || (exerciseData === undefined && exerciseLoading)) {
     return (
@@ -27,34 +27,47 @@ export function MovementSessionCard({ onClick }: MovementSessionCardProps) {
       </div>
     );
   }
-  
-  // Never show mock data. If no data, show empty state with zero points.
-  const finalExerciseData = exerciseData || { exercises: [], totalPoints: 0, region: 'Neck', phase: 'EDUCATE', srsScore: 0 };
+
+  if (!exerciseData) {
+    return (
+      <div className="flex flex-col items-center justify-center bg-white rounded-2xl shadow-lg p-7 border border-btl-100 min-h-[340px] min-w-[260px] text-center">
+        <div className="w-14 h-14 bg-btl-100 rounded-xl flex items-center justify-center mb-4">
+          <Dumbbell className="w-8 h-8 text-btl-600" />
+        </div>
+        <h3 className="font-bold text-lg mb-2 text-btl-900">Movement Session</h3>
+        <p className="text-sm text-btl-700">
+          Your exercise plan is temporarily unavailable. Please try again shortly.
+        </p>
+      </div>
+    );
+  }
+
+  const finalExerciseData = exerciseData;
   const exercises = finalExerciseData.exercises;
   const totalPoints = finalExerciseData.totalPoints;
   const phase = finalExerciseData.phase || 'EDUCATE';
-  
+
   // Define metallic pill classes for Movement Session (gold theme)
   const metallicPills = {
     gold: 'bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-white shadow border border-yellow-500 rounded-full',
     silver: 'bg-gradient-to-br from-btl-800 via-btl-600 to-btl-200 text-white shadow border border-btl-500 rounded-full',
     bronze: 'bg-gradient-to-br from-btl-700 via-btl-500 to-btl-300 text-white shadow border border-btl-400 rounded-full',
   };
-  
+
   // Determine points pill color based on total points
   const getPointsPill = (points: number) => {
     if (points >= 10) return metallicPills.gold;
     if (points >= 7) return metallicPills.silver;
     return metallicPills.bronze;
   };
-  
+
   // Estimate session time based on number of exercises
   const getSessionTime = (exerciseCount: number) => {
     if (exerciseCount <= 2) return "10-15 min";
     if (exerciseCount <= 3) return "15-20 min";
     return "20-25 min";
   };
-  
+
   return (
     <div
       className="flex flex-col items-center bg-white rounded-2xl shadow-lg p-7 border border-btl-100 hover:shadow-xl hover:border-btl-200 transition-all duration-200 cursor-pointer relative group min-h-[340px] min-w-[260px]"
@@ -67,6 +80,11 @@ export function MovementSessionCard({ onClick }: MovementSessionCardProps) {
       <p className="text-[15px] mb-3 text-center text-btl-700">
         {exercises.length === 0 ? 'No exercises assigned yet' : `${exercises.length} exercises personalized for your recovery`}
       </p>
+      {isStale && (
+        <p className="text-xs text-amber-700 mb-2 text-center">
+          Showing your last verified plan while we reconnect.
+        </p>
+      )}
       <span className="inline-block px-4 py-1 text-xs font-semibold rounded-full bg-btl-100 text-btl-600 mb-3 text-center whitespace-nowrap">
         {exercises.length} exercises • {phase.toUpperCase()} phase
       </span>
@@ -85,4 +103,4 @@ export function MovementSessionCard({ onClick }: MovementSessionCardProps) {
       </div>
     </div>
   );
-} 
+}

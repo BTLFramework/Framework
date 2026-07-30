@@ -877,6 +877,9 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
 
   const getPhaseColor = (phase: string) => {
     switch (phase) {
+      case "Reset": return "bg-blue-50 text-blue-800 border-blue-200"
+      case "Educate": return "bg-green-50 text-green-800 border-green-200"
+      case "Rebuild": return "bg-purple-50 text-purple-800 border-purple-200"
       case "Beginner": return "bg-[#D0F6FB] text-[#005F75] border-[#D0F6FB]" // Light teal with dark text
       case "Intermediate": return "bg-[#00C7E3] text-white border-[#00C7E3]" // Medium teal with white text
       case "Advanced": return "bg-[#005F75] text-white border-[#005F75]" // Dark teal with white text
@@ -1228,7 +1231,6 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                           <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Guided Prompts</span>
                           <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Sleep Correlation</span>
                         </div>
-          ) : null}
                       </div>
                       <button 
                         onClick={() => setShowPainJournalPopup(true)}

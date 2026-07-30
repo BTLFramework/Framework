@@ -16,6 +16,7 @@ import {
   AssessmentDialogFooter,
 } from "@/components/ui/assessment-dialog";
 import { SRSRecoveryWheelIcon } from "./ui/SRSRecoveryWheelIcon";
+import { deriveExerciseFocus } from "@/lib/exerciseFocus";
 
 interface MovementSessionDialogProps {
   open: boolean;
@@ -53,7 +54,7 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
   const [completedExercises, setCompletedExercises] = useState<Set<string>>(new Set());
   const [watchedVideos, setWatchedVideos] = useState<Set<string>>(new Set());
   const [showCelebration, setShowCelebration] = useState(false);
-  
+
   const exercises = exerciseData?.exercises || [];
   const completedCount = completedExercises.size;
   const watchedCount = watchedVideos.size;
@@ -80,6 +81,7 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
   const totalPoints = exerciseData?.totalPoints || 0;
   const phaseLabel = exerciseData?.phase ? scoreToPhase(exerciseData.srsScore) : "EDUCATE";
   const regionLabel = exerciseData?.region || "Neck";
+  const { focusRegion, differsFromAssessment } = deriveExerciseFocus(regionLabel, exercises);
 
   // Navigation functions for the pills
   const handlePhaseClick = () => {
@@ -94,7 +96,7 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
   const handleRegionClick = () => {
     // Dispatch custom event to open exercise videos modal
     const event = new CustomEvent('openExerciseVideos', {
-      detail: { filter: 'region', value: regionLabel }
+      detail: { filter: 'region', value: focusRegion }
     });
     window.dispatchEvent(event);
     onClose(); // Close the movement session dialog
@@ -135,14 +137,27 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                 <span className="whitespace-nowrap">{phaseLabel} Phase</span>
               </div>
               <div
-                className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-2 transition-all duration-200 hover:bg-white/25 hover:border-white/50 hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60 group"
+                className={`flex items-center gap-2 rounded-full px-4 py-2 transition-all duration-200 hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60 group ${
+                  differsFromAssessment
+                    ? "bg-btl-500/70 border border-btl-200 ring-1 ring-btl-200/60 shadow-lg shadow-btl-900/20 hover:bg-btl-500/90"
+                    : "bg-white/15 border border-white/30 hover:bg-white/25 hover:border-white/50"
+                }`}
                 tabIndex={0}
                 role="button"
-                title={`Click to view all ${regionLabel} exercises`}
+                title={
+                  differsFromAssessment
+                    ? `Clinician-assigned ${focusRegion} exercises; assessment region is ${regionLabel}`
+                    : `Click to view all ${focusRegion} exercises`
+                }
                 onClick={handleRegionClick}
               >
                 <Activity className="w-5 h-5 stroke-2 group-hover:scale-110 transition-transform duration-200" />
-                <span className="whitespace-nowrap">{regionLabel} Focus</span>
+                <span className="whitespace-nowrap font-semibold">{focusRegion} Focus</span>
+                {differsFromAssessment && (
+                  <span className="whitespace-nowrap rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide">
+                    Clinician Assigned
+                  </span>
+                )}
               </div>
               <div
                 className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-2 transition-all duration-200 hover:bg-white/25 hover:border-white/50 hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60 group"
@@ -178,18 +193,18 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                 Loading exercises...
               </div>
             )}
-            
+
             {exerciseError && (
               <div className="text-center text-red-500 py-8">
                 <AlertCircle className="w-8 h-8 mx-auto mb-2" />
                 Error loading exercises: {exerciseError}
               </div>
             )}
-            
+
             {!exerciseLoading && !exerciseError && exercises.length === 0 && (
               <div className="text-center text-btl-600">No exercises found for your current phase and region.</div>
             )}
-            
+
             {exercises.length > 0 && (
               <div className="exercise-list-container bg-white rounded-xl overflow-hidden flex flex-col gap-2 p-3" style={{ maxHeight: '280px', overflowY: 'auto' }}>
                 {exercises.map((ex: Exercise, idx: number) => {
@@ -295,13 +310,13 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                               <button
                   onClick={async () => {
                     console.log('Complete Session clicked!');
-                    
+
                     try {
                       // Mark all exercises as completed and watched
                       const allExerciseIds = exercises.map((ex, idx) => ex.id || idx.toString());
                       setCompletedExercises(new Set(allExerciseIds));
                       setWatchedVideos(new Set(allExerciseIds));
-                      
+
                       // Get patient ID from email first
                       const patientResponse = await fetch(`/api/patients/portal-data/${patientId}`)
                       if (!patientResponse.ok) {
@@ -309,7 +324,7 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                       }
                       const patientData = await patientResponse.json()
                       const numericPatientId = patientData.data.patient.id
-                      
+
                       // Add recovery points for the completed session
                       const result = await addRecoveryPoints(
                         numericPatientId.toString(),
@@ -317,10 +332,10 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                         'Movement session completed',
                         totalPoints
                       );
-                      
+
                       if (result.success) {
                         console.log('✅ Recovery points added successfully:', result.pointsAdded);
-                        
+
                         // Record task completion to backend
                         try {
                           await fetch('/api/recovery-points/task-completion', {
@@ -339,10 +354,10 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                         } catch (taskError) {
                           console.error('❌ Failed to record task completion:', taskError);
                         }
-                        
+
                         // Show celebration with actual points earned
                         setShowCelebration(true);
-                        
+
                         // Call parent's task completion handler to trigger refresh
                         if (onTaskComplete) {
                           onTaskComplete({
@@ -353,14 +368,14 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                             phase: exerciseData?.phase || 'EDUCATE'
                           });
                         }
-                        
+
                         // Close the dialog after a short delay to show celebration
                         setTimeout(() => {
                           onClose();
                         }, 2000);
                       } else {
                         console.error('❌ Failed to add recovery points:', result.error);
-                        
+
                         // Still record task completion to backend even if RP failed
                         try {
                           await fetch('/api/recovery-points/task-completion', {
@@ -379,10 +394,10 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                         } catch (taskError) {
                           console.error('❌ Failed to record task completion:', taskError);
                         }
-                        
+
                         // Still show celebration but log the error
                         setShowCelebration(true);
-                        
+
                         // Still call parent's task completion handler
                         if (onTaskComplete) {
                           onTaskComplete({
@@ -393,7 +408,7 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                             phase: exerciseData?.phase || 'EDUCATE'
                           });
                         }
-                        
+
                         // Close the dialog after a short delay
                         setTimeout(() => {
                           onClose();
@@ -406,7 +421,7 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                       setCompletedExercises(new Set(allExerciseIds));
                       setWatchedVideos(new Set(allExerciseIds));
                       setShowCelebration(true);
-                      
+
                       // Still call parent's task completion handler
                       if (onTaskComplete) {
                         onTaskComplete({
@@ -417,7 +432,7 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                           phase: exerciseData?.phase || 'EDUCATE'
                         });
                       }
-                      
+
                       // Close the dialog after a short delay
                       setTimeout(() => {
                         onClose();
@@ -465,4 +480,4 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
 
     </>
   );
-} 
+}
