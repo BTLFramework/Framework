@@ -41,7 +41,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
   const [selectedRegion, setSelectedRegion] = useState("all")
   const [selectedPhase, setSelectedPhase] = useState("all")
   console.log('🧩 Toolkit build:', BUILD_TAG, 'insights:', Array.isArray(insightLibrary) ? insightLibrary.length : 'n/a')
-  
+
   // Support Tools State
   const [showTimer, setShowTimer] = useState(false)
   const [timerMinutes, setTimerMinutes] = useState(10)
@@ -110,14 +110,14 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
   // Generate PDF from popup content
   const generatePDFFromPopup = async (contentRef: any, filename: string) => {
     if (!contentRef.current) return
-    
+
     try {
       const canvas = await html2canvas(contentRef.current, {
         useCORS: true,
         allowTaint: true,
         background: '#ffffff'
       })
-      
+
       const imgData = canvas.toDataURL('image/png')
       const pdf = new jsPDF('p', 'mm', 'a4')
       const imgWidth = 210
@@ -125,17 +125,17 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
       const imgHeight = (canvas.height * imgWidth) / canvas.width
       let heightLeft = imgHeight
       let position = 0
-      
+
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
       heightLeft -= pageHeight
-      
+
       while (heightLeft >= 0) {
         position = heightLeft - imgHeight
         pdf.addPage()
         pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
         heightLeft -= pageHeight
       }
-      
+
       pdf.save(filename)
     } catch (error) {
       console.error('Error generating PDF:', error)
@@ -146,7 +146,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
   // Pain Journal Popup
   const PainJournalPopup = () => {
     const contentRef = useRef<HTMLDivElement>(null)
-    
+
     // State for Pain Journal form data
     const [painJournalData, setPainJournalData] = useState({
       painLevel: '',
@@ -707,16 +707,17 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
         return grouped
       case "guides":
         // Map InsightLibrary to guides format with difficulty levels
+        const unavailableInsightIds = new Set([40, 47, 61])
         const insightGuides = insightLibrary.map(insight => {
           // Determine difficulty based on week (simplified mapping)
           let difficulty = "Beginner"
           if (insight.week >= 3 && insight.week <= 4) difficulty = "Intermediate"
           if (insight.week >= 5) difficulty = "Advanced"
-          
+
           // Estimate page count based on complexity
-          const pageCount = insight.week === 1 ? "8-12 pages" : 
+          const pageCount = insight.week === 1 ? "8-12 pages" :
                            insight.week <= 3 ? "10-15 pages" : "15-20 pages"
-          
+
           return {
             id: insight.id,
             title: insight.title,
@@ -726,7 +727,8 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             type: "insight",
             topic: insight.track.toLowerCase().replace(/\s+/g, '-'),
             week: insight.week,
-            track: insight.track
+            track: insight.track,
+            available: !unavailableInsightIds.has(insight.id)
           }
         })
 
@@ -745,7 +747,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
           {
             title: "Progressive Muscle Relaxation",
             description: "Systematic tension and release for full body relaxation",
-            duration: "15-20 min", 
+            duration: "15-20 min",
             difficulty: "Beginner",
             type: "mindfulness",
             topic: "pain-management",
@@ -756,7 +758,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             title: "Body Scan Meditation",
             description: "Mindful awareness of physical sensations throughout the body",
             duration: "10-15 min",
-            difficulty: "Beginner", 
+            difficulty: "Beginner",
             type: "mindfulness",
             topic: "mindfulness",
             url: "https://www.youtube.com/playlist?list=PLbiVpU59JkVaFMGi0A8Im_hfSh-SWsFwg",
@@ -767,7 +769,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
             description: "Mental imagery techniques to support healing and movement",
             duration: "8-12 min",
             difficulty: "Intermediate",
-            type: "mindfulness", 
+            type: "mindfulness",
             topic: "mindset",
             url: "https://www.youtube.com/watch?v=Gv3Z_RnLAO8",
             backupUrl: "https://www.youtube.com/watch?v=fWYUJscRBRw"
@@ -1027,7 +1029,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                         {["Reset", "Educate", "Rebuild"].map(phase => {
                           const phaseExercises = exercises.filter((exercise: any) => exercise.phase === phase)
                           if (phaseExercises.length === 0) return null
-                          
+
                           return (
                             <div key={phase} className="space-y-3">
                               {/* Phase Sub-header */}
@@ -1039,7 +1041,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                                   {phaseExercises.length} exercise{phaseExercises.length !== 1 ? 's' : ''}
                                 </span>
                               </div>
-                              
+
                               {/* Exercises Grid */}
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {phaseExercises.map((exercise: any, index: number) => (
@@ -1093,7 +1095,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                     {["Beginner", "Intermediate", "Advanced"].map(difficulty => {
                       const difficultyGuides = (content as { [key: string]: any[] }).mindfulness ? (content as { [key: string]: any[] }).mindfulness.filter((item: any) => item.difficulty === difficulty) : []
                       if (difficultyGuides.length === 0) return null
-                      
+
                       return (
                         <div key={difficulty} className="space-y-3">
                           {/* Difficulty Sub-header */}
@@ -1105,7 +1107,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                               {difficultyGuides.length} practice{difficultyGuides.length !== 1 ? 's' : ''}
                             </span>
                           </div>
-                          
+
                           {/* Guides Grid */}
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {difficultyGuides.map((guide: any, index: number) => (
@@ -1156,7 +1158,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                     {["Beginner", "Intermediate", "Advanced"].map(difficulty => {
                       const difficultyInsights = (content as { [key: string]: any[] }).insight ? (content as { [key: string]: any[] }).insight.filter((item: any) => item.difficulty === difficulty) : []
                       if (difficultyInsights.length === 0) return null
-                      
+
                       return (
                         <div key={difficulty} className="space-y-3">
                           {/* Difficulty Sub-header */}
@@ -1168,14 +1170,16 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                               {difficultyInsights.length} guide{difficultyInsights.length !== 1 ? 's' : ''}
                             </span>
                           </div>
-                          
+
                           {/* Insights Grid */}
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {difficultyInsights.map((insight: any, index: number) => (
                               <div
                                 key={index}
-                                className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg hover:border-btl-200 hover:shadow-md transition-all duration-200 cursor-pointer"
-                                onClick={() => insight.id ? setSelectedInsight(insight.id) : null}
+                                className={`flex items-center space-x-4 p-4 border border-gray-200 rounded-lg transition-all duration-200 ${
+                                  insight.available ? "hover:border-btl-200 hover:shadow-md cursor-pointer" : "opacity-70"
+                                }`}
+                                onClick={() => insight.available && insight.id ? setSelectedInsight(insight.id) : null}
                               >
                                 <div className="p-2 bg-btl-100 rounded-full border-2 border-btl-600">
                                   <FileText className="w-5 h-5 text-btl-600" />
@@ -1189,14 +1193,19 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                                     <span className="px-2 py-0.5 rounded-full bg-gray-100">{insight.difficulty}</span>
                                   </p>
                                 </div>
-                                <button 
+                                <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    if (insight.id) setSelectedInsight(insight.id);
+                                    if (insight.available && insight.id) setSelectedInsight(insight.id);
                                   }}
-                                  className="px-3 py-1 bg-btl-600 text-white text-sm rounded-full hover:bg-btl-700 transition-colors"
+                                  disabled={!insight.available}
+                                  className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                                    insight.available
+                                      ? "bg-btl-600 text-white hover:bg-btl-700"
+                                      : "bg-gray-200 text-gray-600 cursor-not-allowed"
+                                  }`}
                                 >
-                                  Read
+                                  {insight.available ? "Read" : "Coming Soon"}
                                 </button>
                               </div>
                             ))}
@@ -1232,7 +1241,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                           <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Sleep Correlation</span>
                         </div>
                       </div>
-                      <button 
+                      <button
                         onClick={() => setShowPainJournalPopup(true)}
                         className="px-4 py-2 bg-btl-600 text-white text-sm rounded-xl hover:bg-btl-700 transition-colors"
                       >
@@ -1265,7 +1274,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                             <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Visual Cues</span>
                           </div>
                         </div>
-                        <button 
+                        <button
                           onClick={() => setShowTimer(true)}
                           className="px-4 py-2 bg-btl-600 text-white text-sm rounded-xl hover:bg-btl-700 transition-colors"
                         >
@@ -1281,27 +1290,27 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                         </div>
                         <div className="flex justify-center space-x-4">
                           {!isTimerRunning ? (
-                            <button 
+                            <button
                               onClick={startTimer}
                               className="px-6 py-3 bg-btl-600 text-white rounded-xl hover:bg-btl-700 transition-colors"
                             >
                               Start
                             </button>
                           ) : (
-                            <button 
+                            <button
                               onClick={() => setIsTimerRunning(false)}
                               className="px-6 py-3 bg-yellow-600 text-white rounded-xl hover:bg-yellow-700 transition-colors"
                             >
                               Pause
                             </button>
                           )}
-                          <button 
+                          <button
                             onClick={resetTimer}
                             className="px-6 py-3 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-colors"
                           >
                             Reset
                           </button>
-                          <button 
+                          <button
                             onClick={() => setShowTimer(false)}
                             className="px-6 py-3 btn-primary-gradient text-white rounded-xl hover:bg-btl-700 transition-colors"
                           >
@@ -1359,7 +1368,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                           <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Progress Tracking</span>
                         </div>
                       </div>
-                      <button 
+                      <button
                         onClick={() => setShowSMARTGoalsPopup(true)}
                         className="px-4 py-2 bg-btl-600 text-white text-sm rounded-xl hover:bg-btl-700 transition-colors"
                       >
@@ -1392,7 +1401,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                             <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">Evidence-Based</span>
                           </div>
                         </div>
-                        <button 
+                        <button
                           onClick={() => setShowSleepTracker(true)}
                           className="px-4 py-2 bg-btl-600 text-white text-sm rounded-xl hover:bg-btl-700 transition-colors"
                         >
@@ -1452,7 +1461,7 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                           <div className="text-center text-sm text-gray-600 mt-1">{sleepData.stressLevel}/10</div>
                         </div>
                       </div>
-                      
+
                       <div className="bg-btl-50 p-4 rounded-xl border border-btl-200">
                         <h4 className="font-semibold text-btl-700 mb-2">Sleep-Pain Correlation Insights</h4>
                         <div className="text-sm text-gray-700 space-y-1">
@@ -1470,9 +1479,9 @@ export function ToolkitModal({ toolkit, onClose, patientId = "1", onInsightCompl
                           )}
                         </div>
                       </div>
-                      
+
                       <div className="flex justify-center space-x-4">
-                        <button 
+                        <button
                           onClick={() => setShowSleepTracker(false)}
                           className="px-6 py-3 bg-btl-600 text-white rounded-xl hover:bg-btl-700 transition-colors"
                         >

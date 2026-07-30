@@ -35,8 +35,8 @@ export function MindfulnessSessionCard({ patientId, onClick, isOpen = false }: M
 
   const mindfulnessData = (data as any)?.mindfulness || {};
   const lastSession = mindfulnessData.lastSession;
-  const phase = mindfulnessData.phase || 'EDUCATE';
-  const availableTracks = mindfulnessData.availableTracks || 3;
+  const phase = mindfulnessData.phase ?? 'Unavailable';
+  const availableTracks = mindfulnessData.availableTracks ?? 4;
   const points = 5;
   // Pills styling (silver for mindfulness)
   const pillClass = 'bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 text-white shadow border border-gray-400';
@@ -45,6 +45,15 @@ export function MindfulnessSessionCard({ patientId, onClick, isOpen = false }: M
     <div
       className="flex flex-col items-center bg-white rounded-2xl shadow-lg p-7 border border-btl-100 hover:shadow-xl hover:border-btl-200 transition-all duration-200 cursor-pointer relative group min-h-[340px] min-w-[260px]"
       onClick={onClick}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault()
+          onClick()
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label="Open Mindfulness Session"
     >
       <div className="w-14 h-14 bg-btl-600 rounded-xl flex items-center justify-center mb-4 mt-1 shadow-md">
         <Brain className="w-8 h-8 text-white" />
@@ -70,4 +79,4 @@ export function MindfulnessSessionCard({ patientId, onClick, isOpen = false }: M
       </div>
     </div>
   );
-} 
+}

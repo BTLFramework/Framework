@@ -25,7 +25,6 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    console.log('Patient Portal - Fetching intake data for:', patientEmail)
     
     // Fetch patient data from backend server
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app';
@@ -42,7 +41,6 @@ export async function GET(request: NextRequest) {
     }
 
     const patientData = await backendResponse.json()
-    console.log('Backend patient data:', patientData)
 
     // Transform the data for the assessments section
     const intakeDate = new Date(patientData.intakeDate)
@@ -160,4 +158,4 @@ export async function GET(request: NextRequest) {
       headers: corsHeaders
     })
   }
-} 
+}

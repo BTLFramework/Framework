@@ -9,7 +9,7 @@ export default function BookAppointmentPage() {
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
       // Redirect to Jane App booking system
-      window.location.href = process.env.JANE_APP_BOOKING_URL || "https://backtolife.janeapp.com/"
+      window.location.href = "https://movenetics.janeapp.com/#/staff_member/30"
     }
   }, [authLoading, isAuthenticated])
 

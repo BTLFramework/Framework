@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, MessageCircle, CheckCircle, XCircle, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, MapPin, User, MessageCircle, CheckCircle, XCircle, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
 
@@ -19,61 +19,17 @@ interface Appointment {
 export default function SchedulePage() {
   const router = useRouter()
   const { patient, loading: authLoading, isAuthenticated } = useAuth()
-  
+
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming")
   const [selectedMonth, setSelectedMonth] = useState(new Date())
   const [loading, setLoading] = useState(true)
 
-  // Generate sample appointments
+  // Appointment synchronization is not connected yet. Never substitute sample
+  // appointments because patients may interpret them as real bookings.
   useEffect(() => {
-    const generateAppointments = () => {
-      const sampleAppointments: Appointment[] = [
-        {
-          id: "1",
-          date: "2024-01-15",
-          time: "10:00",
-          type: "Chiropractic Adjustment",
-          status: "upcoming",
-          provider: "Dr. Spencer Barber",
-          duration: 30,
-          notes: "Follow-up on neck pain improvement"
-        },
-        {
-          id: "2",
-          date: "2024-01-22",
-          time: "14:00",
-          type: "Follow-up Session",
-          status: "upcoming",
-          provider: "Dr. Spencer Barber",
-          duration: 45
-        },
-        {
-          id: "3",
-          date: "2024-01-08",
-          time: "09:00",
-          type: "Initial Consultation",
-          status: "completed",
-          provider: "Dr. Spencer Barber",
-          duration: 60,
-          notes: "Initial assessment completed, treatment plan established"
-        },
-        {
-          id: "4",
-          date: "2024-01-01",
-          time: "11:00",
-          type: "Chiropractic Adjustment",
-          status: "completed",
-          provider: "Dr. Spencer Barber",
-          duration: 30
-        }
-      ]
-      
-      setAppointments(sampleAppointments)
-      setLoading(false)
-    }
-    
-    generateAppointments()
+    setAppointments([])
+    setLoading(false)
   }, [])
 
   const upcomingAppointments = appointments.filter(apt => apt.status === "upcoming")
@@ -133,7 +89,7 @@ export default function SchedulePage() {
   const handleCancel = async (appointmentId: string) => {
     if (confirm('Are you sure you want to cancel this appointment?')) {
       // Update appointment status
-      setAppointments(prev => prev.map(apt => 
+      setAppointments(prev => prev.map(apt =>
         apt.id === appointmentId ? { ...apt, status: "cancelled" as const } : apt
       ))
     }
@@ -183,8 +139,8 @@ export default function SchedulePage() {
             >
               Book New
             </button>
-            <button 
-              onClick={() => router.back()} 
+            <button
+              onClick={() => router.back()}
               className="p-3 hover:bg-white/20 rounded-xl transition-all duration-200 hover:scale-105"
             >
               <ArrowLeft className="w-6 h-6 text-white" />
@@ -237,8 +193,8 @@ export default function SchedulePage() {
                 >
                   Upcoming Appointments
                   <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
-                    activeTab === "upcoming" 
-                      ? "bg-btl-600 text-white" 
+                    activeTab === "upcoming"
+                      ? "bg-btl-600 text-white"
                       : "bg-charcoal-100 text-charcoal-600"
                   }`}>
                     {upcomingAppointments.length}
@@ -254,8 +210,8 @@ export default function SchedulePage() {
                 >
                   Past Appointments
                   <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
-                    activeTab === "past" 
-                      ? "bg-btl-600 text-white" 
+                    activeTab === "past"
+                      ? "bg-btl-600 text-white"
                       : "bg-charcoal-100 text-charcoal-600"
                   }`}>
                     {pastAppointments.length}
@@ -277,7 +233,9 @@ export default function SchedulePage() {
                     <Calendar className="w-10 h-10 text-btl-500" />
                   </div>
                   <h3 className="text-xl font-bold text-charcoal-900 mb-3">No upcoming appointments</h3>
-                  <p className="text-charcoal-600 mb-6">You don't have any appointments scheduled</p>
+                  <p className="text-charcoal-600 mb-6">
+                    Appointment details are managed securely through Movenetics Jane.
+                  </p>
                   <button
                     onClick={() => router.push('/book-appointment')}
                     className="bg-gradient-to-r from-btl-600 to-btl-700 hover:from-btl-700 hover:to-btl-800 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 hover:shadow-lg"
@@ -298,7 +256,7 @@ export default function SchedulePage() {
                   {(activeTab === "upcoming" ? upcomingAppointments : pastAppointments).map((appointment) => {
                     const statusInfo = getStatusInfo(appointment.status)
                     const StatusIcon = statusInfo.icon
-                    
+
                     return (
                       <div
                         key={appointment.id}
@@ -352,7 +310,7 @@ export default function SchedulePage() {
                                   <span>Duration: {appointment.duration} minutes</span>
                                   <span>Appointment ID: #{appointment.id}</span>
                                 </div>
-                                
+
                                 {activeTab === "upcoming" && appointment.status === "upcoming" && (
                                   <div className="flex items-center space-x-3">
                                     <button
@@ -384,7 +342,7 @@ export default function SchedulePage() {
           {/* Quick Actions */}
           <div className="card-gradient rounded-2xl shadow-lg p-6 border border-btl-200">
             <h3 className="text-lg font-semibold text-btl-800 mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <button
                 onClick={() => router.push('/book-appointment')}
                 className="bg-gradient-to-r from-btl-600 to-btl-700 hover:from-btl-700 hover:to-btl-800 text-white p-4 rounded-xl font-medium transition-all duration-200 hover:shadow-lg text-left"
@@ -397,7 +355,7 @@ export default function SchedulePage() {
                   </div>
                 </div>
               </button>
-              
+
               <button
                 onClick={() => router.push('/messages')}
                 className="bg-white border border-btl-200 hover:bg-btl-50 text-btl-700 p-4 rounded-xl font-medium transition-all duration-200 text-left"
@@ -407,19 +365,6 @@ export default function SchedulePage() {
                   <div>
                     <div className="font-semibold">Contact Clinic</div>
                     <div className="text-sm opacity-90">Send a message</div>
-                  </div>
-                </div>
-              </button>
-              
-              <button
-                onClick={() => window.open('tel:+15551234567')}
-                className="bg-white border border-btl-200 hover:bg-btl-50 text-btl-700 p-4 rounded-xl font-medium transition-all duration-200 text-left"
-              >
-                <div className="flex items-center space-x-3">
-                  <Phone className="w-6 h-6" />
-                  <div>
-                    <div className="font-semibold">Call Clinic</div>
-                    <div className="text-sm opacity-90">(555) 123-4567</div>
                   </div>
                 </div>
               </button>

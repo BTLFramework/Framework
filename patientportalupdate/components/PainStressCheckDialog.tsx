@@ -13,6 +13,7 @@ import { addRecoveryPoints } from "@/lib/recoveryPointsApi";
 import { classifyTier, Mood } from "@/utils/assessment";
 import { tierContent } from "@/content/assessmentResponses";
 import ResultModal from "./ResultModal";
+import { clinicalRegionFromProfile } from "@/lib/clinicalState";
 
 interface PainStressCheckDialogProps {
   open: boolean;
@@ -24,7 +25,7 @@ interface PainStressCheckDialogProps {
 
 const PAIN_AREAS = [
   "Lower back",
-  "Neck", 
+  "Neck",
   "Shoulder",
   "Knee",
   "Hip",
@@ -34,7 +35,7 @@ const PAIN_AREAS = [
 const FUNCTION_LIKERT = [
   "No limit",
   "A little",
-  "Some", 
+  "Some",
   "A lot",
   "Couldn't do much",
 ];
@@ -110,9 +111,9 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
   }, [open]);
 
   // Get actual patient data instead of hardcoded values
-  const srsScore = patientData?.srsScore || 0;
-  const phaseLabel = patientData?.phase || "EDUCATE";
-  const regionLabel = "Lower back";
+  const srsScore = patientData?.srsScore ?? patientData?.patient?.srsScore ?? "—";
+  const phaseLabel = patientData?.phase ?? patientData?.patient?.phase ?? "Unavailable";
+  const regionLabel = clinicalRegionFromProfile(patientData) ?? "Focus unavailable";
 
   const canSubmit = pain > 0 && painArea && functionLikert && stress > 0;
   const totalPoints = 3;
@@ -154,7 +155,7 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    
+
     try {
       const patientResponse = await fetch(`/api/patients/portal-data/${patientId}`)
       if (!patientResponse.ok) {
@@ -162,7 +163,7 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
       }
       const patientData = await patientResponse.json()
       const numericPatientId = patientData.data.patient.id
-      
+
       // Submit daily pain and stress assessment to backend
               const dailyAssessmentResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/patients/daily-assessment`, {
         method: 'POST',
@@ -180,12 +181,12 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
           stressFactors: stressFactors
         })
       });
-      
+
       if (dailyAssessmentResponse.ok) {
         const assessmentResult = await dailyAssessmentResponse.json();
         console.log('✅ Daily assessment stored:', assessmentResult);
       }
-      
+
       // Call real backend for recovery points
       const result = await addRecoveryPoints(
         numericPatientId.toString(),
@@ -233,7 +234,7 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
         setResult({ tier, debugInfo });
         setEscalate(false); // Backend doesn't support escalation yet
       }, 2000);
-      
+
       if (onTaskComplete) {
         onTaskComplete({
           taskId: 'pain-assessment',
@@ -243,26 +244,26 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
           phase: phaseLabel
         });
       }
-      
-      onComplete?.({ 
-        pain, 
-        painArea, 
-        functionLikert, 
-        triggers, 
-        stress, 
+
+      onComplete?.({
+        pain,
+        painArea,
+        functionLikert,
+        triggers,
+        stress,
         stressFactors,
         pointsEarned: totalPoints
       });
     } catch (error) {
       console.error('❌ Error completing pain assessment:', error);
-      
+
       // Still record task completion to backend even if everything else failed
       try {
         const patientResponse = await fetch(`/api/patients/portal-data/${patientId}`)
         if (patientResponse.ok) {
           const patientData = await patientResponse.json()
           const numericPatientId = patientData.data.patient.id
-          
+
           await fetch('/api/recovery-points/task-completion', {
             method: 'POST',
             headers: {
@@ -280,7 +281,7 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
       } catch (taskError) {
         console.error('❌ Failed to record task completion:', taskError);
       }
-      
+
       setShowCelebration(true);
       setTimeout(() => {
         setShowCelebration(false);
@@ -298,7 +299,7 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
         setResult({ tier, debugInfo });
         setEscalate(false);
       }, 2000);
-      
+
       if (onTaskComplete) {
         onTaskComplete({
           taskId: 'pain-assessment',
@@ -308,18 +309,18 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
           phase: phaseLabel
         });
       }
-      
-      onComplete?.({ 
-        pain, 
-        painArea, 
-        functionLikert, 
-        triggers, 
-        stress, 
+
+      onComplete?.({
+        pain,
+        painArea,
+        functionLikert,
+        triggers,
+        stress,
         stressFactors,
         pointsEarned: totalPoints
       });
     }
-    
+
     setIsSubmitting(false);
   };
 
@@ -354,7 +355,7 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
             Your daily wellness assessment. Track your progress and get personalized insights.
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="bg-gradient-to-br from-btl-900 via-btl-700 to-btl-100 px-8 pt-8 pb-4 border-b border-white/40">
           <div className="flex items-center gap-8 items-center">
             <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
@@ -410,19 +411,19 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
                 <div className="w-3 h-3 bg-gradient-to-r from-btl-600 to-btl-400 rounded-full shadow-sm"></div>
                 Pain Assessment
               </h3>
-              
+
               {/* Pain Slider */}
               <div className="space-y-4 mb-6">
                 <label className="block text-sm font-medium text-gray-700">
                   Rate your pain right now (0-10)
                 </label>
                 <div className="relative">
-                  <input 
-                    type="range" 
-                    min={0} 
-                    max={10} 
-                    value={pain} 
-                    onChange={e => setPain(Number(e.target.value))} 
+                  <input
+                    type="range"
+                    min={0}
+                    max={10}
+                    value={pain}
+                    onChange={e => setPain(Number(e.target.value))}
                     className="w-full h-2 bg-btl-100 rounded-xl appearance-none cursor-pointer accent-btl-600 focus:outline-none focus:ring-2 focus:ring-btl-400 shadow-inner"
                   />
                   <div className="flex justify-between text-xs text-gray-500 mt-2">
@@ -448,9 +449,9 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Where is your pain located?
                 </label>
-                <select 
-                  value={painArea} 
-                  onChange={e => setPainArea(e.target.value)} 
+                <select
+                  value={painArea}
+                  onChange={e => setPainArea(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-btl-500 focus:border-btl-500 bg-white shadow-sm hover:shadow-md transition-all duration-200"
                 >
                   <option value="">Select the affected area</option>
@@ -465,10 +466,10 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
                 </label>
                 <div className="grid grid-cols-5 gap-2">
                   {FUNCTION_LIKERT.map((label, idx) => (
-                    <button 
-                      key={label} 
-                      type="button" 
-                      onClick={() => setFunctionLikert(label)} 
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => setFunctionLikert(label)}
                       className={`py-2 px-2 rounded-full border-2 text-xs font-medium transition-all duration-200 hover:shadow-lg ${
                         functionLikert === label
                           ? 'bg-gradient-to-br from-btl-600 to-btl-500 text-white border-btl-600 shadow-xl scale-105'
@@ -490,10 +491,10 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
                 <div className="space-y-4">
                   <div className="flex flex-wrap gap-3">
                     {TRIGGERS.map(trigger => (
-                      <button 
-                        key={trigger} 
-                        type="button" 
-                        onClick={() => handleChipToggle(triggers, setTriggers, trigger)} 
+                      <button
+                        key={trigger}
+                        type="button"
+                        onClick={() => handleChipToggle(triggers, setTriggers, trigger)}
                         className={`px-4 py-2 rounded-2xl border-2 text-sm font-medium transition-all duration-200 hover:shadow-lg ${
                           triggers.includes(trigger)
                             ? 'bg-gradient-to-r from-btl-600 to-btl-500 text-white border-btl-600 shadow-xl scale-105'
@@ -505,11 +506,11 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
                     ))}
                   </div>
                   <div className="flex items-center gap-3">
-                    <input 
-                      type="text" 
-                      value={customTrigger} 
-                      onChange={e => setCustomTrigger(e.target.value)} 
-                      placeholder="Add custom trigger..." 
+                    <input
+                      type="text"
+                      value={customTrigger}
+                      onChange={e => setCustomTrigger(e.target.value)}
+                      placeholder="Add custom trigger..."
                       className="flex-1 px-4 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-btl-500 focus:border-btl-500 shadow-sm hover:shadow-md transition-all duration-200"
                     />
                     <div className="p-2 bg-btl-100 rounded-2xl">
@@ -526,19 +527,19 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
                 <div className="w-3 h-3 bg-gradient-to-r from-btl-600 to-btl-400 rounded-full shadow-sm"></div>
                 Stress & Mood
               </h3>
-              
+
               {/* Stress Slider */}
               <div className="space-y-4 mb-6">
                 <label className="block text-sm font-medium text-gray-700">
                   How stressed do you feel right now? (0 = calm · 10 = maxed out)
                 </label>
                 <div className="relative">
-                  <input 
-                    type="range" 
-                    min={0} 
-                    max={10} 
-                    value={stress} 
-                    onChange={e => setStress(Number(e.target.value))} 
+                  <input
+                    type="range"
+                    min={0}
+                    max={10}
+                    value={stress}
+                    onChange={e => setStress(Number(e.target.value))}
                     className="w-full h-2 bg-btl-100 rounded-xl appearance-none cursor-pointer accent-btl-600 focus:outline-none focus:ring-2 focus:ring-btl-400 shadow-inner"
                   />
                   <div className="flex justify-between text-xs text-gray-500 mt-2">
@@ -615,8 +616,8 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
                 Total: {totalPoints} pts
               </div>
             </div>
-            <button 
-              onClick={handleSubmit} 
+            <button
+              onClick={handleSubmit}
               disabled={!canSubmit || isSubmitting}
               className={`px-6 py-3 rounded-2xl font-medium transition-all duration-200 shadow-lg ${
                 canSubmit && !isSubmitting
@@ -639,7 +640,7 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
           </div>
         </div>
       </DialogContent>
-      
+
       {result && (
         <ResultModal
           message={tierContent[result.tier].message}
@@ -653,4 +654,4 @@ export function PainStressCheckDialog({ open, onOpenChange, patientId, onComplet
       )}
     </Dialog>
   );
-} 
+}

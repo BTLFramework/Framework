@@ -238,7 +238,7 @@ export const insightLibrary: Insight[] = [
       }
     ]
   },
-  
+
   // ========= WEEK 2 - UPDATED WITH REAL RESOURCES =========
   {
     id: 30,
@@ -488,7 +488,7 @@ export const insightLibrary: Insight[] = [
       }
     ]
   },
-  
+
   // ========= WEEK 3 - UPDATED WITH REAL RESOURCES =========
   {
     id: 37,
@@ -611,8 +611,8 @@ export const insightLibrary: Insight[] = [
     id: 40,
     week: 3,
     track: "SuccessStory",
-    title: "Patient Success: Chronic Pain Overcome",
-    subtitle: "How John went from bedridden to active",
+    title: "Patient Story",
+    subtitle: "Recovery story coming soon",
     assetPath: "/insight/john-success.mp4",
     quizQ: "Chronic pain recovery is possible with the right approach. (T/F)",
     quizA: "T",
@@ -738,7 +738,7 @@ export const insightLibrary: Insight[] = [
       }
     ]
   },
-  
+
   // ========= WEEK 4 - UPDATED WITH REAL RESOURCES =========
   {
     id: 44,
@@ -861,8 +861,8 @@ export const insightLibrary: Insight[] = [
     id: 47,
     week: 4,
     track: "SuccessStory",
-    title: "Patient Success: From Surgery to Strength",
-    subtitle: "Maria's post-op recovery story",
+    title: "Patient Story",
+    subtitle: "Post-operative recovery story coming soon",
     assetPath: "/insight/maria-success.mp4",
     quizQ: "Post-surgical rehabilitation is key to full recovery. (T/F)",
     quizA: "T",
@@ -988,7 +988,7 @@ export const insightLibrary: Insight[] = [
       }
     ]
   },
-  
+
   // WEEK 5 (Keep existing Week 5 content - mostly good)
   {
     id: 51,
@@ -1074,7 +1074,7 @@ export const insightLibrary: Insight[] = [
     releaseOffset: 6,
     points: 5
   },
-  
+
   // WEEK 6 - UPDATED WITH REAL RESOURCES
   {
     id: 58,
@@ -1170,8 +1170,8 @@ export const insightLibrary: Insight[] = [
     id: 61,
     week: 6,
     track: "SuccessStory",
-    title: "Future story slot",
-    subtitle: "New patient success",
+    title: "Patient Story",
+    subtitle: "New recovery story coming soon",
     assetPath: "/insight/future-story.mp4",
     quizQ: "Success stories can inspire and motivate recovery. (T/F)",
     quizA: "T",
@@ -1227,4 +1227,3 @@ export const getInsightsByTrack = (track: string): Insight[] => {
 export const getAllTracks = (): string[] => {
   return [...new Set(insightLibrary.map(insight => insight.track))];
 };
-

@@ -53,3 +53,23 @@ export const normalizeClinicalProfile = (profile) => {
       null,
   }
 }
+
+export const clinicalRegionFromProfile = (profile) => {
+  if (!profile) return null
+
+  const latest = latestSrsRecord(
+    profile.srsScores ??
+    profile.patient?.srsScores ??
+    profile.data?.srsScores ??
+    profile.data?.patient?.srsScores
+  )
+
+  return (
+    profile.region ??
+    profile.patient?.region ??
+    profile.data?.region ??
+    profile.data?.patient?.region ??
+    latest?.region ??
+    null
+  )
+}

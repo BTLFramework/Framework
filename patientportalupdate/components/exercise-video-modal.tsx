@@ -30,6 +30,17 @@ export function ExerciseVideoModal({ exercise, open, onClose }: ExerciseVideoMod
   }, [open]);
 
   if (!exercise) return null;
+  const exerciseTitle =
+    exercise.title ||
+    exercise.name ||
+    exercise.exerciseData?.name ||
+    "Exercise";
+  const videoUrl =
+    exercise.videoUrl ||
+    exercise.videoPath ||
+    exercise.exerciseData?.videoUrl ||
+    exercise.exerciseData?.videoPath ||
+    null;
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -58,7 +69,7 @@ export function ExerciseVideoModal({ exercise, open, onClose }: ExerciseVideoMod
             <div className="flex items-center gap-8">
               <Dumbbell className="w-12 h-12 text-white opacity-90" />
               <div>
-                <h2 className="text-3xl font-bold text-white">{exercise.title ? exercise.title.replace(/\bdecompression\b/i, 'Decompression') : 'Standing Decompression Breath'}</h2>
+                <h2 className="text-3xl font-bold text-white">{exerciseTitle.replace(/\bdecompression\b/i, 'Decompression')}</h2>
                 <p className="mt-2 text-btl-100 text-sm">
                   {exercise.description || 'Reduce spinal compression through mindful breathing'}
                 </p>
@@ -121,7 +132,7 @@ export function ExerciseVideoModal({ exercise, open, onClose }: ExerciseVideoMod
             <div className="mb-6">
               <h3 className="text-2xl font-bold text-gray-900 mb-2">{exercise.title || exercise.name}</h3>
               <p className="text-gray-600 mb-4">{exercise.description}</p>
-              
+
               <div className="flex flex-wrap items-center gap-3 mb-4">
                 <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getPhaseColor(exercise.phase || exercise.exerciseData?.phase)}`}>
                   {exercise.phase || exercise.exerciseData?.phase} Phase
@@ -148,13 +159,23 @@ export function ExerciseVideoModal({ exercise, open, onClose }: ExerciseVideoMod
                     <Play className="w-8 h-8 text-white ml-1" />
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">Exercise Demonstration</h3>
-                  <p className="text-gray-600 mb-4">Watch the video to see proper form and technique</p>
-                  <button
-                    onClick={() => setShowVideo(true)}
-                    className="bg-btl-600 text-white px-6 py-3 rounded-full hover:bg-btl-700 transition-colors font-medium"
-                  >
-                    Watch Video
-                  </button>
+                  <p className="text-gray-600 mb-4">
+                    {videoUrl
+                      ? "Watch the video to see proper form and technique"
+                      : "The demonstration video for this exercise is still being prepared."}
+                  </p>
+                  {videoUrl ? (
+                    <button
+                      onClick={() => setShowVideo(true)}
+                      className="bg-btl-600 text-white px-6 py-3 rounded-full hover:bg-btl-700 transition-colors font-medium"
+                    >
+                      Watch Video
+                    </button>
+                  ) : (
+                    <span className="inline-flex rounded-full bg-btl-100 px-5 py-2 font-semibold text-btl-700">
+                      Video Coming Soon
+                    </span>
+                  )}
                 </div>
               </div>
             ) : (
@@ -164,8 +185,10 @@ export function ExerciseVideoModal({ exercise, open, onClose }: ExerciseVideoMod
                     <div className="w-16 h-16 mx-auto mb-4 bg-btl-600 rounded-full flex items-center justify-center border-4 border-gray-400 opacity-50 shadow-lg">
                       <Play className="w-8 h-8 text-white ml-1" />
                     </div>
-                    <p className="text-lg">{exercise.title || exercise.name}</p>
-                    <p className="text-sm opacity-75">Video ID: {exercise.videoId || exercise.exerciseData?.videoId}</p>
+                    <p className="text-lg">{exerciseTitle}</p>
+                    <video src={videoUrl} controls className="mt-4 max-h-full w-full rounded-lg">
+                      Your browser does not support this video.
+                    </video>
                   </div>
                   <button
                     onClick={() => setShowVideo(false)}
@@ -244,7 +267,7 @@ export function ExerciseVideoModal({ exercise, open, onClose }: ExerciseVideoMod
         {/* Footer with Instructions Button */}
         <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-200">
           <div className="flex items-center justify-between w-full">
-            <button 
+            <button
               onClick={() => {
                 // Scroll to instructions section
                 const instructionsElement = document.querySelector('[data-instructions]');
@@ -269,4 +292,4 @@ export function ExerciseVideoModal({ exercise, open, onClose }: ExerciseVideoMod
       </AssessmentDialogContent>
     </AssessmentDialog>
   );
-} 
+}

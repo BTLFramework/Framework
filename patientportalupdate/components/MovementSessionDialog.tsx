@@ -79,8 +79,8 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
 
   // Calculate total points
   const totalPoints = exerciseData?.totalPoints || 0;
-  const phaseLabel = exerciseData?.phase ? scoreToPhase(exerciseData.srsScore) : "EDUCATE";
-  const regionLabel = exerciseData?.region || "Neck";
+  const phaseLabel = exerciseData?.phase ? scoreToPhase(exerciseData.srsScore) : "Unavailable";
+  const regionLabel = exerciseData?.region || "Focus unavailable";
   const { focusRegion, differsFromAssessment } = deriveExerciseFocus(regionLabel, exercises);
 
   // Navigation functions for the pills
@@ -94,6 +94,10 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
   };
 
   const handleRegionClick = () => {
+    // A clinician-assigned focus is explanatory patient context. Keep the
+    // active session open instead of navigating away from the prescription.
+    if (differsFromAssessment) return;
+
     // Dispatch custom event to open exercise videos modal
     const event = new CustomEvent('openExerciseVideos', {
       detail: { filter: 'region', value: focusRegion }
@@ -167,7 +171,7 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                 onClick={handleSRSClick}
               >
                 <SRSRecoveryWheelIcon className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
-                <span className="whitespace-nowrap">SRS: {exerciseData?.srsScore || 0}</span>
+                <span className="whitespace-nowrap">SRS: {exerciseData?.srsScore ?? "—"}</span>
               </div>
             </div>
           </div>
@@ -296,16 +300,6 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                 <div className={`px-4 py-2 font-medium text-sm ${getPointsPill(totalPoints)}`}>
                   Total: {totalPoints} pts
                 </div>
-                <button
-                  onClick={() => {
-                    setCompletedExercises(new Set());
-                    setWatchedVideos(new Set());
-                    setShowCelebration(false);
-                  }}
-                  className="px-3 py-2 rounded-full bg-red-500 text-white hover:bg-red-600 font-medium text-sm transition-colors"
-                >
-                  Dev Reset
-                </button>
               </div>
                               <button
                   onClick={async () => {

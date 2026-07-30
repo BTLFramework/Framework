@@ -45,6 +45,15 @@ export function PainAssessmentCard({ patientId, onClick, isOpen = false }: PainA
     <div
       className="flex flex-col items-center bg-white rounded-2xl shadow-lg p-7 border border-btl-100 hover:shadow-xl hover:border-btl-200 transition-all duration-200 cursor-pointer relative group min-h-[340px] min-w-[260px]"
       onClick={onClick}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault()
+          onClick()
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label="Open Pain and Stress Check"
     >
       <div className="w-14 h-14 bg-btl-600 rounded-xl flex items-center justify-center mb-4 mt-1 shadow-md">
         <Heart className="w-8 h-8 text-white" />
@@ -70,4 +79,4 @@ export function PainAssessmentCard({ patientId, onClick, isOpen = false }: PainA
       </div>
     </div>
   );
-} 
+}

@@ -1,6 +1,7 @@
 import test from "node:test"
 import assert from "node:assert/strict"
 import {
+  clinicalRegionFromProfile,
   latestSrsRecord,
   normalizeClinicalProfile,
   phaseForSrs,
@@ -48,4 +49,21 @@ test("missing assessment is not converted into an SRS of zero", () => {
   assert.equal(profile.score, null)
   assert.equal(profile.srsScore, null)
   assert.equal(profile.phase, null)
+})
+
+test("clinical region follows the verified assessment across response shapes", () => {
+  assert.equal(clinicalRegionFromProfile({ region: "Neck" }), "Neck")
+  assert.equal(clinicalRegionFromProfile({ patient: { region: "Neck" } }), "Neck")
+  assert.equal(
+    clinicalRegionFromProfile({
+      patient: {
+        srsScores: [
+          { region: "Low Back", date: "2025-01-01" },
+          { region: "Neck", date: "2025-02-01" },
+        ],
+      },
+    }),
+    "Neck"
+  )
+  assert.equal(clinicalRegionFromProfile({}), null)
 })

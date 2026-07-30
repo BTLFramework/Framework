@@ -16,6 +16,7 @@ import InsightDialog from "./InsightDialog";
 import type { RecoveryInsight } from "@/types/recovery";
 import type { Insight } from "@/lib/InsightLibrary";
 import { addDays, startOfDay, differenceInCalendarDays } from 'date-fns';
+import { clinicalRegionFromProfile } from "@/lib/clinicalState";
 
 interface RecoveryInsightDialogProps {
   open: boolean;
@@ -24,9 +25,9 @@ interface RecoveryInsightDialogProps {
   onComplete?: (data: any) => void;
   onTaskComplete?: (taskData: any) => void;
   snapshot: {
-    pain: number;
-    stress: number;
-    risk: string;
+    pain: number | null;
+    stress: number | null;
+    risk: string | null;
   };
   painDelta: number;
   stressDelta: number;
@@ -38,17 +39,17 @@ interface RecoveryInsightDialogProps {
   };
 }
 
-export function RecoveryInsightDialog({ 
-  open, 
-  onOpenChange, 
+export function RecoveryInsightDialog({
+  open,
+  onOpenChange,
   patientId,
-  onComplete, 
+  onComplete,
   onTaskComplete,
-  snapshot, 
-  painDelta, 
-  stressDelta, 
-  showActionPrompt, 
-  actionPrompt 
+  snapshot,
+  painDelta,
+  stressDelta,
+  showActionPrompt,
+  actionPrompt
 }: RecoveryInsightDialogProps) {
   const [selectedInsightId, setSelectedInsightId] = useState<number | null>(null);
   const [showInsightDialog, setShowInsightDialog] = useState(false);
@@ -59,10 +60,10 @@ export function RecoveryInsightDialog({
   const [completedInsights, setCompletedInsights] = useState<number[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [dailyCompletedInsights, setDailyCompletedInsights] = useState<number>(0);
-  
+
   // Debug mode: Check for ?unlockInsights=1 in URL
   const [debugUnlockAll, setDebugUnlockAll] = useState(false);
-  
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -107,9 +108,9 @@ export function RecoveryInsightDialog({
   }, [open, patientId]);
 
   // Get actual patient data instead of hardcoded values
-  const srsScore = patientData?.srsScore || 0;
-  const phaseLabel = patientData?.phase || "EDUCATE";
-  const regionLabel = "Lower back"; // This could also come from patient data if needed
+  const srsScore = patientData?.srsScore ?? patientData?.patient?.srsScore ?? "—";
+  const phaseLabel = patientData?.phase ?? patientData?.patient?.phase ?? "Unavailable";
+  const regionLabel = clinicalRegionFromProfile(patientData) ?? "Focus unavailable";
 
   const canSubmit = selectedInsightId !== null || actionTaken;
 
@@ -146,7 +147,7 @@ export function RecoveryInsightDialog({
   const handleInsightComplete = (insightId: number, points?: number) => {
     console.log('🎯 handleInsightComplete called with:', { insightId, points });
     console.log('🎯 THIS SHOULD APPEAR WHEN INSIGHT IS COMPLETED');
-    
+
     setCompletedInsights(prev => {
       console.log('🎯 Previous completed insights:', prev);
       if (!prev.includes(insightId)) {
@@ -167,7 +168,7 @@ export function RecoveryInsightDialog({
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    
+
     try {
       // Get patient data to get numeric ID
       const patientResponse = await fetch(`/api/patients/portal-data/${patientId}`)
@@ -176,7 +177,7 @@ export function RecoveryInsightDialog({
       }
       const patientData = await patientResponse.json()
       const numericPatientId = patientData.data.patient.id
-      
+
       // Add recovery points for the completed insight
       const result = await addRecoveryPoints(
         numericPatientId.toString(),
@@ -184,10 +185,10 @@ export function RecoveryInsightDialog({
         'Watch micro-lesson',
         totalPoints
       );
-      
+
       if (result.success) {
         console.log('✅ Recovery points added successfully:', result.pointsAdded);
-        
+
         // Record task completion to backend
         try {
           await fetch('/api/recovery-points/task-completion', {
@@ -206,10 +207,10 @@ export function RecoveryInsightDialog({
         } catch (taskError) {
           console.error('❌ Failed to record task completion:', taskError);
         }
-        
+
         // Show celebration
         setShowCelebration(true);
-        
+
         // Call parent's task completion handler to trigger refresh
         if (onTaskComplete) {
           onTaskComplete({
@@ -220,14 +221,14 @@ export function RecoveryInsightDialog({
             phase: phaseLabel
           });
         }
-        
+
         // Call parent's completion handler
-        onComplete?.({ 
+        onComplete?.({
           selectedInsight: selectedInsightId,
           actionTaken: actionTaken ? actionPrompt?.action : null,
           pointsEarned: totalPoints
         });
-        
+
         // Close the dialog after a short delay to show celebration
         setTimeout(() => {
           onOpenChange(false);
@@ -235,15 +236,15 @@ export function RecoveryInsightDialog({
         }, 2000);
       } else {
         console.error('❌ Failed to add recovery points:', result.message || result.error);
-        
+
         // Check if it's a daily cap issue
         const isDailyCapReached = result.message && result.message.includes('Daily education cap reached');
-        
+
         if (isDailyCapReached) {
           // Show a different message for daily cap
           console.log('ℹ️ Daily recovery insights cap reached - still recording completion');
         }
-        
+
         // Still record task completion to backend even if RP failed
         try {
           await fetch('/api/recovery-points/task-completion', {
@@ -262,10 +263,10 @@ export function RecoveryInsightDialog({
         } catch (taskError) {
           console.error('❌ Failed to record task completion:', taskError);
         }
-        
+
         // Show celebration (even for daily cap - user still completed the insight)
         setShowCelebration(true);
-        
+
         // Call parent's task completion handler with appropriate points
         if (onTaskComplete) {
           onTaskComplete({
@@ -276,14 +277,14 @@ export function RecoveryInsightDialog({
             phase: phaseLabel
           });
         }
-        
+
         // Call parent's completion handler
-        onComplete?.({ 
+        onComplete?.({
           selectedInsight: selectedInsightId,
           actionTaken: actionTaken ? actionPrompt?.action : null,
           pointsEarned: isDailyCapReached ? 0 : totalPoints
         });
-        
+
         // Close the dialog after a short delay to show celebration
         setTimeout(() => {
           onOpenChange(false);
@@ -292,14 +293,14 @@ export function RecoveryInsightDialog({
       }
     } catch (error) {
       console.error('❌ Error submitting recovery insight:', error);
-      
+
       // Still record task completion to backend even if everything failed
       try {
         const patientResponse = await fetch(`/api/patients/portal-data/${patientId}`)
         if (patientResponse.ok) {
           const patientData = await patientResponse.json()
           const numericPatientId = patientData.data.patient.id
-          
+
           await fetch('/api/recovery-points/task-completion', {
             method: 'POST',
             headers: {
@@ -317,10 +318,10 @@ export function RecoveryInsightDialog({
       } catch (taskError) {
         console.error('❌ Failed to record task completion:', taskError);
       }
-      
+
       // Still show celebration but log the error
       setShowCelebration(true);
-      
+
       // Still call parent's task completion handler
       if (onTaskComplete) {
         onTaskComplete({
@@ -331,14 +332,14 @@ export function RecoveryInsightDialog({
           phase: phaseLabel
         });
       }
-      
+
       // Still call parent's completion handler
-      onComplete?.({ 
+      onComplete?.({
         selectedInsight: selectedInsightId,
         actionTaken: actionTaken ? actionPrompt?.action : null,
         pointsEarned: totalPoints
       });
-      
+
       // Close the dialog after a short delay to show celebration
       setTimeout(() => {
         onOpenChange(false);
@@ -383,7 +384,7 @@ export function RecoveryInsightDialog({
     // Simple approach: just use the index to determine today's insight
     // Today's insight is always index 0, future insights are positive offsets
     const offset = index;
-    
+
     return {
       id: insight.id.toString(),
       title: insight.title,
@@ -417,7 +418,7 @@ export function RecoveryInsightDialog({
     const startDate = new Date('2024-01-01');
     const daysSinceStart = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     const currentDayIndex = daysSinceStart % insightLibrary.length;
-    
+
     // Calculate offset (days from today)
     let offset: number;
     if (index >= currentDayIndex) {
@@ -426,14 +427,14 @@ export function RecoveryInsightDialog({
       // For past insights, calculate negative offset
       offset = -(insightLibrary.length - currentDayIndex + index);
     }
-    
+
     const isToday = offset === 0;
     const isFuture = offset > 0;
     const isCompleted = offset < 0 || completedInsights.includes(insightLibrary[index]?.id);
-    
-    return { 
-      isToday, 
-      isFuture, 
+
+    return {
+      isToday,
+      isFuture,
       isCompleted,
       offset
     };
@@ -519,30 +520,34 @@ export function RecoveryInsightDialog({
                 <h3 className="text-xl font-semibold text-gray-900 mb-6">
                   Your Recovery Snapshot
                 </h3>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-bold text-btl-600">Pain Level</span>
                       {getDeltaIcon(painDelta)}
                     </div>
-                    <div className="text-2xl font-bold text-gray-900">{snapshot.pain}/10</div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {snapshot.pain === null ? "Unavailable" : `${snapshot.pain}/10`}
+                    </div>
                   </div>
-                  
+
                   <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-bold text-btl-600">Stress Level</span>
                       {getDeltaIcon(stressDelta)}
                     </div>
-                    <div className="text-2xl font-bold text-gray-900">{snapshot.stress}/10</div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {snapshot.stress === null ? "Unavailable" : `${snapshot.stress}/10`}
+                    </div>
                   </div>
-                  
+
                   <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-bold text-btl-600">Risk Level</span>
                     </div>
-                    <Badge className={`${getRiskColor(snapshot.risk)} text-sm font-medium`}>
-                      {snapshot.risk.toUpperCase()}
+                    <Badge className={`${getRiskColor(snapshot.risk ?? "")} text-sm font-medium`}>
+                      {snapshot.risk?.toUpperCase() ?? "UNAVAILABLE"}
                     </Badge>
                   </div>
                 </div>
@@ -604,20 +609,20 @@ export function RecoveryInsightDialog({
                       const isToday = debugUnlockAll ? true : offset === 0; // Only today's insight is available (unless debug mode)
                       const isFuture = debugUnlockAll ? false : offset > 0; // Future insights are locked (unless debug mode)
                       const isCompleted = completedInsights.includes(Number(insight.id));
-                      
+
                       if (i === 0) {
                         console.log('🔓 First insight unlock status:', { debugUnlockAll, isToday, isFuture, offset });
                       }
-                      
+
                       // Calculate week and day labels
                       const getDayLabel = (offset: number) => {
                         if (offset === 0) return "Today";
-                        
+
                         const week = Math.floor(offset / 7) + 1;
                         const day = (offset % 7) + 1;
                         return `Week ${week}: Day ${day}`;
                       };
-                      
+
                       console.log('🎯 Insight pill:', { id: insight.id, title: insight.title, isCompleted, completedInsights, offset, label: getDayLabel(offset) });
                       return (
                         <button
@@ -718,4 +723,4 @@ export function RecoveryInsightDialog({
       </Dialog>
     </>
   );
-} 
+}

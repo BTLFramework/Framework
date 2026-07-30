@@ -9,6 +9,7 @@ import { exercises as allExercises } from "@/lib/exerciseLibrary"
 import { ExerciseVideoModal } from "@/components/exercise-video-modal"
 import { ToolkitModal } from "@/components/toolkit-modal"
 import { useAuth } from "@/hooks/useAuth"
+import { insightLibrary } from "@/lib/InsightLibrary"
 
 export default function RecoveryToolsPage() {
   const router = useRouter()
@@ -16,13 +17,13 @@ export default function RecoveryToolsPage() {
   const [selectedExercise, setSelectedExercise] = useState<any>(null)
   const [patientId, setPatientId] = useState<string>("")
   const [completedInsights, setCompletedInsights] = useState<number[]>([])
-  
+
   // Dialog state for toolkit modal
   const [selectedToolkit, setSelectedToolkit] = useState<any>(null)
 
   // Fetch patient data via SWR
   const { data: patientData, error: patientError, isLoading: patientLoading } = usePatientRecoveryData(patientId, "patient", !!patientId)
-  
+
   // Get patient's personalized exercises from the centralized library
   const patientExercises = patientData ? useExercises(patientData.region, patientData.phase) : []
 
@@ -52,7 +53,7 @@ export default function RecoveryToolsPage() {
 
   // Resource counts for each category
   const exerciseCount = allExercises.length
-  const recoveryGuidesCount = 49 // Based on the toolkit section data
+  const recoveryGuidesCount = insightLibrary.length
   const supportToolsCount = 4 // Consistent across all files
 
   const handleInsightComplete = (insightId: number, points?: number) => {
@@ -131,8 +132,8 @@ export default function RecoveryToolsPage() {
           <h1 className="text-3xl font-bold text-white mb-1">Recovery Tools</h1>
           <p className="text-white/90 text-lg">Comprehensive resources to support your recovery journey</p>
         </div>
-        <button 
-          onClick={() => router.push('/')} 
+        <button
+          onClick={() => router.push('/')}
           className="p-3 hover:bg-white/20 rounded-xl transition-all duration-200 backdrop-blur-sm"
         >
           <ArrowLeft className="w-6 h-6 text-white" />

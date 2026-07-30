@@ -13,6 +13,7 @@ import { addRecoveryPoints } from "@/lib/recoveryPointsApi";
 import { MindfulnessVideoModal } from "@/components/MindfulnessVideoModal";
 import { MoodModal } from "@/components/MoodModal";
 import { useToast } from "@/hooks/use-toast";
+import { clinicalRegionFromProfile } from "@/lib/clinicalState";
 
 interface MindfulnessSessionDialogProps {
   open: boolean;
@@ -27,7 +28,7 @@ const MINDFULNESS_TRACKS = [
     id: 'breathwork',
     title: 'Breathwork',
     description: 'Deep breathing exercises for stress relief',
-    duration: '90s',
+    duration: '5–10 min',
     icon: <Wind className="w-6 h-6" />,
     color: 'from-cyan-500 to-cyan-600'
   },
@@ -35,7 +36,7 @@ const MINDFULNESS_TRACKS = [
     id: 'nsdr',
     title: 'NSDR',
     description: 'Non-sleep deep rest for recovery',
-    duration: '90s',
+    duration: '5–10 min',
     icon: <Brain className="w-6 h-6" />,
     color: 'from-cyan-500 to-cyan-600'
   },
@@ -43,7 +44,7 @@ const MINDFULNESS_TRACKS = [
     id: 'lymph',
     title: 'Lymph Flow',
     description: 'Gentle movement for lymphatic drainage',
-    duration: '90s',
+    duration: '5–10 min',
     icon: <Droplets className="w-6 h-6" />,
     color: 'from-cyan-500 to-cyan-600'
   },
@@ -51,7 +52,7 @@ const MINDFULNESS_TRACKS = [
     id: 'mindshift',
     title: 'Mindshift',
     description: 'Cognitive reframing techniques',
-    duration: '90s',
+    duration: '5–10 min',
     icon: <Zap className="w-6 h-6" />,
     color: 'from-cyan-500 to-cyan-600'
   }
@@ -98,9 +99,9 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
   }, [showMoodModal]);
 
   // Get actual patient data instead of hardcoded values
-  const srsScore = patientData?.srsScore || 0;
-  const phaseLabel = patientData?.phase || "EDUCATE";
-  const regionLabel = "Lower back"; // This could also come from patient data if needed
+  const srsScore = patientData?.srsScore ?? patientData?.patient?.srsScore ?? "—";
+  const phaseLabel = patientData?.phase ?? patientData?.patient?.phase ?? "Unavailable";
+  const regionLabel = clinicalRegionFromProfile(patientData) ?? "Focus unavailable";
 
   // Smart suggestion logic based on patient data
   const getSuggestedTrack = () => {
@@ -110,8 +111,8 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
     const tskScore = patientAssessments.tsk7 || 0; // Modified Fear-Avoidance Screener (0-28)
     const stressLevel = patientAssessments.stress || 5; // Daily stress (0-10)
     const painLevel = patientAssessments.pain || 5; // Daily pain (0-10)
-    const srsScore = patientData?.srsScore || 0; // Signature Recovery Score
-    
+    const srsScore = patientData?.srsScore ?? patientData?.patient?.srsScore; // Signature Recovery Score
+
     // Decision tree for mindfulness track selection
     if (pcsScore >= 12) {
       // High pain catastrophizing - suggest loving-kindness to reduce negative self-talk
@@ -125,7 +126,7 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
     } else if (painLevel >= 7) {
       // High pain - suggest progressive relaxation for muscle tension
       return MINDFULNESS_TRACKS.find(track => track.id === 'progressive-relaxation') || MINDFULNESS_TRACKS[0];
-    } else if (srsScore <= 3) {
+    } else if (typeof srsScore === "number" && srsScore <= 3) {
       // Low recovery score - suggest mindful movement for gentle activity
       return MINDFULNESS_TRACKS.find(track => track.id === 'mindful-movement') || MINDFULNESS_TRACKS[0];
     } else {
@@ -141,8 +142,8 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
     const tskScore = patientAssessments.tsk7 || 0;
     const stressLevel = patientAssessments.stress || 5;
     const painLevel = patientAssessments.pain || 5;
-    const srsScore = patientData?.srsScore || 0;
-    
+    const srsScore = patientData?.srsScore ?? patientData?.patient?.srsScore;
+
     // Provide personalized reasoning based on patient data
     if (pcsScore >= 12) {
       return `your pain catastrophizing score (${pcsScore}/16) suggests negative thought patterns`;
@@ -178,24 +179,24 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    
+
     try {
       // Patient ID is already fetched when dialog opens
       if (!numericPatientId) {
         throw new Error('Patient ID not available');
       }
-      
+
       console.log('✅ Session started, waiting for completion...');
-      
+
       // Show success toast for starting
       toast({
         title: "Session Started!",
         description: "Complete the practice to earn your points.",
       });
-      
+
     } catch (error) {
       console.error('❌ Error starting mindfulness session:', error);
-      
+
       // Show error toast
       toast({
         title: "Error",
@@ -203,19 +204,19 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
         variant: "destructive",
       });
     }
-    
+
     setIsSubmitting(false);
   };
 
   const handleVideoComplete = async () => {
     console.log('🎯 handleVideoComplete called');
     console.log('🎯 numericPatientId:', numericPatientId);
-    
+
     if (!numericPatientId) {
       console.error('❌ No patient ID available for completion');
       return;
     }
-    
+
     try {
       console.log('🎯 Adding recovery points...');
       // Add recovery points for the completed mindfulness session (MINDSET category, 7 points)
@@ -225,12 +226,12 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
         'Mindfulness Session completed',
         totalPoints
       );
-      
+
       console.log('🎯 Recovery points result:', result);
-      
+
       if (result.success) {
         console.log('✅ Recovery points added successfully:', result.pointsAdded);
-        
+
         // Record task completion to backend
         try {
           await fetch('/api/recovery-points/task-completion', {
@@ -249,13 +250,13 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
         } catch (taskError) {
           console.error('❌ Failed to record task completion:', taskError);
         }
-        
+
         // Show success toast
         toast({
           title: "Great job!",
           description: `+${result.pointsAdded} Recovery Points!`,
         });
-        
+
         // Call parent's task completion handler to trigger refresh
         if (onTaskComplete) {
           onTaskComplete({
@@ -266,43 +267,43 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
             phase: phaseLabel
           });
         }
-        
+
         // Call parent's completion handler
-        onComplete?.({ 
+        onComplete?.({
           selectedTrack,
           pointsEarned: result.pointsAdded || totalPoints
         });
-        
+
         console.log('🎯 Setting showMoodModal to true');
         // Show mood modal for first completion of the day
         setShowMoodModal(true);
         console.log('🎯 Setting showCelebration to true');
         setShowCelebration(true); // Set celebration state to true
-        
+
       } else if (result.alreadyLogged) {
         console.log('⚠️ Mindfulness already logged for today');
-        
+
         // Show info toast for already logged
         toast({
           title: "Mindfulness already logged for today",
           description: "You've already completed your daily mindfulness practice.",
         });
-        
+
         // Still call parent's completion handler (but no points)
-        onComplete?.({ 
+        onComplete?.({
           selectedTrack,
           pointsEarned: 0,
           alreadyLogged: true
         });
-        
+
         // Close the dialog
         setTimeout(() => {
           onOpenChange(false);
         }, 1000);
-        
+
       } else {
         console.error('❌ Failed to add recovery points:', result.error);
-        
+
         // Still record task completion to backend even if RP failed
         try {
           await fetch('/api/recovery-points/task-completion', {
@@ -321,7 +322,7 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
         } catch (taskError) {
           console.error('❌ Failed to record task completion:', taskError);
         }
-        
+
         // Show error toast
         toast({
           title: "Error",
@@ -331,7 +332,7 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
       }
     } catch (error) {
       console.error('❌ Error completing mindfulness session:', error);
-      
+
       // Still record task completion to backend even if everything failed
       try {
         await fetch('/api/recovery-points/task-completion', {
@@ -350,7 +351,7 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
       } catch (taskError) {
         console.error('❌ Failed to record task completion:', taskError);
       }
-      
+
       // Show error toast
       toast({
         title: "Error",
@@ -458,7 +459,7 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
               <h3 className="text-2xl font-bold text-btl-800 mb-6">
                 Choose Your Practice
               </h3>
-              
+
               <div className="space-y-4">
                 {/* Suggested Track - Highlighted at the top */}
                 <div className="mb-6">
@@ -477,8 +478,8 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className={`p-2 rounded-xl ${
-                          selectedTrack === suggestedTrack.id 
-                            ? 'bg-white/20' 
+                          selectedTrack === suggestedTrack.id
+                            ? 'bg-white/20'
                             : `bg-gradient-to-br ${suggestedTrack.color} text-white`
                         }`}>
                           {suggestedTrack.icon}
@@ -496,7 +497,7 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
                           </p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center gap-3">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
                           selectedTrack === suggestedTrack.id
@@ -545,8 +546,8 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
                             <div className={`p-2 rounded-xl ${
-                              selectedTrack === track.id 
-                                ? 'bg-white/20' 
+                              selectedTrack === track.id
+                                ? 'bg-white/20'
                                 : `bg-gradient-to-br ${track.color} text-white`
                             }`}>
                               {track.icon}
@@ -564,7 +565,7 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
                               </p>
                             </div>
                           </div>
-                          
+
                           <div className="flex items-center gap-3">
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
                               selectedTrack === track.id
@@ -607,7 +608,7 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
                 </div>
                 <span className="text-xl font-semibold text-gray-900">How It Works</span>
               </div>
-              
+
               <div className="space-y-4 text-gray-700">
                 <div className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-btl-600 text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">1</div>
@@ -618,7 +619,7 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
                 <div className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-btl-600 text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">2</div>
                   <div>
-                    <p className="font-medium">Complete the 90-second guided session</p>
+                    <p className="font-medium">Complete the guided session</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -664,8 +665,8 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
                 Total: {totalPoints} pts
               </div>
             </div>
-            <button 
-              onClick={handleSubmit} 
+            <button
+              onClick={handleSubmit}
               disabled={!canSubmit || isSubmitting}
               className={`px-6 py-3 rounded-2xl font-medium transition-all duration-200 shadow-lg ${
                 canSubmit && !isSubmitting
@@ -711,4 +712,4 @@ export function MindfulnessSessionDialog({ open, onOpenChange, patientId, onComp
       />
     </Dialog>
   );
-} 
+}

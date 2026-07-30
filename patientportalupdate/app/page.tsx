@@ -25,10 +25,10 @@ import { phaseForSrs } from "@/lib/clinicalState"
 const PatientRecoveryDashboard: React.FC = () => {
   // Use proper authentication
   const { patient, loading: authLoading, isAuthenticated } = useAuth()
-  
+
   console.log('🎯 Dashboard render state:', { patient, authLoading, isAuthenticated })
   console.log('🧩 Build marker:', { BUILD_TAG, BUILD_HINT })
-  
+
   const [showScoreModal, setShowScoreModal] = useState(false)
   const [selectedTask, setSelectedTask] = useState<any>(null)
   const [showChatAssistant, setShowChatAssistant] = useState(false)
@@ -40,7 +40,11 @@ const PatientRecoveryDashboard: React.FC = () => {
   const [showMindfulnessDialog, setShowMindfulnessDialog] = useState(false)
   const [showInsightsDialog, setShowInsightsDialog] = useState(false)
   const [tasksData, setTasksData] = useState<any>(null)
-  const [currentSnapshot, setCurrentSnapshot] = useState({ pain: 5, stress: 5, risk: 'low' })
+  const [currentSnapshot, setCurrentSnapshot] = useState<{
+    pain: number | null
+    stress: number | null
+    risk: string | null
+  }>({ pain: null, stress: null, risk: null })
   const [amyIntakeData, setAmyIntakeData] = useState<any>(null) // Store Amy's real intake data
   const [loading, setLoading] = useState(true) // New state for loading
   const [debugToolkit, setDebugToolkit] = useState(false)
@@ -62,13 +66,13 @@ const PatientRecoveryDashboard: React.FC = () => {
       if (!portalResponse.ok) return
 
       const portalData = await portalResponse.json()
-      const baselineVAS = portalData.data.vas || 5
-      
+      const baselineVAS = portalData.data.vas ?? null
+
       // Get current daily data
               const dailyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/patients/daily-data/${patient.email}`)
       let currentPain = baselineVAS
-      let currentStress = 2 // Default stress level
-      
+      let currentStress: number | null = null
+
       if (dailyResponse.ok) {
         const dailyData = await dailyResponse.json()
         if (dailyData.success && dailyData.data) {
@@ -79,11 +83,13 @@ const PatientRecoveryDashboard: React.FC = () => {
       }
 
       // Determine risk level based on pain and stress
-      let riskLevel = 'low'
-      if (currentPain >= 7 || currentStress >= 7) {
+      let riskLevel: string | null = null
+      if (currentPain !== null && currentStress !== null && (currentPain >= 7 || currentStress >= 7)) {
         riskLevel = 'high'
-      } else if (currentPain >= 5 || currentStress >= 5) {
+      } else if (currentPain !== null && currentStress !== null && (currentPain >= 5 || currentStress >= 5)) {
         riskLevel = 'moderate'
+      } else if (currentPain !== null && currentStress !== null) {
+        riskLevel = 'low'
       }
 
       const newSnapshot = {
@@ -160,11 +166,11 @@ const PatientRecoveryDashboard: React.FC = () => {
     try {
       setLoading(true)
       console.log('🔄 Refreshing patient data from backend...')
-      
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/patients/portal-data/${patient.email}`)
       if (response.ok) {
         const result = await response.json()
-        
+
         if (result.success && result.data) {
           const updatedData = {
             ...patient,
@@ -173,7 +179,7 @@ const PatientRecoveryDashboard: React.FC = () => {
             phase: result.data.phase ?? result.data.srsScore?.phase ?? result.data.patient?.phase ?? patient.phase,
             lastUpdated: new Date().toISOString()
           }
-          
+
           // Patient data is now managed by useAuth, so we don't need to update it here
           console.log('✅ Patient data refreshed:', updatedData)
         }
@@ -193,7 +199,7 @@ const PatientRecoveryDashboard: React.FC = () => {
     }
 
     console.log('🎯 Task completed:', taskData)
-    
+
     try {
       // Update local patient data immediately (but don't persist since useAuth manages it)
       const updatedData = {
@@ -202,12 +208,12 @@ const PatientRecoveryDashboard: React.FC = () => {
         phase: taskData.phase,
         lastUpdated: new Date().toISOString()
       }
-      
+
       console.log('📊 Updated patient data locally:', updatedData)
-      
+
       // Trigger refresh
       setRefreshKey(prev => prev + 1)
-      
+
       // Optional: Record activity in backend
       try {
         await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/patients/activity`, {
@@ -228,7 +234,7 @@ const PatientRecoveryDashboard: React.FC = () => {
       } catch (activityError) {
         console.log('ℹ️ Could not record activity (non-critical):', activityError)
       }
-      
+
     } catch (error) {
       console.error('❌ Error handling task completion:', error)
     }
@@ -313,13 +319,13 @@ const PatientRecoveryDashboard: React.FC = () => {
   const handleTaskDialogOpen = (task: any) => {
     console.log('🎯 Task clicked:', task)
     console.log('🎯 Task ID:', task.id)
-    console.log('🎯 Current dialog states:', { 
-      showMovementDialog, 
-      showPainDialog, 
-      showMindfulnessDialog, 
-      showInsightsDialog 
+    console.log('🎯 Current dialog states:', {
+      showMovementDialog,
+      showPainDialog,
+      showMindfulnessDialog,
+      showInsightsDialog
     })
-    
+
     switch (task.id) {
       case "movement-session":
         console.log('🎯 Opening movement dialog')
@@ -350,73 +356,38 @@ const PatientRecoveryDashboard: React.FC = () => {
   const fetchPatientIntakeData = async () => {
     try {
       if (!patient?.email) {
-        console.log('⚠️ No patient email available, using sample data')
-        setAmyIntakeData({
-          vas: 3,
-          disability: 15,
-          psfs: 7.0,
-          confidence: 6,
-          negativeBeliefs: 'no',
-          pcs4: 5,
-          tsk11: 18,
-          milestoneAchieved: 'no',
-          objectiveProgress: 'no'
-        })
+        setAmyIntakeData(null)
         return
       }
 
       console.log('🔍 Fetching patient intake data for SRS breakdown...')
-      
+
       // Fetch current patient's portal data which includes intake information
               const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/patients/portal-data/${patient.email}`)
       if (response.ok) {
         const result = await response.json()
-        console.log('📊 Patient portal data:', result.data)
-        
         // Extract intake data from the portal response
         const intakeData = {
-          vas: result.data.vas || 3,
-          disability: result.data.disability || 15,
-          psfs: result.data.psfs || 7.0,
-          confidence: result.data.confidence || 6,
-          negativeBeliefs: result.data.negativeBeliefs || 'no',
-          pcs4: result.data.pcs4 || 5,
-          tsk11: result.data.tsk11 || 18,
-          milestoneAchieved: result.data.milestoneAchieved || 'no',
-          objectiveProgress: result.data.objectiveProgress || 'no'
+          vas: result.data.vas ?? null,
+          disability: result.data.disability ?? null,
+          ndi: result.data.ndi ?? null,
+          psfs: result.data.psfs ?? null,
+          confidence: result.data.confidence ?? null,
+          beliefStatus: result.data.beliefStatus ?? null,
+          negativeBeliefs: result.data.negativeBeliefs ?? null,
+          pcs4: result.data.pcs4 ?? null,
+          tsk7: result.data.tsk7 ?? result.data.tsk11 ?? null,
+          milestoneAchieved: result.data.milestoneAchieved ?? null,
+          objectiveProgress: result.data.objectiveProgress ?? null
         }
-        
+
         setAmyIntakeData(intakeData)
-        console.log('✅ Patient intake data loaded for SRS breakdown:', intakeData)
       } else {
-        console.log('⚠️ Could not fetch patient data, using sample data')
-        // Fallback to sample data if fetch fails
-        setAmyIntakeData({
-          vas: 3,
-          disability: 15,
-          psfs: 7.0,
-          confidence: 6,
-          negativeBeliefs: 'no',
-          pcs4: 5,
-          tsk11: 18,
-          milestoneAchieved: 'no',
-          objectiveProgress: 'no'
-        })
+        setAmyIntakeData(null)
       }
     } catch (error) {
       console.error('❌ Error fetching patient intake data:', error)
-      // Fallback to sample data on error
-      setAmyIntakeData({
-        vas: 3,
-        disability: 15,
-        psfs: 7.0,
-        confidence: 6,
-        negativeBeliefs: 'no',
-        pcs4: 5,
-        tsk11: 18,
-        milestoneAchieved: 'no',
-        objectiveProgress: 'no'
-      })
+      setAmyIntakeData(null)
     }
   }
 
@@ -442,23 +413,47 @@ const PatientRecoveryDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-btl-50 to-btl-100 flex">
-      <div className="fixed inset-y-0 left-0 z-50">
+    <div className="min-h-screen bg-gradient-to-br from-btl-50 to-btl-100 flex overflow-x-hidden">
+      <div className="hidden md:block fixed inset-y-0 left-0 z-50">
         <LeftSidebar patientData={patient} />
       </div>
-      
+
       {/* Main Content */}
-      <div className="flex-1 pl-64 flex flex-col min-h-screen">
-        <TopHeader 
+      <div className="flex-1 min-w-0 md:pl-64 flex flex-col min-h-screen">
+        <nav
+          aria-label="Patient portal"
+          className="md:hidden sticky top-0 z-40 overflow-x-auto border-b border-btl-200 bg-white px-3 py-2 shadow-sm"
+        >
+          <div className="flex min-w-max gap-2">
+            {[
+              ["Home", "/"],
+              ["Tasks", "/todays-tasks"],
+              ["Score", "/recovery-score"],
+              ["Points", "/recovery-points"],
+              ["Tools", "/recovery-tools"],
+              ["Forms", "/assessments"],
+              ["Messages", "/messages"],
+            ].map(([label, href]) => (
+              <a
+                key={href}
+                href={href}
+                className="rounded-full border border-btl-200 bg-btl-50 px-3 py-2 text-sm font-semibold text-btl-700"
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+        </nav>
+        <TopHeader
           patientData={patient || { name: 'Loading...', email: '' }}
           onChatAssistant={() => setShowChatAssistant(true)}
           onBookAppointment={() => window.open("/book-appointment", "_blank")}
         />
-        
+
         {/* Pass authenticated patient data to components */}
         {patient && (
-          <TodaysTasksSection 
-            onTaskClick={handleTaskDialogOpen} 
+          <TodaysTasksSection
+            onTaskClick={handleTaskDialogOpen}
             onTaskComplete={(taskData) => {
               console.log('Task completed:', taskData)
               setRefreshKey(prev => prev + 1)
@@ -466,7 +461,7 @@ const PatientRecoveryDashboard: React.FC = () => {
             refreshKey={refreshKey}
           />
         )}
-        
+
         {/* Score and Weekly Points Side by Side */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Recovery Score with Wheel */}
@@ -507,9 +502,9 @@ const PatientRecoveryDashboard: React.FC = () => {
       {patient && (
         <>
           {console.log('🎯 Rendering MovementSessionDialog, open:', showMovementDialog)}
-          <MovementSessionDialog 
-            open={showMovementDialog} 
-            onClose={() => setShowMovementDialog(false)} 
+          <MovementSessionDialog
+            open={showMovementDialog}
+            onClose={() => setShowMovementDialog(false)}
             patientId={patient.email}
             onTaskComplete={handleTaskComplete}
           />
@@ -561,17 +556,17 @@ const PatientRecoveryDashboard: React.FC = () => {
         )}
       {/* Fallback for any other tasks (legacy) */}
       {selectedTask && (
-        <TaskModal 
-          task={selectedTask} 
-          onClose={() => setSelectedTask(null)} 
+        <TaskModal
+          task={selectedTask}
+          onClose={() => setSelectedTask(null)}
           onTaskComplete={handleTaskComplete}
         />
       )}
       {showChatAssistant && <ChatAssistant onClose={() => setShowChatAssistant(false)} />}
       {selectedToolkit && (
-        <ToolkitModal 
-          toolkit={selectedToolkit} 
-          onClose={() => setSelectedToolkit(null)} 
+        <ToolkitModal
+          toolkit={selectedToolkit}
+          onClose={() => setSelectedToolkit(null)}
           patientId={patient?.id?.toString() || patient?.email || "1"}
         />
       )}
@@ -579,8 +574,8 @@ const PatientRecoveryDashboard: React.FC = () => {
         <AssessmentModal assessment={selectedAssessment} onClose={() => setSelectedAssessment(null)} />
       )}
       {showScoreModal && (
-        <ScoreBreakdownModal 
-          score={currentScore} 
+        <ScoreBreakdownModal
+          score={currentScore}
           onClose={() => setShowScoreModal(false)}
           intakeData={amyIntakeData} // Pass Amy's real intake data
         />

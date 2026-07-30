@@ -20,13 +20,13 @@ export function ChatAssistant({ onClose }: ChatAssistantProps) {
     {
       id: 1,
       type: "bot",
-      content: "Hi! I'm your Back to Life recovery assistant. I'm here to guide you through your recovery journey using our structured, evidence-informed recovery blueprint. We blend manual therapy, movement education, and patient-centered coaching into a proven framework: guiding you from pain, to education, to resilience. How can I help you today?",
+      content: "Hi! I'm your Back to Life recovery assistant. I'm here to help you navigate your recovery plan and the educational resources selected for your portal. I can explain the framework, but I cannot diagnose symptoms or replace advice from your clinician. How can I help you today?",
       timestamp: new Date(),
     },
   ])
   const [inputValue, setInputValue] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  
+
   // Ref for auto-scrolling to bottom
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -106,7 +106,7 @@ export function ChatAssistant({ onClose }: ChatAssistantProps) {
       },
       achievements: {
         bronze: "50+ points - Getting Started",
-        silver: "100+ points - Making Progress", 
+        silver: "100+ points - Making Progress",
         gold: "150+ points - Recovery Champion",
         platinum: "200+ points - Recovery Master"
       }
@@ -116,9 +116,9 @@ export function ChatAssistant({ onClose }: ChatAssistantProps) {
   const generateResponse = async (userMessage: string): Promise<string> => {
     // Simulate processing time
     await new Promise(resolve => setTimeout(resolve, 1000))
-    
+
     const lowerMessage = userMessage.toLowerCase()
-    
+
     // Phase-specific responses using authentic Back to Life clinical language
     if (lowerMessage.includes("phase") || lowerMessage.includes("reset") || lowerMessage.includes("educate") || lowerMessage.includes("rebuild")) {
       if (lowerMessage.includes("reset")) {
@@ -195,7 +195,7 @@ This phase is about sustainability. We're not just fixing a problem - we're buil
 You're not just recovering - you're building something better than before. This is about long-term resilience and sustainable results. 💪`
       }
     }
-    
+
     // Pain management responses using real Back to Life clinical language
     if (lowerMessage.includes("pain") || lowerMessage.includes("hurt") || lowerMessage.includes("ache")) {
       return `Pain is your body's communication system - let's listen to what it's telling us.
@@ -223,7 +223,7 @@ We're not just managing pain - we're building a system that prevents pain. This 
 
 Trust the process—you're still moving forward, even when it doesn't feel like it. 🧘‍♀️`
     }
-    
+
     // Movement responses using real Back to Life exercise system
     if (lowerMessage.includes("exercise") || lowerMessage.includes("movement") || lowerMessage.includes("workout")) {
       return `Movement is medicine! Here's how our Back to Life exercise system actually works:
@@ -256,7 +256,7 @@ Start where you are - no judgment. Quality over quantity. Listen to your body's 
 
 Remember: Movement should feel good (not necessarily easy). Your body is designed to move! 🏃‍♀️`
     }
-    
+
     // SRS scoring responses using real Back to Life language
     if (lowerMessage.includes("srs") || lowerMessage.includes("score") || lowerMessage.includes("recovery score")) {
       return `The Signature Recovery Score™ (SRS) is your personalized recovery metric - this is how we actually track your progress.
@@ -359,14 +359,14 @@ At Back to Life, we're guiding you from pain, to education, to resilience. This 
 
 You're stronger than you think, and you're doing better than you realize. 🌟`
     }
-    
+
     // Default response using authentic Back to Life language
-    return `Thank you for sharing that with me! 
+    return `Thank you for sharing that with me!
 
 As your Back to Life recovery assistant, I'm here to support you through your journey using our structured, evidence-informed recovery blueprint.
 
 🔹 **Our Framework:**
-We blend manual therapy, movement education, and patient-centered coaching into a proven framework: guiding you from pain, to education, to resilience.
+We blend manual therapy, movement education, and patient-centered coaching within the Back to Life Framework: guiding you from pain, to education, to resilience.
 
 🔹 **What Makes Us Different:**
 This isn't just treatment - it's a complete recovery system. We're not just managing symptoms; we're building a foundation for long-term health and function.
@@ -401,14 +401,14 @@ What aspect of your recovery would you like to explore today? 💪`
 
     try {
       const response = await generateResponse(userMessage)
-      
+
       const botResponse: Message = {
         id: messages.length + 2,
         type: "bot",
         content: response,
         timestamp: new Date(),
       }
-      
+
       setMessages(prev => [...prev, botResponse])
     } catch (error) {
       console.error('Error generating response:', error)
@@ -439,8 +439,8 @@ What aspect of your recovery would you like to explore today? 💪`
                 <p className="text-btl-100 text-sm font-medium">Powered by the Back to Life Framework</p>
               </div>
             </div>
-            <button 
-              onClick={onClose} 
+            <button
+              onClick={onClose}
               className="p-2 hover:bg-white/20 rounded-xl transition-all duration-200"
             >
               <X className="w-5 h-5 text-white" />
@@ -457,8 +457,8 @@ What aspect of your recovery would you like to explore today? 💪`
               >
                 <div
                   className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-md ${
-                    message.type === "user" 
-                      ? "bg-gradient-to-br from-btl-500 to-btl-600" 
+                    message.type === "user"
+                      ? "bg-gradient-to-br from-btl-500 to-btl-600"
                       : "bg-gradient-to-br from-btl-100 to-btl-200 border border-btl-200"
                   }`}
                 >
@@ -470,8 +470,8 @@ What aspect of your recovery would you like to explore today? 💪`
                 </div>
                 <div
                   className={`p-4 rounded-2xl shadow-md ${
-                    message.type === "user" 
-                      ? "btn-primary-gradient text-white" 
+                    message.type === "user"
+                      ? "btn-primary-gradient text-white"
                       : "bg-white border border-charcoal-200 text-charcoal-900"
                   }`}
                 >
@@ -480,7 +480,7 @@ What aspect of your recovery would you like to explore today? 💪`
               </div>
             </div>
           ))}
-          
+
           {/* Loading indicator */}
           {isLoading && (
             <div className="flex justify-start">
@@ -524,7 +524,7 @@ What aspect of your recovery would you like to explore today? 💪`
           <div className="mt-3 flex items-center justify-center space-x-4 text-xs text-charcoal-500">
             <div className="flex items-center space-x-1">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>HIPAA Compliant</span>
+              <span>Secure patient portal</span>
             </div>
             <div className="flex items-center space-x-1">
               <div className="w-2 h-2 bg-btl-500 rounded-full"></div>

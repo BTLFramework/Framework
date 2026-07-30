@@ -9,7 +9,6 @@ export async function GET(
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app';
     const { email } = await params;
 
-    console.log(`📊 Frontend API: Fetching progress history for ${email}`);
 
     const response = await fetch(`${backendUrl}/patients/progress-history/${encodeURIComponent(email)}`);
     const data = await response.json();
@@ -22,7 +21,6 @@ export async function GET(
       );
     }
 
-    console.log(`✅ Progress history fetched: ${data.data.progressHistory.length} entries`);
 
     return NextResponse.json(data);
   } catch (error) {

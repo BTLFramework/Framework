@@ -51,7 +51,7 @@ const pcs4Questions = [
     category: "Rumination"
   },
   {
-    id: "pcs2", 
+    id: "pcs2",
     question: "I feel I can't go on",
     category: "Magnification"
   },
@@ -193,7 +193,7 @@ export default function IntakeFormPage() {
 
   const handleSubmit = async () => {
     setIsSubmitting(true)
-    
+
     try {
       const response = await fetch('/api/intake', {
         method: 'POST',
@@ -202,17 +202,20 @@ export default function IntakeFormPage() {
         },
         body: JSON.stringify({
           ...formData,
-          formType: 'Intake',
+          formType:
+            typeof window !== 'undefined'
+              ? new URLSearchParams(window.location.search).get('formType') || 'Intake'
+              : 'Intake',
           date: new Date().toISOString()
         })
       })
-      
+
       const result = await response.json()
-      
+
       if (result.success) {
         // Store intake data in localStorage for the portal
         localStorage.setItem('btl_intake_data', JSON.stringify(formData))
-        
+
         // Store patient data for the portal
         const patientData = {
           name: formData.patientName,
@@ -222,12 +225,12 @@ export default function IntakeFormPage() {
           timestamp: new Date().toISOString()
         }
         localStorage.setItem('btl_patient_data', JSON.stringify(patientData))
-        
+
         toast({
           title: "Intake Form Submitted!",
           description: `Welcome ${formData.patientName}! Your recovery journey begins now.`,
         })
-        
+
         // Redirect to dashboard
         router.push('/')
       } else {
@@ -575,7 +578,7 @@ export default function IntakeFormPage() {
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="bg-white rounded-xl shadow-lg p-8">
           {renderStep()}
-          
+
           {/* Navigation Buttons */}
           <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
             <button
@@ -585,7 +588,7 @@ export default function IntakeFormPage() {
             >
               Previous
             </button>
-            
+
             <div className="flex space-x-3">
               {currentStep < totalSteps ? (
                 <button
@@ -620,4 +623,4 @@ export default function IntakeFormPage() {
       </div>
     </div>
   )
-} 
+}

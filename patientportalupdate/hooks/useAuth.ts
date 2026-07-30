@@ -45,8 +45,6 @@ export function useAuth() {
     }
   );
 
-  console.log('🔍 useAuth hook state:', { patient, error, isLoading, isAuthenticated: !!patient });
-
   const login = async (email: string, password: string) => {
     try {
       const response = await fetch('/api/patient-portal/login', {

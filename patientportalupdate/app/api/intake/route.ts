@@ -18,8 +18,6 @@ export async function OPTIONS(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.json();
-    console.log('Patient Portal - Received intake form data:', formData);
-    
     // Send comprehensive data to backend server
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app';
     const backendResponse = await fetch(`${backendUrl}/patients/submit-intake`, {
@@ -35,26 +33,26 @@ export async function POST(request: NextRequest) {
         date: formData.date || new Date().toISOString(),
         formType: formData.formType || "Intake",
         region: formData.region,
-        
+
         // Disability Index Arrays (based on region)
         ndi: formData.region === "Neck" ? formData.ndi : null,
         odi: formData.region === "Back" ? formData.odi : null,
         ulfi: formData.region === "Upper Limb" ? formData.ulfi : null,
         lefs: formData.region === "Lower Limb" ? formData.lefs : null,
-        
+
         // Pain and Function Assessment
         vas: formData.vas,
         psfs: formData.psfs || [],
-        
+
         // Cognitive Assessment
         pcs4: formData.pcs4 || null,
         tsk11: formData.tsk11 || null,
         beliefs: formData.beliefs || [],
         confidence: formData.confidence,
-        
+
         // Follow-up specific (if applicable)
         groc: formData.groc || 0,
-        
+
         // Clinical verification (if applicable)
         recoveryMilestone: formData.recoveryMilestone || false,
         clinicalProgressVerified: formData.clinicalProgressVerified || false
@@ -67,8 +65,6 @@ export async function POST(request: NextRequest) {
     }
 
     const backendResult = await backendResponse.json();
-    console.log('Backend response:', backendResult);
-
     // Return success response with backend data
     return NextResponse.json({
       success: true,
@@ -87,12 +83,12 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Patient Portal - Intake processing error:', error);
-    
+
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Processing failed',
       message: 'Failed to process intake form. Please try again.'
-    }, { 
+    }, {
       status: 500,
       headers: corsHeaders
     });
@@ -102,22 +98,22 @@ export async function POST(request: NextRequest) {
 // Legacy calculation functions (kept for reference but not used)
 function calculateSRS(formData: any): string {
   let score = 0;
-  
+
   if (formData.vas && formData.previousVas && (formData.previousVas - formData.vas) >= 2) {
     score += 1;
   }
-  
+
   if (formData.psfs) {
     const psfTotal = formData.psfs.reduce((sum: number, item: any) => sum + (item.score || 0), 0);
     if (psfTotal >= 4) score += 2;
   }
-  
+
   if (formData.confidence >= 7) score += 2;
-  
+
   if (formData.beliefs && formData.beliefs.includes("None of these apply")) {
     score += 1;
   }
-  
+
   return `${Math.min(score, 11)}/11`;
 }
 
@@ -126,4 +122,4 @@ function determinePhase(formData: any): string {
   if (score <= 3) return "RESET";
   if (score <= 6) return "EDUCATE";
   return "REBUILD";
-} 
+}

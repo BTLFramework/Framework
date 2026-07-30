@@ -1,67 +1,95 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { clinicalRegionFromProfile, normalizeClinicalProfile } from '@/lib/clinicalState';
 
-export async function GET(req: NextRequest, context: { params: Promise<{ id: string, type: string }> }) {
-  const params = await context.params;
-  const { id, type } = params;
+export const dynamic = 'force-dynamic';
 
-  // TODO: Fetch patient data from DB by id
-  // For now, mock patient data
-  const patientData = {
-    id,
-    srsScore: 7,
-    phase: 'Educate',
-    region: 'Low Back / SI Joint',
-  };
+export async function GET(
+  _req: NextRequest,
+  context: { params: Promise<{ id: string; type: string }> }
+) {
+  const { id, type } = await context.params;
+  const backendUrl =
+    process.env.NEXT_PUBLIC_API_URL ||
+    'https://framework-production-92f5.up.railway.app';
 
-  switch (type) {
-    case 'patient': {
-      // Return patient data for components that need region/phase
-      return NextResponse.json(patientData);
+  try {
+    const response = await fetch(
+      `${backendUrl}/patients/portal-data/${encodeURIComponent(id)}`,
+      { cache: 'no-store' }
+    );
+
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: 'Verified patient recovery data is unavailable' },
+        { status: response.status }
+      );
     }
-    case 'recovery-insights':
-    case 'insight':
-    case 'insights': {
-      return NextResponse.json({
-        insights: {
-          availableInsights: 3,
-          viewedInsights: 1,
-          phase: 'EDUCATE',
-          riskProfile: 'Low',
-          lastUpdated: new Date()
-        }
-      });
-    }
-    case 'pain': {
-      return NextResponse.json({
-        pain: {
-          lastAssessment: {
-            level: 4,
-            location: 'Lower back',
-            type: 'Aching',
-            date: new Date(Date.now() - 24 * 60 * 60 * 1000) // 1 day ago
+
+    const result = await response.json();
+    const portalData = result?.data ?? result;
+    const profile = normalizeClinicalProfile({
+      ...(portalData?.patient ?? {}),
+      ...portalData,
+    });
+    const patientData = {
+      id: profile?.id ?? portalData?.patient?.id ?? id,
+      srsScore: profile?.srsScore ?? null,
+      phase: profile?.phase ?? null,
+      region: clinicalRegionFromProfile(portalData),
+    };
+
+    switch (type) {
+      case 'patient':
+        return NextResponse.json(patientData);
+
+      case 'recovery-insights':
+      case 'insight':
+      case 'insights':
+        return NextResponse.json({
+          recoveryInsights: {
+            availableInsights: null,
+            viewedInsights: null,
+            phase: patientData.phase,
+            srsScore: patientData.srsScore,
+            region: patientData.region,
+            riskProfile: null,
+            lastUpdated: portalData?.updatedAt ?? null,
           },
-          phase: 'EDUCATE',
-          trend: 'improving',
-          lastUpdated: new Date()
-        }
-      });
-    }
-    case 'mindfulness': {
-      return NextResponse.json({
-        mindfulness: {
-          lastSession: {
-            track: 'Breathing Basics',
-            duration: 8,
-            date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
+        });
+
+      case 'pain':
+        return NextResponse.json({
+          pain: {
+            lastAssessment: portalData?.lastPainAssessment ?? null,
+            phase: patientData.phase,
+            region: patientData.region,
+            trend: null,
+            lastUpdated: portalData?.updatedAt ?? null,
           },
-          availableTracks: 5,
-          phase: 'EDUCATE',
-          streak: 3,
-          lastUpdated: new Date()
-        }
-      });
+        });
+
+      case 'mindfulness':
+        return NextResponse.json({
+          mindfulness: {
+            lastSession: portalData?.lastMindfulnessSession ?? null,
+            availableTracks: 4,
+            phase: patientData.phase,
+            region: patientData.region,
+            streak: portalData?.mindfulnessStreak ?? null,
+            lastUpdated: portalData?.updatedAt ?? null,
+          },
+        });
+
+      default:
+        return NextResponse.json(
+          { error: 'Unknown recovery type' },
+          { status: 404 }
+        );
     }
-    default:
-      return NextResponse.json({ error: 'Unknown recovery type' }, { status: 404 });
+  } catch {
+    return NextResponse.json(
+      { error: 'Verified patient recovery data is unavailable' },
+      { status: 503 }
+    );
   }
 }

@@ -13,7 +13,6 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    console.log(`✅ Frontend API: Recording task completion for patient ${patientId}: ${taskType}`);
     
     // Proxy to backend
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app';
@@ -39,7 +38,6 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await response.json();
-    console.log(`✅ Task completion recorded successfully: ${taskType}`);
     
     return NextResponse.json(result);
     
@@ -50,4 +48,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

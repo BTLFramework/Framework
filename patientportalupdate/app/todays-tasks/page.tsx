@@ -16,19 +16,19 @@ export default function TodaysTasksPage() {
   const { toast } = useToast()
   const { patient, isAuthenticated } = useAuth()
   const [completedTasks, setCompletedTasks] = useState<any[]>([])
-  
+
   // Drawer states
   const [movementDrawerOpen, setMovementDrawerOpen] = useState(false)
   const [painDrawerOpen, setPainDrawerOpen] = useState(false)
   const [mindfulnessDrawerOpen, setMindfulnessDrawerOpen] = useState(false)
   const [insightsDrawerOpen, setInsightsDrawerOpen] = useState(false)
-  
+
   // Get patient ID from auth context
   const patientId = patient?.email || ""
 
   const handleTaskClick = (task: any) => {
     console.log('🎯 Task clicked:', task)
-    
+
     // Open appropriate drawer based on task ID
     switch (task.id) {
       case "movement-session":
@@ -54,10 +54,10 @@ export default function TodaysTasksPage() {
 
   const handleTaskComplete = (taskData: any) => {
     console.log('🎯 Task completed:', taskData)
-    
+
     // Add to completed tasks
     setCompletedTasks(prev => [...prev, taskData])
-    
+
     // Show success toast
     toast({
       title: "Task Completed!",
@@ -74,8 +74,8 @@ export default function TodaysTasksPage() {
             Complete your daily recovery activities to track progress and earn points
           </p>
         </div>
-        
-        <TodaysTasksSection 
+
+        <TodaysTasksSection
           onTaskClick={handleTaskClick}
           onTaskComplete={handleTaskComplete}
         />
@@ -87,14 +87,14 @@ export default function TodaysTasksPage() {
         onClose={() => setMovementDrawerOpen(false)}
         patientId={patientId}
       />
-      
+
       <PainAssessmentDialog
         open={painDrawerOpen}
         onClose={() => setPainDrawerOpen(false)}
         patientId={patientId}
         onTaskComplete={handleTaskComplete}
       />
-      
+
       <MindfulnessSessionDialog
         open={mindfulnessDrawerOpen}
         onOpenChange={setMindfulnessDrawerOpen}
@@ -104,7 +104,7 @@ export default function TodaysTasksPage() {
         }}
         onTaskComplete={handleTaskComplete}
       />
-      
+
       <RecoveryInsightDialog
         open={insightsDrawerOpen}
         onOpenChange={setInsightsDrawerOpen}
@@ -113,11 +113,11 @@ export default function TodaysTasksPage() {
           handleTaskComplete({ id: 'recovery-insights', pointsEarned: data.pointsEarned });
         }}
         onTaskComplete={handleTaskComplete}
-        snapshot={{ pain: 5, stress: 5, risk: 'low' }}
+        snapshot={{ pain: null, stress: null, risk: null }}
         painDelta={0}
         stressDelta={0}
         showActionPrompt={false}
       />
     </div>
   )
-} 
+}

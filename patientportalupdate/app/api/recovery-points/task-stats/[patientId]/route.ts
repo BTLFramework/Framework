@@ -9,7 +9,6 @@ export async function GET(
   try {
     const { patientId } = await params;
     
-    console.log(`📈 Frontend API: Getting task completion stats for patient ${patientId}`);
     
     // Proxy to backend
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app';
@@ -29,7 +28,6 @@ export async function GET(
     }
 
     const result = await response.json();
-    console.log(`📊 Task stats fetched successfully for patient ${patientId}`);
     
     return NextResponse.json(result);
     

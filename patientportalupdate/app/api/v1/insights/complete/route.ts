@@ -4,7 +4,6 @@ export async function POST(request: NextRequest) {
   try {
     const { insightId, patientId } = await request.json();
     
-    console.log('🎯 Insight completion request:', { insightId, patientId });
     
     // Store insight completion in localStorage for now (in production, this would go to a database)
     const completionKey = `insight_completed_${patientId}_${insightId}`;
@@ -26,7 +25,6 @@ export async function POST(request: NextRequest) {
     }
     (global as any).insightCompletions[completionKey] = completionData;
     
-    console.log('✅ Insight completion recorded:', completionData);
     
     return NextResponse.json({
       success: true,
@@ -80,7 +78,6 @@ export async function GET(request: NextRequest) {
       });
     }
     
-    console.log('📊 Completed insights for patient:', patientId, completedInsights);
     
     return NextResponse.json({
       success: true,
@@ -96,4 +93,4 @@ export async function GET(request: NextRequest) {
       error: 'Failed to fetch completed insights'
     }, { status: 500 });
   }
-} 
+}

@@ -21,7 +21,7 @@ export function ExerciseModal({ isOpen, onClose, onComplete, patientId }: Exerci
 
   // Fetch patient data via SWR
   const { data: patientData, error: patientError, isLoading: patientLoading } = usePatientRecoveryData(patientId, "patient", isOpen)
-  
+
   // Get exercises from the centralized library
   const exercises = patientData ? useExercises(patientData.region, patientData.phase) : []
 
@@ -273,7 +273,7 @@ export function ExerciseModal({ isOpen, onClose, onComplete, patientId }: Exerci
                   </div>
                 </div>
               ))}
-              
+
               {/* Complete Session Button */}
               {completedExercises.length === exercises.length && (
                 <div className="text-center pt-6">
@@ -303,13 +303,10 @@ export function ExerciseModal({ isOpen, onClose, onComplete, patientId }: Exerci
                       <Play className="w-8 h-8 text-white ml-1" />
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Exercise Demonstration</h3>
-                    <p className="text-gray-600 mb-4">Watch the video to see proper form and technique</p>
-                    <button
-                      onClick={() => setShowVideo(true)}
-                      className="bg-btl-600 text-white px-6 py-3 rounded-full hover:bg-btl-700 transition-colors font-medium"
-                    >
-                      Watch Video
-                    </button>
+                    <p className="text-gray-600 mb-4">The demonstration video for this exercise is still being prepared.</p>
+                    <span className="inline-flex rounded-full bg-btl-100 px-5 py-2 font-semibold text-btl-700">
+                      Video Coming Soon
+                    </span>
                   </div>
                 </div>
               ) : (
@@ -373,7 +370,7 @@ export function ExerciseModal({ isOpen, onClose, onComplete, patientId }: Exerci
                 >
                   Previous Step
                 </button>
-                
+
                 <div className="text-sm text-gray-500 px-3 py-1 rounded-full bg-gray-100">
                   Step {currentStep + 1} of {currentExerciseData.instructions.length}
                 </div>
@@ -400,4 +397,4 @@ export function ExerciseModal({ isOpen, onClose, onComplete, patientId }: Exerci
       </div>
     </div>
   )
-} 
+}

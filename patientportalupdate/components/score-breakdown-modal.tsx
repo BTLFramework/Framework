@@ -40,6 +40,9 @@ interface ScoreResult {
   totalDomains?: number
 }
 
+const hasNumericValue = (value: unknown) =>
+  value !== null && value !== undefined && value !== "" && Number.isFinite(Number(value))
+
 // Patient-friendly SRS Configuration
 
 const recoveryAreas = {
@@ -99,14 +102,14 @@ const recoveryAreas = {
     category: 'movement' as const
   },
   clinician: {
-    milestone: { 
+    milestone: {
       title: "Recovery Milestone Achievement",
       description: "Met an important recovery goal",
       points: 1,
       icon: <Target className="w-5 h-5" />,
       category: 'progress' as const
     },
-    progress: { 
+    progress: {
       title: "Objective Progress Measurement",
       description: "Showing clear improvement in function",
       points: 1,
@@ -119,17 +122,6 @@ const recoveryAreas = {
 // Remove the calculateRealSRS function - frontend doesn't calculate SRS anymore
 // The backend is the single source of truth for all SRS calculations
 
-// Sample data for demonstration
-const sampleIntakeData = {
-  vas: "2",
-  disability: "15",
-  psfs: "7.5",
-  confidence: "7",
-  negativeBeliefs: "no",
-  painCatastrophizing: "5",
-      tsk7: "18"
-}
-
 export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdownModalProps) {
   const [calculatedScore, setCalculatedScore] = useState<ScoreResult>({ score: 0, breakdown: [] })
   const [expanded, setExpanded] = useState(false) // Tiered reveal state
@@ -140,15 +132,15 @@ export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdo
     try {
       console.log('📊 Using backend SRS score:', score)
       console.log('📊 Backend intake data:', intakeData)
-      
+
       // Create breakdown structure based on Amy's actual data
       const displayBreakdown: BreakdownItem[] = [
         {
           title: "Pain Level (0-10 scale)",
           description: "Low pain that doesn't limit your daily activities",
-          points: (intakeData && intakeData.vas <= 2) ? 1 : 0,
-          achieved: intakeData && intakeData.vas <= 2,
-          details: intakeData ? `Your score: ${intakeData.vas || 0}/10` : "Assessment data loading...",
+          points: hasNumericValue(intakeData?.vas) && Number(intakeData.vas) <= 2 ? 1 : 0,
+          achieved: hasNumericValue(intakeData?.vas) && Number(intakeData.vas) <= 2,
+          details: hasNumericValue(intakeData?.vas) ? `Your score: ${intakeData.vas}/10` : "Assessment data unavailable",
           icon: <Heart className="w-5 h-5" />,
           category: 'assessment'
         },
@@ -175,7 +167,7 @@ export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdo
             return false;
           })(),
           details: (() => {
-            if (!intakeData || !intakeData.ndi || !Array.isArray(intakeData.ndi)) return "Assessment data loading...";
+            if (!intakeData || !intakeData.ndi || !Array.isArray(intakeData.ndi)) return "Assessment data unavailable";
             const ndiTotal = intakeData.ndi.reduce((sum: number, score: number) => sum + score, 0);
             const ndiPercentage = Math.round((ndiTotal / 50) * 100);
             return `Your score: ${ndiPercentage}%`;
@@ -197,7 +189,7 @@ export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdo
             return avgScore >= 4;
           })(),
           details: (() => {
-            if (!intakeData || !intakeData.psfs || !Array.isArray(intakeData.psfs)) return "Assessment data loading...";
+            if (!intakeData || !intakeData.psfs || !Array.isArray(intakeData.psfs)) return "Assessment data unavailable";
             const avgScore = (intakeData.psfs.reduce((sum: number, item: any) => sum + (item.score || 0), 0) / intakeData.psfs.length).toFixed(1);
             return `Your score: ${avgScore}/10`;
           })(),
@@ -207,9 +199,9 @@ export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdo
         {
           title: "Recovery Confidence (0-10 scale)",
           description: "Feeling confident about your recovery journey",
-          points: (intakeData && intakeData.confidence >= 8) ? 2 : (intakeData && intakeData.confidence >= 5) ? 1 : 0,
-          achieved: intakeData && intakeData.confidence >= 5,
-          details: intakeData ? `Your score: ${intakeData.confidence || 0}/10` : "Assessment data loading...",
+          points: hasNumericValue(intakeData?.confidence) && Number(intakeData.confidence) >= 8 ? 2 : hasNumericValue(intakeData?.confidence) && Number(intakeData.confidence) >= 5 ? 1 : 0,
+          achieved: hasNumericValue(intakeData?.confidence) && Number(intakeData.confidence) >= 5,
+          details: hasNumericValue(intakeData?.confidence) ? `Your score: ${intakeData.confidence}/10` : "Assessment data unavailable",
           icon: <TrendingUp className="w-5 h-5" />,
           category: 'mindset'
         },
@@ -218,7 +210,7 @@ export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdo
           description: "Maintaining positive outlook on recovery",
           points: (intakeData && intakeData.beliefStatus === "Positive") ? 1 : 0,
           achieved: intakeData && intakeData.beliefStatus === "Positive",
-          details: intakeData ? `Your outlook: ${intakeData.beliefStatus || "Not assessed"}` : "Assessment data loading...",
+          details: intakeData?.beliefStatus ? `Your outlook: ${intakeData.beliefStatus}` : "Assessment data unavailable",
           icon: <Shield className="w-5 h-5" />,
           category: 'mindset'
         },
@@ -236,7 +228,7 @@ export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdo
             return pcsTotal <= 6;
           })(),
           details: (() => {
-            if (!intakeData || !intakeData.pcs4) return "Assessment data loading...";
+            if (!intakeData || !intakeData.pcs4) return "Assessment data unavailable";
             const pcsTotal = Object.values(intakeData.pcs4).reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
             return `Your score: ${pcsTotal}/16`;
           })(),
@@ -257,7 +249,7 @@ export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdo
   return tskTotal <= 8; // TSK-7 threshold: ≤8 points (30% of 28)
           })(),
           details: (() => {
-              if (!intakeData || !intakeData.tsk7) return "Assessment data loading...";
+              if (!intakeData || !intakeData.tsk7) return "Assessment data unavailable";
   const tskTotal = Object.values(intakeData.tsk7).reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
   return `Your score: ${tskTotal}/28`;
           })(),
@@ -279,7 +271,7 @@ export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdo
           description: "Shows clear, measurable improvement in your function",
           points: 0,
           achieved: false,
-          details: "Not yet assessed", 
+          details: "Not yet assessed",
           icon: <TrendingUp className="w-5 h-5" />,
           category: 'progress',
           helper: "Your therapist will track and update this based on your progress."
@@ -291,13 +283,13 @@ export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdo
       const totalDomains = displayBreakdown.length
 
       // Set the calculated score for display
-      setCalculatedScore({ 
+      setCalculatedScore({
         score: score, // Use backend score (single source of truth)
         breakdown: displayBreakdown,
         achievedAreas: achievedAreas,
         totalDomains: totalDomains
       })
-      
+
     } catch (error) {
       console.error('Error processing SRS breakdown data:', error)
       setCalculatedScore({ score: score, breakdown: [] })
@@ -343,7 +335,7 @@ export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdo
           >
             <X className="w-6 h-6" />
           </button>
-          
+
           <div className="flex items-center space-x-2">
             <img src="/SRS-icon.png" alt="SRS Logo" className="w-24 h-24 object-contain" />
             <div>
@@ -355,7 +347,7 @@ export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdo
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-8 py-6 space-y-6">
-          
+
             {/* About Your Score Info */}
           <div className="flex items-start space-x-3 p-4 bg-gradient-to-r from-btl-50 to-btl-100 rounded-xl border border-btl-200">
             <Info className="w-6 h-6 text-btl-600 mt-0.5 flex-shrink-0" />
@@ -376,7 +368,7 @@ export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdo
               </div>
               <p className="text-sm text-btl-600">Signature Recovery Score™</p>
                 </div>
-            
+
             <div className="text-center p-6 bg-gradient-to-br from-btl-50 to-btl-100 rounded-xl border border-btl-200">
               <h3 className="font-semibold text-btl-900 mb-2">Your Progress</h3>
               <div className="text-4xl font-bold text-btl-700 mb-1">
@@ -514,4 +506,3 @@ export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdo
     </AssessmentDialog>
   )
 }
-

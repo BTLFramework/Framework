@@ -14,7 +14,7 @@ export default function RecoveryPointsPage() {
   const router = useRouter()
   // Use proper authentication
   const { patient, loading: authLoading, isAuthenticated } = useAuth()
-  
+
   const [showInsights, setShowInsights] = useState(false)
   const [completedTaskIds, setCompletedTaskIds] = useState<Set<number>>(new Set())
   const [loading, setLoading] = useState(false)
@@ -40,30 +40,6 @@ export default function RecoveryPointsPage() {
       confidence: 5
     }
   })
-
-  // Show loading state while authenticating
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-btl-50 to-btl-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-btl-600 mx-auto mb-4"></div>
-          <p className="text-btl-600">Loading recovery points...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Show login prompt if not authenticated
-  if (!isAuthenticated || !patient) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-btl-50 to-btl-100 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-btl-900 mb-4">Please log in to continue</h1>
-          <p className="text-btl-600">Authentication is required to access your recovery points.</p>
-        </div>
-      </div>
-    )
-  }
 
   // Task-driven "Biggest Win" logic
   const [taskStats, setTaskStats] = useState({
@@ -93,42 +69,42 @@ export default function RecoveryPointsPage() {
   // Fetch real task completion data
   useEffect(() => {
     const fetchTaskStats = async () => {
-      if (!patient.email) {
+      if (!patient?.email) {
         console.log('ℹ️ No valid patient email, skipping task stats fetch')
         return
       }
-      
+
       try {
         console.log('🔄 Fetching task completion stats for:', patient.email)
-        
+
         // Get patient data first to get patient ID
         const patientResponse = await fetch(`/api/patients/portal-data/${patient.email}`)
         if (!patientResponse.ok) {
           console.log('❌ Patient not found, skipping task stats fetch')
           return
         }
-        
+
         const patientResult = await patientResponse.json()
         const patientDbId = patientResult.data.patient.id
-        
+
         // Get task completion statistics
         const taskStatsResponse = await fetch(`/api/recovery-points/task-stats/${patientDbId}`)
         if (taskStatsResponse.ok) {
           const taskStatsData = await taskStatsResponse.json()
           console.log('📊 Task completion stats:', taskStatsData.data)
-          
+
           setTaskCompletionData({
             thisWeek: taskStatsData.data.thisWeek,
             lastWeek: taskStatsData.data.lastWeek
           })
-          
+
           setTaskStats({
             biggestWin: taskStatsData.data.biggestWin
           })
         } else {
           console.log('⚠️ Could not fetch task stats, using default data')
         }
-        
+
       } catch (error) {
         console.error('❌ Error fetching task completion stats:', error)
         // Keep default values on error
@@ -136,7 +112,7 @@ export default function RecoveryPointsPage() {
     }
 
     fetchTaskStats()
-  }, [patient.email])
+  }, [patient?.email])
 
   // Calculate task completion deltas
   const calculateTaskDeltas = () => {
@@ -203,7 +179,7 @@ export default function RecoveryPointsPage() {
     },
     {
       id: 2,
-      title: "Pain Assessment", 
+      title: "Pain Assessment",
       points: 3, // Form submitted on time from rpActions.ADHERENCE
       icon: Heart,
       timeEstimate: "3 min",
@@ -229,7 +205,7 @@ export default function RecoveryPointsPage() {
     if (isCompleted) {
       return "bg-gradient-to-br from-emerald-100 to-emerald-200 text-emerald-700 border border-emerald-300"
     }
-    
+
     // Use achievement logic: 5+ points = gold, 3-4 points = silver, 1-2 points = bronze
     if (points >= 5) {
       return "bg-gradient-to-br from-yellow-400 to-yellow-600 text-yellow-950 shadow-md border border-yellow-600" // Gold
@@ -296,14 +272,37 @@ export default function RecoveryPointsPage() {
   // Modal state for which task is open
   const [openTask, setOpenTask] = useState<string | null>(null);
 
+  // Authentication states must be rendered after every hook has been called.
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-btl-50 to-btl-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-btl-600 mx-auto mb-4"></div>
+          <p className="text-btl-600">Loading recovery points...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated || !patient) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-btl-50 to-btl-100 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-btl-900 mb-4">Please log in to continue</h1>
+          <p className="text-btl-600">Authentication is required to access your recovery points.</p>
+        </div>
+      </div>
+    )
+  }
+
   // Handle task completion
   const handleTaskComplete = async (taskData: any) => {
     console.log('🎯 Task completed:', taskData);
-    
+
     // Mark task as completed locally
     setCompletedTaskIds(prev => new Set([...prev, taskData.taskId || 1]));
     setOpenTask(null);
-    
+
     // Record task completion in backend
     if (patient.email) {
       try {
@@ -312,13 +311,13 @@ export default function RecoveryPointsPage() {
         if (patientResponse.ok) {
           const patientResult = await patientResponse.json()
           const patientDbId = patientResult.data.patient.id
-          
+
           // Map task type to backend enum
           let taskType = 'MOVEMENT'
           if (taskData.taskTitle === 'Pain Assessment') taskType = 'PAIN_ASSESSMENT'
           else if (taskData.taskTitle === 'Mindfulness Session') taskType = 'MINDFULNESS'
           else if (taskData.taskTitle === 'Recovery Insights') taskType = 'RECOVERY_INSIGHTS'
-          
+
           // Record task completion
           await fetch('/api/recovery-points/task-completion', {
             method: 'POST',
@@ -332,9 +331,9 @@ export default function RecoveryPointsPage() {
               pointsEarned: taskData.pointsEarned || null
             }),
           })
-          
+
           console.log(`✅ Task completion recorded: ${taskType}`)
-          
+
           // Refresh task stats to update "Biggest Win This Week"
           const taskStatsResponse = await fetch(`/api/recovery-points/task-stats/${patientDbId}`)
           if (taskStatsResponse.ok) {
@@ -365,8 +364,8 @@ export default function RecoveryPointsPage() {
           <h1 className="text-3xl font-bold text-white mb-1">Recovery Points</h1>
           <p className="text-white/90 text-lg">Complete tasks to earn points and unlock achievements</p>
         </div>
-        <button 
-          onClick={() => router.back()} 
+        <button
+          onClick={() => router.back()}
           className="p-3 hover:bg-white/20 rounded-xl transition-all duration-200 backdrop-blur-sm"
         >
           <ArrowLeft className="w-6 h-6 text-white" />
@@ -384,7 +383,7 @@ export default function RecoveryPointsPage() {
               <div className="text-3xl font-bold gradient-text mb-1">{weeklyStats.current}</div>
               <div className="text-btl-600 font-medium">Points This Week</div>
             </div>
-            
+
             <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 text-center">
               <div className="w-12 h-12 bg-gradient-to-br from-btl-600 to-btl-700 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-md">
                 <Heart className="w-6 h-6 text-white" />
@@ -392,7 +391,7 @@ export default function RecoveryPointsPage() {
               <div className="text-3xl font-bold gradient-text mb-1">{weeklyStats.streak}</div>
               <div className="text-btl-600 font-medium">Day Streak</div>
             </div>
-            
+
             <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 text-center">
               <div className="w-12 h-12 bg-gradient-to-br from-btl-600 to-btl-700 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-md">
                 <Calendar className="w-6 h-6 text-white" />
@@ -401,7 +400,7 @@ export default function RecoveryPointsPage() {
               <div className="text-btl-600 font-medium">Weekly Progress</div>
             </div>
           </div>
-          
+
           {/* Weekly Progress Bar with BackToLife theme */}
           <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
             <div className="flex items-center justify-between mb-4">

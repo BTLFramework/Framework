@@ -24,7 +24,8 @@ export default function MessagesPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  
+  const [searchQuery, setSearchQuery] = useState("")
+
   // Ref for auto-scrolling to bottom
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -60,13 +61,13 @@ export default function MessagesPage() {
       try {
         setLoading(true)
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/api/messages/patient/${patientId}`)
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch messages')
         }
 
         const result = await response.json()
-        
+
         if (result.success) {
           // Format messages for display
           const formattedMessages = result.messages.map((msg: any) => ({
@@ -75,17 +76,17 @@ export default function MessagesPage() {
             senderName: msg.senderName,
             content: msg.content,
             subject: msg.subject,
-            timestamp: new Date(msg.timestamp).toLocaleTimeString('en-US', { 
-              hour: 'numeric', 
+            timestamp: new Date(msg.timestamp).toLocaleTimeString('en-US', {
+              hour: 'numeric',
               minute: '2-digit',
-              hour12: true 
+              hour12: true
             }),
             isOwn: msg.senderType === 'PATIENT',
             isRead: msg.isRead
           }))
-          
+
           setMessages(formattedMessages)
-          
+
           // Update conversation with latest message
           if (formattedMessages.length > 0) {
             const latestMessage = formattedMessages[0]
@@ -148,14 +149,14 @@ export default function MessagesPage() {
           senderId: 'me',
           senderName: 'You',
           content: newMessage,
-          timestamp: new Date().toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
+          timestamp: new Date().toLocaleTimeString('en-US', {
+            hour: 'numeric',
             minute: '2-digit',
-            hour12: true 
+            hour12: true
           }),
       isOwn: true,
         }
-        
+
         setMessages(prev => [newMsg, ...prev])
       setNewMessage("")
       } else {
@@ -168,6 +169,11 @@ export default function MessagesPage() {
   }
 
   const selectedConv = conversations.find((c) => c.id === selectedConversation)
+  const filteredConversations = conversations.filter((conversation) =>
+    `${conversation.name} ${conversation.role}`
+      .toLowerCase()
+      .includes(searchQuery.trim().toLowerCase())
+  )
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-btl-50 via-white to-btl-100">
@@ -183,8 +189,8 @@ export default function MessagesPage() {
               <p className="text-btl-100 mt-1">Communicate with your care team</p>
             </div>
           </div>
-          <button 
-            onClick={() => router.back()} 
+          <button
+            onClick={() => router.back()}
             className="p-3 hover:bg-white/20 rounded-xl transition-all duration-200 hover:scale-105"
           >
             <ArrowLeft className="w-6 h-6 text-white" />
@@ -194,12 +200,14 @@ export default function MessagesPage() {
 
               <div className="flex h-[calc(100vh-140px)]">
         {/* Conversations List */}
-        <div className="w-1/3 bg-white border-r border-charcoal-200">
+        <div className="hidden md:block w-1/3 bg-white border-r border-charcoal-200">
           <div className="p-4 border-b border-charcoal-200">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-charcoal-400 w-4 h-4" />
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="Search conversations..."
                 className="w-full pl-10 pr-4 py-2 border border-charcoal-200 rounded-xl focus:ring-2 focus:ring-btl-500 focus:border-btl-500 transition-all duration-200"
               />
@@ -207,13 +215,13 @@ export default function MessagesPage() {
           </div>
 
           <div className="overflow-y-auto">
-            {conversations.map((conversation) => (
+            {filteredConversations.map((conversation) => (
               <div
                 key={conversation.id}
                 onClick={() => setSelectedConversation(conversation.id)}
                 className={`p-4 mx-3 my-2 border border-transparent cursor-pointer transition-all duration-200 rounded-xl ${
-                  selectedConversation === conversation.id 
-                    ? "bg-btl-50 border-btl-200 shadow-md" 
+                  selectedConversation === conversation.id
+                    ? "bg-btl-50 border-btl-200 shadow-md"
                     : "hover:bg-charcoal-50 hover:border-charcoal-200"
                 }`}
               >
@@ -260,13 +268,13 @@ export default function MessagesPage() {
                 </div>
               </div>
               <div className="flex items-center space-x-2">
-                <button className="p-2 hover:bg-btl-50 rounded-xl transition-all duration-200 border border-transparent hover:border-btl-200">
+                <button aria-label="Call care team" className="p-2 hover:bg-btl-50 rounded-xl transition-all duration-200 border border-transparent hover:border-btl-200">
                   <Phone className="w-5 h-5 text-charcoal-600" />
                 </button>
-                <button className="p-2 hover:bg-btl-50 rounded-xl transition-all duration-200 border border-transparent hover:border-btl-200">
+                <button aria-label="Start video call" className="p-2 hover:bg-btl-50 rounded-xl transition-all duration-200 border border-transparent hover:border-btl-200">
                   <Video className="w-5 h-5 text-charcoal-600" />
                 </button>
-                <button className="p-2 hover:bg-btl-50 rounded-xl transition-all duration-200 border border-transparent hover:border-btl-200">
+                <button aria-label="More message options" className="p-2 hover:bg-btl-50 rounded-xl transition-all duration-200 border border-transparent hover:border-btl-200">
                   <MoreVertical className="w-5 h-5 text-charcoal-600" />
                 </button>
               </div>
@@ -306,8 +314,8 @@ export default function MessagesPage() {
               <div key={message.id} className={`flex ${message.isOwn ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-md ${
-                    message.isOwn 
-                      ? "btn-primary-gradient text-white" 
+                    message.isOwn
+                      ? "btn-primary-gradient text-white"
                       : "bg-white border border-charcoal-200 text-charcoal-900"
                   }`}
                 >
@@ -338,6 +346,8 @@ export default function MessagesPage() {
               />
               <button
                 onClick={handleSendMessage}
+                disabled={!newMessage.trim()}
+                aria-label="Send message"
                 className="p-3 btn-primary-gradient text-white rounded-xl hover:shadow-lg transition-all duration-200 transform hover:scale-105"
               >
                 <Send className="w-5 h-5" />

@@ -32,10 +32,10 @@ export default function AssessmentsPage() {
   const calculateIntakeDates = (intakeDate: Date) => {
     const fourWeekDate = new Date(intakeDate)
     fourWeekDate.setDate(fourWeekDate.getDate() + 28) // 4 weeks = 28 days
-    
+
     const eightWeekDate = new Date(intakeDate)
     eightWeekDate.setDate(eightWeekDate.getDate() + 56) // 8 weeks = 56 days
-    
+
     return { fourWeekDate, eightWeekDate }
   }
 
@@ -82,106 +82,109 @@ export default function AssessmentsPage() {
   const loadIntakeData = async () => {
     try {
       setLoading(true)
-      
+
       // Use authenticated patient data instead of localStorage
       if (!patient || !patient.email) {
         // No authenticated patient found
         throw new Error('No authenticated patient')
       }
-      
+
       const patientEmail = patient.email
       // Loading data for authenticated patient
-      
+
       // DEV: Use override intake date if set
       let effectiveIntakeDate: Date | undefined = undefined
       if (devIntakeDate) {
         effectiveIntakeDate = new Date(devIntakeDate)
       }
-      
+
       // Fetch real patient data from backend
               const response = await fetch(`/api/patients/portal-data/${encodeURIComponent(patientEmail)}`)
-      
+
       if (!response.ok) {
                   console.error('Failed to fetch patient data, status:', response.status)
         throw new Error('Failed to fetch patient data')
       }
-      
+
       const result = await response.json()
               // Portal data fetched successfully
-      
+
       if (result.success && result.data) {
         // Get patient's intake date and SRS scores
         const patientData = result.data.patient
-        
+
         // Use the actual intake date from the patient data
-        const intakeDate = effectiveIntakeDate || new Date(patientData.intakeDate || patientData.createdAt || '2024-01-01')
-        
+        const intakeDateValue = patientData.intakeDate || patientData.createdAt
+        if (!effectiveIntakeDate && !intakeDateValue) {
+          throw new Error('Verified intake date is unavailable')
+        }
+        const intakeDate = effectiveIntakeDate || new Date(intakeDateValue)
+
         // Fetch all SRS scores for this patient to determine completion status
         const srsResponse = await fetch(`/api/patients/${patientData.id}/srs-scores`)
         let srsScores = []
-        
+
         if (srsResponse.ok) {
           const srsResult = await srsResponse.json()
           srsScores = srsResult.data || []
         }
-        
+
         // SRS scores for patient
-        
+
         // Check for different possible form type values
-        const hasInitialIntake = srsScores.some((score: any) => 
-          score.formType === 'Intake' || 
-          score.formType === 'Initial Intake' || 
+        const hasInitialIntake = srsScores.some((score: any) =>
+          score.formType === 'Intake' ||
+          score.formType === 'Initial Intake' ||
           score.formType === 'Initial' ||
           score.formType === 'initial'
         )
-        const hasFourWeekFollowup = srsScores.some((score: any) => 
-          score.formType === '4-Week Follow-up' || 
+        const hasFourWeekFollowup = srsScores.some((score: any) =>
+          score.formType === '4-Week Follow-up' ||
           score.formType === '4 Week Follow-up' ||
           score.formType === '4-Week' ||
           score.formType === '4 Week'
         )
-        const hasEightWeekFollowup = srsScores.some((score: any) => 
-          score.formType === '8-Week Follow-up' || 
+        const hasEightWeekFollowup = srsScores.some((score: any) =>
+          score.formType === '8-Week Follow-up' ||
           score.formType === '8 Week Follow-up' ||
           score.formType === '8-Week' ||
           score.formType === '8 Week'
         )
         // Assessment completion status
-        
+
         // Calculate due dates based on intake date
         const { fourWeekDate, eightWeekDate } = calculateIntakeDates(intakeDate)
         const today = new Date()
-        
+
         // Determine completion status based on real SRS scores
-        // If patient can access portal, initial intake must be completed
-        const initialCompleted = hasInitialIntake || true // Always true for portal users
+        const initialCompleted = hasInitialIntake
         const fourWeekCompleted = hasFourWeekFollowup
         const eightWeekCompleted = hasEightWeekFollowup
         const fourWeekOverdue = !fourWeekCompleted && today > fourWeekDate
         const eightWeekOverdue = !eightWeekCompleted && today > eightWeekDate
-        
+
         // Get the actual form data from SRS scores
         const getFormData = (formType: string) => {
           // getFormData called for formType
-          
+
           let score
           if (formType === 'Intake') {
-            score = srsScores.find((s: any) => 
-              s.formType === 'Intake' || 
-              s.formType === 'Initial Intake' || 
+            score = srsScores.find((s: any) =>
+              s.formType === 'Intake' ||
+              s.formType === 'Initial Intake' ||
               s.formType === 'Initial' ||
               s.formType === 'initial'
             )
           } else if (formType === '4-Week Follow-up') {
-            score = srsScores.find((s: any) => 
-              s.formType === '4-Week Follow-up' || 
+            score = srsScores.find((s: any) =>
+              s.formType === '4-Week Follow-up' ||
               s.formType === '4 Week Follow-up' ||
               s.formType === '4-Week' ||
               s.formType === '4 Week'
             )
           } else if (formType === '8-Week Follow-up') {
-            score = srsScores.find((s: any) => 
-              s.formType === '8-Week Follow-up' || 
+            score = srsScores.find((s: any) =>
+              s.formType === '8-Week Follow-up' ||
               s.formType === '8 Week Follow-up' ||
               s.formType === '8-Week' ||
               s.formType === '8 Week'
@@ -189,10 +192,10 @@ export default function AssessmentsPage() {
           } else {
             score = srsScores.find((s: any) => s.formType === formType)
           }
-          
+
           // Found score for formType
           if (!score) return undefined
-          
+
           return {
             patientName: patientData.name,
             region: score.region,
@@ -207,7 +210,7 @@ export default function AssessmentsPage() {
             tsk7: score.tsk7 || null
           }
         }
-        
+
         const forms: IntakeForm[] = [
           {
             id: "initial-intake",
@@ -245,52 +248,15 @@ export default function AssessmentsPage() {
             isHighlighted: eightWeekOverdue
           }
         ]
-        
+
         setIntakeForms(forms)
       } else {
         throw new Error('Invalid patient data response')
       }
     } catch (error) {
       console.error('Error in loadIntakeData:', error)
-      
-      // Create default forms on error so user always sees something
-      const today = new Date()
-      const { fourWeekDate, eightWeekDate } = calculateIntakeDates(today)
-      
-      const defaultForms: IntakeForm[] = [
-        {
-          id: "initial-intake",
-          title: "Initial Intake Form",
-          description: "Your first assessment to establish your SRS (Signature Recovery Score).",
-          status: "completed",
-          date: formatDate(today),
-          completedDate: formatDate(today),
-          actionButton: "View Results",
-          isHighlighted: false
-        },
-        {
-          id: "4-week-followup",
-          title: "4 Week Follow-up Intake",
-          description: "Progress assessment to track your recovery journey",
-          status: "upcoming",
-          date: formatDate(fourWeekDate),
-          dueDate: formatDate(fourWeekDate),
-          actionButton: "Start Assessment",
-          isHighlighted: false
-        },
-        {
-          id: "8-week-followup",
-          title: "8 Week Follow-up Intake",
-          description: "Final assessment to evaluate long-term progress",
-          status: "upcoming",
-          date: formatDate(eightWeekDate),
-          dueDate: formatDate(eightWeekDate),
-          actionButton: "Start Assessment",
-          isHighlighted: false
-        }
-      ]
-      
-      setIntakeForms(defaultForms)
+
+      setIntakeForms([])
     } finally {
       setLoading(false)
     }
@@ -329,8 +295,8 @@ export default function AssessmentsPage() {
       <div className="min-h-screen bg-gradient-to-br from-btl-50 via-white to-btl-100">
         <div className="bg-gradient-to-r from-btl-900 via-btl-700 to-btl-600 text-white px-6 py-6 shadow-lg">
           <div className="flex items-center space-x-4">
-            <button 
-              onClick={() => router.back()} 
+            <button
+              onClick={() => router.back()}
               className="p-2 hover:bg-white/20 rounded-xl transition-all duration-200 hover:scale-105"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -363,8 +329,8 @@ export default function AssessmentsPage() {
       <div className="min-h-screen bg-gradient-to-br from-btl-50 via-white to-btl-100">
         <div className="bg-gradient-to-r from-btl-900 via-btl-700 to-btl-600 text-white px-6 py-6 shadow-lg">
           <div className="flex items-center space-x-4">
-            <button 
-              onClick={() => router.back()} 
+            <button
+              onClick={() => router.back()}
               className="p-2 hover:bg-white/20 rounded-xl transition-all duration-200 hover:scale-105"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -402,8 +368,8 @@ export default function AssessmentsPage() {
               <p className="text-btl-100 mt-1">Complete forms to track your recovery progress</p>
             </div>
           </div>
-          <button 
-            onClick={() => router.back()} 
+          <button
+            onClick={() => router.back()}
             className="p-3 hover:bg-white/20 rounded-xl transition-all duration-200 hover:scale-105"
           >
             <ArrowLeft className="w-6 h-6 text-white" />
@@ -447,7 +413,7 @@ export default function AssessmentsPage() {
                   onChange={e => setDevIntakeDate(e.target.value)}
                   className="border border-btl-200 rounded px-3 py-1 text-sm"
                 />
-                <button 
+                <button
                   onClick={() => setDevIntakeDate("")}
                   className="text-xs text-btl-600 hover:text-btl-700"
                 >
@@ -471,10 +437,10 @@ export default function AssessmentsPage() {
                         : "border-transparent text-charcoal-500 hover:text-btl-600 hover:border-btl-300"
                     }`}
                   >
-                    {tab.name} 
+                    {tab.name}
                     <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
-                      activeTab === tab.id 
-                        ? "bg-btl-600 text-white" 
+                      activeTab === tab.id
+                        ? "bg-btl-600 text-white"
                         : "bg-charcoal-100 text-charcoal-600"
                     }`}>
                       {tab.count}
@@ -495,14 +461,20 @@ export default function AssessmentsPage() {
                   // Handler for assessment click
                   const handleClick = () => {
                         // Assessment clicked
-                    
+
                     if (assessment.status === 'completed' && assessment.formData) {
                       // Open modal for completed forms
                       // Opening modal with assessment
                       setSelectedAssessment(assessment)
                     } else if (assessment.status === 'due') {
                       // Redirect to intake form for due forms
-                      window.location.href = '/intake';
+                      const formType =
+                        assessment.id === '4-week-followup'
+                          ? '4-Week Follow-up'
+                          : assessment.id === '8-week-followup'
+                            ? '8-Week Follow-up'
+                            : 'Intake'
+                      window.location.href = `/intake?formType=${encodeURIComponent(formType)}`;
                     }
                     // Upcoming forms are locked, no action needed
                   }
@@ -511,11 +483,19 @@ export default function AssessmentsPage() {
                     <div
                       key={assessment.id}
                       className={`border rounded-2xl p-6 transition-all duration-300 group ${
-                        assessment.isHighlighted 
-                          ? 'border-btl-300 bg-gradient-to-r from-btl-50 to-white shadow-lg' 
+                        assessment.isHighlighted
+                          ? 'border-btl-300 bg-gradient-to-r from-btl-50 to-white shadow-lg'
                           : 'border-btl-200'
                       } ${isLocked ? 'opacity-60 cursor-not-allowed' : 'hover:border-btl-300 hover:bg-btl-50 hover:shadow-lg cursor-pointer'}`}
                       onClick={isLocked ? undefined : handleClick}
+                      onKeyDown={isLocked ? undefined : (event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault()
+                          handleClick()
+                        }
+                      }}
+                      role={isLocked ? undefined : "button"}
+                      tabIndex={isLocked ? -1 : 0}
                       title={isLocked ? `Available on ${assessment.dueDate || assessment.date}` : ''}
                     >
                       <div className="flex items-start space-x-6">
@@ -561,7 +541,7 @@ export default function AssessmentsPage() {
                               <p className="text-sm text-btl-800 font-medium flex items-center space-x-2">
                                 <AlertTriangle className="w-4 h-4" />
                                 <span>
-                                  {assessment.status === "due" 
+                                  {assessment.status === "due"
                                     ? "This form needs your attention"
                                     : "This form will be available soon"
                                   }
@@ -611,4 +591,3 @@ export default function AssessmentsPage() {
     </div>
   )
 }
-

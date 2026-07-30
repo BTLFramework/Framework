@@ -15,7 +15,7 @@ export const tierContent = {
   },
   4: {
     message: "You’re not alone in this. When pain and stress are intense, it’s important to pause and care for yourself. If you need more support, booking a check-in with your clinician is always an option.",
-    cta: { label: "Book a Check-in", route: "https://kineticliving.janeapp.com/" },
+    cta: { label: "Book a Check-in", route: "https://movenetics.janeapp.com/#/staff_member/30" },
     secondaryCta: { label: "Talk to your provider", route: "/messages" }
   }
-} as const; 
+} as const;

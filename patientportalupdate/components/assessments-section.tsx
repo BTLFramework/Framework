@@ -34,10 +34,10 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
   const calculateIntakeDates = (intakeDate: Date) => {
     const fourWeekDate = new Date(intakeDate)
     fourWeekDate.setDate(fourWeekDate.getDate() + 28) // 4 weeks = 28 days
-    
+
     const eightWeekDate = new Date(intakeDate)
     eightWeekDate.setDate(eightWeekDate.getDate() + 56) // 8 weeks = 56 days
-    
+
     return { fourWeekDate, eightWeekDate }
   }
 
@@ -84,71 +84,75 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
   const loadIntakeData = async () => {
     try {
       setLoading(true)
-      
+
       // Use authenticated patient data
       if (!isAuthenticated || !patient?.email) {
         // No authenticated patient available
         setLoading(false)
         return
       }
-      
+
       const patientEmail = patient.email
       // Loading data for authenticated patient
-      
+
       // DEV: Use override intake date if set
       if (devIntakeDate) {
         effectiveIntakeDate = new Date(devIntakeDate)
       }
-      
+
       // Fetch real patient data from backend
       const response = await fetch(`/api/patients/portal-data/${encodeURIComponent(patientEmail)}`)
-      
+
       if (!response.ok) {
                   console.error('Failed to fetch patient data, status:', response.status)
         throw new Error('Failed to fetch patient data')
       }
-      
+
       const result = await response.json()
               // Portal data fetched successfully
-      
+
       if (result.success && result.data) {
         // Get patient's intake date and SRS scores
         const patientData = result.data.patient
-        
+
         // Use the actual intake date from the patient data
-        const intakeDate = effectiveIntakeDate || new Date(patientData.intakeDate || patientData.createdAt || '2024-01-01')
-        
+        const intakeDateValue = patientData.intakeDate || patientData.createdAt
+        if (!effectiveIntakeDate && !intakeDateValue) {
+          throw new Error('Verified intake date is unavailable')
+        }
+        const intakeDate = effectiveIntakeDate || new Date(intakeDateValue)
+
         // Fetch all SRS scores for this patient to determine completion status
         const srsResponse = await fetch(`/api/patients/${patientData.id}/srs-scores`)
         let srsScores = []
-        
+
         if (srsResponse.ok) {
           const srsResult = await srsResponse.json()
           srsScores = srsResult.data || []
         }
-        
+
         // SRS scores for patient
         const hasInitialIntake = srsScores.some((score: any) => score.formType === 'Intake' || score.formType === 'Initial')
         const hasFourWeekFollowup = srsScores.some((score: any) => score.formType === '4-Week Follow-up')
         const hasEightWeekFollowup = srsScores.some((score: any) => score.formType === '8-Week Follow-up')
         // Assessment completion status
-        
+
         // Calculate due dates based on intake date
         const { fourWeekDate, eightWeekDate } = calculateIntakeDates(intakeDate)
         const today = new Date()
-        
+
         // Determine completion status based on real SRS scores
         const initialCompleted = hasInitialIntake
         const fourWeekCompleted = hasFourWeekFollowup
         const eightWeekCompleted = hasEightWeekFollowup
         const fourWeekOverdue = !fourWeekCompleted && today > fourWeekDate
         const eightWeekOverdue = !eightWeekCompleted && today > eightWeekDate
-        
+
         // Get the actual form data from SRS scores
         const getFormData = (formType: string) => {
           const score = srsScores.find((s: any) => s.formType === formType)
           if (!score) return undefined
-          
+
           return {
             patientName: patientData.name,
             region: score.region,
@@ -163,7 +167,7 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
             tsk7: score.tsk7 || null
           }
         }
-        
+
         const forms: IntakeForm[] = [
           {
             id: "initial-intake",
@@ -201,7 +205,7 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
             isHighlighted: eightWeekOverdue
           }
         ]
-        
+
         setIntakeForms(forms)
       } else {
         throw new Error('Invalid patient data response')
@@ -286,7 +290,13 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
             if (form.formData) {
               onAssessmentClick(form)
             } else if (isDue) {
-              window.location.href = '/intake';
+              const formType =
+                form.id === '4-week-followup'
+                  ? '4-Week Follow-up'
+                  : form.id === '8-week-followup'
+                    ? '8-Week Follow-up'
+                    : 'Intake'
+              window.location.href = `/intake?formType=${encodeURIComponent(formType)}`;
             }
           }
 
@@ -294,11 +304,19 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
             <div
               key={form.id}
               className={`border rounded-xl p-4 transition-all duration-200 group ${
-                form.isHighlighted 
-                  ? 'border-btl-300 bg-btl-50 shadow-md' 
+                form.isHighlighted
+                  ? 'border-btl-300 bg-btl-50 shadow-md'
                   : 'border-btl-200'
               } ${isLocked ? 'opacity-60 cursor-not-allowed' : 'hover:border-btl-300 hover:bg-btl-50 hover:shadow-md cursor-pointer'}`}
               onClick={isLocked ? undefined : handleClick}
+              onKeyDown={isLocked ? undefined : (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  handleClick()
+                }
+              }}
+              role={isLocked ? undefined : "button"}
+              tabIndex={isLocked ? -1 : 0}
               title={isLocked ? `Available on ${form.dueDate || form.date}` : ''}
             >
               <div className="flex items-start space-x-4">
@@ -327,7 +345,7 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
                       <statusInfo.icon className="w-3 h-3" />
                       <span>{isLocked ? `Available on ${form.dueDate || form.date}` : statusInfo.timeInfo}</span>
                     </div>
-                    {form.actionButton && form.formData && (
+                    {form.actionButton && !isLocked && (
                       <span className="text-xs font-semibold px-3 py-1 rounded-full text-btl-600 bg-btl-100">
                         {form.actionButton}
                       </span>

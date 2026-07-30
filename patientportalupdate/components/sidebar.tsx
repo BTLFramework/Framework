@@ -9,7 +9,7 @@ const navigationItems = [
   { name: "Weekly Plan", icon: Calendar, href: "/weekly-plan" },
   { name: "Forms", icon: FileText, href: "/forms" },
   { name: "Recovery Toolkit", icon: Book, href: "/toolkit" },
-  { name: "Book Appointment", icon: Phone, href: "https://kineticliving.janeapp.com/#/staff_member/37", external: true },
+  { name: "Book Appointment", icon: Phone, href: "https://movenetics.janeapp.com/#/staff_member/30", external: true },
   { name: "Support", icon: HelpCircle, href: "/support" },
 ]
 
