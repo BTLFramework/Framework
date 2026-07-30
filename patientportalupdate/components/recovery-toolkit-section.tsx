@@ -17,6 +17,7 @@ export function RecoveryToolkitSection({ onToolkitClick }: RecoveryToolkitSectio
       iconBg: "bg-gradient-to-br from-btl-100 to-btl-200",
       iconColor: "text-btl-600",
       count: allExercises.length,
+      status: "Library growing",
       category: "videos",
     },
     {
@@ -26,6 +27,7 @@ export function RecoveryToolkitSection({ onToolkitClick }: RecoveryToolkitSectio
       iconBg: "bg-gradient-to-br from-btl-50 to-btl-200",
       iconColor: "text-btl-700",
       count: Array.isArray(insightLibrary) ? insightLibrary.length : 0,
+      status: "Library growing",
       category: "guides",
     },
     {
@@ -35,6 +37,7 @@ export function RecoveryToolkitSection({ onToolkitClick }: RecoveryToolkitSectio
       iconBg: "bg-gradient-to-br from-btl-100 to-btl-300",
       iconColor: "text-btl-600",
       count: 4,
+      status: "Available",
       category: "tools",
     },
   ]
@@ -85,7 +88,7 @@ export function RecoveryToolkitSection({ onToolkitClick }: RecoveryToolkitSectio
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-xs font-semibold text-btl-600 bg-btl-100 px-2 py-1 rounded-full">
-                {item.count}
+                {item.status}
               </span>
               <ArrowRight className="w-4 h-4 text-charcoal-400 group-hover:text-btl-600 transition-colors" />
             </div>

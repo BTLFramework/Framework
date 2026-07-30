@@ -78,6 +78,7 @@ export default function RecoveryToolsPage() {
       bgColor: "from-btl-50 to-btl-100",
       borderColor: "border-btl-200",
       count: exerciseCount,
+      availabilityLabel: "Library growing",
       onClick: () => setSelectedToolkit({
         title: "Exercise Videos",
         description: "Guided recovery movements",
@@ -95,6 +96,7 @@ export default function RecoveryToolsPage() {
       bgColor: "from-btl-50 to-btl-100",
       borderColor: "border-btl-200",
       count: recoveryGuidesCount,
+      availabilityLabel: "Library growing",
       onClick: () => setSelectedToolkit({
         title: "Recovery Guides",
         description: "Educational resources",
@@ -112,6 +114,7 @@ export default function RecoveryToolsPage() {
       bgColor: "from-btl-50 to-btl-100",
       borderColor: "border-btl-200",
       count: supportToolsCount,
+      availabilityLabel: "Available",
       onClick: () => setSelectedToolkit({
         title: "Support Tools",
         description: "Recovery support utilities",
@@ -195,8 +198,8 @@ export default function RecoveryToolsPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm text-btl-500 font-medium">Available</div>
-                      <div className="text-2xl font-bold text-btl-700">{category.count}</div>
+                      <div className="text-sm text-btl-500 font-medium">Beta library</div>
+                      <div className="text-base font-bold text-btl-700">{category.availabilityLabel}</div>
                     </div>
                   </div>
 
@@ -205,7 +208,9 @@ export default function RecoveryToolsPage() {
                     <div className="flex items-center justify-between text-sm text-btl-600 mb-3">
                       <div className="flex items-center">
                         <Target className="w-4 h-4 mr-1 text-btl-500" />
-                        <span className="font-medium">{category.count} resources available</span>
+                        <span className="font-medium">
+                          {category.id === "tools" ? "Support tools available" : "Content added progressively"}
+                        </span>
                       </div>
                       <div className="flex items-center">
                         <Clock className="w-4 h-4 mr-1 text-btl-500" />
