@@ -4,10 +4,10 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { patientId: string } }
+  { params }: { params: Promise<{ patientId: string }> }
 ) {
   try {
-    const { patientId } = params;
+    const { patientId } = await params;
     
     console.log(`📈 Frontend API: Getting task completion stats for patient ${patientId}`);
     
