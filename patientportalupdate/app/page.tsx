@@ -20,6 +20,7 @@ import { RecoveryInsightDialog } from "@/components/RecoveryInsightDialog"
 import { useAuth } from "@/hooks/useAuth"
 import { LoginForm } from "@/components/LoginForm"
 import { BUILD_TAG, BUILD_HINT } from "@/lib/buildInfo"
+import { phaseForSrs } from "@/lib/clinicalState"
 
 const PatientRecoveryDashboard: React.FC = () => {
   // Use proper authentication
@@ -306,6 +307,7 @@ const PatientRecoveryDashboard: React.FC = () => {
       return 0; // Safe fallback
     }
   })()
+  const currentPhase = phaseForSrs(currentScore) || patient?.phase || patient?.currentPhase || 'RESET'
 
   // Handler for opening the correct dialog based on card id
   const handleTaskDialogOpen = (task: any) => {
@@ -484,7 +486,7 @@ const PatientRecoveryDashboard: React.FC = () => {
                 View Breakdown
               </button>
             </div>
-            <RecoveryScoreWheel score={currentScore} maxScore={11} phase={patient?.phase || patient?.currentPhase || 'RESET'} />
+            <RecoveryScoreWheel score={currentScore} maxScore={11} phase={currentPhase} />
           </div>
 
           {/* Weekly Points */}
