@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { ArrowLeft, Send, Search, Phone, Video, MoreVertical, MessageCircle } from "lucide-react"
+import { ArrowLeft, Send, Search, Phone, CalendarDays, MessageCircle } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
 
@@ -42,7 +42,7 @@ export default function MessagesPage() {
     {
       id: 1,
       name: "Dr. Spencer Barber",
-      role: "Primary Healthcare Provider",
+      role: "Your Back to Life clinician",
       avatar: "/placeholder.svg?height=40&width=40",
       lastMessage: latestMessage?.content || (loading ? "Loading..." : "No messages yet"),
       timestamp: latestMessage?.timestamp || "",
@@ -263,15 +263,24 @@ export default function MessagesPage() {
                 </div>
               </div>
               <div className="flex items-center space-x-2">
-                <button aria-label="Call care team" className="p-2 hover:bg-btl-50 rounded-xl transition-all duration-200 border border-transparent hover:border-btl-200">
+                <a
+                  href="tel:+17802971111"
+                  aria-label="Call Movenetics"
+                  title="Call Movenetics"
+                  className="p-2 hover:bg-btl-50 rounded-xl transition-all duration-200 border border-transparent hover:border-btl-200"
+                >
                   <Phone className="w-5 h-5 text-charcoal-600" />
-                </button>
-                <button aria-label="Start video call" className="p-2 hover:bg-btl-50 rounded-xl transition-all duration-200 border border-transparent hover:border-btl-200">
-                  <Video className="w-5 h-5 text-charcoal-600" />
-                </button>
-                <button aria-label="More message options" className="p-2 hover:bg-btl-50 rounded-xl transition-all duration-200 border border-transparent hover:border-btl-200">
-                  <MoreVertical className="w-5 h-5 text-charcoal-600" />
-                </button>
+                </a>
+                <a
+                  href="https://movenetics.janeapp.com/#/staff_member/30"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Book an appointment with Dr. Spencer Barber"
+                  title="Book an appointment"
+                  className="p-2 hover:bg-btl-50 rounded-xl transition-all duration-200 border border-transparent hover:border-btl-200"
+                >
+                  <CalendarDays className="w-5 h-5 text-charcoal-600" />
+                </a>
               </div>
             </div>
           </div>
@@ -300,7 +309,7 @@ export default function MessagesPage() {
                   <h3 className="text-xl font-semibold text-charcoal-900 mb-2">No messages yet</h3>
                   <p className="text-charcoal-600 text-sm leading-relaxed">Your care team will send updates here</p>
                   <div className="mt-4 p-3 bg-btl-50 rounded-xl border border-btl-100">
-                    <p className="text-xs text-btl-700 font-medium">Messages from Dr. Spencer Barber and your care team will appear here</p>
+                    <p className="text-xs text-btl-700 font-medium">Messages from Dr. Spencer Barber will appear here</p>
                   </div>
                 </div>
               </div>
