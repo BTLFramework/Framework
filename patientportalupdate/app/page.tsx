@@ -61,42 +61,14 @@ const PatientRecoveryDashboard: React.FC = () => {
     if (!patient?.email) return
 
     try {
-      // Get baseline data
-              const portalResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/patients/portal-data/${patient.email}`)
-      if (!portalResponse.ok) return
+      const response = await fetch(
+        `/api/patients/${encodeURIComponent(patient.email)}/recovery/snapshot`,
+        { cache: 'no-store' }
+      )
+      if (!response.ok) return
 
-      const portalData = await portalResponse.json()
-      const baselineVAS = portalData.data.vas ?? null
-
-      // Get current daily data
-              const dailyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/patients/daily-data/${patient.email}`)
-      let currentPain = baselineVAS
-      let currentStress: number | null = null
-
-      if (dailyResponse.ok) {
-        const dailyData = await dailyResponse.json()
-        if (dailyData.success && dailyData.data) {
-          // Convert 0-100 scale back to 0-10
-          currentPain = Math.round((dailyData.data.pain / 100) * 10)
-          currentStress = Math.round((dailyData.data.psychLoad / 100) * 10)
-        }
-      }
-
-      // Determine risk level based on pain and stress
-      let riskLevel: string | null = null
-      if (currentPain !== null && currentStress !== null && (currentPain >= 7 || currentStress >= 7)) {
-        riskLevel = 'high'
-      } else if (currentPain !== null && currentStress !== null && (currentPain >= 5 || currentStress >= 5)) {
-        riskLevel = 'moderate'
-      } else if (currentPain !== null && currentStress !== null) {
-        riskLevel = 'low'
-      }
-
-      const newSnapshot = {
-        pain: currentPain,
-        stress: currentStress,
-        risk: riskLevel
-      }
+      const result = await response.json()
+      const newSnapshot = result.snapshot ?? { pain: null, stress: null, risk: null }
 
       setCurrentSnapshot(newSnapshot)
       console.log('📊 Updated recovery snapshot:', newSnapshot)
@@ -167,7 +139,7 @@ const PatientRecoveryDashboard: React.FC = () => {
       setLoading(true)
       console.log('🔄 Refreshing patient data from backend...')
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/patients/portal-data/${patient.email}`)
+      const response = await fetch(`/api/patients/portal-data/${encodeURIComponent(patient.email)}`)
       if (response.ok) {
         const result = await response.json()
 
@@ -227,7 +199,7 @@ const PatientRecoveryDashboard: React.FC = () => {
 
       // Optional: Record activity in backend
       try {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/patients/activity`, {
+        await fetch('/api/patients/activity', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -255,7 +227,7 @@ const PatientRecoveryDashboard: React.FC = () => {
   useEffect(() => {
     const recordPortalVisit = async () => {
       try {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/patients/update-engagement`, {
+        await fetch('/api/patients/update-engagement', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -374,7 +346,7 @@ const PatientRecoveryDashboard: React.FC = () => {
       console.log('🔍 Fetching patient intake data for SRS breakdown...')
 
       // Fetch current patient's portal data which includes intake information
-              const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app'}/patients/portal-data/${patient.email}`)
+      const response = await fetch(`/api/patients/portal-data/${encodeURIComponent(patient.email)}`)
       if (response.ok) {
         const result = await response.json()
         // Extract intake data from the portal response

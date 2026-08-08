@@ -364,14 +364,16 @@ function personalizeInsights(patientData: any): RecoveryInsight[] {
       if (!patientData.patient?.email) return;
       
       try {
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app';
-        const response = await fetch(`${backendUrl}/patients/daily-data/${patientData.patient.email}`);
+        const response = await fetch(
+          `/api/patients/${encodeURIComponent(patientData.patient.email)}/recovery/snapshot`,
+          { cache: 'no-store' }
+        );
         if (response.ok) {
           const result = await response.json();
-          if (result.success && result.data) {
-            // Convert 0-100 scale back to 0-10 for display
-            const dailyPain = Math.round((result.data.pain / 100) * 10);
-            const dailyStress = Math.round((result.data.psychLoad / 100) * 10);
+          if (result.snapshot) {
+            const dailyPain = result.snapshot.pain;
+            const dailyStress = result.snapshot.stress;
+            if (typeof dailyPain !== 'number' || typeof dailyStress !== 'number') return;
             
             setCurrentPain(dailyPain);
             setRecentStress(dailyStress);
@@ -528,4 +530,4 @@ export function useRecoveryInsights(patientData: any, refreshKey?: number): Reco
   }, [completedInsights]);
 
   return insights;
-} 
+}
