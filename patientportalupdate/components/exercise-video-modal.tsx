@@ -69,10 +69,12 @@ export function ExerciseVideoModal({ exercise, open, onClose }: ExerciseVideoMod
             <div className="flex items-center gap-8">
               <Dumbbell className="w-12 h-12 text-white opacity-90" />
               <div>
-                <h2 className="text-3xl font-bold text-white">{exerciseTitle.replace(/\bdecompression\b/i, 'Decompression')}</h2>
-                <p className="mt-2 text-btl-100 text-sm">
+                <AssessmentDialogTitle className="text-3xl font-bold text-white">
+                  {exerciseTitle.replace(/\bdecompression\b/i, 'Decompression')}
+                </AssessmentDialogTitle>
+                <AssessmentDialogDescription className="mt-2 text-btl-100 text-sm">
                   {exercise.description || 'Reduce spinal compression through mindful breathing'}
-                </p>
+                </AssessmentDialogDescription>
               </div>
             </div>
             <button
