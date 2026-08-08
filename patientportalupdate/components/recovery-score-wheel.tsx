@@ -85,7 +85,7 @@ export function RecoveryScoreWheel({ score, maxScore, phase }: RecoveryScoreWhee
       // RESET: 0-4 points to complete
       const phaseProgress = Math.min(validScore, 4)
       return {
-        label: "RESET COMPLETE",
+        label: "RESET PROGRESS",
         min: 0,
         max: 4,
         current: phaseProgress,
@@ -95,7 +95,7 @@ export function RecoveryScoreWheel({ score, maxScore, phase }: RecoveryScoreWhee
       // EDUCATE: 4-7 points to complete (show as 0-3 progress)
       const phaseProgress = Math.min(Math.max(validScore - 4, 0), 3)
       return {
-        label: "EDUCATE COMPLETE", 
+        label: "EDUCATE PROGRESS",
         min: 0,
         max: 3,
         current: phaseProgress,
@@ -105,7 +105,7 @@ export function RecoveryScoreWheel({ score, maxScore, phase }: RecoveryScoreWhee
       // REBUILD: 7-11 points to complete (show as 0-4 progress)
       const phaseProgress = Math.min(Math.max(validScore - 7, 0), 4)
       return {
-        label: "REBUILD COMPLETE",
+        label: "REBUILD PROGRESS",
         min: 0,
         max: 4,
         current: phaseProgress,
