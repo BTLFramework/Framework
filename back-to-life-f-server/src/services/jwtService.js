@@ -5,14 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateSetupLink = exports.verifySetupToken = exports.verifyToken = exports.generatePatientToken = exports.generateSetupToken = exports.generateToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const SETUP_SECRET = process.env.SETUP_SECRET || 'setup-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'back-to-life-jwt-secret-2024-production';
+const SETUP_SECRET = process.env.SETUP_SECRET || 'back-to-life-setup-secret-2024-production';
 const generateToken = (user) => {
     return jsonwebtoken_1.default.sign({ id: user.id, email: user.email, role: "clinician" }, JWT_SECRET, { expiresIn: "24h" });
 };
 exports.generateToken = generateToken;
-const generateSetupToken = (email) => {
-    return jsonwebtoken_1.default.sign({ email }, SETUP_SECRET, { expiresIn: "24h" });
+const generateSetupToken = (email, patientId) => {
+    return jsonwebtoken_1.default.sign({ email, patientId, type: 'setup' }, SETUP_SECRET, { expiresIn: "24h" });
 };
 exports.generateSetupToken = generateSetupToken;
 const generatePatientToken = (patientPortal) => {
@@ -43,7 +43,7 @@ const verifySetupToken = (token) => {
 };
 exports.verifySetupToken = verifySetupToken;
 const generateSetupLink = (email, patientId, baseUrl) => {
-    const token = (0, exports.generateSetupToken)(email);
-    return `${baseUrl}/set-password?token=${token}`;
+    const token = (0, exports.generateSetupToken)(email, patientId);
+    return `${baseUrl}/create-account?token=${encodeURIComponent(token)}`;
 };
 exports.generateSetupLink = generateSetupLink;

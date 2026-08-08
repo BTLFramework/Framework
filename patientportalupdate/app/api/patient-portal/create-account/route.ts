@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, patientName } = await request.json()
+    const { email, password, patientName, setupToken } = await request.json()
 
-    if (!email || !password || !patientName) {
+    if (!email || !password || !patientName || !setupToken) {
       return NextResponse.json(
-        { error: 'Email, password, and patient name are required' },
+        { error: 'A valid intake setup link is required to create an account.' },
         { status: 400 }
       )
     }
@@ -30,7 +30,8 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         email,
         password,
-        patientName
+        patientName,
+        setupToken
       }),
     })
 
@@ -57,4 +58,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-} 
+}

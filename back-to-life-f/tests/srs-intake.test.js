@@ -49,12 +49,16 @@ test('the real backend response shape becomes portal-ready patient data', () => 
     success: true,
     patient: { name: 'Beta Patient', email: 'beta@example.com' },
     srsScore: { srsScore: 5 },
-    phase: 'EDUCATE'
+    phase: 'EDUCATE',
+    setupToken: 'signed-token',
+    portalAccountExists: false
   });
 
   assert.equal(normalized.score, 5);
   assert.equal(normalized.portalPatientData.score, '5/11');
   assert.equal(normalized.portalPatientData.phase, 'EDUCATE');
+  assert.equal(normalized.portalPatientData.setupToken, 'signed-token');
+  assert.equal(normalized.portalPatientData.portalAccountExists, false);
 });
 
 test('an incomplete backend response fails closed', () => {

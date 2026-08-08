@@ -8,7 +8,8 @@ import {
 } from "../models/patientModel";
 import { PrismaClient } from "@prisma/client";
 import { sendWelcomeEmail, sendWelcomeEmailDev } from "../services/emailService";
-import { generateSetupLink } from "../services/jwtService";
+import { generateSetupLink, generateSetupToken } from "../services/jwtService";
+import { getExistingPatientIntakeConflict } from "../services/onboardingIdentity";
 
 // TSK-7 calculation function (standardized across all apps)
 const calculateTSK7Score = (tsk7Data: any) => {
@@ -458,7 +459,7 @@ export const getPatientRecoveryPointsData = async (patientId: number) => {
 
 export const submitIntake = async (req: any, res: any) => {
   try {
-    console.log('Received comprehensive intake submission:', req.body);
+    console.log('Received comprehensive intake submission');
     const { 
       patientName, 
       email, 
@@ -544,6 +545,8 @@ export const submitIntake = async (req: any, res: any) => {
     if (validationErrors.length > 0) {
       return res.status(400).json({ success: false, error: 'Invalid intake submission', details: validationErrors });
     }
+
+    const normalizedEmail = email.trim().toLowerCase();
     
     // Calculate disability percentage
     const disabilityPercentage = calculateDisabilityPercentage({
@@ -551,18 +554,32 @@ export const submitIntake = async (req: any, res: any) => {
     });
     
     // Check if patient already exists
-    let patient = await findPatientByEmail(email);
+    let patient = await findPatientByEmail(normalizedEmail);
     let previousData = null;
+    const portalAccountExists = Boolean(patient?.portalAccount);
+    const identityConflict = getExistingPatientIntakeConflict(
+      patient,
+      formType,
+      patientName,
+      dob
+    );
+
+    if (identityConflict) {
+      return res.status(409).json({
+        success: false,
+        ...identityConflict
+      });
+    }
     
     if (!patient) {
-      console.log('Creating new patient:', patientName, email, date, dob);
+      console.log('Creating new patient:', patientName, normalizedEmail, date);
       // Create new patient
-      const newPatient = await createPatient(patientName, email, new Date(date), dob);
+      const newPatient = await createPatient(patientName.trim(), normalizedEmail, new Date(date), dob);
       console.log('Patient created:', newPatient);
       
       // Create patient portal account (with temporary password)
       const tempPassword = Math.random().toString(36).slice(-8); // Simple temp password
-      await createPatientPortalAccount(newPatient.id, email, tempPassword);
+      await createPatientPortalAccount(newPatient.id, normalizedEmail, tempPassword);
       console.log('Patient portal account created');
       
       // Initialize Recovery Points system for new patient
@@ -571,7 +588,7 @@ export const submitIntake = async (req: any, res: any) => {
       console.log('Recovery points system initialized');
       
       // Get the full patient record with relations
-      patient = await findPatientByEmail(email);
+      patient = await findPatientByEmail(normalizedEmail);
     } else {
       console.log('Patient already exists:', patient);
       // Get previous data for SRS calculation
@@ -641,18 +658,21 @@ export const submitIntake = async (req: any, res: any) => {
     
     // Generate setup link
     const baseUrl = process.env.PATIENT_PORTAL_URL || 'http://localhost:3000';
-    const setupLink = generateSetupLink(email, patient.id, baseUrl);
+    const setupToken = portalAccountExists ? undefined : generateSetupToken(normalizedEmail, patient.id);
+    const setupLink = portalAccountExists
+      ? `${baseUrl}/login`
+      : generateSetupLink(normalizedEmail, patient.id, baseUrl);
     
     const emailSent = process.env.NODE_ENV === 'production'
       ? await sendWelcomeEmail({
           firstName,
-          email,
+          email: normalizedEmail,
           phase: phase.label,
           setupLink
         })
       : await sendWelcomeEmailDev({
           firstName,
-          email,
+          email: normalizedEmail,
           phase: phase.label,
           setupLink
         });
@@ -666,6 +686,8 @@ export const submitIntake = async (req: any, res: any) => {
       beliefStatus: srsData.beliefStatus,
       continuousSRS, // NEW: Include continuous SRS
       emailSent,
+      portalAccountExists,
+      setupToken,
       setupLink: process.env.NODE_ENV === 'development' ? setupLink : undefined,
       message: `${formType || 'Intake'} assessment processed successfully. Patient ${formType === 'Follow-Up' ? 'progress updated' : 'enrolled'} in Back to Life program.`
     });

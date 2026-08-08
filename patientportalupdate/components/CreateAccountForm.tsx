@@ -6,12 +6,13 @@ import { Eye, EyeOff, Lock, Mail, User, CheckCircle } from 'lucide-react'
 interface CreateAccountFormProps {
   patientEmail: string
   patientName: string
+  setupToken?: string
   onSuccess: () => void
   onBack: () => void
   isDirectSignup?: boolean
 }
 
-export function CreateAccountForm({ patientEmail, patientName, onSuccess, onBack, isDirectSignup = false }: CreateAccountFormProps) {
+export function CreateAccountForm({ patientEmail, patientName, setupToken, onSuccess, onBack, isDirectSignup = false }: CreateAccountFormProps) {
   const [email, setEmail] = useState(patientEmail)
   const [name, setName] = useState(patientName)
   const [password, setPassword] = useState('')
@@ -45,9 +46,8 @@ export function CreateAccountForm({ patientEmail, patientName, onSuccess, onBack
       return
     }
 
-    // For direct signup, require name and email
-    if (isDirectSignup && (!name.trim() || !email.trim())) {
-      setError('Please fill in all required fields.')
+    if (!setupToken) {
+      setError('Please use the secure account setup link from your completed intake or welcome email.')
       setIsLoading(false)
       return
     }
@@ -60,7 +60,8 @@ export function CreateAccountForm({ patientEmail, patientName, onSuccess, onBack
         body: JSON.stringify({ 
           email, 
           password,
-          patientName: name 
+          patientName: name,
+          setupToken
         }),
       })
 
@@ -312,4 +313,4 @@ export function CreateAccountForm({ patientEmail, patientName, onSuccess, onBack
       </div>
     </div>
   )
-} 
+}

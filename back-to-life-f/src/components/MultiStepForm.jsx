@@ -202,6 +202,10 @@ export default function MultiStepForm() {
 
   const [formData, setFormData] = useState(getInitialFormData());
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [currentStep, showResult]);
+
   // Steps array changes based on formType
   const steps =
     formData.formType === "Follow-Up"
@@ -502,6 +506,33 @@ export default function MultiStepForm() {
 
   // If "showResult" is true, display the Recovery Results UI with portal integration
   if (showResult) {
+    if (!submissionResult?.success) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50 to-blue-50 flex items-start justify-center px-4 py-8">
+          <div className="w-full max-w-xl bg-white rounded-xl shadow-sm p-6 border border-red-200">
+            <h1 className="text-2xl font-bold text-gray-900 mb-3">We couldn&apos;t complete this assessment</h1>
+            <p className="text-gray-700 mb-2">
+              {submissionResult?.details || submissionResult?.error || 'Please review your information and try again.'}
+            </p>
+            <p className="text-sm text-gray-600 mb-6">
+              No new patient score or portal account was created from this attempt.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setShowResult(false);
+                setSubmissionResult(null);
+                setCurrentStep(0);
+              }}
+              className="w-full btn-primary-gradient text-white font-semibold py-3 px-5 rounded-xl"
+            >
+              Review Patient Information
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     // Get the calculated score and phase from the stored form data or default values
     const displayScore = formData.srsScore || 0;
     const displayPhase = formData.phase || "RESET";
@@ -556,10 +587,16 @@ export default function MultiStepForm() {
                 onClick={() => {
                   if (submissionResult?.success) {
                     const patientData = normalizeIntakeSubmissionResult(submissionResult).portalPatientData;
+                    const patientPortalUrl = import.meta.env.VITE_PATIENT_PORTAL_URL || 'https://framework-six-umber.vercel.app';
+
+                    if (patientData.portalAccountExists) {
+                      window.location.href = `${patientPortalUrl}/login`;
+                      return;
+                    }
+
                     const params = new URLSearchParams({
                       patientData: JSON.stringify(patientData)
                     });
-                    const patientPortalUrl = import.meta.env.VITE_PATIENT_PORTAL_URL || 'https://framework-six-umber.vercel.app';
                     window.location.href = `${patientPortalUrl}/create-account?${params.toString()}`;
                   } else {
                     const patientPortalUrl = import.meta.env.VITE_PATIENT_PORTAL_URL || 'https://framework-six-umber.vercel.app';
@@ -568,7 +605,7 @@ export default function MultiStepForm() {
                 }}
                 className="w-full btn-primary-gradient text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:shadow-lg text-lg"
               >
-                Create Your Portal Account
+                {submissionResult?.portalAccountExists ? 'Sign In to Your Portal' : 'Create Your Portal Account'}
               </button>
 
               {/* Next Steps - Cleaner */}

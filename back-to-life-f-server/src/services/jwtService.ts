@@ -17,8 +17,8 @@ export const generateToken = (user: any) => {
   );
 };
 
-export const generateSetupToken = (email: string) => {
-  return jwt.sign({ email }, SETUP_SECRET, { expiresIn: "24h" });
+export const generateSetupToken = (email: string, patientId: number) => {
+  return jwt.sign({ email, patientId, type: 'setup' }, SETUP_SECRET, { expiresIn: "24h" });
 };
 
 export const generatePatientToken = (patientPortal: any) => {
@@ -51,6 +51,6 @@ export const verifySetupToken = (token: string) => {
 };
 
 export const generateSetupLink = (email: string, patientId: number, baseUrl: string): string => {
-  const token = generateSetupToken(email);
-  return `${baseUrl}/set-password?token=${token}`;
-}; 
+  const token = generateSetupToken(email, patientId);
+  return `${baseUrl}/create-account?token=${encodeURIComponent(token)}`;
+};

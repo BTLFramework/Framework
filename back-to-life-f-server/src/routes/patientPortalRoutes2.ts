@@ -23,6 +23,10 @@ router.get('/verify-setup-token/:token', async (req: any, res: any) => {
     if (!patientPortal) {
       return res.status(404).json({ error: 'Patient portal account not found' });
     }
+
+    if (payload.type !== 'setup' || payload.patientId !== patientPortal.patientId) {
+      return res.status(400).json({ error: 'Invalid setup token for this patient' });
+    }
     
     res.json({
       email: payload.email,
@@ -49,6 +53,12 @@ router.post('/set-password', async (req: any, res: any) => {
       return res.status(400).json({ error: 'Invalid or expired token' });
     }
     
+    const patientPortal = await findPatientPortalByEmail(payload.email);
+
+    if (!patientPortal || payload.type !== 'setup' || payload.patientId !== patientPortal.patientId) {
+      return res.status(400).json({ error: 'Invalid setup token for this patient' });
+    }
+
     // Update password
     await updatePatientPortalPassword(payload.email, password);
     
@@ -69,10 +79,16 @@ router.get('/test-route', (req: any, res: any) => {
 // Create account for patient portal (after intake completion)
 router.post('/create-account', async (req: any, res: any) => {
   try {
-    const { email, password, patientName } = req.body;
+    const { email, password, patientName, setupToken } = req.body;
     
-    if (!email || !password || !patientName) {
-      return res.status(400).json({ error: 'Email, password, and patient name are required' });
+    if (!email || !password || !patientName || !setupToken) {
+      return res.status(400).json({ error: 'A valid intake setup link is required to create an account.' });
+    }
+
+    const payload = verifySetupToken(setupToken);
+
+    if (!payload || payload.type !== 'setup' || payload.email.toLowerCase() !== email.toLowerCase()) {
+      return res.status(400).json({ error: 'Invalid or expired account setup link.' });
     }
     
     // Find existing patient portal account (created during intake)
@@ -80,6 +96,14 @@ router.post('/create-account', async (req: any, res: any) => {
     
     if (!patientPortal) {
       return res.status(404).json({ error: 'Patient portal account not found. Please complete your intake form first.' });
+    }
+
+    if (payload.patientId !== patientPortal.patientId) {
+      return res.status(409).json({ error: 'This setup link does not belong to this patient account.' });
+    }
+
+    if (patientPortal.patient.name.trim().toLowerCase() !== patientName.trim().toLowerCase()) {
+      return res.status(409).json({ error: 'The intake identity does not match this patient account. Please contact the clinic.' });
     }
     
     // Update the password (replacing the temporary one)
@@ -118,9 +142,6 @@ router.post('/login', async (req: any, res: any) => {
     }
     
     console.log(`🔍 Found patient portal account for: ${email}`);
-    console.log(`🔑 Stored password: ${patientPortal.password}`);
-    console.log(`🔑 Provided password: ${password}`);
-    
     if (patientPortal.password !== password) {
       console.log(`❌ Password mismatch for: ${email}`);
       return res.status(401).json({ error: 'Invalid email or password' });
@@ -265,4 +286,4 @@ router.get('/patients/:id/srs-scores', async (req: any, res: any) => {
   }
 });
 
-export default router; 
+export default router;

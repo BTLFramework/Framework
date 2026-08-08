@@ -16,6 +16,8 @@ export function normalizeIntakeSubmissionResult(result) {
       email: patient.email,
       score: `${score}/11`,
       phase,
+      setupToken: result.setupToken,
+      portalAccountExists: Boolean(result.portalAccountExists),
       timestamp: new Date().toISOString()
     }
   };

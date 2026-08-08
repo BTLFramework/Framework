@@ -13,6 +13,7 @@ export default function CreateAccountPage() {
     // Get patient data from URL parameters
     const urlParams = new URLSearchParams(window.location.search)
     const urlPatientData = urlParams.get('patientData')
+    const setupToken = urlParams.get('token')
     
     if (urlPatientData) {
       try {
@@ -25,6 +26,22 @@ export default function CreateAccountPage() {
         // Continue without patient data - allow direct account creation
         setPatientData(null)
       }
+    } else if (setupToken) {
+      fetch(`/api/patient-portal/verify-setup-token/${encodeURIComponent(setupToken)}`, {
+        credentials: 'include'
+      })
+        .then(async response => {
+          if (!response.ok) throw new Error('Invalid or expired setup link')
+          return response.json()
+        })
+        .then(data => setPatientData({
+          email: data.email,
+          name: data.patientName,
+          setupToken
+        }))
+        .catch(() => setPatientData(null))
+        .finally(() => setLoading(false))
+      return
     } else {
       // No patient data - allow direct account creation
       setPatientData(null)
@@ -60,9 +77,10 @@ export default function CreateAccountPage() {
     <CreateAccountForm
       patientEmail={patientData?.email || ''}
       patientName={patientData?.name || ''}
+      setupToken={patientData?.setupToken}
       onSuccess={handleAccountCreated}
       onBack={handleBack}
       isDirectSignup={!patientData}
     />
   )
-} 
+}
