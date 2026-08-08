@@ -1,96 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const backendUrl =
+  process.env.NEXT_PUBLIC_API_URL ||
+  'https://framework-production-92f5.up.railway.app';
+
+async function forwardResponse(response: Response) {
+  const payload = await response.json().catch(() => ({
+    success: false,
+    error: 'Recovery Insight service returned an invalid response'
+  }));
+  return NextResponse.json(payload, { status: response.status });
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { insightId, patientId } = await request.json();
-    
-    
-    // Store insight completion in localStorage for now (in production, this would go to a database)
-    const completionKey = `insight_completed_${patientId}_${insightId}`;
-    const completionData = {
-      insightId,
-      patientId,
-      completedAt: new Date().toISOString(),
-      points: 5 // Standard points for insight completion
-    };
-    
-    // Store in localStorage (this is a simple solution for now)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(completionKey, JSON.stringify(completionData));
-    }
-    
-    // Also store in a global completions object for server-side access
-    if (!(global as any).insightCompletions) {
-      (global as any).insightCompletions = {};
-    }
-    (global as any).insightCompletions[completionKey] = completionData;
-    
-    
-    return NextResponse.json({
-      success: true,
-      message: 'Insight completed successfully',
-      data: completionData
+    const body = await request.json();
+    const response = await fetch(`${backendUrl}/api/recovery-points/insights/complete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      cache: 'no-store'
     });
+    return forwardResponse(response);
   } catch (error) {
-    console.error('❌ Error completing insight:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to complete insight'
-    }, { status: 500 });
+    console.error('Error completing Recovery Insight:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to complete Recovery Insight' },
+      { status: 500 }
+    );
   }
 }
 
 export async function GET(request: NextRequest) {
+  const patientId = request.nextUrl.searchParams.get('patientId');
+  if (!patientId) {
+    return NextResponse.json(
+      { success: false, error: 'Patient ID is required' },
+      { status: 400 }
+    );
+  }
+
   try {
-    const { searchParams } = new URL(request.url);
-    const patientId = searchParams.get('patientId');
-    
-    if (!patientId) {
-      return NextResponse.json({
-        success: false,
-        error: 'Patient ID is required'
-      }, { status: 400 });
-    }
-    
-    // Get all completed insights for this patient
-    const completedInsights: string[] = [];
-    
-    // Check localStorage (client-side)
-    if (typeof window !== 'undefined') {
-      const keys = Object.keys(localStorage);
-      keys.forEach(key => {
-        if (key.startsWith(`insight_completed_${patientId}_`)) {
-          const insightId = key.replace(`insight_completed_${patientId}_`, '');
-          completedInsights.push(insightId);
-        }
-      });
-    }
-    
-    // Check global completions (server-side)
-    if ((global as any).insightCompletions) {
-      Object.keys((global as any).insightCompletions).forEach(key => {
-        if (key.startsWith(`insight_completed_${patientId}_`)) {
-          const insightId = key.replace(`insight_completed_${patientId}_`, '');
-          if (!completedInsights.includes(insightId)) {
-            completedInsights.push(insightId);
-          }
-        }
-      });
-    }
-    
-    
-    return NextResponse.json({
-      success: true,
-      data: {
-        patientId,
-        completedInsights
-      }
-    });
+    const response = await fetch(
+      `${backendUrl}/api/recovery-points/insights/status/${encodeURIComponent(patientId)}`,
+      { cache: 'no-store' }
+    );
+    return forwardResponse(response);
   } catch (error) {
-    console.error('❌ Error fetching completed insights:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to fetch completed insights'
-    }, { status: 500 });
+    console.error('Error loading Recovery Insight status:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to load Recovery Insight status' },
+      { status: 500 }
+    );
   }
 }

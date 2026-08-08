@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { addRecoveryPoints } from "@/lib/recoveryPointsApi";
 import { Badge } from "@/components/ui/badge";
 import { insightLibrary } from "@/lib/InsightLibrary";
 import InsightDialog from "./InsightDialog";
@@ -60,11 +59,12 @@ export function RecoveryInsightDialog({
   const [selectedInsightId, setSelectedInsightId] = useState<number | null>(null);
   const [showInsightDialog, setShowInsightDialog] = useState(false);
   const [actionTaken, setActionTaken] = useState<boolean>(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showCelebration, setShowCelebration] = useState<boolean>(false);
   const [patientData, setPatientData] = useState<any>(null);
   const [completedInsights, setCompletedInsights] = useState<number[]>([]);
+  const [availableInsightId, setAvailableInsightId] = useState<number | null>(null);
+  const [completedToday, setCompletedToday] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [dailyCompletedInsights, setDailyCompletedInsights] = useState<number>(0);
 
@@ -75,25 +75,39 @@ export function RecoveryInsightDialog({
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const unlockParam = params.get('unlockInsights');
-      const shouldUnlock = unlockParam === '1';
+      const shouldUnlock = process.env.NODE_ENV !== 'production' && unlockParam === '1';
       console.log('🔓 Debug unlock check:', { unlockParam, shouldUnlock, url: window.location.href });
       setDebugUnlockAll(shouldUnlock);
     }
   }, []);
 
-  // Load completed insights from localStorage
+  // Completion and unlocking must be durable across devices, so the backend
+  // Recovery Points ledger is the source of truth.
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('btl_completed_insights');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        setCompletedInsights(parsed);
-        console.log('🎯 Loaded completed insights from localStorage:', parsed);
+    if (!open || !patientId) return;
+
+    const loadInsightStatus = async () => {
+      try {
+        const response = await fetch(
+          `/api/v1/insights/complete?patientId=${encodeURIComponent(patientId)}`,
+          { cache: 'no-store' }
+        );
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || 'Failed to load Recovery Insight progress');
+        }
+
+        setCompletedInsights(result.data.completedInsightIds || []);
+        setAvailableInsightId(result.data.availableInsightId ?? null);
+        setCompletedToday(Boolean(result.data.completedToday));
+      } catch (error) {
+        console.error('Error loading Recovery Insight progress:', error);
+        setSubmitError('Your Recovery Insight progress is temporarily unavailable. Please try again.');
       }
-    } catch (error) {
-      console.error('Error loading completed insights:', error);
-    }
-  }, [open]); // Re-load when dialog opens
+    };
+
+    void loadInsightStatus();
+  }, [open, patientId]);
 
   // Fetch patient data to get correct SRS score
   useEffect(() => {
@@ -130,8 +144,6 @@ export function RecoveryInsightDialog({
     clinicalRegionFromProfile(patientData) ??
     "Focus unavailable";
 
-  const canSubmit = selectedInsightId !== null || actionTaken;
-
   // Calculate total points (same formula as other dialogs)
   const totalPoints = 5; // 5 points per insight completion
 
@@ -162,162 +174,36 @@ export function RecoveryInsightDialog({
     setShowInsightDialog(true);
   };
 
-  const handleInsightComplete = (insightId: number, points?: number) => {
-    console.log('🎯 handleInsightComplete called with:', { insightId, points });
-    console.log('🎯 THIS SHOULD APPEAR WHEN INSIGHT IS COMPLETED');
+  const handleInsightComplete = (insightId: number, points?: number, result?: any) => {
+    const status = result?.data;
+    setCompletedInsights(status?.completedInsightIds || ((previous) =>
+      previous.includes(insightId) ? previous : [...previous, insightId]
+    ));
+    setAvailableInsightId(status?.availableInsightId ?? null);
+    setCompletedToday(Boolean(status?.completedToday));
 
-    setCompletedInsights(prev => {
-      console.log('🎯 Previous completed insights:', prev);
-      if (!prev.includes(insightId)) {
-        const newCompleted = [...prev, insightId];
-        localStorage.setItem('btl_completed_insights', JSON.stringify(newCompleted));
-        console.log('🎯 Updated completed insights:', newCompleted);
-        return newCompleted;
-      }
-      console.log('🎯 Insight already completed, no change');
-      return prev;
+    if (result?.alreadyCompleted) return;
+
+    const pointsEarned = points || 0;
+    setShowCelebration(true);
+    onTaskComplete?.({
+      taskId: 'recovery-insight',
+      taskTitle: 'Recovery Insight',
+      pointsEarned,
+      newSRSScore: srsScore,
+      phase: phaseLabel
     });
+    onComplete?.({ selectedInsight: insightId, pointsEarned });
+
+    setTimeout(() => {
+      onOpenChange(false);
+      setShowCelebration(false);
+    }, 2000);
   };
 
   const handleCloseInsightDialog = () => {
     setShowInsightDialog(false);
     setSelectedInsightId(null);
-  };
-
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    setSubmitError(null);
-
-    try {
-      // Get patient data to get numeric ID
-      const patientResponse = await fetch(`/api/patients/portal-data/${patientId}`)
-      if (!patientResponse.ok) {
-        throw new Error('Failed to get patient data')
-      }
-      const patientData = await patientResponse.json()
-      const numericPatientId = patientData.data.patient.id
-
-      // Add recovery points for the completed insight
-      const result = await addRecoveryPoints(
-        numericPatientId.toString(),
-        'EDUCATION',
-        'Watch micro-lesson',
-        totalPoints
-      );
-
-      if (result.success) {
-        console.log('✅ Recovery points added successfully:', result.pointsAdded);
-
-        // Record task completion to backend
-        const taskResponse = await fetch('/api/recovery-points/task-completion', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              patientId: numericPatientId,
-              taskType: 'RECOVERY_INSIGHTS',
-              sessionDuration: null,
-              pointsEarned: totalPoints
-            }),
-          });
-        if (!taskResponse.ok) {
-          throw new Error('Failed to record recovery insight completion');
-        }
-        console.log('✅ Task completion recorded for recovery insight');
-
-        // Show celebration
-        setShowCelebration(true);
-
-        // Call parent's task completion handler to trigger refresh
-        if (onTaskComplete) {
-          onTaskComplete({
-            taskId: 'recovery-insight',
-            taskTitle: 'Recovery Insight',
-            pointsEarned: totalPoints,
-            newSRSScore: srsScore,
-            phase: phaseLabel
-          });
-        }
-
-        // Call parent's completion handler
-        onComplete?.({
-          selectedInsight: selectedInsightId,
-          actionTaken: actionTaken ? actionPrompt?.action : null,
-          pointsEarned: totalPoints
-        });
-
-        // Close the dialog after a short delay to show celebration
-        setTimeout(() => {
-          onOpenChange(false);
-          setShowCelebration(false);
-        }, 2000);
-      } else {
-        console.error('❌ Failed to add recovery points:', result.message || result.error);
-
-        // Check if it's a daily cap issue
-        const isDailyCapReached = result.message && result.message.includes('Daily education cap reached');
-
-        if (isDailyCapReached) {
-          // Show a different message for daily cap
-          console.log('ℹ️ Daily recovery insights cap reached - still recording completion');
-        } else {
-          throw new Error(result.error || result.message || 'Failed to add recovery points');
-        }
-
-        // Still record task completion to backend even if RP failed
-        const taskResponse = await fetch('/api/recovery-points/task-completion', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              patientId: numericPatientId,
-              taskType: 'RECOVERY_INSIGHTS',
-              sessionDuration: null,
-              pointsEarned: isDailyCapReached ? 0 : totalPoints // No points if daily cap reached
-            }),
-          });
-        if (!taskResponse.ok) {
-          throw new Error('Failed to record capped recovery insight completion');
-        }
-        console.log('✅ Task completion recorded for capped recovery insight');
-
-        // Show celebration (even for daily cap - user still completed the insight)
-        setShowCelebration(true);
-
-        // Call parent's task completion handler with appropriate points
-        if (onTaskComplete) {
-          onTaskComplete({
-            taskId: 'recovery-insight',
-            taskTitle: 'Recovery Insight',
-            pointsEarned: isDailyCapReached ? 0 : totalPoints,
-            newSRSScore: srsScore,
-            phase: phaseLabel
-          });
-        }
-
-        // Call parent's completion handler
-        onComplete?.({
-          selectedInsight: selectedInsightId,
-          actionTaken: actionTaken ? actionPrompt?.action : null,
-          pointsEarned: isDailyCapReached ? 0 : totalPoints
-        });
-
-        // Close the dialog after a short delay to show celebration
-        setTimeout(() => {
-          onOpenChange(false);
-          setShowCelebration(false);
-        }, 2000);
-      }
-    } catch (error) {
-      console.error('❌ Error submitting recovery insight:', error);
-      setSubmitError(
-        'We could not confirm this insight completion. Your progress was not marked complete; please try again.'
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   const handlePhaseClick = () => {
@@ -372,13 +258,11 @@ export function RecoveryInsightDialog({
 
   const filteredInsights: (RecoveryInsight & { releaseOffset: number })[] = getFilteredInsights().map((insight, index) => mapInsightToRecoveryInsight(insight, index));
 
-  // Calculate daily completed insights from completed insights
+  // Calculate durable curriculum progress from completed insights.
   useEffect(() => {
     // Count insights that were completed today
-    const today = new Date().toISOString().slice(0, 10);
-    const todayCompletedCount = completedInsights.length; // For now, count all completed insights
+    const todayCompletedCount = completedInsights.length;
     const totalInsights = filteredInsights.length;
-    console.log('🎯 Daily progress calculation:', { completedInsights, todayCompletedCount, totalInsights, today });
     setDailyCompletedInsights(Math.min(todayCompletedCount, totalInsights));
   }, [completedInsights, filteredInsights]);
 
@@ -469,10 +353,10 @@ export function RecoveryInsightDialog({
             </div>
           </div>
 
-          {/* Daily Progress Bar */}
+          {/* Curriculum Progress Bar */}
           <div className="px-6 py-3 border-b border-gray-200">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-btl-700">Daily Progress</span>
+              <span className="text-sm font-medium text-btl-700">Curriculum Progress</span>
               <span className="text-sm font-medium text-btl-600">{dailyCompletedInsights} of {filteredInsights.length} completed</span>
             </div>
             <div className="w-full bg-btl-200 rounded-full h-3">
@@ -575,25 +459,22 @@ export function RecoveryInsightDialog({
                     {filteredInsights.map((insight, i) => {
                       if (!insight) return null;
                       const offset = insight.releaseOffset;
-                      // In debug mode, all insights are unlocked
-                      const isToday = debugUnlockAll ? true : offset === 0; // Only today's insight is available (unless debug mode)
-                      const isFuture = debugUnlockAll ? false : offset > 0; // Future insights are locked (unless debug mode)
                       const isCompleted = completedInsights.includes(Number(insight.id));
-
-                      if (i === 0) {
-                        console.log('🔓 First insight unlock status:', { debugUnlockAll, isToday, isFuture, offset });
-                      }
+                      const isAvailable = debugUnlockAll || Number(insight.id) === availableInsightId;
+                      const isFuture = !isCompleted && !isAvailable;
 
                       // Calculate week and day labels
                       const getDayLabel = (offset: number) => {
-                        if (offset === 0) return "Today";
+                        if (Number(insight.id) === availableInsightId) return "Today";
+                        if (completedToday && Number(insight.id) === insightLibrary[completedInsights.length]?.id) {
+                          return "Unlocks tomorrow";
+                        }
 
                         const week = Math.floor(offset / 7) + 1;
                         const day = (offset % 7) + 1;
                         return `Week ${week}: Day ${day}`;
                       };
 
-                      console.log('🎯 Insight pill:', { id: insight.id, title: insight.title, isCompleted, completedInsights, offset, label: getDayLabel(offset) });
                       return (
                         <button
                           key={insight.id}
@@ -607,6 +488,9 @@ export function RecoveryInsightDialog({
                           }`}
                         >
                           <div className="flex flex-col items-start">
+                            <span className="mb-1 text-xs font-semibold uppercase tracking-wide text-btl-600">
+                              {getDayLabel(offset)}
+                            </span>
                             <h4 className="font-semibold text-base text-gray-900">{insight.title}</h4>
                             <p className="text-sm text-gray-600">{insight.description}</p>
                           </div>
@@ -617,6 +501,13 @@ export function RecoveryInsightDialog({
                                 <CheckCircle className="w-4 h-4" />
                               </div>
                               <span className="text-xs text-green-600 font-medium">(Redo)</span>
+                            </div>
+                          ) : isFuture ? (
+                            <div className="flex items-center gap-2">
+                              <span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600">+5 pts</span>
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-400 text-white shadow-md">
+                                <Lock className="w-4 h-4" />
+                              </div>
                             </div>
                           ) : (
                             <div className="flex items-center gap-2">
@@ -634,41 +525,16 @@ export function RecoveryInsightDialog({
                 </div>
               )}
 
-              {/* Footer cloned from MindfulnessSessionDialog */}
+              {/* Completion is confirmed inside the lesson after its activity/quiz. */}
               <div className="px-6 py-4 bg-white border-t border-gray-200">
                 {submitError && (
                   <p role="alert" className="mb-3 text-sm font-medium text-red-700">
                     {submitError}
                   </p>
                 )}
-                <div className="flex items-center justify-between w-full">
-                  <div className="flex items-center gap-3">
-                    <div className="px-4 py-2 font-medium text-sm bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-yellow-900 shadow-lg border border-yellow-500 rounded-2xl">
-                      Total: {filteredInsights.length * 5} pts
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleSubmit}
-                    disabled={!canSubmit || isSubmitting}
-                    className={`px-6 py-3 rounded-2xl font-medium transition-all duration-200 shadow-lg ${
-                      canSubmit && !isSubmitting
-                        ? 'bg-gradient-to-r from-btl-600 to-btl-500 text-white hover:from-btl-700 hover:to-btl-600 hover:shadow-xl hover:scale-105'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                  >
-                    {isSubmitting ? (
-                      <div className="flex items-center justify-center gap-3">
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Submitting...
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-3">
-                        <Play className="w-5 h-5" />
-                        Complete Insight
-                      </div>
-                    )}
-                  </button>
-                </div>
+                <p className="text-center text-sm font-medium text-btl-700">
+                  Complete today&apos;s lesson and activity to earn 5 points and unlock the next day.
+                </p>
               </div>
 
               {/* Celebration */}

@@ -97,7 +97,10 @@ async function addRecoveryPoints(patientId, category, action, points) {
     
     // Special daily cap for recovery insights (EDUCATION category with "Watch micro-lesson" action)
     let dailyCap;
-    if (category === 'EDUCATION' && action === 'Watch micro-lesson') {
+    if (
+      category === 'EDUCATION' &&
+      (action === 'Watch micro-lesson' || action.startsWith('INSIGHT:'))
+    ) {
       dailyCap = 5; // 5 points per day for recovery insights (one insight per day)
     } else {
       // The daily cap is the points value for this card/task
@@ -492,4 +495,4 @@ module.exports = {
   getRecentActivity,
   resetPatientRecoveryPoints,
   initializePatientRecoveryPoints
-}; 
+};

@@ -44,7 +44,8 @@ const weeklyCaps = {
   MOVEMENT: 60,
   LIFESTYLE: 40,
   MINDSET: 40,
-  EDUCATION: 30,
+  // Seven daily Recovery Insights at five points each.
+  EDUCATION: 35,
   ADHERENCE: 30
 };
 
@@ -148,4 +149,4 @@ module.exports = {
   weeklyTargets,
   achievementLevels,
   getAchievementLevel
-}; 
+};

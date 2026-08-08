@@ -19,7 +19,6 @@ import FlarePlan, { FlarePlanData } from "./FlarePlan";
 import JsonFormRenderer from "./JsonFormRenderer";
 import { SummaryCarousel } from "./SummaryCarousel";
 import InsightSummaryCard from "./InsightSummaryCard";
-import { addRecoveryPoints } from "@/lib/recoveryPointsApi";
 import { completeInsight } from "@/services/insights.service";
 import { useToast } from "@/hooks/use-toast";
 import { mutate } from "swr";
@@ -28,7 +27,7 @@ interface InsightDialogProps {
   insightId: number;
   isOpen: boolean;
   onClose: () => void;
-  onComplete?: (insightId: number, points?: number) => void;
+  onComplete?: (insightId: number, points?: number, result?: any) => void;
   patientId: string;
 }
 
@@ -366,13 +365,12 @@ export default function InsightDialog({
 
   const handleFlarePlanComplete = (data: FlarePlanData) => {
     setFlarePlanData(data);
-    setIsCompleted(true);
-    onComplete?.(insightId, 15); // Award 15 points for form completion
+    void handleComplete();
   };
 
   const handleJsonFormComplete = (data: any) => {
-    setIsCompleted(true);
-    onComplete?.(insightId, 15); // Award 15 points for form completion
+    setJsonFormData(data);
+    void handleComplete();
   };
 
   const handleQuizComplete = () => {
@@ -393,50 +391,6 @@ export default function InsightDialog({
     }, 2000);
   };
 
-  const handleCompleteSession = async () => {
-    if (!insight || !patientId) return;
-    setIsSubmitting(true);
-    try {
-      // Get numeric patient ID from backend (if email is used)
-      let numericPatientId = patientId;
-      if (isNaN(Number(patientId))) {
-        // Fetch patient data to get numeric ID
-        const patientResponse = await fetch(`/api/patients/portal-data/${patientId}`);
-        if (!patientResponse.ok) throw new Error('Failed to get patient data');
-        const patientData = await patientResponse.json();
-        numericPatientId = patientData.data.patient.id;
-      }
-      // Add recovery points
-      const result = await addRecoveryPoints(
-        numericPatientId.toString(),
-        'INSIGHT',
-        insight.title,
-        insight.points || 2
-      );
-      if (result.success) {
-        setIsCompleted(true);
-        if (onComplete) onComplete(insightId, insight.points || 2);
-        setTimeout(() => {
-          onClose();
-        }, 1000);
-      } else {
-        // Still call onComplete for UI feedback
-        if (onComplete) onComplete(insightId, insight.points || 2);
-        setTimeout(() => {
-          onClose();
-        }, 1000);
-      }
-    } catch (error) {
-      // Log error, but still close
-      if (onComplete) onComplete(insightId, insight.points || 2);
-      setTimeout(() => {
-        onClose();
-      }, 1000);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const handleComplete = async () => {
     console.log('🎯 handleComplete called with patientId:', patientId, 'insightId:', insightId);
     
@@ -450,24 +404,17 @@ export default function InsightDialog({
     
     try {
       // Ensure we have a valid patientId
-      const validPatientId = patientId || '1';
+      if (!patientId) {
+        throw new Error('Patient identity is unavailable');
+      }
+      const validPatientId = patientId;
       console.log('🎯 Using validPatientId:', validPatientId);
       
       console.log('🎯 Step 1: Calling completeInsight...');
       const insightResult = await completeInsight(validPatientId, insightId.toString());
       console.log('🎯 Step 1 result:', insightResult);
       
-      console.log('🎯 Step 2: Calling addRecoveryPoints...');
-      // Use the patientId passed to the component instead of relying on localStorage
-      try {
-        const pointsResult = await addRecoveryPoints(validPatientId, 'EDUCATION', `Completed insight: ${insight?.title || 'Unknown'}`, insight?.points || 5);
-        console.log('🎯 Step 2 result:', pointsResult);
-      } catch (pointsError) {
-        console.warn('🎯 Points award failed, but continuing with insight completion:', pointsError);
-        // Continue with insight completion even if points fail
-      }
-      
-      console.log('🎯 Step 3: Calling SWR mutate...');
+      console.log('🎯 Step 2: Refreshing recovery data...');
       try {
         mutate(['/api/v1/recovery-points', validPatientId]);
         console.log('🎯 SWR mutate called successfully');
@@ -475,12 +422,12 @@ export default function InsightDialog({
         console.log('🎯 SWR mutate error (non-critical):', mutateError);
       }
       
-      console.log('🎯 Step 4: Setting isCompleted to show congratulations...');
+      console.log('🎯 Step 3: Setting isCompleted to show congratulations...');
       setIsCompleted(true);                                              // Show congratulations message
       
       // Call onComplete callback
       if (onComplete) {
-        onComplete(insightId, insight?.points || 2);
+        onComplete(insightId, insightResult.pointsAdded || 0, insightResult);
       }
       
       // Close after a delay to show the congratulations message (matching MovementSessionDialog)
@@ -1733,4 +1680,4 @@ export default function InsightDialog({
       />
     </>
   );
-} 
+}

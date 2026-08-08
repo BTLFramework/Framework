@@ -3,6 +3,11 @@ const express = require('express');
 const router = express.Router();
 const recoveryPointsService = require('../services/recoveryPointsService');
 const { rpActions } = require('../config/recoveryPointsConfig');
+const { insightSequence } = require('../config/insightSequence');
+const {
+  INSIGHT_ACTION_PREFIX,
+  calculateInsightStatus
+} = require('../services/insightProgression');
 
 // Use centralized Prisma instance with fallback
 let prisma;
@@ -14,6 +19,124 @@ try {
   const { PrismaClient } = require('@prisma/client');
   prisma = new PrismaClient();
 }
+
+async function resolvePatient(patientIdentifier) {
+  const identifier = String(patientIdentifier || '').trim();
+  if (!identifier) return null;
+
+  if (/^\d+$/.test(identifier)) {
+    return prisma.patient.findUnique({ where: { id: parseInt(identifier, 10) } });
+  }
+
+  return prisma.patient.findUnique({ where: { email: identifier.toLowerCase() } });
+}
+
+async function getInsightStatus(patient) {
+  const records = await prisma.recoveryPoint.findMany({
+    where: {
+      patientId: patient.id,
+      category: 'EDUCATION',
+      action: { startsWith: INSIGHT_ACTION_PREFIX }
+    },
+    orderBy: { date: 'asc' }
+  });
+
+  return calculateInsightStatus({
+    records,
+    enrollmentDate: patient.intakeDate || patient.createdAt
+  });
+}
+
+// Durable Recovery Insight progression. Upcoming titles remain visible in the
+// patient portal, but only the next sequential, calendar-eligible lesson opens.
+router.get('/insights/status/:patientIdentifier', async (req, res) => {
+  try {
+    const patient = await resolvePatient(req.params.patientIdentifier);
+    if (!patient) {
+      return res.status(404).json({ success: false, error: 'Patient not found' });
+    }
+
+    return res.json({ success: true, data: await getInsightStatus(patient) });
+  } catch (error) {
+    console.error('Error getting Recovery Insight status:', error);
+    return res.status(500).json({ success: false, error: 'Failed to get Recovery Insight status' });
+  }
+});
+
+router.post('/insights/complete', async (req, res) => {
+  try {
+    const { patientId, insightId } = req.body;
+    const patient = await resolvePatient(patientId);
+    const numericInsightId = parseInt(insightId, 10);
+
+    if (!patient) {
+      return res.status(404).json({ success: false, error: 'Patient not found' });
+    }
+    if (!insightSequence.includes(numericInsightId)) {
+      return res.status(400).json({ success: false, error: 'Unknown Recovery Insight' });
+    }
+
+    const action = `${INSIGHT_ACTION_PREFIX}${numericInsightId}`;
+    const duplicate = await prisma.recoveryPoint.findFirst({
+      where: { patientId: patient.id, category: 'EDUCATION', action }
+    });
+    if (duplicate) {
+      return res.json({
+        success: true,
+        alreadyCompleted: true,
+        pointsAdded: 0,
+        data: await getInsightStatus(patient)
+      });
+    }
+
+    const status = await getInsightStatus(patient);
+    if (status.completedToday) {
+      return res.status(409).json({
+        success: false,
+        error: 'Today’s Recovery Insight is already complete. The next lesson unlocks tomorrow.',
+        data: status
+      });
+    }
+    if (status.availableInsightId !== numericInsightId) {
+      return res.status(409).json({
+        success: false,
+        error: 'Complete the previous Recovery Insight before opening this lesson.',
+        data: status
+      });
+    }
+
+    const pointsResult = await recoveryPointsService.addRecoveryPoints(
+      patient.id,
+      'EDUCATION',
+      action,
+      5
+    );
+    if (!pointsResult.success) {
+      return res.status(409).json({
+        success: false,
+        error: pointsResult.message || pointsResult.error || 'Recovery Insight points could not be recorded'
+      });
+    }
+
+    await prisma.taskCompletion.create({
+      data: {
+        patientId: patient.id,
+        taskType: 'RECOVERY_INSIGHTS',
+        pointsEarned: pointsResult.pointsAdded || 5
+      }
+    });
+
+    return res.json({
+      success: true,
+      alreadyCompleted: false,
+      pointsAdded: pointsResult.pointsAdded || 5,
+      data: await getInsightStatus(patient)
+    });
+  } catch (error) {
+    console.error('Error completing Recovery Insight:', error);
+    return res.status(500).json({ success: false, error: 'Failed to complete Recovery Insight' });
+  }
+});
 
 // Add recovery points
 router.post('/add', async (req, res) => {
@@ -467,4 +590,4 @@ router.post('/mood', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;
