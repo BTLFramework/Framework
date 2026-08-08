@@ -16,10 +16,10 @@
 - `SETUP_SECRET` - Setup security secret
 
 ### Welcome Email (required for production onboarding)
-- `EMAIL_PROVIDER` - Email provider (`gmail` for the current configuration)
-- `EMAIL_USER` - Gmail address used to send welcome emails
-- `EMAIL_PASS` - Gmail app password (not the normal account password)
-- `EMAIL_FROM` - Sender address shown to patients
+- `EMAIL_PROVIDER` - Set to `resend` in Railway production (HTTPS; Railway Hobby blocks SMTP)
+- `RESEND_API_KEY` - Secret Resend API key used to send welcome emails
+- `EMAIL_FROM` - Verified sender shown to patients, for example `Back to Life <welcome@updates.example.com>`
+- `EMAIL_USER` / `EMAIL_PASS` - Optional SMTP credentials for non-Railway environments only
 - `PATIENT_PORTAL_URL` - Public patient portal URL used in secure setup links
 
 ## Optional Variables

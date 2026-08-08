@@ -7,7 +7,7 @@ import {
   createPatientPortalAccount
 } from "../models/patientModel";
 import { PrismaClient } from "@prisma/client";
-import { sendWelcomeEmailDev } from "../services/emailService";
+import { sendWelcomeEmail, sendWelcomeEmailDev } from "../services/emailService";
 import { generateSetupLink } from "../services/jwtService";
 
 // TSK-7 calculation function (standardized across all apps)
@@ -643,10 +643,13 @@ export const submitIntake = async (req: any, res: any) => {
     const baseUrl = process.env.PATIENT_PORTAL_URL || 'http://localhost:3000';
     const setupLink = generateSetupLink(email, patient.id, baseUrl);
     
-    // Railway Hobby blocks outbound SMTP. Until the HTTPS email provider is
-    // configured, production must fail fast instead of delaying intake requests.
     const emailSent = process.env.NODE_ENV === 'production'
-      ? false
+      ? await sendWelcomeEmail({
+          firstName,
+          email,
+          phase: phase.label,
+          setupLink
+        })
       : await sendWelcomeEmailDev({
           firstName,
           email,

@@ -82,8 +82,6 @@ const createTransporter = () => {
   }
 };
 
-const transporter = createTransporter();
-
 export interface EmailData {
   firstName: string;
   email: string;
@@ -91,30 +89,98 @@ export interface EmailData {
   setupLink: string;
 }
 
+interface RenderedEmail {
+  subject: string;
+  body: string;
+}
+
+function renderWelcomeEmail(emailData: EmailData): RenderedEmail {
+  const template = emailTemplates[emailData.phase] || emailTemplates['RESET'];
+
+  return {
+    subject: template.subject.replace('{{firstName}}', emailData.firstName),
+    body: template.body
+      .replace(/{{firstName}}/g, emailData.firstName)
+      .replace('{{setupLink}}', emailData.setupLink),
+  };
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+async function sendWithResend(emailData: EmailData, rendered: RenderedEmail): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.EMAIL_FROM;
+
+  if (!apiKey || !from) {
+    console.error('❌ Welcome email not sent: RESEND_API_KEY and EMAIL_FROM must be configured');
+    return false;
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from,
+        to: [emailData.email],
+        subject: rendered.subject,
+        text: rendered.body,
+        html: escapeHtml(rendered.body).replace(/\n/g, '<br>'),
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const details = await response.text();
+      console.error(`❌ Resend rejected welcome email (${response.status}): ${details}`);
+      return false;
+    }
+
+    console.log(`✅ Welcome email accepted for delivery to ${emailData.email}`);
+    return true;
+  } catch (error) {
+    console.error('❌ Error sending welcome email through Resend:', error);
+    return false;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export const sendWelcomeEmail = async (emailData: EmailData): Promise<boolean> => {
   try {
+    const rendered = renderWelcomeEmail(emailData);
+
+    if ((process.env.EMAIL_PROVIDER || '').toLowerCase() === 'resend') {
+      return await sendWithResend(emailData, rendered);
+    }
+
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       console.error('❌ Welcome email not sent: EMAIL_USER and EMAIL_PASS must be configured');
       return false;
     }
 
-    const template = emailTemplates[emailData.phase] || emailTemplates['RESET'];
-    
-    // Replace placeholders in template
-    let subject = template.subject.replace('{{firstName}}', emailData.firstName);
-    let body = template.body
-      .replace(/{{firstName}}/g, emailData.firstName)
-      .replace('{{setupLink}}', emailData.setupLink);
-
     const mailOptions = {
       from: process.env.EMAIL_FROM || process.env.EMAIL_USER || 'spencerbarberchiro@gmail.com',
       to: emailData.email,
-      subject: subject,
-      text: body,
-      html: body.replace(/\n/g, '<br>')
+      subject: rendered.subject,
+      text: rendered.body,
+      html: escapeHtml(rendered.body).replace(/\n/g, '<br>')
     };
 
-    await transporter.sendMail(mailOptions);
+    await createTransporter().sendMail(mailOptions);
     console.log(`✅ Welcome email sent to ${emailData.email}`);
     return true;
   } catch (error) {
@@ -125,12 +191,7 @@ export const sendWelcomeEmail = async (emailData: EmailData): Promise<boolean> =
 
 // For development/testing - log email instead of sending
 export const sendWelcomeEmailDev = async (emailData: EmailData): Promise<boolean> => {
-  const template = emailTemplates[emailData.phase] || emailTemplates['RESET'];
-  
-  let subject = template.subject.replace('{{firstName}}', emailData.firstName);
-  let body = template.body
-    .replace(/{{firstName}}/g, emailData.firstName)
-    .replace('{{setupLink}}', emailData.setupLink);
+  const { subject, body } = renderWelcomeEmail(emailData);
 
   console.log('=== WELCOME EMAIL (DEV MODE) ===');
   console.log('To:', emailData.email);

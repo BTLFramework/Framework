@@ -17,7 +17,8 @@
     "prisma:generate": "npx prisma generate",
     "prisma:studio": "npx prisma studio",
     "clean": "rm -rf dist && echo 'Cleaned dist directory'",
-    "test:startup": "node test-startup.js"
+    "test:startup": "node test-startup.js",
+    "test:email": "node --test test/emailService.resend.test.js"
   },
   "keywords": [],
   "author": "",
