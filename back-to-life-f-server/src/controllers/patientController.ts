@@ -51,9 +51,13 @@ const calculateSRS = async (formData: any, previousData?: any) => {
   console.log('📊 Form data:', formData);
   console.log('📊 Previous data:', previousData);
   
-  // For initial intake, use standardized baseline calculation
-  if (!previousData) {
+  // Intake always uses the baseline model, even if the email already exists.
+  if (formData.formType !== 'Follow-Up') {
     return computeBaselineSRS(formData);
+  }
+
+  if (!previousData) {
+    throw new Error('A follow-up assessment requires an existing baseline assessment');
   }
   
   // For follow-up, use standardized follow-up calculation
@@ -287,7 +291,7 @@ const computeFollowUpSRS = async (baselineData: any, currentData: any) => {
 // Enhanced phase determination function
 export const getPhaseByScore = (score: number) => {
   if (score <= 3) return { label: "RESET", color: "blue" };
-  if (score <= 6) return { label: "EDUCATE", color: "amber" };
+  if (score <= 7) return { label: "EDUCATE", color: "amber" };
   return { label: "REBUILD", color: "emerald" };
 };
 
@@ -307,10 +311,10 @@ const calculateDisabilityPercentage = (formData: any) => {
   } else if (region === "Low Back / SI Joint" && odi) {
     totalScore = odi.reduce((sum: number, score: number) => sum + score, 0);
     maxScore = odi.length * 5; // ODI: 0-5 scale, 10 questions
-  } else if (region === "Upper Limb" && ulfi) {
+  } else if (["Shoulder", "Elbow / Forearm", "Wrist / Hand", "Upper Limb"].includes(region) && ulfi) {
     totalScore = ulfi.reduce((sum: number, score: number) => sum + score, 0);
     maxScore = ulfi.length * 4; // ULFI: 0-4 scale, 25 questions
-  } else if (region === "Lower Extremity" && lefs) {
+  } else if (["Hip / Groin", "Knee", "Ankle / Foot", "Lower Limb", "Lower Extremity"].includes(region) && lefs) {
     totalScore = lefs.reduce((sum: number, score: number) => sum + score, 0);
     maxScore = lefs.length * 4; // LEFS: 0-4 scale, 20 questions
   }
@@ -482,6 +486,64 @@ export const submitIntake = async (req: any, res: any) => {
       recoveryMilestone,
       clinicalProgressVerified
     } = req.body;
+
+    const isNumberInRange = (value: unknown, min: number, max: number) => {
+      if (typeof value === 'string' && value.trim() === '') return false;
+      const numericValue = Number(value);
+      return value !== undefined && value !== null && Number.isFinite(numericValue) && numericValue >= min && numericValue <= max;
+    };
+    const requiredDisabilityResponses = (() => {
+      if (region === 'Neck') return { values: ndi, length: 10, max: 5 };
+      if (region === 'Mid-Back / Thoracic') return { values: tdi, length: 10, max: 5 };
+      if (region === 'Low Back / SI Joint') return { values: odi, length: 10, max: 5 };
+      if (["Shoulder", "Elbow / Forearm", "Wrist / Hand", "Upper Limb"].includes(region)) {
+        return { values: ulfi, length: 25, max: 4 };
+      }
+      if (["Hip / Groin", "Knee", "Ankle / Foot", "Lower Limb", "Lower Extremity"].includes(region)) {
+        return { values: lefs, length: 20, max: 4 };
+      }
+      return null;
+    })();
+    const validationErrors: string[] = [];
+
+    if (typeof patientName !== 'string' || !patientName.trim()) validationErrors.push('Patient name is required');
+    if (typeof email !== 'string' || !email.trim() || !/^\S+@\S+\.\S+$/.test(email)) {
+      validationErrors.push('A valid email is required');
+    }
+    if (!dob || Number.isNaN(new Date(dob).getTime())) validationErrors.push('A valid date of birth is required');
+    if (!date || Number.isNaN(new Date(date).getTime()) || new Date(date) > new Date()) {
+      validationErrors.push('A valid completion date that is not in the future is required');
+    }
+    if (!['Intake', 'Follow-Up'].includes(formType)) validationErrors.push('Assessment type is invalid');
+    if (!requiredDisabilityResponses) validationErrors.push('Region of complaint is invalid');
+    if (
+      requiredDisabilityResponses &&
+      (!Array.isArray(requiredDisabilityResponses.values) ||
+        requiredDisabilityResponses.values.length !== requiredDisabilityResponses.length ||
+        !requiredDisabilityResponses.values.every((value: unknown) =>
+          isNumberInRange(value, 0, requiredDisabilityResponses.max)
+        ))
+    ) {
+      validationErrors.push('The disability questionnaire is incomplete');
+    }
+    if (!isNumberInRange(vas, 0, 10)) validationErrors.push('Pain must be between 0 and 10');
+    if (!isNumberInRange(confidence, 0, 10)) validationErrors.push('Confidence must be between 0 and 10');
+    if (
+      !Array.isArray(psfs) || psfs.length !== 3 ||
+      !psfs.every((item: any) => item?.activity?.trim() && isNumberInRange(item.score, 0, 10))
+    ) {
+      validationErrors.push('All three activity scores are required');
+    }
+    if (![1, 2, 3, 4].every(index => isNumberInRange(pcs4?.[index], 0, 4))) {
+      validationErrors.push('PCS-4 is incomplete');
+    }
+    if (![1, 2, 3, 4, 5, 6, 7].every(index => isNumberInRange(tsk7?.[index], 1, 4))) {
+      validationErrors.push('TSK-7 is incomplete');
+    }
+
+    if (validationErrors.length > 0) {
+      return res.status(400).json({ success: false, error: 'Invalid intake submission', details: validationErrors });
+    }
     
     // Calculate disability percentage
     const disabilityPercentage = calculateDisabilityPercentage({
@@ -523,7 +585,7 @@ export const submitIntake = async (req: any, res: any) => {
     // Calculate SRS score
     const srsScore = await calculateSRS({
       vas, psfs, pcs4, tsk7, disabilityPercentage, confidence, beliefs, groc, formType,
-      recoveryMilestone, clinicalProgressVerified
+      recoveryMilestone, clinicalProgressVerified, patientId: patient.id
     }, previousData);
     
     console.log('🔢 SRS Score calculated:', srsScore, 'Type:', typeof srsScore);
@@ -852,4 +914,4 @@ export const deletePatient = async (req: any, res: any) => {
       error: (err as Error).message
     });
   }
-}; 
+};

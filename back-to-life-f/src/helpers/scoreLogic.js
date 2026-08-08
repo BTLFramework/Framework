@@ -8,7 +8,7 @@ import {
 
 export function getPhaseByScore(score) {
   if (score <= 3) return { label: "RESET", color: "bg-green-400" };
-  if (score <= 6) return { label: "EDUCATE", color: "bg-yellow-400" };
+  if (score <= 7) return { label: "EDUCATE", color: "bg-yellow-400" };
   return { label: "REBUILD", color: "bg-blue-400" };
 }
 
@@ -28,7 +28,7 @@ export function calculateSRS(formData, previousData = null, clinicianData = {}) 
   }
 }
 
-// Baseline (Intake) SRS Calculation - Range: 0-9 points
+// Baseline (Intake) SRS Calculation - Range: 0-11 points
 export function computeBaselineSRS(formData, clinicianData = {}) {
   
   let points = 0;
@@ -120,7 +120,27 @@ export function computeBaselineSRS(formData, clinicianData = {}) {
     breakdown.push(`❌ Fear-Avoidance (TSK-7 incomplete): +0 points`);
   }
 
-  // 6. Clinician Assessments
+  // 6. Pain Beliefs Assessment (PCS-4)
+  const pcs4Values = [1, 2, 3, 4].map(index => formData.pcs4?.[index]);
+  const hasCompletePCS4 = pcs4Values.every(value =>
+    value !== undefined && value !== null && Number(value) >= 0 && Number(value) <= 4
+  );
+  const pcs4TotalScore = hasCompletePCS4
+    ? pcs4Values.reduce((sum, value) => sum + Number(value), 0)
+    : null;
+
+  if (pcs4TotalScore !== null) {
+    if (pcs4TotalScore <= intakeRules.painBeliefs.threshold) {
+      points += intakeRules.painBeliefs.points;
+      breakdown.push(`✅ ${intakeRules.painBeliefs.description} (${pcs4TotalScore}): +${intakeRules.painBeliefs.points} point`);
+    } else {
+      breakdown.push(`❌ Pain Beliefs (PCS-4 ${pcs4TotalScore} > ${intakeRules.painBeliefs.threshold}): +0 points`);
+    }
+  } else {
+    breakdown.push('❌ Pain Beliefs (PCS-4 incomplete): +0 points');
+  }
+
+  // 7. Clinician Assessments
   if (clinicianData.milestoneMet) {
     points += intakeRules.clinician.milestone.points;
     breakdown.push(`✅ ${intakeRules.clinician.milestone.description}: +${intakeRules.clinician.milestone.points} point`);

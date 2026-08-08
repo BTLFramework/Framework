@@ -3,6 +3,7 @@ import Stepper from "./Stepper";
 import PhaseFlow from "./PhaseFlow";
 import SRSDisplay from "./SRSDisplay";
 import { computeBaselineSRS, getPhaseByScore } from "../helpers/scoreLogic";
+import { normalizeIntakeSubmissionResult } from "../helpers/intakeResult";
 
 // Import each step
 import PatientInfo from "./steps/PatientInfo";
@@ -327,13 +328,14 @@ export default function MultiStepForm() {
     }
   };
 
-  // Automatically reset form when formType changes, quickTestMode changes, or on mount
+  // Quick-test mode intentionally replaces the draft. Changing Intake to
+  // Follow-Up must not reset the form back to Intake.
   useEffect(() => {
     setFormData(getInitialFormData());
     setCurrentStep(0);
     setShowResult(false);
     setSubmissionResult(null);
-  }, [formData.formType, quickTestMode]);
+  }, [quickTestMode]);
 
   // Validation for required fields per step
   const isStepComplete = () => {
@@ -424,7 +426,7 @@ export default function MultiStepForm() {
       email: formData.email,
       dob: formData.dob,
       date: formData.date,
-      formType: 'Intake',
+      formType: formData.formType,
       region: formData.region,
       ndi: formData.ndi,
       tdi: formData.tdi, // Include TDI data
@@ -472,14 +474,15 @@ export default function MultiStepForm() {
       
       // Store patient data for portal access
       if (result.success) {
-        const patientData = {
-          name: result.data.patient.name,
-          email: result.data.patient.email,
-          score: `${result.data.srsScore}/9`, // Format as string for portal compatibility (baseline scoring)
-          phase: result.data.phase,
-          timestamp: new Date().toISOString()
-        };
-        localStorage.setItem('btl_patient_data', JSON.stringify(patientData));
+        const normalizedResult = normalizeIntakeSubmissionResult(result);
+
+        setFormData(prev => ({
+          ...prev,
+          srsScore: normalizedResult.score,
+          phase: normalizedResult.phase
+        }));
+
+        localStorage.setItem('btl_patient_data', JSON.stringify(normalizedResult.portalPatientData));
       }
       
       setSubmissionResult(result);
@@ -540,7 +543,7 @@ export default function MultiStepForm() {
                   </div>
 
                   <p className="text-gray-600 text-sm">
-                    {displayScore < 4 ? "RESET Phase" : displayScore < 7 ? "EDUCATE Phase" : "REBUILD Phase"}
+                    {displayScore <= 3 ? "RESET Phase" : displayScore <= 7 ? "EDUCATE Phase" : "REBUILD Phase"}
                   </p>
                 </div>
               </div>
@@ -552,20 +555,14 @@ export default function MultiStepForm() {
               <button 
                 onClick={() => {
                   if (submissionResult?.success) {
-                    const patientData = {
-                      name: submissionResult.data.patient.name,
-                      email: submissionResult.data.patient.email,
-                      score: `${submissionResult.data.srsScore}/9`,
-                      phase: submissionResult.data.phase,
-                      timestamp: new Date().toISOString()
-                    };
+                    const patientData = normalizeIntakeSubmissionResult(submissionResult).portalPatientData;
                     const params = new URLSearchParams({
                       patientData: JSON.stringify(patientData)
                     });
-                    const patientPortalUrl = import.meta.env.VITE_PATIENT_PORTAL_URL || 'https://framework-production-92f5.up.railway.app';
+                    const patientPortalUrl = import.meta.env.VITE_PATIENT_PORTAL_URL || 'https://framework-six-umber.vercel.app';
                     window.location.href = `${patientPortalUrl}/create-account?${params.toString()}`;
                   } else {
-                    const patientPortalUrl = import.meta.env.VITE_PATIENT_PORTAL_URL || 'https://framework-production-92f5.up.railway.app';
+                    const patientPortalUrl = import.meta.env.VITE_PATIENT_PORTAL_URL || 'https://framework-six-umber.vercel.app';
                     window.location.href = patientPortalUrl;
                   }
                 }}

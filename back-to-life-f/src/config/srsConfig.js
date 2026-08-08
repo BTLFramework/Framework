@@ -1,7 +1,7 @@
 // SRS Configuration - Single Source of Truth
 // This file centralizes all scoring rules and phase cutoffs
 
-// Baseline (Intake) Scoring Rules - Range: 0-9 points
+// Baseline (Intake) Scoring Rules - Range: 0-11 points
 export const intakeRules = {
   pain: {
     // VAS 0-10: ≤2 → +1 point
@@ -36,6 +36,13 @@ export const intakeRules = {
     threshold: 8,
     points: 1,
     description: "Low fear-avoidance (TSK-7 ≤8)"
+  },
+
+  painBeliefs: {
+    // PCS-4 total score ≤6 → +1 point (low catastrophizing)
+    threshold: 6,
+    points: 1,
+    description: "Low pain catastrophizing (PCS-4 ≤6)"
   },
   
   clinician: {
@@ -108,7 +115,7 @@ export function getPhase(score) {
 
 // Score Ranges
 export const scoreRanges = {
-  baseline: { min: 0, max: 9 },
+  baseline: { min: 0, max: 11 },
   followup: { min: 0, max: 11 }
 };
 
@@ -152,4 +159,4 @@ export const evidenceBase = {
     reference: "pmc.ncbi.nlm.nih.gov",
     note: "High self-efficacy drives adherence"
   }
-}; 
+};
