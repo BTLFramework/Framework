@@ -111,7 +111,8 @@ export default function AssessmentsPage() {
 
       if (result.success && result.data) {
         // Get patient's intake date and SRS scores
-        const patientData = result.data.patient
+        const portalData = result.data
+        const patientData = portalData.patient ?? portalData
 
         // Use the actual intake date from the patient data
         const intakeDateValue = patientData.intakeDate || patientData.createdAt
@@ -122,11 +123,13 @@ export default function AssessmentsPage() {
 
         // Fetch all SRS scores for this patient to determine completion status
         const srsResponse = await fetch(`/api/patients/${patientData.id}/srs-scores`)
-        let srsScores = []
+        let srsScores = Array.isArray(portalData.srsScores) ? portalData.srsScores : []
 
         if (srsResponse.ok) {
           const srsResult = await srsResponse.json()
-          srsScores = srsResult.data || []
+          if (Array.isArray(srsResult.data) && srsResult.data.length > 0) {
+            srsScores = srsResult.data
+          }
         }
 
         // SRS scores for patient
@@ -211,6 +214,18 @@ export default function AssessmentsPage() {
           }
         }
 
+        const getCompletionDate = (formType: string, scheduledDate: Date) => {
+          const formData = getFormData(formType)
+          if (!formData) return undefined
+
+          const score = srsScores.find((candidate: any) =>
+            candidate.srsScore === formData.srsScore &&
+            candidate.region === formData.region
+          )
+          const completedAt = score?.completedAt || score?.date || score?.createdAt
+          return formatDate(completedAt ? new Date(completedAt) : scheduledDate)
+        }
+
         const forms: IntakeForm[] = [
           {
             id: "initial-intake",
@@ -218,7 +233,7 @@ export default function AssessmentsPage() {
             description: "Your first assessment to establish your SRS (Signature Recovery Score).",
             status: initialCompleted ? "completed" : "due",
             date: formatDate(intakeDate),
-            completedDate: initialCompleted ? formatDate(intakeDate) : undefined,
+            completedDate: initialCompleted ? getCompletionDate('Intake', intakeDate) : undefined,
             formData: getFormData('Intake'),
             actionButton: initialCompleted ? "View Results" : "Complete Form",
             isHighlighted: !initialCompleted
@@ -230,7 +245,7 @@ export default function AssessmentsPage() {
             status: fourWeekCompleted ? "completed" : fourWeekOverdue ? "due" : "upcoming",
             date: formatDate(fourWeekDate),
             dueDate: formatDate(fourWeekDate),
-            completedDate: fourWeekCompleted ? formatDate(fourWeekDate) : undefined,
+            completedDate: fourWeekCompleted ? getCompletionDate('4-Week Follow-up', fourWeekDate) : undefined,
             formData: getFormData('4-Week Follow-up'),
             actionButton: fourWeekCompleted ? "View Results" : "Start Assessment",
             isHighlighted: fourWeekOverdue
@@ -242,7 +257,7 @@ export default function AssessmentsPage() {
             status: eightWeekCompleted ? "completed" : eightWeekOverdue ? "due" : "upcoming",
             date: formatDate(eightWeekDate),
             dueDate: formatDate(eightWeekDate),
-            completedDate: eightWeekCompleted ? formatDate(eightWeekDate) : undefined,
+            completedDate: eightWeekCompleted ? getCompletionDate('8-Week Follow-up', eightWeekDate) : undefined,
             formData: getFormData('8-Week Follow-up'),
             actionButton: eightWeekCompleted ? "View Results" : "Start Assessment",
             isHighlighted: eightWeekOverdue

@@ -113,7 +113,8 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
 
       if (result.success && result.data) {
         // Get patient's intake date and SRS scores
-        const patientData = result.data.patient
+        const portalData = result.data
+        const patientData = portalData.patient ?? portalData
 
         // Use the actual intake date from the patient data
         const intakeDateValue = patientData.intakeDate || patientData.createdAt
@@ -124,17 +125,27 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
 
         // Fetch all SRS scores for this patient to determine completion status
         const srsResponse = await fetch(`/api/patients/${patientData.id}/srs-scores`)
-        let srsScores = []
+        let srsScores = Array.isArray(portalData.srsScores) ? portalData.srsScores : []
 
         if (srsResponse.ok) {
           const srsResult = await srsResponse.json()
-          srsScores = srsResult.data || []
+          if (Array.isArray(srsResult.data) && srsResult.data.length > 0) {
+            srsScores = srsResult.data
+          }
         }
 
         // SRS scores for patient
-        const hasInitialIntake = srsScores.some((score: any) => score.formType === 'Intake' || score.formType === 'Initial')
-        const hasFourWeekFollowup = srsScores.some((score: any) => score.formType === '4-Week Follow-up')
-        const hasEightWeekFollowup = srsScores.some((score: any) => score.formType === '8-Week Follow-up')
+        const matchesFormType = (score: any, formType: string) => {
+          const value = String(score?.formType || '').toLowerCase().replace(/[\s-]+/g, '')
+          const expected = String(formType).toLowerCase().replace(/[\s-]+/g, '')
+          if (formType === 'Intake') {
+            return ['intake', 'initialintake', 'initial'].includes(value)
+          }
+          return value === expected
+        }
+        const hasInitialIntake = srsScores.some((score: any) => matchesFormType(score, 'Intake'))
+        const hasFourWeekFollowup = srsScores.some((score: any) => matchesFormType(score, '4-Week Follow-up'))
+        const hasEightWeekFollowup = srsScores.some((score: any) => matchesFormType(score, '8-Week Follow-up'))
         // Assessment completion status
 
         // Calculate due dates based on intake date
@@ -150,7 +161,7 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
 
         // Get the actual form data from SRS scores
         const getFormData = (formType: string) => {
-          const score = srsScores.find((s: any) => s.formType === formType)
+          const score = srsScores.find((s: any) => matchesFormType(s, formType))
           if (!score) return undefined
 
           return {
@@ -168,6 +179,12 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
           }
         }
 
+        const getCompletionDate = (formType: string, scheduledDate: Date) => {
+          const score = srsScores.find((candidate: any) => matchesFormType(candidate, formType))
+          const completedAt = score?.completedAt || score?.date || score?.createdAt
+          return score ? formatDate(completedAt ? new Date(completedAt) : scheduledDate) : undefined
+        }
+
         const forms: IntakeForm[] = [
           {
             id: "initial-intake",
@@ -175,7 +192,7 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
             description: "Your first assessment to establish your SRS (Signature Recovery Score).",
             status: initialCompleted ? "completed" : "due",
             date: formatDate(intakeDate),
-            completedDate: initialCompleted ? formatDate(intakeDate) : undefined,
+            completedDate: initialCompleted ? getCompletionDate('Intake', intakeDate) : undefined,
             formData: getFormData('Intake') || getFormData('Initial'),
             actionButton: initialCompleted ? "View Results" : "Complete Form",
             isHighlighted: !initialCompleted
@@ -187,7 +204,7 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
             status: fourWeekCompleted ? "completed" : fourWeekOverdue ? "due" : "upcoming",
             date: formatDate(fourWeekDate),
             dueDate: formatDate(fourWeekDate),
-            completedDate: fourWeekCompleted ? formatDate(fourWeekDate) : undefined,
+            completedDate: fourWeekCompleted ? getCompletionDate('4-Week Follow-up', fourWeekDate) : undefined,
             formData: getFormData('4-Week Follow-up'),
             actionButton: fourWeekCompleted ? "View Results" : "Start Assessment",
             isHighlighted: fourWeekOverdue
@@ -199,7 +216,7 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
             status: eightWeekCompleted ? "completed" : eightWeekOverdue ? "due" : "upcoming",
             date: formatDate(eightWeekDate),
             dueDate: formatDate(eightWeekDate),
-            completedDate: eightWeekCompleted ? formatDate(eightWeekDate) : undefined,
+            completedDate: eightWeekCompleted ? getCompletionDate('8-Week Follow-up', eightWeekDate) : undefined,
             formData: getFormData('8-Week Follow-up'),
             actionButton: eightWeekCompleted ? "View Results" : "Start Assessment",
             isHighlighted: eightWeekOverdue
