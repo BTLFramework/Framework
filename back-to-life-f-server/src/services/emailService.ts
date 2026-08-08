@@ -93,6 +93,11 @@ export interface EmailData {
 
 export const sendWelcomeEmail = async (emailData: EmailData): Promise<boolean> => {
   try {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      console.error('❌ Welcome email not sent: EMAIL_USER and EMAIL_PASS must be configured');
+      return false;
+    }
+
     const template = emailTemplates[emailData.phase] || emailTemplates['RESET'];
     
     // Replace placeholders in template

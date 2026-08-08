@@ -15,6 +15,13 @@
 - `JWT_SECRET` - Authentication secret
 - `SETUP_SECRET` - Setup security secret
 
+### Welcome Email (required for production onboarding)
+- `EMAIL_PROVIDER` - Email provider (`gmail` for the current configuration)
+- `EMAIL_USER` - Gmail address used to send welcome emails
+- `EMAIL_PASS` - Gmail app password (not the normal account password)
+- `EMAIL_FROM` - Sender address shown to patients
+- `PATIENT_PORTAL_URL` - Public patient portal URL used in secure setup links
+
 ## Optional Variables
 - `CORS_ORIGIN` - Allowed origins for CORS
 - `LOG_LEVEL` - Logging level
