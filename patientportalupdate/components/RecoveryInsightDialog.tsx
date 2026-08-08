@@ -61,6 +61,7 @@ export function RecoveryInsightDialog({
   const [showInsightDialog, setShowInsightDialog] = useState(false);
   const [actionTaken, setActionTaken] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [showCelebration, setShowCelebration] = useState<boolean>(false);
   const [patientData, setPatientData] = useState<any>(null);
   const [completedInsights, setCompletedInsights] = useState<number[]>([]);
@@ -185,6 +186,7 @@ export function RecoveryInsightDialog({
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    setSubmitError(null);
 
     try {
       // Get patient data to get numeric ID
@@ -207,8 +209,7 @@ export function RecoveryInsightDialog({
         console.log('✅ Recovery points added successfully:', result.pointsAdded);
 
         // Record task completion to backend
-        try {
-          await fetch('/api/recovery-points/task-completion', {
+        const taskResponse = await fetch('/api/recovery-points/task-completion', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -220,10 +221,10 @@ export function RecoveryInsightDialog({
               pointsEarned: totalPoints
             }),
           });
-          console.log('✅ Task completion recorded for recovery insight');
-        } catch (taskError) {
-          console.error('❌ Failed to record task completion:', taskError);
+        if (!taskResponse.ok) {
+          throw new Error('Failed to record recovery insight completion');
         }
+        console.log('✅ Task completion recorded for recovery insight');
 
         // Show celebration
         setShowCelebration(true);
@@ -260,11 +261,12 @@ export function RecoveryInsightDialog({
         if (isDailyCapReached) {
           // Show a different message for daily cap
           console.log('ℹ️ Daily recovery insights cap reached - still recording completion');
+        } else {
+          throw new Error(result.error || result.message || 'Failed to add recovery points');
         }
 
         // Still record task completion to backend even if RP failed
-        try {
-          await fetch('/api/recovery-points/task-completion', {
+        const taskResponse = await fetch('/api/recovery-points/task-completion', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -276,10 +278,10 @@ export function RecoveryInsightDialog({
               pointsEarned: isDailyCapReached ? 0 : totalPoints // No points if daily cap reached
             }),
           });
-          console.log('✅ Task completion recorded for recovery insight (despite RP failure)');
-        } catch (taskError) {
-          console.error('❌ Failed to record task completion:', taskError);
+        if (!taskResponse.ok) {
+          throw new Error('Failed to record capped recovery insight completion');
         }
+        console.log('✅ Task completion recorded for capped recovery insight');
 
         // Show celebration (even for daily cap - user still completed the insight)
         setShowCelebration(true);
@@ -310,58 +312,9 @@ export function RecoveryInsightDialog({
       }
     } catch (error) {
       console.error('❌ Error submitting recovery insight:', error);
-
-      // Still record task completion to backend even if everything failed
-      try {
-        const patientResponse = await fetch(`/api/patients/portal-data/${patientId}`)
-        if (patientResponse.ok) {
-          const patientData = await patientResponse.json()
-          const numericPatientId = patientData.data.patient.id
-
-          await fetch('/api/recovery-points/task-completion', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              patientId: numericPatientId,
-              taskType: 'RECOVERY_INSIGHTS',
-              sessionDuration: null,
-              pointsEarned: totalPoints
-            }),
-          });
-          console.log('✅ Task completion recorded for recovery insight (despite error)');
-        }
-      } catch (taskError) {
-        console.error('❌ Failed to record task completion:', taskError);
-      }
-
-      // Still show celebration but log the error
-      setShowCelebration(true);
-
-      // Still call parent's task completion handler
-      if (onTaskComplete) {
-        onTaskComplete({
-          taskId: 'recovery-insight',
-          taskTitle: 'Recovery Insight',
-          pointsEarned: totalPoints,
-          newSRSScore: srsScore,
-          phase: phaseLabel
-        });
-      }
-
-      // Still call parent's completion handler
-      onComplete?.({
-        selectedInsight: selectedInsightId,
-        actionTaken: actionTaken ? actionPrompt?.action : null,
-        pointsEarned: totalPoints
-      });
-
-      // Close the dialog after a short delay to show celebration
-      setTimeout(() => {
-        onOpenChange(false);
-        setShowCelebration(false);
-      }, 2000);
+      setSubmitError(
+        'We could not confirm this insight completion. Your progress was not marked complete; please try again.'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -683,6 +636,11 @@ export function RecoveryInsightDialog({
 
               {/* Footer cloned from MindfulnessSessionDialog */}
               <div className="px-6 py-4 bg-white border-t border-gray-200">
+                {submitError && (
+                  <p role="alert" className="mb-3 text-sm font-medium text-red-700">
+                    {submitError}
+                  </p>
+                )}
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center gap-3">
                     <div className="px-4 py-2 font-medium text-sm bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-yellow-900 shadow-lg border border-yellow-500 rounded-2xl">
