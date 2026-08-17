@@ -9,11 +9,13 @@ import { PainStressCheckDialog } from "@/components/PainStressCheckDialog";
 import { MindfulnessSessionDialog } from "@/components/MindfulnessSessionDialog";
 import { RecoveryInsightDialog } from "@/components/RecoveryInsightDialog";
 import { useAuth } from "@/hooks/useAuth";
+import { useAssignedExercises } from "@/hooks/useAssignedExercises";
 
 export default function RecoveryPointsPage() {
   const router = useRouter()
   // Use proper authentication
   const { patient, loading: authLoading, isAuthenticated } = useAuth()
+  const { data: assignedExerciseData } = useAssignedExercises(patient?.email || '')
 
   const [showInsights, setShowInsights] = useState(false)
   const [completedTaskIds, setCompletedTaskIds] = useState<Set<number>>(new Set())
@@ -173,7 +175,9 @@ export default function RecoveryPointsPage() {
     {
       id: 1,
       title: "Morning Movement",
-      points: 9, // Usually 3 exercises × 3 points each = 9-12 points
+      // Match the actual clinician-assigned plan instead of presenting a
+      // generic value that can disagree with the Movement Session card.
+      points: assignedExerciseData?.totalPoints ?? null,
       icon: Zap,
       timeEstimate: "15 min",
     },
@@ -201,15 +205,15 @@ export default function RecoveryPointsPage() {
   ]
 
   // Helper function to get task badge colors based on points (gold/silver/bronze logic)
-  const getTaskBadgeColor = (points: number, isCompleted: boolean) => {
+  const getTaskBadgeColor = (points: number | null, isCompleted: boolean) => {
     if (isCompleted) {
       return "bg-gradient-to-br from-emerald-100 to-emerald-200 text-emerald-700 border border-emerald-300"
     }
 
     // Use achievement logic: 5+ points = gold, 3-4 points = silver, 1-2 points = bronze
-    if (points >= 5) {
+    if (points !== null && points >= 5) {
       return "bg-gradient-to-br from-yellow-400 to-yellow-600 text-yellow-950 shadow-md border border-yellow-600" // Gold
-    } else if (points >= 3) {
+    } else if (points !== null && points >= 3) {
       return "bg-gradient-to-br from-gray-300 to-gray-500 text-gray-900 shadow-md border border-gray-500" // Silver
     } else {
       return "bg-gradient-to-br from-orange-400 to-orange-600 text-orange-950 shadow-md border border-orange-600" // Bronze
@@ -457,7 +461,7 @@ export default function RecoveryPointsPage() {
                         <p className="text-btl-600 text-sm">{task.timeEstimate}</p>
                       </div>
                       <span className={`px-3 py-1 rounded-full font-bold text-sm transition-all duration-200 ${getTaskBadgeColor(task.points, isCompleted)}`}>
-                        +{task.points} pts
+                        {task.points === null ? '— pts' : `+${task.points} pts`}
                       </span>
                       {isCompleted && (
                         <div className="absolute inset-0 flex items-center justify-center z-10">

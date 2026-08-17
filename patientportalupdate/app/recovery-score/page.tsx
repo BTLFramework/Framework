@@ -316,7 +316,15 @@ export default function RecoveryScorePage() {
             ? progressResult.data.progressHistory
             : []
           progressData = verifiedHistory.map((entry: any) => ({
-            date: new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            // Assessment dates are clinical calendar dates, not instants in
+            // the patient's browser timezone. Formatting in UTC prevents a
+            // midnight ISO date from appearing as the previous day in
+            // Edmonton.
+            date: new Date(entry.date).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              timeZone: 'UTC'
+            }),
             score: entry.score,
             phase: entry.phase,
             formType: entry.formType
