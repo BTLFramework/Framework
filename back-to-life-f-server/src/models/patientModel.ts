@@ -1,4 +1,5 @@
 import prisma from "../db";
+import { hashPatientPassword } from "../services/patientPasswordService";
 
 export const createPatient = async (name: string, email: string, intakeDate: Date, dob?: string) => {
   return await prisma.patient.create({ 
@@ -12,11 +13,13 @@ export const createPatient = async (name: string, email: string, intakeDate: Dat
 };
 
 export const createPatientPortalAccount = async (patientId: number, email: string, password: string) => {
+  const hashedPassword = await hashPatientPassword(password);
+
   return await prisma.patientPortal.create({
     data: {
       patientId,
       email,
-      password // Note: This should be hashed in production
+      password: hashedPassword
     }
   });
 };
@@ -43,9 +46,11 @@ export const findPatientPortalByEmail = async (email: string) => {
 };
 
 export const updatePatientPortalPassword = async (email: string, password: string) => {
+  const hashedPassword = await hashPatientPassword(password);
+
   return await prisma.patientPortal.update({
     where: { email },
-    data: { password },
+    data: { password: hashedPassword },
   });
 };
 
@@ -160,7 +165,7 @@ export const deletePatient = async (patientId: number) => {
   return await prisma.patient.delete({
     where: { id: patientId },
   });
-}; 
+};
 
 // Get assigned exercises for movement session by email
 export const getAssignedExercisesByEmail = async (email: string) => {

@@ -4,6 +4,7 @@ import {
   findPatientPortalByEmail, 
   updatePatientPortalPassword 
 } from '../models/patientModel';
+import { verifyPatientPassword } from '../services/patientPasswordService';
 
 const router = express.Router();
 
@@ -142,9 +143,16 @@ router.post('/login', async (req: any, res: any) => {
     }
     
     console.log(`🔍 Found patient portal account for: ${email}`);
-    if (patientPortal.password !== password) {
+    const passwordCheck = await verifyPatientPassword(patientPortal.password, password);
+
+    if (!passwordCheck.valid) {
       console.log(`❌ Password mismatch for: ${email}`);
       return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    if (passwordCheck.needsUpgrade) {
+      await updatePatientPortalPassword(patientPortal.email, password);
+      console.log(`🔒 Upgraded legacy password storage for: ${email}`);
     }
     
     console.log(`✅ Password match for: ${email}`);
