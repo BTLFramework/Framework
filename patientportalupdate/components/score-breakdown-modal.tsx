@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { X, CheckCircle, XCircle, Info, TrendingUp, Target, Heart, Shield, Zap } from "lucide-react"
 import { AssessmentDialog, AssessmentDialogContent, AssessmentDialogHeader } from "@/components/ui/assessment-dialog"
+import { calculateTSK7Score } from "@/lib/assessmentScores"
 
 // Custom SRS Icon Component
 function SRSIcon({ className = "w-12 h-12" }: { className?: string }) {
@@ -240,18 +241,18 @@ export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdo
           description: "Feeling comfortable with physical activity",
           points: (() => {
               if (!intakeData || !intakeData.tsk7) return 0;
-  const tskTotal = Object.values(intakeData.tsk7).reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
-  return tskTotal <= 8 ? 1 : 0; // TSK-7 threshold: ≤8 points (30% of 28)
+  const tskTotal = calculateTSK7Score(intakeData.tsk7);
+  return tskTotal !== null && tskTotal <= 8 ? 1 : 0;
           })(),
           achieved: (() => {
               if (!intakeData || !intakeData.tsk7) return false;
-  const tskTotal = Object.values(intakeData.tsk7).reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
-  return tskTotal <= 8; // TSK-7 threshold: ≤8 points (30% of 28)
+  const tskTotal = calculateTSK7Score(intakeData.tsk7);
+  return tskTotal !== null && tskTotal <= 8;
           })(),
           details: (() => {
               if (!intakeData || !intakeData.tsk7) return "Assessment data unavailable";
-  const tskTotal = Object.values(intakeData.tsk7).reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
-  return `Your score: ${tskTotal}/28`;
+  const tskTotal = calculateTSK7Score(intakeData.tsk7);
+  return tskTotal === null ? "Assessment data unavailable" : `Your score: ${tskTotal}/28`;
           })(),
           icon: <Zap className="w-5 h-5" />,
           category: 'movement'

@@ -1,6 +1,7 @@
 "use client"
 
 import { X, ArrowRight, CheckCircle, Calendar, FileText } from "lucide-react"
+import { calculateTSK7Score } from "@/lib/assessmentScores"
 
 // Utility function for missing data badge
 function MissingBadge() {
@@ -213,22 +214,7 @@ export function AssessmentModal({ assessment, onClose }: AssessmentModalProps) {
                       <div className="flex justify-between">
                         <span className="text-sm text-btl-700">TSK-7 Total:</span>
                         <span className="font-semibold text-btl-900">
-                          {/* Calculate with reverse scoring for items 2, 6, 7 */}
-                          {(() => {
-                            const reverseScoredItems = [2, 6, 7];
-                            let total = 0;
-                            for (let i = 1; i <= 7; i++) {
-                              const response = assessment.formData.tsk7[i];
-                              if (response !== undefined && response >= 0 && response <= 4) {
-                                if (reverseScoredItems.includes(i)) {
-                                  total += (4 - response);
-                                } else {
-                                  total += response;
-                                }
-                              }
-                            }
-                            return total;
-                          })()}/28
+                          {calculateTSK7Score(assessment.formData.tsk7) ?? "Unavailable"}/28
                         </span>
                       </div>
                     ) : (

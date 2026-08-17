@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import AssignExercisesModal from './AssignExercisesModal';
 import { API_URL } from "../config/api";
+import { calculatePCS4Score, calculateTSK7Score, pluralizeDay } from "../helpers/assessmentScores";
 
 // Helper function to get disability color based on region and score
 const getDisabilityColor = (region, score) => {
@@ -89,13 +90,8 @@ const getDisabilityLabel = (region, score) => {
 };
 
 // Helper functions for PCS-4 (Pain Catastrophizing Scale)
-const calculatePCS4Score = (pcs4) => {
-  if (!pcs4) return 0;
-  return Object.values(pcs4).reduce((sum, score) => sum + (score || 0), 0);
-};
-
 const getPCS4Color = (pcs4) => {
-  const score = calculatePCS4Score(pcs4);
+  const score = calculatePCS4Score(pcs4) ?? 0;
   if (score <= 6) return '#155e75'; // Dark blue - Low catastrophizing
   if (score <= 12) return '#0891b2'; // Medium blue - Moderate catastrophizing
   return '#06b6d4'; // Light blue - High catastrophizing
@@ -108,32 +104,8 @@ const getPCS4Label = (score) => {
 };
 
 // Helper functions for TSK-7 (Modified Fear-Avoidance Screener)
-const calculateTSK7Score = (tsk7) => {
-  if (!tsk7) return 0;
-  let totalScore = 0;
-  let validResponses = 0;
-  
-  // TSK-7 items with reverse-scored items (2, 6, 7)
-  for (let i = 1; i <= 7; i++) {
-    const response = tsk7[i];
-    if (response !== undefined && response >= 0 && response <= 4) {
-      let itemScore = response;
-      
-      // Reverse score items 2, 6, 7 (0→4, 1→3, 2→2, 3→1, 4→0)
-      if (i === 2 || i === 6 || i === 7) {
-        itemScore = 4 - response;
-      }
-      
-      totalScore += itemScore;
-      validResponses++;
-    }
-  }
-  
-  return validResponses === 7 ? totalScore : 0;
-};
-
 const getTSK7Color = (tsk7) => {
-  const score = calculateTSK7Score(tsk7);
+  const score = calculateTSK7Score(tsk7) ?? 0;
   const fearScore = (score / 28) * 100; // Normalize to percentage
   if (fearScore <= 30) return '#155e75'; // Dark blue - Low fear-avoidance
   if (fearScore <= 50) return '#0891b2'; // Medium blue - Moderate fear-avoidance
@@ -603,7 +575,7 @@ function PatientModal({ patient, onClose }) {
                   Email: {patient.email}
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  Intake: {formatDate(patient.intakeDate)} ({daysSinceIntake} days ago)
+                  Intake: {formatDate(patient.intakeDate)} ({pluralizeDay(daysSinceIntake)} ago)
                 </span>
               </div>
             </div>
@@ -1090,10 +1062,10 @@ function PatientModal({ patient, onClose }) {
                   <div style={{ background: 'white', padding: '8px', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
                     <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: '4px' }}>Pain Beliefs (PCS-4)</div>
                     <div style={{ fontSize: '0.875rem', fontWeight: 'bold', color: getPCS4Color(patient.pcs4) }}>
-                      {calculatePCS4Score(patient.pcs4)}/20
+                      {calculatePCS4Score(patient.pcs4) ?? "Unavailable"}/16
                     </div>
                     <div style={{ fontSize: '0.6rem', color: '#6b7280', marginTop: '2px' }}>
-                      {getPCS4Label(calculatePCS4Score(patient.pcs4))}
+                      {calculatePCS4Score(patient.pcs4) === null ? "Not assessed" : getPCS4Label(calculatePCS4Score(patient.pcs4))}
                     </div>
                   </div>
                 )}
@@ -1103,10 +1075,10 @@ function PatientModal({ patient, onClose }) {
           <div style={{ background: 'white', padding: '8px', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
             <div style={{ fontSize: '0.7rem', color: '#6b7280', marginBottom: '4px' }}>Fear of Movement (TSK-7)</div>
             <div style={{ fontSize: '0.875rem', fontWeight: 'bold', color: getTSK7Color(patient.tsk7) }}>
-              {calculateTSK7Score(patient.tsk7)}/28
+              {calculateTSK7Score(patient.tsk7) ?? "Unavailable"}/28
             </div>
             <div style={{ fontSize: '0.6rem', color: '#6b7280', marginTop: '2px' }}>
-              {getTSK7Label(calculateTSK7Score(patient.tsk7))}
+              {calculateTSK7Score(patient.tsk7) === null ? "Not assessed" : getTSK7Label(calculateTSK7Score(patient.tsk7))}
             </div>
           </div>
         ) : (
@@ -2791,4 +2763,4 @@ function PatientModal({ patient, onClose }) {
   );
 }
 
-export default PatientModal; 
+export default PatientModal;

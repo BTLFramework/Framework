@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { RecoveryScoreWheel } from "@/components/recovery-score-wheel"
 import { ScoreBreakdownModal } from "@/components/score-breakdown-modal"
 import { useAuth } from "@/hooks/useAuth"
+import { calculateTSK7Score } from "@/lib/assessmentScores"
 
 type BreakdownItem = {
   title: string;
@@ -130,18 +131,18 @@ function ScoreBreakdownSection({ score, intakeData }: { score: number; intakeDat
         description: "Feeling comfortable with physical activity",
         points: (() => {
             if (!intakeData || !intakeData.tsk7) return 0;
-  const tskTotal = Object.values(intakeData.tsk7).reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
-  return tskTotal <= 8 ? 1 : 0; // TSK-7 threshold: ≤8 points (30% of 28)
+  const tskTotal = calculateTSK7Score(intakeData.tsk7);
+  return tskTotal !== null && tskTotal <= 8 ? 1 : 0;
         })(),
         achieved: (() => {
             if (!intakeData || !intakeData.tsk7) return false;
-  const tskTotal = Object.values(intakeData.tsk7).reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
-  return tskTotal <= 8; // TSK-7 threshold: ≤8 points (30% of 28)
+  const tskTotal = calculateTSK7Score(intakeData.tsk7);
+  return tskTotal !== null && tskTotal <= 8;
         })(),
         details: (() => {
             if (!intakeData || !intakeData.tsk7) return "Not yet assessed";
-  const tskTotal = Object.values(intakeData.tsk7).reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
-  return `Your score: ${tskTotal}/28`;
+  const tskTotal = calculateTSK7Score(intakeData.tsk7);
+  return tskTotal === null ? "Assessment data unavailable" : `Your score: ${tskTotal}/28`;
         })(),
         icon: <Zap className="w-5 h-5" />,
         category: 'movement'

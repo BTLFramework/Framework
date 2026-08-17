@@ -364,7 +364,7 @@ export default function PatientTable({
                         <div style={{ fontSize: '0.8rem', color: '#64748b', display: 'flex', gap: '8px', alignItems: 'center' }}>
                           <span>ID: {patient.id.toString().padStart(4, '0')}</span>
                           <span>•</span>
-                          <span>Confidence: {patient.confidence}%</span>
+                          <span>Confidence: {patient.confidence}/10</span>
                           {patient.painLevel && (
                             <>
                               <span>•</span>
@@ -394,7 +394,7 @@ export default function PatientTable({
                           day: 'numeric',
                           year: 'numeric'
                         })}
-                        {nextAppointment && (
+                        {nextAppointment?.date && !Number.isNaN(new Date(nextAppointment.date).getTime()) && (
                           <div style={{ marginTop: '2px' }}>
                             Next: {new Date(nextAppointment.date).toLocaleDateString('en-US', { 
                               month: 'short', 
