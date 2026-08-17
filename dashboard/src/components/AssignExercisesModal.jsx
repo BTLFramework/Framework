@@ -29,7 +29,7 @@ export default function AssignExercisesModal({ isOpen, onClose, patient, onSave 
     const currentPlan = parseTreatmentPlan(patient?.treatmentPlan);
     setSelectedIds(currentPlan.assignedExercises);
     setSummary(currentPlan.summary || `Plan for ${patient?.name || 'patient'} — focus by phase/region`);
-  }, [isOpen, patient]);
+  }, [isOpen, patient?.id, patient?.name, patient?.treatmentPlan]);
 
   const regions = useMemo(() => {
     const set = new Set(exercises.map(e => e.region).filter(Boolean));
@@ -138,4 +138,3 @@ export default function AssignExercisesModal({ isOpen, onClose, patient, onSave 
     </div>
   );
 }
-
