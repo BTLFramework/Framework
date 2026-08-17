@@ -82,11 +82,15 @@ export async function GET(
           const dailyResult = await dailyResponse.json();
           const dailyData = dailyResult?.data ?? dailyResult;
 
-          if (typeof dailyData?.pain === 'number') {
+          if (
+            dailyResult?.success === true &&
+            dailyData?.source === 'daily-assessment' &&
+            typeof dailyData?.pain === 'number'
+          ) {
             pain = Math.round((dailyData.pain / 100) * 10);
-          }
-          if (typeof dailyData?.psychLoad === 'number') {
-            stress = Math.round((dailyData.psychLoad / 100) * 10);
+            if (typeof dailyData?.stress === 'number') {
+              stress = Math.round((dailyData.stress / 100) * 10);
+            }
           }
         }
 

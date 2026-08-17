@@ -45,6 +45,11 @@ const PatientRecoveryDashboard: React.FC = () => {
     stress: number | null
     risk: string | null
   }>({ pain: null, stress: null, risk: null })
+  const [currentClinical, setCurrentClinical] = useState<{
+    srsScore: number | null
+    phase: string | null
+    region: string | null
+  }>({ srsScore: null, phase: null, region: null })
   const [amyIntakeData, setAmyIntakeData] = useState<any>(null) // Store Amy's real intake data
   const [loading, setLoading] = useState(true) // New state for loading
   const [debugToolkit, setDebugToolkit] = useState(false)
@@ -71,6 +76,11 @@ const PatientRecoveryDashboard: React.FC = () => {
       const newSnapshot = result.snapshot ?? { pain: null, stress: null, risk: null }
 
       setCurrentSnapshot(newSnapshot)
+      setCurrentClinical(result.clinical ?? {
+        srsScore: null,
+        phase: null,
+        region: null,
+      })
       console.log('📊 Updated recovery snapshot:', newSnapshot)
 
     } catch (error) {
@@ -527,6 +537,7 @@ const PatientRecoveryDashboard: React.FC = () => {
             }}
             onTaskComplete={handleTaskComplete}
             snapshot={currentSnapshot}
+            clinical={currentClinical}
             painDelta={0}
             stressDelta={0}
             showActionPrompt={false}

@@ -388,7 +388,25 @@ router.get("/daily-data/:email", async (req: any, res: any) => {
       return res.status(404).json({ error: "Patient not found" });
     }
     
-    // Get latest daily assessment
+    // SRSDaily is also populated by the initial intake. Confirm that the
+    // patient actually completed the Pain & Stress task before presenting an
+    // SRSDaily row as a daily check-in.
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const dailyAssessmentCompletion = await prisma.taskCompletion.findFirst({
+      where: {
+        patientId: patient.id,
+        taskType: 'PAIN_ASSESSMENT',
+        completedAt: { gte: today, lt: tomorrow }
+      },
+      orderBy: { completedAt: 'desc' }
+    });
+
+    // Get latest SRS daily row. Without the completion marker this is an
+    // intake-derived clinical row, not a patient-entered daily assessment.
     const latestDaily = await prisma.sRSDaily.findFirst({
       where: { patientId: patient.id },
       orderBy: { date: 'desc' }
@@ -400,6 +418,33 @@ router.get("/daily-data/:email", async (req: any, res: any) => {
         message: 'No daily assessment data found'
       });
     }
+
+    if (!dailyAssessmentCompletion) {
+      return res.json({
+        success: false,
+        message: 'No completed daily assessment found'
+      });
+    }
+
+    // Daily submissions store psychLoad as the average of stress and PCS-4.
+    // Recover the patient's entered stress value so the portal does not label
+    // the combined psychological-load metric as "Stress Level".
+    const latestSRS = await prisma.sRSScore.findFirst({
+      where: { patientId: patient.id },
+      orderBy: { date: 'desc' }
+    });
+    const pcs4Data = latestSRS?.pcs4 as any;
+    let pcs4Total = 0;
+    if (pcs4Data && typeof pcs4Data === 'object') {
+      for (let i = 1; i <= 4; i++) {
+        if (typeof pcs4Data[i] === 'number') pcs4Total += pcs4Data[i];
+      }
+    }
+    const pcs4Normalized = Math.min(100, (pcs4Total / 16) * 100);
+    const stressNormalized = Math.max(
+      0,
+      Math.min(100, (latestDaily.psychLoad * 2) - pcs4Normalized)
+    );
     
     console.log('✅ Latest daily data found:', latestDaily);
     
@@ -410,9 +455,11 @@ router.get("/daily-data/:email", async (req: any, res: any) => {
         patientId: latestDaily.patientId,
         date: latestDaily.date,
         pain: latestDaily.pain,
+        stress: stressNormalized,
         function: latestDaily.function,
         psychLoad: latestDaily.psychLoad,
-        fa: latestDaily.fa
+        fa: latestDaily.fa,
+        source: 'daily-assessment'
       }
     });
     
