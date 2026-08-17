@@ -225,7 +225,7 @@ export default function RecoveryPointsPage() {
     {
       icon: Zap,
       title: "Daily Streak",
-      description: `${weeklyStats.streak} days`,
+      description: `${weeklyStats.streak} ${weeklyStats.streak === 1 ? "day" : "days"}`,
       points: weeklyStats.streak >= 7 ? 5 : weeklyStats.streak >= 3 ? 3 : weeklyStats.streak >= 1 ? 1 : 0,
       badgeClass: weeklyStats.streak >= 7 ? "badge-gold" : weeklyStats.streak >= 3 ? "badge-silver" : weeklyStats.streak >= 1 ? "badge-bronze" : "badge-none",
       iconColor: "#B8860B",

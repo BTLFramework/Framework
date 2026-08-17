@@ -222,7 +222,7 @@ export function WeeklyPointsSection({ patientEmail, refreshKey }: WeeklyPointsSe
     {
       icon: Flame,
       title: "Daily Streak",
-      description: `${weeklyData.streakDays} days`,
+      description: `${weeklyData.streakDays} ${weeklyData.streakDays === 1 ? "day" : "days"}`,
       points: weeklyData.streakDays >= 7 ? 5 : weeklyData.streakDays >= 3 ? 3 : weeklyData.streakDays >= 1 ? 1 : 0,
       badgeClass: weeklyData.streakDays >= 7 ? "badge-gold" : weeklyData.streakDays >= 3 ? "badge-silver" : weeklyData.streakDays >= 1 ? "badge-bronze" : "badge-none",
       iconColor: metallicGold,
