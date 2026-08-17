@@ -1,6 +1,6 @@
 import test from "node:test"
 import assert from "node:assert/strict"
-import { calculatePCS4Score, calculateTSK7Score, pluralizeDay } from "../src/helpers/assessmentScores.js"
+import { calculatePCS4Score, calculateTSK7Score, parseTreatmentPlan, pluralizeDay } from "../src/helpers/assessmentScores.js"
 
 test("PCS-4 uses its documented 0-16 range", () => {
   assert.equal(calculatePCS4Score({ 1: 1, 2: 0, 3: 2, 4: 1 }), 4)
@@ -19,4 +19,10 @@ test("incomplete TSK-7 data remains unavailable", () => {
 test("day label is grammatically correct", () => {
   assert.equal(pluralizeDay(1), "1 day")
   assert.equal(pluralizeDay(2), "2 days")
+})
+
+test("existing manual treatment plans retain their selected exercises", () => {
+  const parsed = parseTreatmentPlan(JSON.stringify({ summary: "Shoulder plan", assignedExercises: ["a", "b"] }))
+  assert.deepEqual(parsed, { summary: "Shoulder plan", assignedExercises: ["a", "b"] })
+  assert.deepEqual(parseTreatmentPlan("Legacy plan"), { summary: "Legacy plan", assignedExercises: [] })
 })

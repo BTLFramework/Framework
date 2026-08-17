@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { API_URL } from '../config/api';
+import { parseTreatmentPlan } from '../helpers/assessmentScores';
 
 export default function AssignExercisesModal({ isOpen, onClose, patient, onSave }) {
   const [loading, setLoading] = useState(false);
@@ -25,7 +26,9 @@ export default function AssignExercisesModal({ isOpen, onClose, patient, onSave 
 
   useEffect(() => {
     if (!isOpen) return;
-    setSummary(`Plan for ${patient?.name || 'patient'} — focus by phase/region`);
+    const currentPlan = parseTreatmentPlan(patient?.treatmentPlan);
+    setSelectedIds(currentPlan.assignedExercises);
+    setSummary(currentPlan.summary || `Plan for ${patient?.name || 'patient'} — focus by phase/region`);
   }, [isOpen, patient]);
 
   const regions = useMemo(() => {
@@ -135,5 +138,4 @@ export default function AssignExercisesModal({ isOpen, onClose, patient, onSave 
     </div>
   );
 }
-
 

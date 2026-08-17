@@ -23,3 +23,18 @@ export const calculateTSK7Score = (responses) => {
 }
 
 export const pluralizeDay = (count) => `${count} ${count === 1 ? "day" : "days"}`
+
+export const parseTreatmentPlan = (treatmentPlan) => {
+  if (!treatmentPlan) return { summary: "", assignedExercises: [] }
+  if (typeof treatmentPlan === "object") {
+    return {
+      summary: typeof treatmentPlan.summary === "string" ? treatmentPlan.summary : "",
+      assignedExercises: Array.isArray(treatmentPlan.assignedExercises) ? treatmentPlan.assignedExercises : [],
+    }
+  }
+  try {
+    return parseTreatmentPlan(JSON.parse(treatmentPlan))
+  } catch {
+    return { summary: String(treatmentPlan), assignedExercises: [] }
+  }
+}
