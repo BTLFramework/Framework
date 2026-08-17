@@ -24,6 +24,24 @@ export const calculateTSK7Score = (responses) => {
 
 export const pluralizeDay = (count) => `${count} ${count === 1 ? "day" : "days"}`
 
+export const parseClinicalDate = (value) => {
+  if (!value) return null
+  const text = String(value)
+  const dateOnly = text.match(/^(\d{4})-(\d{2})-(\d{2})(?:T00:00:00(?:\.000)?Z)?$/)
+  const parsed = dateOnly
+    ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]))
+    : new Date(value)
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
+export const calendarDaysSince = (value, now = new Date()) => {
+  const parsed = parseClinicalDate(value)
+  if (!parsed) return null
+  const start = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate())
+  const end = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  return Math.max(0, Math.round((end - start) / 86400000))
+}
+
 export const parseTreatmentPlan = (treatmentPlan) => {
   if (!treatmentPlan) return { summary: "", assignedExercises: [] }
   if (typeof treatmentPlan === "object") {

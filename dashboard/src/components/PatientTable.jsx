@@ -1,6 +1,7 @@
 import React from "react";
 import { format } from "date-fns";
 import SRSDisplay from "./SRSDisplay";
+import { calendarDaysSince, parseClinicalDate } from "../helpers/assessmentScores";
 
 export default function PatientTable({
   patients,
@@ -131,10 +132,7 @@ export default function PatientTable({
     }
   };
 
-  const getDaysSinceLastContact = (lastUpdate) => {
-    const days = Math.floor((new Date() - new Date(lastUpdate)) / (1000 * 60 * 60 * 24));
-    return days;
-  };
+  const getDaysSinceLastContact = (lastUpdate) => calendarDaysSince(lastUpdate);
 
   const handleSelectPatient = (patientId, isSelected) => {
     if (isSelected) {
@@ -499,15 +497,16 @@ export default function PatientTable({
                   >
                     <div>
                       <div style={{ fontSize: '0.9rem', color: '#1e293b', fontWeight: 600 }}>
-                        {daysSinceContact === 0 ? 'Today' : 
+                        {daysSinceContact == null ? 'No contact date' :
+                         daysSinceContact === 0 ? 'Today' :
                          daysSinceContact === 1 ? 'Yesterday' : 
                          `${daysSinceContact} days ago`}
                       </div>
                       <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                        {new Date(patient.lastUpdate).toLocaleDateString('en-US', { 
+                        {parseClinicalDate(patient.lastUpdate)?.toLocaleDateString('en-US', {
                           month: 'short', 
                           day: 'numeric' 
-                        })}
+                        }) || 'N/A'}
                       </div>
                     </div>
                   </td>

@@ -1,6 +1,6 @@
 import test from "node:test"
 import assert from "node:assert/strict"
-import { calculatePCS4Score, calculateTSK7Score, parseTreatmentPlan, pluralizeDay } from "../src/helpers/assessmentScores.js"
+import { calculatePCS4Score, calculateTSK7Score, calendarDaysSince, parseClinicalDate, parseTreatmentPlan, pluralizeDay } from "../src/helpers/assessmentScores.js"
 
 test("PCS-4 uses its documented 0-16 range", () => {
   assert.equal(calculatePCS4Score({ 1: 1, 2: 0, 3: 2, 4: 1 }), 4)
@@ -25,4 +25,13 @@ test("existing manual treatment plans retain their selected exercises", () => {
   const parsed = parseTreatmentPlan(JSON.stringify({ summary: "Shoulder plan", assignedExercises: ["a", "b"] }))
   assert.deepEqual(parsed, { summary: "Shoulder plan", assignedExercises: ["a", "b"] })
   assert.deepEqual(parseTreatmentPlan("Legacy plan"), { summary: "Legacy plan", assignedExercises: [] })
+})
+
+test("date-only clinical records do not shift to the previous day", () => {
+  const parsed = parseClinicalDate("2026-08-16T00:00:00.000Z")
+  assert.deepEqual(
+    [parsed.getFullYear(), parsed.getMonth() + 1, parsed.getDate()],
+    [2026, 8, 16],
+  )
+  assert.equal(calendarDaysSince("2026-08-16T00:00:00.000Z", new Date(2026, 7, 17, 23, 30)), 1)
 })
