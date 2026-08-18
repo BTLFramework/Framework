@@ -1,0 +1,58 @@
+{
+  "type": "form",
+  "title": "Map Your Recovery Signals",
+  "subtitle": "Turn this week's ideas into information you can use.",
+  "description": "There are no right or wrong answers. Notice what tends to increase concern and what helps you feel more confident, supported, or able to participate.",
+  "sections": [
+    {
+      "title": "What increases concern?",
+      "description": "Think about situations—not just symptoms—that can make recovery feel harder.",
+      "fields": [
+        {
+          "type": "checkbox",
+          "label": "Which factors have mattered recently?",
+          "options": [
+            "Poor or disrupted sleep",
+            "A stressful day",
+            "Uncertainty about what symptoms mean",
+            "Doing much more than usual",
+            "Avoiding activity because it feels unsafe",
+            "Feeling unsupported or rushed"
+          ]
+        },
+        {
+          "type": "textarea",
+          "label": "What else tends to increase concern or make symptoms harder to manage?",
+          "placeholder": "Describe a situation, thought, sensation, or pattern you have noticed...",
+          "rows": 3
+        }
+      ]
+    },
+    {
+      "title": "What builds confidence?",
+      "description": "Identify resources that help you feel safer or more capable—not necessarily symptom-free.",
+      "fields": [
+        {
+          "type": "checkbox",
+          "label": "Which could support you?",
+          "options": [
+            "Understanding what is happening",
+            "A manageable movement or exercise",
+            "A clear plan",
+            "Rest or a change of pace",
+            "Support from someone I trust",
+            "Remembering progress I have already made"
+          ]
+        },
+        {
+          "type": "textarea",
+          "label": "What is one confidence-building action you can try this week?",
+          "placeholder": "Choose something small and realistic...",
+          "rows": 3
+        }
+      ]
+    }
+  ],
+  "submitText": "Save My Recovery Signals",
+  "successMessage": "Your recovery signals map is complete. Use it as a starting point—not a fixed rule—and update it as you learn more."
+}

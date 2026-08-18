@@ -1,47 +1,47 @@
 {
   "timeMinutes": 2,
   "level": "Beginner",
-  "why": "Gentle movement helps reduce pain sensitivity and keeps tissues mobile without overloading.",
+  "why": "Appropriately dosed movement can support function, confidence, and recovery.",
   "slides": [
     {
       "id": 1,
       "title": "Motion is Lotion",
-      "content": "Gentle movement helps reduce pain sensitivity and keeps tissues mobile without overloading",
+      "content": "Movement is one recovery tool. The useful type and dose depend on you, your goals, and your current capacity.",
       "backgroundColor": "#f0f9ff",
       "textColor": "#075985"
     },
     {
       "id": 2,
       "title": "Why It Works",
-      "content": "Movement increases circulation, reduces stiffness, and can calm the nervous system's pain response",
+      "content": "Movement can support strength, mobility, confidence, and participation. It may also change pain or stiffness for some people.",
       "backgroundColor": "#e0f2fe",
       "textColor": "#0c4a6e"
     },
     {
       "id": 3,
       "title": "Gentle Movement",
-      "content": "Start slow and small; pain-free range only; focus on quality over quantity; listen to your body",
+      "content": "Start with a manageable dose. Some symptoms during or after activity do not automatically mean harm; use your plan and response over time to guide progression.",
       "backgroundColor": "#bae6fd",
       "textColor": "#075985"
     },
     {
       "id": 4,
       "title": "Evidence Base",
-      "content": "Research shows that gentle movement can reduce pain sensitivity and improve function in chronic pain conditions",
+      "content": "Exercise and physical activity can improve pain and function across many musculoskeletal conditions, but the best approach is individualized.",
       "backgroundColor": "#7dd3fc",
       "textColor": "#0c4a6e"
     },
     {
       "id": 6,
-      "title": "Myth vs Fact",
-      "content": "Myth: Movement makes pain worse. Fact: Gentle movement often reduces pain and stiffness.",
+      "title": "Symptoms Are Information",
+      "content": "A symptom response is information—not an automatic damage report. Consider its intensity, duration, trend, and effect on function.",
       "backgroundColor": "#38bdf8",
       "textColor": "#075985"
     },
     {
       "id": 5,
       "title": "Try this today",
-      "content": "5 minutes of gentle movement every hour; walking, stretching, or simple range of motion exercises",
+      "content": "Choose one manageable activity that fits your plan. Notice how you feel during it, shortly afterward, and later that day.",
       "backgroundColor": "#eff6ff",
       "textColor": "#1e40af",
       "resourceLink": "https://www.arthritis.ca/treatment/physical-activity-guide/",

@@ -1,0 +1,46 @@
+{
+  "timeMinutes": 3,
+  "level": "Beginner",
+  "why": "Stress is one of several factors that can influence pain, sleep, energy, and recovery behaviours.",
+  "slides": [
+    {
+      "id": 1,
+      "title": "Stress Is a Normal Response",
+      "content": "Your stress system helps you respond to challenge. Stress is not automatically harmful, and having stress does not mean you are failing at recovery.",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#075985"
+    },
+    {
+      "id": 2,
+      "title": "When Stress Stays High",
+      "content": "Ongoing stress can affect sleep, mood, attention, muscle tension, pain sensitivity, and the energy available for helpful routines.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#0c4a6e"
+    },
+    {
+      "id": 3,
+      "title": "Where Cortisol Fits",
+      "content": "Cortisol is one part of a complex stress response. It changes naturally across the day and is not a simple scorecard for whether your body is healing.",
+      "backgroundColor": "#bae6fd",
+      "textColor": "#075985"
+    },
+    {
+      "id": 4,
+      "title": "Look at the Whole Picture",
+      "content": "Symptoms and recovery are influenced by many interacting factors. Stress may matter without being the only cause or the only thing to address.",
+      "backgroundColor": "#7dd3fc",
+      "textColor": "#0c4a6e"
+    },
+    {
+      "id": 5,
+      "title": "Try One Manageable Step",
+      "content": "Choose one option that fits today: a slower breath, brief movement, a short break, a conversation, or support from your care team.",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}

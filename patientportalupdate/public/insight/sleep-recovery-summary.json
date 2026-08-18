@@ -1,47 +1,47 @@
 {
   "timeMinutes": 2,
   "level": "Beginner",
-  "why": "Better sleep reduces pain sensitivity and speeds tissue repair.",
+  "why": "Sleep can influence pain sensitivity, energy, mood, and your ability to participate in recovery.",
   "slides": [
     {
       "id": 1,
       "title": "Sleep & Healing",
-      "content": "Quality sleep is when your body does most of its tissue repair and recovery work",
+      "content": "Sleep supports many recovery processes and can affect how sensitive, rested, and capable you feel the next day.",
       "backgroundColor": "#dbeafe",
       "textColor": "#1e3a8a"
     },
     {
       "id": 2,
-      "title": "7-9 Hours Target",
-      "content": "Most adults need 7-9 hours of quality sleep for optimal recovery and pain management",
+      "title": "Make Room for Sleep",
+      "content": "Most adults are advised to get at least 7 hours regularly, although individual needs and circumstances vary.",
       "backgroundColor": "#bfdbfe",
       "textColor": "#1e40af"
     },
     {
       "id": 3,
       "title": "Sleep Hygiene Basics",
-      "content": "Consistent schedule, cool dark room, no screens before bed, and limiting caffeine after 2pm",
+      "content": "A reasonably consistent schedule, a comfortable environment, and a wind-down routine can support sleep. Choose changes that are realistic for you.",
       "backgroundColor": "#93c5fd",
       "textColor": "#1e40af"
     },
     {
       "id": 4,
-      "title": "Sleep Architecture",
-      "content": "Deep sleep and REM cycles are crucial for tissue repair and memory consolidation during recovery.",
+      "title": "Sleep Is More Than Hours",
+      "content": "Timing, regularity, continuity, and how rested you feel can all matter—not only the number on the clock.",
       "backgroundColor": "#e0f2fe",
       "textColor": "#075985"
     },
     {
       "id": 6,
-      "title": "Myth vs Fact",
-      "content": "Myth: You can catch up on weekends. Fact: Irregular patterns still impair recovery.",
+      "title": "Avoid the Perfect-Sleep Trap",
+      "content": "One difficult night does not ruin recovery. Look for patterns over time and focus on changes you can sustain.",
       "backgroundColor": "#dbeafe",
       "textColor": "#1e40af"
     },
     {
       "id": 5,
       "title": "Try this tonight",
-      "content": "Dim lights 60 minutes pre‑bed and park your phone outside the bedroom.",
+      "content": "Choose one experiment tonight: dim the lights, reduce stimulating content, or give yourself a consistent wind-down period. Notice what helps.",
       "backgroundColor": "#eff6ff",
       "textColor": "#1e40af",
       "resourceLink": "https://www.nhsinform.scot/illnesses-and-conditions/mental-health/mental-health-self-help-guides/sleep-problems-and-insomnia-self-help-guide/",
@@ -53,4 +53,3 @@
   "showDots": true,
   "showArrows": true
 }
-

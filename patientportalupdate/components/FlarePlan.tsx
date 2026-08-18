@@ -127,10 +127,11 @@ ${formData.immediateActions.filter(a => a.trim()).map((action, i) => `${i + 1}. 
 📋 FOLLOW-UP ACTIONS (10-30 min):
 ${formData.followUpActions.filter(a => a.trim()).map((action, i) => `${i + 1}. ${action}`).join('\n')}
 
-📞 EMERGENCY CONTACT:
+📞 SUPPORT CONTACT:
 ${formData.emergencyContact || 'Your healthcare provider'}
 
-🚨 CALL IF INTENSITY ≥ ${formData.intensityThreshold}/10
+CHECK-IN THRESHOLD: ${formData.intensityThreshold}/10
+Follow your clinician's advice and seek urgent care for new or concerning symptoms.
     `;
     
     const blob = new Blob([cardContent], { type: 'text/plain' });
@@ -225,10 +226,10 @@ ${formData.emergencyContact || 'Your healthcare provider'}
                 </div>
 
                 <div className="bg-gradient-to-br from-btl-50 to-white border-2 border-btl-200 rounded-2xl p-6 shadow-sm">
-                  <h3 className="text-lg font-bold text-btl-900 mb-4">Safety Threshold</h3>
+                  <h3 className="text-lg font-bold text-btl-900 mb-4">Personal Check-In Threshold</h3>
                   <div className="bg-white border border-btl-200 rounded-xl p-4">
                     <p className="text-btl-800 font-medium">
-                      Call healthcare provider if intensity ≥ <span className="text-red-600 font-bold">{formData.intensityThreshold}/10</span>
+                      If symptoms reach <span className="text-red-600 font-bold">{formData.intensityThreshold}/10</span>, pause and use your plan. Contact your provider if symptoms are new, concerning, or not settling as expected.
                     </p>
                   </div>
                 </div>
@@ -237,7 +238,7 @@ ${formData.emergencyContact || 'Your healthcare provider'}
                   <div className="bg-gradient-to-br from-btl-50 to-white border-2 border-btl-200 rounded-2xl p-6 shadow-sm">
                     <div className="flex items-center gap-3 mb-4">
                       <Phone className="w-5 h-5 text-btl-600" />
-                      <h3 className="text-lg font-bold text-btl-900">Emergency Contact</h3>
+                      <h3 className="text-lg font-bold text-btl-900">Support Contact</h3>
                     </div>
                     <p className="text-btl-800 bg-white border border-btl-200 rounded-xl p-4">
                       {formData.emergencyContact}
@@ -471,8 +472,8 @@ ${formData.emergencyContact || 'Your healthcare provider'}
 
               {/* Intensity Threshold */}
               <div className="space-y-4 mb-6">
-                <h4 className="text-lg font-semibold text-btl-900">Flare Intensity Threshold</h4>
-                <p className="text-btl-700">At what pain/intensity level should you seek professional help?</p>
+                <h4 className="text-lg font-semibold text-btl-900">Personal Check-In Threshold</h4>
+                <p className="text-btl-700">At what symptom level will you pause, check your plan, and decide what support you need?</p>
                 <div className="bg-white border border-btl-200 rounded-xl p-6">
                   <div className="flex items-center gap-4 mb-3">
                     <input
@@ -490,14 +491,14 @@ ${formData.emergencyContact || 'Your healthcare provider'}
                     </span>
                   </div>
                   <p className="text-sm text-btl-700">
-                    If intensity ≥ <span className="font-bold text-red-600">{formData.intensityThreshold}/10</span> or symptoms change suddenly, call your healthcare provider
+                    Use <span className="font-bold text-red-600">{formData.intensityThreshold}/10</span> as a personal cue—not as a diagnosis. Follow your clinician's advice and seek urgent care for new or concerning symptoms.
                   </p>
                 </div>
               </div>
 
-              {/* Emergency Contact */}
+              {/* Support Contact */}
               <div className="space-y-3 mb-6">
-                <h4 className="text-lg font-semibold text-btl-900">Emergency Contact (Optional)</h4>
+                <h4 className="text-lg font-semibold text-btl-900">Support Contact (Optional)</h4>
                 <Input
                   id="emergency-contact"
                   name="emergency-contact"
@@ -556,4 +557,4 @@ ${formData.emergencyContact || 'Your healthcare provider'}
       </div>
     </div>
   );
-} 
+}

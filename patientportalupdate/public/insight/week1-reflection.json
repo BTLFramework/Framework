@@ -1,0 +1,74 @@
+{
+  "type": "form",
+  "title": "Week 1 Check-In",
+  "subtitle": "Notice what you learned, what you tried, and what your recovery needs next.",
+  "description": "This is a reflection, not a test. Honest answers help you and your practitioner focus on what matters.",
+  "sections": [
+    {
+      "title": "What stood out?",
+      "description": "Review the main ideas from your first week.",
+      "fields": [
+        {
+          "type": "checkbox",
+          "label": "Which topics felt most relevant?",
+          "options": [
+            "Factors that can increase or decrease protection",
+            "Stress and recovery",
+            "Sleep and pain sensitivity",
+            "My own recovery signals",
+            "Finding a manageable movement dose",
+            "Having a plan for symptom flare-ups"
+          ]
+        },
+        {
+          "type": "textarea",
+          "label": "What is one idea you understand differently now?",
+          "placeholder": "In your own words...",
+          "rows": 3
+        }
+      ]
+    },
+    {
+      "title": "What did you notice?",
+      "description": "Look for patterns without judging yourself or forcing one explanation.",
+      "fields": [
+        {
+          "type": "textarea",
+          "label": "What seemed to help you participate in recovery this week?",
+          "placeholder": "Consider sleep, stress, movement, support, understanding, pacing, or anything else...",
+          "rows": 3
+        },
+        {
+          "type": "textarea",
+          "label": "What made participation more difficult?",
+          "placeholder": "What got in the way?",
+          "rows": 3
+        }
+      ]
+    },
+    {
+      "title": "Choose one next step",
+      "description": "Keep it specific and manageable.",
+      "fields": [
+        {
+          "type": "text",
+          "label": "One action I will try next week:",
+          "placeholder": "For example: take a short walk after lunch three times..."
+        },
+        {
+          "type": "text",
+          "label": "What would make that action easier?",
+          "placeholder": "A reminder, support, a smaller starting point, a clearer plan..."
+        },
+        {
+          "type": "textarea",
+          "label": "Is there anything you want your practitioner to know?",
+          "placeholder": "Questions, concerns, wins, or barriers...",
+          "rows": 3
+        }
+      ]
+    }
+  ],
+  "submitText": "Complete Week 1 Check-In",
+  "successMessage": "Week 1 complete. Your observations help turn education into a recovery plan that fits you."
+}

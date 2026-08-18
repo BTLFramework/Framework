@@ -19,38 +19,38 @@ export interface QuizQuestion {
 }
 
 export const insightLibrary: Insight[] = [
-  // --- Week 1 (Keep existing Week 1 content) ---
+  // --- Week 1: Understand, notice, and participate ---
   {
     id: 21,
     week: 1,
     track: "PainScience",
-    title: "Danger vs. safety signals",
-    subtitle: "How your brain turns pain up or down",
-    assetPath: "/insight/ps-danger.mp4",
-    quizQ: "Which best describes a safety signal?",
-    quizA: "Trusted movement pattern",
+    title: "What can influence pain?",
+    subtitle: "How context, protection, and safety can change your experience",
+    assetPath: "/insight/pain-influences-week1-summary.json",
+    quizQ: "Which can help create a sense of safety during recovery?",
+    quizA: "A manageable movement you feel confident doing",
     releaseOffset: 0,
     points: 5,
     questions: [
       {
-        question: "Which best describes a safety signal?",
+        question: "Which can help create a sense of safety during recovery?",
         options: [
-          "A movement that always causes pain",
-          "A trusted movement pattern that feels safe",
+          "A movement you must complete despite severe symptoms",
+          "A manageable movement you feel confident doing",
           "Any exercise that makes you sweat",
-          "A movement that requires maximum effort"
+          "Avoiding every activity that feels uncertain"
         ],
         correctAnswer: 1
       },
       {
-        question: "What happens when your brain perceives a movement as dangerous?",
+        question: "Which statement best describes pain?",
         options: [
-          "Pain signals are turned down",
-          "Pain signals are amplified",
-          "Nothing changes",
-          "Movement becomes easier"
+          "Pain always measures the amount of tissue damage",
+          "Pain is imaginary when scans are normal",
+          "Pain is a real protective experience influenced by many factors",
+          "Pain should always be ignored"
         ],
-        correctAnswer: 1
+        correctAnswer: 2
       }
     ]
   },
@@ -58,26 +58,26 @@ export const insightLibrary: Insight[] = [
     id: 22,
     week: 1,
     track: "StressMood",
-    title: "How cortisol slows healing",
-    subtitle: "Stress and tissue repair",
-    assetPath: "/insight/cortisol.json",
-    quizQ: "High cortisol can slow tissue repair. (T/F)",
+    title: "Stress and recovery",
+    subtitle: "Why stress deserves attention without becoming another threat",
+    assetPath: "/insight/stress-recovery-summary.json",
+    quizQ: "Stress can influence recovery, but it is only one part of the picture. (T/F)",
     quizA: "T",
     releaseOffset: 1,
     points: 5,
     questions: [
       {
-        question: "High cortisol levels can slow tissue repair. (True/False)",
+        question: "Stress can influence sleep, pain, mood, and recovery, but it is only one part of the picture. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
       {
-        question: "Which of the following is NOT a way to reduce cortisol?",
+        question: "Which is the most useful response to a stressful recovery day?",
         options: [
-          "Deep breathing exercises",
-          "Regular exercise",
-          "Chronic stress",
-          "Adequate sleep"
+          "Blame yourself for slowing your healing",
+          "Stop all activity until stress disappears",
+          "Choose one manageable action such as breathing, movement, rest, or support",
+          "Assume stress is the only cause of your symptoms"
         ],
         correctAnswer: 2
       }
@@ -87,26 +87,26 @@ export const insightLibrary: Insight[] = [
     id: 23,
     week: 1,
     track: "Lifestyle",
-    title: "Sleep debt + pain sensitivity",
-    subtitle: "Less sleep, louder pain",
+    title: "Sleep and pain sensitivity",
+    subtitle: "How sleep can influence pain, energy, and recovery",
     assetPath: "/insight/sleep-recovery-summary.json",
-    quizQ: "Sleeping < 6 h raises pain sensitivity by about 20 %. (T/F)",
+    quizQ: "Poor sleep can increase pain sensitivity for some people. (T/F)",
     quizA: "T",
     releaseOffset: 2,
     points: 5,
     questions: [
       {
-        question: "Sleeping < 6 h raises pain sensitivity by about 20 %. (True/False)",
+        question: "Poor or insufficient sleep can increase pain sensitivity for some people. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
       {
-        question: "What is the most effective way to combat sleep debt?",
+        question: "Which sleep goal is generally most helpful?",
         options: [
-          "Catching up on sleep",
-          "Reducing caffeine intake",
-          "Increasing exercise",
-          "Eating a large meal"
+          "A consistent routine with enough opportunity for sleep",
+          "Changing your bedtime dramatically every night",
+          "Trying to force perfect sleep",
+          "Relying only on weekend catch-up sleep"
         ],
         correctAnswer: 0
       }
@@ -115,38 +115,21 @@ export const insightLibrary: Insight[] = [
   {
     id: 24,
     week: 1,
-    track: "SuccessStory",
-    title: "Jess's 2-week back-to-run win",
-    subtitle: "Real patient clip",
-    assetPath: "/insight/jess-success.mp4",
-    quizQ: "Jess cut her pain from 7/10 to 2/10 after 2 weeks. (T/F)",
-    quizA: "T",
+    track: "SelfEfficacy",
+    title: "Map your recovery signals",
+    subtitle: "Notice what increases concern and what builds confidence",
+    assetPath: "/insight/recovery-signals-week1.json",
+    quizQ: "Complete your recovery signals map.",
+    quizA: "(user input)",
     releaseOffset: 3,
-    points: 5,
-    questions: [
-      {
-        question: "Jess cut her pain from 7/10 to 2/10 after 2 weeks. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0
-      },
-      {
-        question: "What was the primary factor in Jess's successful pain reduction?",
-        options: [
-          "Medication",
-          "Physical therapy",
-          "Mindfulness",
-          "Diet"
-        ],
-        correctAnswer: 1
-      }
-    ]
+    points: 5
   },
   {
     id: 25,
     week: 1,
     track: "PainScience",
-    title: "Motion is Lotion",
-    subtitle: "Gentle movement can quiet pain",
+    title: "Movement as a recovery tool",
+    subtitle: "Find a manageable dose and build from there",
     assetPath: "/insight/motion-lotion-summary.json", // Summary card with movement science content
     quizQ: "Gentle movement can help reduce pain sensitivity. (T/F)",
     quizA: "T",
@@ -159,14 +142,14 @@ export const insightLibrary: Insight[] = [
         correctAnswer: 0
       },
       {
-        question: "Which of the following is NOT a recommended pain-reducing movement?",
+        question: "Which is the best starting point for movement during recovery?",
         options: [
-          "Stretching",
-          "Yoga",
-          "Heavy lifting",
-          "Walking"
+          "The same exercise and dose for every person",
+          "A manageable activity matched to your current ability and plan",
+          "Only movement that produces absolutely no sensation",
+          "Maximum effort to test whether you are healed"
         ],
-        correctAnswer: 2
+        correctAnswer: 1
       }
     ]
   },
@@ -174,69 +157,25 @@ export const insightLibrary: Insight[] = [
     id: 28,
     week: 1,
     track: "SelfEfficacy",
-    title: "Flare Up Plan",
-    subtitle: "Build your personalized flare up plan to stay in control when symptoms spike.",
+    title: "Build your flare-up plan",
+    subtitle: "Prepare flexible steps for a temporary increase in symptoms.",
     assetPath: "FORM:flare-up-plan",
-    quizQ: "What is one thing you can do to calm a flare?",
+    quizQ: "Complete your personalized flare-up plan.",
     quizA: "(user input)",
     releaseOffset: 5,
-    points: 5,
-    questions: [
-      {
-        question: "What is one thing you can do to calm a flare?",
-        options: [
-          "Take a hot bath",
-          "Watch TV",
-          "Go for a walk",
-          "Eat a large meal"
-        ],
-        correctAnswer: 2
-      },
-      {
-        question: "Which of the following is NOT a recommended self-soothing technique?",
-        options: [
-          "Mindfulness meditation",
-          "Distraction",
-          "Self-criticism",
-          "Deep breathing"
-        ],
-        correctAnswer: 2
-      }
-    ]
+    points: 5
   },
   {
     id: 29,
     week: 1,
     track: "Recap",
-    title: "Weekly Insight Recap & reflection",
-    subtitle: "Reflect on your week",
-    assetPath: "/insight/recap-week1.json",
-    quizQ: "What was your biggest learning this week?",
+    title: "Week 1 check-in",
+    subtitle: "Connect this week's learning to your own recovery",
+    assetPath: "/insight/week1-reflection.json",
+    quizQ: "Complete your Week 1 check-in.",
     quizA: "(user input)",
     releaseOffset: 6,
-    points: 5,
-    questions: [
-      {
-        question: "What was your biggest learning this week?",
-        options: [
-          "Mindfulness meditation",
-          "Distraction",
-          "Self-criticism",
-          "Deep breathing"
-        ],
-        correctAnswer: 0
-      },
-      {
-        question: "Which of the following is NOT a recommended self-soothing technique?",
-        options: [
-          "Mindfulness meditation",
-          "Distraction",
-          "Self-criticism",
-          "Deep breathing"
-        ],
-        correctAnswer: 2
-      }
-    ]
+    points: 5
   },
 
   // ========= WEEK 2 - UPDATED WITH REAL RESOURCES =========

@@ -1,0 +1,46 @@
+{
+  "timeMinutes": 3,
+  "level": "Beginner",
+  "why": "Pain is real and protective, but its intensity is not a precise measure of tissue damage.",
+  "slides": [
+    {
+      "id": 1,
+      "title": "Pain Has a Protective Purpose",
+      "content": "Pain is a real experience designed to protect you. It can be influenced by information from your body as well as context, expectations, past experiences, sleep, stress, and perceived safety.",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#075985"
+    },
+    {
+      "id": 2,
+      "title": "Pain and Damage Are Not the Same",
+      "content": "Pain can occur with tissue injury, but the amount of pain does not precisely reveal the amount of damage. This does not make pain imaginary.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#0c4a6e"
+    },
+    {
+      "id": 3,
+      "title": "Context Can Turn Protection Up",
+      "content": "Uncertainty, fear, poor sleep, stress, or a previous difficult experience can increase concern and sensitivity. These are influences—not proof of one cause.",
+      "backgroundColor": "#bae6fd",
+      "textColor": "#075985"
+    },
+    {
+      "id": 4,
+      "title": "Confidence Can Change the Experience",
+      "content": "Clear information, support, a manageable plan, and successful movement experiences can build confidence and participation over time.",
+      "backgroundColor": "#7dd3fc",
+      "textColor": "#0c4a6e"
+    },
+    {
+      "id": 5,
+      "title": "Try This Today",
+      "content": "Notice one situation that increases concern and one thing that helps you feel more capable. You will use these observations later this week.",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}
