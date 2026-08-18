@@ -339,7 +339,6 @@ function PatientModal({ patient, onClose }) {
 
   // Quick Actions Handlers
   const handleScheduleReassessment = async () => {
-    if (!window.confirm(`Send ${patient.name} a message to book their reassessment now?`)) return;
     try {
       const response = await authenticatedFetch(`${API_URL}/patients/${patient.id}/reassessment`, {
         method: 'POST',
