@@ -207,6 +207,24 @@ export async function scheduleReassessment(req: any, res: any) {
       });
       if (!patient) throw new Error('Patient not found');
 
+      const duplicateWindowStart = new Date(Date.now() - 5 * 60 * 1000);
+      const recentReminder = await tx.message.findFirst({
+        where: {
+          patientId,
+          subject: 'Time to book your reassessment',
+          senderType: 'CLINICIAN',
+          createdAt: { gte: duplicateWindowStart },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+      if (recentReminder) {
+        const current = await tx.patient.findUnique({
+          where: { id: patientId },
+          select: { id: true, nextReassessmentAt: true },
+        });
+        return { patient: current, message: recentReminder, duplicate: true };
+      }
+
       const message = await tx.message.create({
         data: {
           patientId,
@@ -230,9 +248,9 @@ export async function scheduleReassessment(req: any, res: any) {
           practitionerId: null,
         },
       });
-      return { patient: updated, message };
+      return { patient: updated, message, duplicate: false };
     });
-    res.status(201).json(result);
+    res.status(result.duplicate ? 200 : 201).json(result);
   } catch (err: any) {
     console.error('scheduleReassessment', err);
     res.status(400).json({ error: err.message ?? 'Bad request' });

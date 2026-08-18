@@ -347,8 +347,11 @@ function PatientModal({ patient, onClose }) {
       });
 
       if (response.ok) {
+        const result = await response.json();
         setQuickActions(prev => ({ ...prev, reassessmentScheduled: true }));
-        alert(`Reassessment booking message sent to ${patient.name}.`);
+        alert(result.duplicate
+          ? `A reassessment reminder was already sent to ${patient.name} recently.`
+          : `Reassessment booking message sent to ${patient.name}.`);
       } else {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || 'Failed to send reassessment reminder');
