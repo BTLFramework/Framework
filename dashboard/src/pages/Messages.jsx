@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardHeader from "../components/DashboardHeader";
 import { API_URL } from "../config/api";
+import { CLINICIAN } from "../config/clinician";
 import { formatClinicalDate, formatRelativeClinicalDate } from "../helpers/assessmentScores";
 
 const Messages = () => {
@@ -99,8 +100,8 @@ const Messages = () => {
           patientId: selectedConversation.id,
           subject: 'Reply from clinician', // Default subject for replies
           content: newMessage,
-          senderName: 'Clinician', // TODO: Get from authenticated user context
-          senderEmail: 'dr.mitchell@clinic.com'
+          senderName: CLINICIAN.name,
+          senderEmail: CLINICIAN.email
         })
       });
 
@@ -113,7 +114,7 @@ const Messages = () => {
           subject: 'Reply from clinician',
           content: newMessage,
           senderType: 'CLINICIAN',
-          senderName: 'Dr. Sarah Mitchell',
+          senderName: CLINICIAN.name,
           createdAt: result.data.sentAt
         };
         
@@ -131,7 +132,7 @@ const Messages = () => {
                     subject: 'Reply from clinician',
                     timestamp: result.data.sentAt,
                     senderType: 'CLINICIAN',
-                    senderName: 'Dr. Sarah Mitchell'
+                    senderName: CLINICIAN.name
                   }
                 }
               : conv
@@ -161,8 +162,8 @@ const Messages = () => {
           patientId: selectedConversation.id,
           subject: messageSubject,
           content: newMessage,
-          senderName: 'Dr. Sarah Mitchell',
-          senderEmail: 'dr.mitchell@clinic.com'
+          senderName: CLINICIAN.name,
+          senderEmail: CLINICIAN.email
         })
       });
 
@@ -174,7 +175,7 @@ const Messages = () => {
           subject: messageSubject,
           content: newMessage,
           senderType: 'CLINICIAN',
-          senderName: 'Dr. Sarah Mitchell',
+          senderName: CLINICIAN.name,
           createdAt: result.data.sentAt
         };
         
@@ -193,7 +194,7 @@ const Messages = () => {
                     subject: messageSubject,
                     timestamp: result.data.sentAt,
                     senderType: 'CLINICIAN',
-                    senderName: 'Dr. Sarah Mitchell'
+                    senderName: CLINICIAN.name
                   }
                 }
               : conv

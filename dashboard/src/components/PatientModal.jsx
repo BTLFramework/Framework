@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import AssignExercisesModal from './AssignExercisesModal';
 import { API_URL } from "../config/api";
+import { CLINICIAN } from "../config/clinician";
 import { calculatePCS4Score, calculateTSK7Score, pluralizeDay } from "../helpers/assessmentScores";
 
 // Helper function to get disability color based on region and score
@@ -265,8 +266,8 @@ function PatientModal({ patient, onClose }) {
       const assessmentData = {
         patientId: patient.id,
         ...practitionerAssessment,
-        clinicianId: 'clinician-001', // TODO: Get from auth context
-        clinicianName: 'Dr. Practitioner' // TODO: Get from auth context
+        clinicianId: CLINICIAN.id,
+        clinicianName: CLINICIAN.name
       };
 
       const response = await fetch(`${API_URL}/patients/${patient.id}/assessment`, {
@@ -307,8 +308,8 @@ function PatientModal({ patient, onClose }) {
       const assessmentData = {
         patientId: patient.id,
         ...clinicianAssessment,
-        clinicianId: 'clinician-001', // TODO: Get from auth context
-        clinicianName: 'Dr. Practitioner' // TODO: Get from auth context
+        clinicianId: CLINICIAN.id,
+        clinicianName: CLINICIAN.name
       };
 
       const response = await fetch(`${API_URL}/patients/${patient.id}/assessment`, {
@@ -382,7 +383,7 @@ function PatientModal({ patient, onClose }) {
               await fetch(`${API_URL}/api/messages/send`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ patientId: patient.id, subject: 'Reassessment Reminder', content: msg, senderName: 'Clinician', senderEmail: 'clinician@backtolife.ca' })
+                body: JSON.stringify({ patientId: patient.id, subject: 'Reassessment Reminder', content: msg, senderName: CLINICIAN.name, senderEmail: CLINICIAN.email })
               });
             } catch (e) {
               console.warn('Failed to send immediate reassessment reminder:', e);
@@ -427,8 +428,8 @@ function PatientModal({ patient, onClose }) {
       const reviewData = {
         patientId: patient.id,
         reviewedAt: new Date().toISOString(),
-        reviewedBy: 'clinician-001',
-        reviewerName: 'Dr. Practitioner',
+        reviewedBy: CLINICIAN.id,
+        reviewerName: CLINICIAN.name,
         reviewType: 'clinical_review'
       };
 
@@ -465,8 +466,8 @@ function PatientModal({ patient, onClose }) {
         text: newNoteText.trim(),
         type: newNoteType,
         createdAt: new Date().toISOString(),
-        clinicianId: 'clinician-001',
-        clinicianName: 'Dr. Practitioner'
+        clinicianId: CLINICIAN.id,
+        clinicianName: CLINICIAN.name
       };
 
       const response = await fetch(`${API_URL}/patients/${patient.id}/notes`, {
@@ -484,7 +485,7 @@ function PatientModal({ patient, onClose }) {
           text: newNoteText.trim(),
           type: newNoteType,
           createdAt: new Date().toISOString(),
-          clinicianName: 'Dr. Practitioner'
+          clinicianName: CLINICIAN.name
         };
         
         setClinicalNotes(prev => [newNote, ...prev]);
@@ -2250,8 +2251,8 @@ function PatientModal({ patient, onClose }) {
                       patientId: patient.id,
                       subject: 'Appointment Reminder',
                       content: `Hi ${patient.name},\n\nIt's time to schedule your next follow-up appointment. Please log into your patient portal to book a time that works for you.\n\nWe look forward to seeing you!\n\nBest regards,\nYour Back to Life Team`,
-                      senderName: 'Clinician',
-                      senderEmail: 'clinician@backtolife.ca',
+                      senderName: CLINICIAN.name,
+                      senderEmail: CLINICIAN.email,
                       messageType: 'appointment_reminder'
                     })
                   });
@@ -2523,8 +2524,8 @@ function PatientModal({ patient, onClose }) {
                           patientId: patient.id,
                           subject: messageSubject,
                           content: messageText,
-                          senderName: 'Clinician', // TODO: Get from authenticated user context
-                          senderEmail: 'clinician@backtolife.ca' // TODO: Get from authenticated user context
+                          senderName: CLINICIAN.name,
+                          senderEmail: CLINICIAN.email
                         })
                       });
 
