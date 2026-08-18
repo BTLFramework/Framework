@@ -3,6 +3,12 @@ import { API_URL } from '../config/api';
 import { authenticatedFetch } from '../api/authenticatedFetch';
 import { parseTreatmentPlan } from '../helpers/assessmentScores';
 
+const normalizeRegionLabel = (value = '') => {
+  const compact = value.replace(/\s+/g, '').toLowerCase();
+  if (compact === 'foot/ankle') return 'Foot / Ankle';
+  return value.trim();
+};
+
 export default function AssignExercisesModal({ isOpen, onClose, patient, onSave }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -33,7 +39,7 @@ export default function AssignExercisesModal({ isOpen, onClose, patient, onSave 
   }, [isOpen, patient?.id, patient?.name, patient?.treatmentPlan]);
 
   const regions = useMemo(() => {
-    const set = new Set(exercises.map(e => e.region).filter(Boolean));
+    const set = new Set(exercises.map(e => normalizeRegionLabel(e.region)).filter(Boolean));
     return Array.from(set);
   }, [exercises]);
 
@@ -57,7 +63,7 @@ export default function AssignExercisesModal({ isOpen, onClose, patient, onSave 
         (e.description || '').toLowerCase().includes(t)
       );
     }
-    if (region) data = data.filter(e => e.region === region);
+    if (region) data = data.filter(e => normalizeRegionLabel(e.region) === region);
     if (phase) data = data.filter(e => e.phase === phase);
     if (difficulty) data = data.filter(e => e.difficulty === difficulty);
     return data;
@@ -109,7 +115,7 @@ export default function AssignExercisesModal({ isOpen, onClose, patient, onSave 
                   />
                   <div>
                     <div style={{ fontWeight: 600, color: '#0f172a' }}>{ex.name}</div>
-                    <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{ex.region} • {ex.phase} • {ex.difficulty}</div>
+                    <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{normalizeRegionLabel(ex.region)} • {ex.phase} • {ex.difficulty}</div>
                     {ex.duration && <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{ex.duration}</div>}
                     {ex.focus && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>{ex.focus}</div>}
                   </div>

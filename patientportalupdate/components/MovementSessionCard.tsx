@@ -61,13 +61,6 @@ export function MovementSessionCard({ onClick }: MovementSessionCardProps) {
     return metallicPills.bronze;
   };
 
-  // Estimate session time based on number of exercises
-  const getSessionTime = (exerciseCount: number) => {
-    if (exerciseCount <= 2) return "10-15 min";
-    if (exerciseCount <= 3) return "15-20 min";
-    return "20-25 min";
-  };
-
   return (
     <div
       className="flex flex-col items-center bg-white rounded-2xl shadow-lg p-7 border border-btl-100 hover:shadow-xl hover:border-btl-200 transition-all duration-200 cursor-pointer relative group min-h-[340px] min-w-[260px]"
@@ -108,7 +101,7 @@ export function MovementSessionCard({ onClick }: MovementSessionCardProps) {
       </div>
       <div className="flex items-center justify-center text-xs text-btl-500 mt-auto">
         <Clock className="w-4 h-4 mr-1" />
-        {getSessionTime(exercises.length)}
+        Follow your prescribed dosage
       </div>
     </div>
   );
