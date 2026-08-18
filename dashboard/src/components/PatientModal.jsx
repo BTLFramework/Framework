@@ -155,8 +155,18 @@ function PatientModal({ patient, onClose }) {
   const [quickActions, setQuickActions] = useState({
     reassessmentScheduled: Boolean(patient?.nextReassessmentAt),
     treatmentPlanUpdated: false,
-    reviewed: false
+    reviewed: Boolean(patient?.reviewedAt)
   });
+  const [reviewedAt, setReviewedAt] = useState(patient?.reviewedAt || null);
+
+  useEffect(() => {
+    setReviewedAt(patient?.reviewedAt || null);
+    setQuickActions(prev => ({
+      ...prev,
+      reassessmentScheduled: Boolean(patient?.nextReassessmentAt),
+      reviewed: Boolean(patient?.reviewedAt)
+    }));
+  }, [patient?.id, patient?.reviewedAt, patient?.nextReassessmentAt]);
 
   // Clinical Notes State
   const [clinicalNotes, setClinicalNotes] = useState([]);
@@ -388,14 +398,6 @@ function PatientModal({ patient, onClose }) {
 
   const handleMarkAsReviewed = async () => {
     try {
-      const reviewData = {
-        patientId: patient.id,
-        reviewedAt: new Date().toISOString(),
-        reviewedBy: CLINICIAN.id,
-        reviewerName: CLINICIAN.name,
-        reviewType: 'clinical_review'
-      };
-
       const response = await authenticatedFetch(`${API_URL}/patients/${patient.id}/review`, {
         method: 'PATCH',
         headers: {
@@ -405,6 +407,8 @@ function PatientModal({ patient, onClose }) {
       });
 
       if (response.ok) {
+        const result = await response.json();
+        setReviewedAt(result?.patient?.reviewedAt || new Date().toISOString());
         setQuickActions(prev => ({ ...prev, reviewed: true }));
         alert('Patient marked as reviewed successfully!');
       } else {
@@ -1246,10 +1250,15 @@ function PatientModal({ patient, onClose }) {
                     <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Recovery Score</div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#d97706' }}>
-                      No
+                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: reviewedAt ? '#059669' : '#d97706' }}>
+                      {reviewedAt ? 'Yes' : 'No'}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Clinician Reviewed</div>
+                    {reviewedAt && (
+                      <div style={{ fontSize: '0.7rem', color: '#6b7280', marginTop: '2px' }}>
+                        {new Date(reviewedAt).toLocaleString()}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
