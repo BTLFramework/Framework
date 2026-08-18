@@ -42,6 +42,21 @@ export const calendarDaysSince = (value, now = new Date()) => {
   return Math.max(0, Math.round((end - start) / 86400000))
 }
 
+export const formatClinicalDate = (value, locale = "en-US") => {
+  const parsed = parseClinicalDate(value)
+  return parsed ? parsed.toLocaleDateString(locale) : "Unavailable"
+}
+
+export const formatRelativeClinicalDate = (value, now = new Date(), locale = "en-US") => {
+  const parsed = parseClinicalDate(value)
+  if (!parsed) return "Unavailable"
+  const days = calendarDaysSince(parsed, now)
+  if (days === 0) return "Today"
+  if (days === 1) return "Yesterday"
+  if (days <= 6) return `${days} days ago`
+  return parsed.toLocaleDateString(locale)
+}
+
 export const parseTreatmentPlan = (treatmentPlan) => {
   if (!treatmentPlan) return { summary: "", assignedExercises: [] }
   if (typeof treatmentPlan === "object") {

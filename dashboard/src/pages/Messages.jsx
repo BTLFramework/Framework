@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardHeader from "../components/DashboardHeader";
 import { API_URL } from "../config/api";
+import { formatClinicalDate, formatRelativeClinicalDate } from "../helpers/assessmentScores";
 
 const Messages = () => {
   const navigate = useNavigate();
@@ -218,16 +219,7 @@ const Messages = () => {
   };
 
   const formatTimestamp = (timestamp) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffTime = Math.abs(now - date);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 1) return 'Today';
-    if (diffDays === 2) return 'Yesterday';
-    if (diffDays <= 7) return `${diffDays - 1} days ago`;
-    
-    return date.toLocaleDateString();
+    return formatRelativeClinicalDate(timestamp);
   };
 
   const formatMessageTime = (timestamp) => {
@@ -484,7 +476,7 @@ const Messages = () => {
                         {selectedConversation.name}
                       </h3>
                       <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: '4px 0 0 0' }}>
-                        {selectedConversation.email} • Intake: {new Date(selectedConversation.intakeDate).toLocaleDateString()}
+                        {selectedConversation.email} • Intake: {formatClinicalDate(selectedConversation.intakeDate)}
                       </p>
                     </div>
                   </div>
@@ -747,4 +739,4 @@ const Messages = () => {
   );
 };
 
-export default Messages; 
+export default Messages;

@@ -1,6 +1,6 @@
 import test from "node:test"
 import assert from "node:assert/strict"
-import { calculatePCS4Score, calculateTSK7Score, calendarDaysSince, parseClinicalDate, parseTreatmentPlan, pluralizeDay } from "../src/helpers/assessmentScores.js"
+import { calculatePCS4Score, calculateTSK7Score, calendarDaysSince, formatClinicalDate, formatRelativeClinicalDate, parseClinicalDate, parseTreatmentPlan, pluralizeDay } from "../src/helpers/assessmentScores.js"
 
 test("PCS-4 uses its documented 0-16 range", () => {
   assert.equal(calculatePCS4Score({ 1: 1, 2: 0, 3: 2, 4: 1 }), 4)
@@ -34,4 +34,13 @@ test("date-only clinical records do not shift to the previous day", () => {
     [2026, 8, 16],
   )
   assert.equal(calendarDaysSince("2026-08-16T00:00:00.000Z", new Date(2026, 7, 17, 23, 30)), 1)
+  assert.equal(formatClinicalDate("2026-08-16T00:00:00.000Z", "en-CA"), "2026-08-16")
+})
+
+test("message dates use calendar days instead of elapsed 24-hour windows", () => {
+  const now = new Date(2026, 7, 17, 0, 5)
+  assert.equal(formatRelativeClinicalDate(new Date(2026, 7, 17, 0, 1), now), "Today")
+  assert.equal(formatRelativeClinicalDate(new Date(2026, 7, 16, 23, 59), now), "Yesterday")
+  assert.equal(formatRelativeClinicalDate(new Date(2026, 7, 14, 12), now), "3 days ago")
+  assert.equal(formatRelativeClinicalDate(null, now), "Unavailable")
 })
