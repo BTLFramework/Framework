@@ -2044,32 +2044,6 @@ function PatientModal({ patient, onClose }) {
                 </h4>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                   <button 
-                    onClick={handleScheduleReassessment}
-                    style={{
-                      padding: '8px 16px',
-                      fontSize: '0.875rem',
-                      fontWeight: 500,
-                      color: '#155e75',
-                      backgroundColor: 'white',
-                      border: '1px solid #155e75',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
-                    onMouseOver={(e) => {
-                      e.target.style.backgroundColor = '#f0fdff';
-                    }}
-                    onMouseOut={(e) => {
-                      e.target.style.backgroundColor = 'white';
-                    }}
-                  >
-                    {quickActions.reassessmentScheduled ? '✅' : '📅'} 
-                    {quickActions.reassessmentScheduled ? 'Send Reassessment Reminder Again' : 'Prompt Reassessment Booking'}
-                  </button>
-                  <button 
                     onClick={handleUpdateTreatmentPlan}
                     style={{
                       padding: '8px 16px',
@@ -2194,37 +2168,9 @@ function PatientModal({ patient, onClose }) {
                 e.target.style.transform = 'translateY(0)';
                 e.target.style.boxShadow = '0 2px 4px rgba(21, 94, 117, 0.2)';
               }}
-              onClick={async () => {
-                try {
-                  const response = await authenticatedFetch(`${API_URL}/api/messages/send`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      patientId: patient.id,
-                      subject: 'Appointment Reminder',
-                      content: `Hi ${patient.name},\n\nIt's time to schedule your next follow-up appointment. Please log into your patient portal to book a time that works for you.\n\nWe look forward to seeing you!\n\nBest regards,\nYour Back to Life Team`,
-                      senderName: CLINICIAN.name,
-                      senderEmail: CLINICIAN.email,
-                      messageType: 'appointment_reminder'
-                    })
-                  });
-
-                  const result = await response.json();
-
-                  if (result.success) {
-                    alert(`✅ Appointment reminder sent to ${patient.name}!\n\nThe reminder will appear on their dashboard when they log into their patient portal.`);
-                  } else {
-                    throw new Error(result.error || 'Failed to send appointment reminder');
-                  }
-                } catch (error) {
-                  console.error('Error sending appointment reminder:', error);
-                  alert(`❌ Failed to send appointment reminder: ${error.message}\n\nPlease check your connection and try again.`);
-                }
-              }}
+              onClick={handleScheduleReassessment}
             >
-              📅 Schedule Follow-up
+              {quickActions.reassessmentScheduled ? '✅ Send Reassessment Reminder Again' : '📅 Send Reassessment Reminder'}
             </button>
           </div>
         </div>
