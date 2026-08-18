@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Dumbbell, AlertCircle, Play, Check, Target, Activity, Award, PartyPopper } from "lucide-react";
 import { useAssignedExercises } from "@/hooks/useAssignedExercises";
 import type { Exercise } from "@/types/exercise";
@@ -54,10 +54,11 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
   const [completedExercises, setCompletedExercises] = useState<Set<string>>(new Set());
   const [watchedVideos, setWatchedVideos] = useState<Set<string>>(new Set());
   const [showCelebration, setShowCelebration] = useState(false);
+  const [completionError, setCompletionError] = useState<string | null>(null);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   const exercises = exerciseData?.exercises || [];
   const completedCount = completedExercises.size;
-  const watchedCount = watchedVideos.size;
   const totalExercises = exercises.length;
 
   const toggleExerciseCompletion = (exerciseId: string) => {
@@ -70,12 +71,7 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
     setCompletedExercises(newCompleted);
   };
 
-  useEffect(() => {
-    if (watchedCount === totalExercises && totalExercises > 0) {
-      setShowCelebration(true);
-      // Keep banner visible - no auto-hide
-    }
-  }, [watchedCount, totalExercises]);
+  const canCompleteSession = totalExercises > 0 && completedCount === totalExercises;
 
   // Calculate total points
   const totalPoints = exerciseData?.totalPoints || 0;
@@ -295,22 +291,27 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
 
           {/* Footer with Action Buttons */}
           <AssessmentDialogFooter className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <div className="flex items-center justify-between w-full">
+            <div className="flex flex-col w-full gap-3">
+              {completionError && (
+                <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+                  {completionError}
+                </div>
+              )}
+              <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-3">
                 <div className={`px-4 py-2 font-medium text-sm ${getPointsPill(totalPoints)}`}>
                   Total: {totalPoints} pts
                 </div>
               </div>
                               <button
+                  disabled={!canCompleteSession || isCompleting}
                   onClick={async () => {
+                    if (!canCompleteSession || isCompleting) return;
                     console.log('Complete Session clicked!');
+                    setCompletionError(null);
+                    setIsCompleting(true);
 
                     try {
-                      // Mark all exercises as completed and watched
-                      const allExerciseIds = exercises.map((ex, idx) => ex.id || idx.toString());
-                      setCompletedExercises(new Set(allExerciseIds));
-                      setWatchedVideos(new Set(allExerciseIds));
-
                       // Get patient ID from email first
                       const patientResponse = await fetch(`/api/patients/portal-data/${patientId}`)
                       if (!patientResponse.ok) {
@@ -331,23 +332,22 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                         console.log('✅ Recovery points added successfully:', result.pointsAdded);
 
                         // Record task completion to backend
-                        try {
-                          await fetch('/api/recovery-points/task-completion', {
-                            method: 'POST',
-                            headers: {
-                              'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                              patientId: numericPatientId,
-                              taskType: 'MOVEMENT',
-                              sessionDuration: null,
-                              pointsEarned: totalPoints
-                            }),
-                          });
-                          console.log('✅ Task completion recorded for movement session');
-                        } catch (taskError) {
-                          console.error('❌ Failed to record task completion:', taskError);
+                        const taskResponse = await fetch('/api/recovery-points/task-completion', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            patientId: numericPatientId,
+                            taskType: 'MOVEMENT',
+                            sessionDuration: null,
+                            pointsEarned: result.pointsAdded ?? totalPoints
+                          }),
+                        });
+                        if (!taskResponse.ok) {
+                          throw new Error('Points were recorded, but the daily task could not be confirmed. Please contact your clinician before trying again.');
                         }
+                        console.log('✅ Task completion recorded for movement session');
 
                         // Show celebration with actual points earned
                         setShowCelebration(true);
@@ -368,86 +368,33 @@ export function MovementSessionDialog({ open, onClose, patientId, onTaskComplete
                           onClose();
                         }, 2000);
                       } else {
-                        console.error('❌ Failed to add recovery points:', result.error);
-
-                        // Still record task completion to backend even if RP failed
-                        try {
-                          await fetch('/api/recovery-points/task-completion', {
-                            method: 'POST',
-                            headers: {
-                              'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                              patientId: numericPatientId,
-                              taskType: 'MOVEMENT',
-                              sessionDuration: null,
-                              pointsEarned: totalPoints
-                            }),
-                          });
-                          console.log('✅ Task completion recorded for movement session (despite RP failure)');
-                        } catch (taskError) {
-                          console.error('❌ Failed to record task completion:', taskError);
-                        }
-
-                        // Still show celebration but log the error
-                        setShowCelebration(true);
-
-                        // Still call parent's task completion handler
-                        if (onTaskComplete) {
-                          onTaskComplete({
-                            taskId: 'movement-session',
-                            taskTitle: 'Movement Session',
-                            pointsEarned: totalPoints,
-                            newSRSScore: exerciseData?.srsScore || 0,
-                            phase: exerciseData?.phase || 'EDUCATE'
-                          });
-                        }
-
-                        // Close the dialog after a short delay
-                        setTimeout(() => {
-                          onClose();
-                        }, 2000);
+                        throw new Error(result.message || result.error || 'Recovery points could not be recorded. Please try again.');
                       }
                     } catch (error) {
                       console.error('❌ Error completing session:', error);
-                      // Still mark as completed locally
-                      const allExerciseIds = exercises.map((ex, idx) => ex.id || idx.toString());
-                      setCompletedExercises(new Set(allExerciseIds));
-                      setWatchedVideos(new Set(allExerciseIds));
-                      setShowCelebration(true);
-
-                      // Still call parent's task completion handler
-                      if (onTaskComplete) {
-                        onTaskComplete({
-                          taskId: 'movement-session',
-                          taskTitle: 'Movement Session',
-                          pointsEarned: totalPoints,
-                          newSRSScore: exerciseData?.srsScore || 0,
-                          phase: exerciseData?.phase || 'EDUCATE'
-                        });
-                      }
-
-                      // Close the dialog after a short delay
-                      setTimeout(() => {
-                        onClose();
-                      }, 2000);
+                      setCompletionError(error instanceof Error ? error.message : 'The session could not be completed. Please try again.');
+                    } finally {
+                      setIsCompleting(false);
                     }
                   }}
                   className={`px-6 py-2 rounded-full font-medium transition-colors ${
-                    watchedCount === totalExercises
-                      ? 'bg-green-500 text-white hover:bg-green-600'
-                      : 'bg-btl-600 text-white hover:bg-btl-700'
+                    !canCompleteSession || isCompleting
+                      ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                      : 'bg-green-500 text-white hover:bg-green-600'
                   }`}
                 >
-                {watchedCount === totalExercises ? (
+                {isCompleting ? (
+                  'Saving...'
+                ) : canCompleteSession ? (
                   <div className="flex items-center gap-2">
                     <Check className="w-4 h-4" />
-                    Session Complete
+                    Complete Session
                   </div>
                 ) : (
-                  'Complete Session'
+                  `Complete all exercises (${completedCount}/${totalExercises})`
                 )}
               </button>
+              </div>
             </div>
           </AssessmentDialogFooter>
         </AssessmentDialogContent>

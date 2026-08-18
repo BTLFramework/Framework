@@ -242,6 +242,31 @@ router.post('/task-completion', async (req, res) => {
     }
     
     console.log(`✅ API: Recording task completion for patient ${patientId}: ${taskType}`);
+
+    // A daily task can only advance the patient's day once. Recovery points
+    // already enforce a daily cap; make the completion record idempotent too
+    // so retries or double-clicks cannot inflate progress statistics.
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const existingCompletion = await prisma.taskCompletion.findFirst({
+      where: {
+        patientId: parseInt(patientId),
+        taskType,
+        completedAt: { gte: today, lt: tomorrow }
+      },
+      orderBy: { completedAt: 'desc' }
+    });
+
+    if (existingCompletion) {
+      return res.json({
+        success: true,
+        alreadyCompleted: true,
+        data: existingCompletion,
+        message: `Task was already completed today: ${taskType}`
+      });
+    }
     
     // Record the task completion
     const taskCompletion = await prisma.taskCompletion.create({
@@ -255,6 +280,7 @@ router.post('/task-completion', async (req, res) => {
     
     res.json({
       success: true,
+      alreadyCompleted: false,
       data: taskCompletion,
       message: `Task completion recorded: ${taskType}`
     });
