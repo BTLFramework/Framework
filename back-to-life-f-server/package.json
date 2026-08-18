@@ -18,7 +18,7 @@
     "prisma:studio": "npx prisma studio",
     "clean": "rm -rf dist && echo 'Cleaned dist directory'",
     "test:startup": "node test-startup.js",
-    "test": "node --test test/emailService.resend.test.js test/setupToken.test.js test/onboardingIdentity.test.js test/patientPasswordService.test.js test/practitionerAuthMiddleware.test.js test/clinicalIntegrationLogic.test.js test/clinicalNoteType.test.js",
+    "test": "node --test test/emailService.resend.test.js test/setupToken.test.js test/onboardingIdentity.test.js test/patientPasswordService.test.js test/practitionerAuthMiddleware.test.js test/clinicalIntegrationLogic.test.js test/clinicalNoteType.test.js test/practitionerAssessmentLogic.test.js",
     "test:email": "node --test test/emailService.resend.test.js",
     "test:onboarding": "node --test test/setupToken.test.js test/onboardingIdentity.test.js"
   },

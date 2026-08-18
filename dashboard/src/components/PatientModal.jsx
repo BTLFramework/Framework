@@ -5,6 +5,23 @@ import { CLINICIAN } from "../config/clinician";
 import { calculatePCS4Score, calculateTSK7Score, pluralizeDay } from "../helpers/assessmentScores";
 import { authenticatedFetch } from "../api/authenticatedFetch";
 
+const PRACTITIONER_ASSESSMENT_KEYS = [
+  'neurological', 'mechanical', 'orthopedic', 'provocative',
+  'rom', 'functional', 'movement', 'strength', 'balance', 'stability', 'treatment'
+];
+
+const createBlankPractitionerAssessment = () => Object.fromEntries(
+  PRACTITIONER_ASSESSMENT_KEYS.map((key) => [key, { selected: false, score: '0', notes: '' }])
+);
+
+const practitionerAssessmentFromApi = (assessment) => Object.fromEntries(
+  PRACTITIONER_ASSESSMENT_KEYS.map((key) => [key, {
+    selected: Boolean(assessment?.[`${key}Selected`]),
+    score: String(assessment?.[`${key}Score`] ?? 0),
+    notes: assessment?.[`${key}Notes`] ?? '',
+  }])
+);
+
 // Helper function to get disability color based on region and score
 const getDisabilityColor = (region, score) => {
   const regionLower = region?.toLowerCase();
@@ -128,28 +145,36 @@ function PatientModal({ patient, onClose }) {
   const [messageSubject, setMessageSubject] = useState('');
   
   // Practitioner Assessment State
-  const [practitionerAssessment, setPractitionerAssessment] = useState({
-    // Section 1: Symptom & Key Finding Resolution
-    neurological: { selected: false, score: '0', notes: '' },
-    mechanical: { selected: false, score: '0', notes: '' },
-    orthopedic: { selected: false, score: '0', notes: '' },
-    provocative: { selected: false, score: '0', notes: '' },
-    
-    // Section 2: Functional & Mechanical Progress
-    rom: { selected: false, score: '0', notes: '' },
-    functional: { selected: false, score: '0', notes: '' },
-    movement: { selected: false, score: '0', notes: '' },
-    strength: { selected: false, score: '0', notes: '' },
-    balance: { selected: false, score: '0', notes: '' },
-    stability: { selected: false, score: '0', notes: '' },
-    treatment: { selected: false, score: '0', notes: '' }
-  });
+  const [practitionerAssessment, setPractitionerAssessment] = useState(createBlankPractitionerAssessment);
+  const [practitionerAssessmentLoading, setPractitionerAssessmentLoading] = useState(false);
+  const [practitionerAssessmentError, setPractitionerAssessmentError] = useState('');
+  const [practitionerAssessmentSaving, setPractitionerAssessmentSaving] = useState(false);
 
-  // Clinician Assessment State
-  const [clinicianAssessment, setClinicianAssessment] = useState({
-    recoveryMilestone: false,
-    clinicalProgressVerified: false
-  });
+  useEffect(() => {
+    if (!patient?.id) return;
+    let cancelled = false;
+    const loadPractitionerAssessment = async () => {
+      setPractitionerAssessmentLoading(true);
+      setPractitionerAssessmentError('');
+      try {
+        const response = await authenticatedFetch(`${API_URL}/api/practitioner-assessment/patient/${patient.id}`);
+        if (!response.ok) throw new Error(`Unable to load practitioner assessment (${response.status})`);
+        const result = await response.json();
+        if (!cancelled) {
+          setPractitionerAssessment(result.assessment
+            ? practitionerAssessmentFromApi(result.assessment)
+            : createBlankPractitionerAssessment());
+        }
+      } catch (error) {
+        console.error('Error loading practitioner assessment:', error);
+        if (!cancelled) setPractitionerAssessmentError(error.message || 'Unable to load the saved assessment.');
+      } finally {
+        if (!cancelled) setPractitionerAssessmentLoading(false);
+      }
+    };
+    loadPractitionerAssessment();
+    return () => { cancelled = true; };
+  }, [patient?.id]);
 
   // Quick Actions State
   const [quickActions, setQuickActions] = useState({
@@ -290,6 +315,8 @@ function PatientModal({ patient, onClose }) {
   };
   
   const handleSavePractitionerAssessment = async () => {
+    if (practitionerAssessmentLoading || practitionerAssessmentError || practitionerAssessmentSaving) return;
+    setPractitionerAssessmentSaving(true);
     try {
       const assessmentData = {
         patientId: patient.id,
@@ -309,7 +336,9 @@ function PatientModal({ patient, onClose }) {
       if (response.ok) {
         const result = await response.json();
         console.log('Assessment saved successfully:', result);
-        alert('Practitioner assessment saved successfully!');
+        alert(result.srsScore == null
+          ? 'Practitioner assessment saved. No SRS record was available to update.'
+          : `Practitioner assessment saved. SRS is now ${result.srsScore}/11.`);
         
         window.location.reload();
       } else {
@@ -319,48 +348,8 @@ function PatientModal({ patient, onClose }) {
     } catch (error) {
       console.error('Error saving practitioner assessment:', error);
       alert(`Failed to save assessment: ${error.message}`);
-    }
-  };
-
-  // Clinician Assessment Handlers
-  const handleClinicianAssessmentChange = (field, value) => {
-    setClinicianAssessment(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleSaveClinicianAssessment = async () => {
-    try {
-      const assessmentData = {
-        patientId: patient.id,
-        ...clinicianAssessment,
-        clinicianId: CLINICIAN.id,
-        clinicianName: CLINICIAN.name
-      };
-
-      const response = await authenticatedFetch(`${API_URL}/patients/${patient.id}/assessment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(assessmentData)
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Clinician assessment saved successfully:', result);
-        alert(result.srsScore == null
-          ? 'Clinician assessment saved. No SRS record was available to update.'
-          : `Clinician assessment saved. SRS is now ${result.srsScore}/11.`);
-        window.location.reload();
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to save assessment');
-      }
-    } catch (error) {
-      console.error('Error saving clinician assessment:', error);
-      alert(`Failed to save assessment: ${error.message}`);
+    } finally {
+      setPractitionerAssessmentSaving(false);
     }
   };
 
@@ -1291,99 +1280,6 @@ function PatientModal({ patient, onClose }) {
                 </div>
               </div>
 
-              {/* SRS Clinician Assessment */}
-              <div 
-                style={{
-                  background: 'white',
-                  padding: '20px',
-                  borderRadius: '12px',
-                  border: '1px solid #e5e7eb',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
-                }}
-              >
-                <h4 style={{ fontSize: '1rem', fontWeight: 600, color: '#155e75', marginBottom: '16px', margin: 0 }}>
-                  SRS Clinician Assessment
-                </h4>
-                
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {/* Recovery Milestone */}
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      checked={clinicianAssessment.recoveryMilestone}
-                      onChange={(e) => handleClinicianAssessmentChange('recoveryMilestone', e.target.checked)}
-                      style={{
-                        width: '16px',
-                        height: '16px',
-                        accentColor: '#155e75'
-                      }}
-                    />
-                    <span style={{ fontSize: '0.875rem', color: '#374151' }}>
-                      Recovery Milestone Achieved
-                    </span>
-                    <span style={{ 
-                      fontSize: '0.75rem', 
-                      color: '#059669', 
-                      backgroundColor: '#f0fdf4',
-                      padding: '2px 6px',
-                      borderRadius: '4px',
-                      border: '1px solid #bbf7d0'
-                    }}>
-                      +1 SRS Point
-                    </span>
-                  </label>
-
-                  {/* Clinical Progress Verified */}
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      checked={clinicianAssessment.clinicalProgressVerified}
-                      onChange={(e) => handleClinicianAssessmentChange('clinicalProgressVerified', e.target.checked)}
-                      style={{
-                        width: '16px',
-                        height: '16px',
-                        accentColor: '#155e75'
-                      }}
-                    />
-                    <span style={{ fontSize: '0.875rem', color: '#374151' }}>
-                      Clinical Progress Verified
-                    </span>
-                    <span style={{ 
-                      fontSize: '0.75rem', 
-                      color: '#059669', 
-                      backgroundColor: '#f0fdf4',
-                      padding: '2px 6px',
-                      borderRadius: '4px',
-                      border: '1px solid #bbf7d0'
-                    }}>
-                      +1 SRS Point
-                    </span>
-                  </label>
-                </div>
-
-                {/* Save Button */}
-                <div style={{ marginTop: '16px', textAlign: 'center' }}>
-                  <button
-                    onClick={handleSaveClinicianAssessment}
-                    style={{
-                      padding: '8px 16px',
-                      background: 'linear-gradient(135deg, #155e75 0%, #0891b2 100%)',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontSize: '0.875rem',
-                      fontWeight: '500',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onMouseOver={(e) => e.target.style.transform = 'translateY(-1px)'}
-                    onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
-                  >
-                    Save Clinician Assessment
-                  </button>
-                </div>
-              </div>
-
               {/* SRS Practitioner Assessment */}
               <div 
                 style={{
@@ -1396,6 +1292,19 @@ function PatientModal({ patient, onClose }) {
                 <h4 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#1e293b', marginBottom: '20px', margin: 0 }}>
                   SRS Practitioner Assessment
                 </h4>
+                <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '8px 0 20px' }}>
+                  This detailed assessment is the practitioner contribution to the 11-point SRS. Saving replaces the previous practitioner contribution; it does not stack additional points.
+                </p>
+                {practitionerAssessmentLoading && (
+                  <div style={{ padding: '10px 12px', marginBottom: '16px', borderRadius: '8px', background: '#f0f9ff', color: '#0369a1' }}>
+                    Loading the saved practitioner assessment…
+                  </div>
+                )}
+                {practitionerAssessmentError && (
+                  <div style={{ padding: '10px 12px', marginBottom: '16px', borderRadius: '8px', background: '#fff7ed', color: '#9a3412' }}>
+                    {practitionerAssessmentError} Saving is disabled to protect the existing SRS contribution.
+                  </div>
+                )}
                 
                 {/* Section 1: Symptom & Key Finding Resolution */}
                 <div style={{ marginBottom: '24px' }}>
@@ -1952,21 +1861,26 @@ function PatientModal({ patient, onClose }) {
                 <div style={{ textAlign: 'center', marginTop: '20px' }}>
                   <button 
                     onClick={handleSavePractitionerAssessment}
+                    disabled={practitionerAssessmentLoading || Boolean(practitionerAssessmentError) || practitionerAssessmentSaving}
                     style={{
                       padding: '12px 24px',
                       fontSize: '1rem',
                       fontWeight: '600',
                       color: 'white',
-                      backgroundColor: '#0ea5e9',
+                      backgroundColor: (practitionerAssessmentLoading || practitionerAssessmentError || practitionerAssessmentSaving) ? '#94a3b8' : '#0ea5e9',
                       border: 'none',
                       borderRadius: '8px',
-                      cursor: 'pointer',
+                      cursor: (practitionerAssessmentLoading || practitionerAssessmentError || practitionerAssessmentSaving) ? 'not-allowed' : 'pointer',
                       transition: 'all 0.2s ease'
                     }}
-                    onMouseOver={(e) => e.target.style.backgroundColor = '#0891b2'}
-                    onMouseOut={(e) => e.target.style.backgroundColor = '#0ea5e9'}
+                    onMouseOver={(e) => {
+                      if (!practitionerAssessmentLoading && !practitionerAssessmentError && !practitionerAssessmentSaving) e.target.style.backgroundColor = '#0891b2';
+                    }}
+                    onMouseOut={(e) => {
+                      if (!practitionerAssessmentLoading && !practitionerAssessmentError && !practitionerAssessmentSaving) e.target.style.backgroundColor = '#0ea5e9';
+                    }}
                   >
-                    Save Practitioner Assessment
+                    {practitionerAssessmentSaving ? 'Saving…' : 'Save Practitioner Assessment'}
                   </button>
                 </div>
               </div>

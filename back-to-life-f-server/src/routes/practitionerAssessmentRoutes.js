@@ -1,6 +1,7 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const { requirePractitionerAuth } = require('../middleware/requirePractitionerAuth');
+const { normalizePractitionerAssessment, reconcilePractitionerScore } = require('../services/practitionerAssessmentLogic');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -18,69 +19,72 @@ router.post('/save', async (req, res) => {
       clinicianName
     } = req.body;
 
-    // Calculate section scores
-    const section1Items = [neurological, mechanical, orthopedic, provocative];
-    const section2Items = [rom, functional, movement, strength, balance, stability, treatment];
-    
-    const section1Score = calculateSectionScore(section1Items);
-    const section2Score = calculateSectionScore(section2Items);
-    const totalScore = Math.round((section1Score + section2Score) * 10) / 10;
+    const parsedPatientId = Number(patientId);
+    if (!Number.isInteger(parsedPatientId) || parsedPatientId <= 0) {
+      return res.status(400).json({ success: false, error: 'Valid patientId is required' });
+    }
+    const normalized = normalizePractitionerAssessment(req.body || {});
+    const { items, section1Score, section2Score, totalPractitionerScore: totalScore } = normalized;
 
-    const previousAssessment = await prisma.practitionerAssessment.findFirst({
-      where: { patientId: parseInt(patientId) },
-      orderBy: [{ date: 'desc' }, { id: 'desc' }]
-    });
+    const result = await prisma.$transaction(async (tx) => {
+      const previousAssessment = await tx.practitionerAssessment.findFirst({
+        where: { patientId: parsedPatientId },
+        orderBy: [{ date: 'desc' }, { id: 'desc' }]
+      });
+      const latestSRS = await tx.sRSScore.findFirst({
+        where: { patientId: parsedPatientId },
+        orderBy: [{ date: 'desc' }, { id: 'desc' }]
+      });
 
-    // Save to database
-    const assessment = await prisma.practitionerAssessment.create({
+      const assessment = await tx.practitionerAssessment.create({
       data: {
-        patientId: parseInt(patientId),
+        patientId: parsedPatientId,
         
         // Section 1: Symptom & Key Finding Resolution
-        neurologicalSelected: neurological.selected,
-        neurologicalScore: parseFloat(neurological.score),
-        neurologicalNotes: neurological.notes,
+        neurologicalSelected: items.neurological.selected,
+        neurologicalScore: items.neurological.score,
+        neurologicalNotes: items.neurological.notes,
         
-        mechanicalSelected: mechanical.selected,
-        mechanicalScore: parseFloat(mechanical.score),
-        mechanicalNotes: mechanical.notes,
+        mechanicalSelected: items.mechanical.selected,
+        mechanicalScore: items.mechanical.score,
+        mechanicalNotes: items.mechanical.notes,
         
-        orthopedicSelected: orthopedic.selected,
-        orthopedicScore: parseFloat(orthopedic.score),
-        orthopedicNotes: orthopedic.notes,
+        orthopedicSelected: items.orthopedic.selected,
+        orthopedicScore: items.orthopedic.score,
+        orthopedicNotes: items.orthopedic.notes,
         
-        provocativeSelected: provocative.selected,
-        provocativeScore: parseFloat(provocative.score),
-        provocativeNotes: provocative.notes,
+        provocativeSelected: items.provocative.selected,
+        provocativeScore: items.provocative.score,
+        provocativeNotes: items.provocative.notes,
         
         // Section 2: Functional & Mechanical Progress
-        romSelected: rom.selected,
-        romScore: parseFloat(rom.score),
-        romNotes: rom.notes,
+        romSelected: items.rom.selected,
+        romScore: items.rom.score,
+        romNotes: items.rom.notes,
         
-        functionalSelected: functional.selected,
-        functionalScore: parseFloat(functional.score),
-        functionalNotes: functional.notes,
+        functionalSelected: items.functional.selected,
+        functionalScore: items.functional.score,
+        functionalNotes: items.functional.notes,
         
-        movementSelected: movement.selected,
-        movementScore: parseFloat(movement.score),
-        movementNotes: movement.notes,
+        movementSelected: items.movement.selected,
+        movementScore: items.movement.score,
+        movementNotes: items.movement.notes,
         
-        strengthSelected: strength.selected,
-        strengthScore: parseFloat(strength.score),
-        strengthNotes: strength.notes,
+        strengthSelected: items.strength.selected,
+        strengthScore: items.strength.score,
+        strengthNotes: items.strength.notes,
         
-        balanceSelected: balance.selected,
-        balanceScore: parseFloat(balance.score),
-        balanceNotes: balance.notes,
+        balanceSelected: items.balance.selected,
+        balanceScore: items.balance.score,
+        balanceNotes: items.balance.notes,
         
-        stabilitySelected: stability.selected,
-        stabilityScore: parseFloat(stability.score),
-        stabilityNotes: stability.notes,
+        stabilitySelected: items.stability.selected,
+        stabilityScore: items.stability.score,
+        stabilityNotes: items.stability.notes,
         
-        treatmentSelected: treatment.selected,
-        treatmentScore: parseFloat(treatment.score),
-        treatmentNotes: treatment.notes,
+        treatmentSelected: items.treatment.selected,
+        treatmentScore: items.treatment.score,
+        treatmentNotes: items.treatment.notes,
         
         // Calculated scores
         section1Score,
@@ -91,25 +95,29 @@ router.post('/save', async (req, res) => {
         clinicianId,
         clinicianName
       }
+      });
+      let srsScore = null;
+      if (latestSRS) {
+        srsScore = reconcilePractitionerScore(
+          latestSRS.srsScore,
+          previousAssessment?.totalPractitionerScore || 0,
+          totalScore,
+        );
+        await tx.sRSScore.update({ where: { id: latestSRS.id }, data: { srsScore } });
+      }
+      return { assessment, srsScore };
     });
-
-    // Update the patient's SRS score to include practitioner points
-    const srsScore = await updatePatientSRSScore(
-      patientId,
-      totalScore,
-      previousAssessment?.totalPractitionerScore || 0
-    );
 
     res.json({
       success: true,
-      assessment,
-      srsScore,
+      assessment: result.assessment,
+      srsScore: result.srsScore,
       message: 'Practitioner assessment saved successfully'
     });
 
   } catch (error) {
     console.error('Error saving practitioner assessment:', error);
-    res.status(500).json({
+    res.status(error?.message?.includes('score must be') || error?.message?.includes('assessment is required') ? 400 : 500).json({
       success: false,
       error: 'Failed to save practitioner assessment',
       details: error.message
@@ -124,7 +132,7 @@ router.get('/patient/:patientId', async (req, res) => {
     
     const assessment = await prisma.practitionerAssessment.findFirst({
       where: { patientId: parseInt(patientId) },
-      orderBy: { date: 'desc' }
+      orderBy: [{ date: 'desc' }, { id: 'desc' }]
     });
 
     res.json({
@@ -141,49 +149,5 @@ router.get('/patient/:patientId', async (req, res) => {
     });
   }
 });
-
-// Helper function to calculate section score
-function calculateSectionScore(items) {
-  const selectedItems = items.filter(item => item.selected);
-  if (selectedItems.length === 0) return 0;
-  
-  const totalScore = selectedItems.reduce((sum, item) => sum + parseFloat(item.score), 0);
-  return Math.min(1, totalScore / selectedItems.length);
-}
-
-// Helper function to update patient SRS score
-async function updatePatientSRSScore(patientId, practitionerScore, previousPractitionerScore = 0) {
-  try {
-    // Get the latest SRS score for this patient
-    const latestSRS = await prisma.sRSScore.findFirst({
-      where: { patientId: parseInt(patientId) },
-      orderBy: { date: 'desc' }
-    });
-
-    if (latestSRS) {
-      // SRSScore is an integer. Replace the previous practitioner contribution
-      // so editing/re-saving an assessment cannot repeatedly inflate the score.
-      const previousPoints = Math.round(previousPractitionerScore);
-      const nextPoints = Math.round(practitionerScore);
-      const newTotalScore = Math.max(0, Math.min(11, latestSRS.srsScore - previousPoints + nextPoints));
-      
-      // Update the SRS score
-      await prisma.sRSScore.update({
-        where: { id: latestSRS.id },
-        data: { 
-          srsScore: newTotalScore,
-          updatedAt: new Date()
-        }
-      });
-
-      console.log(`Updated SRS score for patient ${patientId}: replacing ${previousPoints} with ${nextPoints} = ${newTotalScore}`);
-      return newTotalScore;
-    }
-    return null;
-  } catch (error) {
-    console.error('Error updating patient SRS score:', error);
-    throw error;
-  }
-}
 
 module.exports = router;
