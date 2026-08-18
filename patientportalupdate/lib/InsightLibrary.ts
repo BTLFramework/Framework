@@ -88,27 +88,27 @@ export const insightLibrary: Insight[] = [
     week: 1,
     track: "Lifestyle",
     title: "Sleep and pain sensitivity",
-    subtitle: "How sleep can influence pain, energy, and recovery",
-    assetPath: "/insight/sleep-recovery-summary.json",
-    quizQ: "Poor sleep can increase pain sensitivity for some people. (T/F)",
+    subtitle: "Professor Colin Espie's five principles of good sleep health",
+    assetPath: "https://www.youtube.com/watch?v=OvQTjAlIvI8",
+    quizQ: "Good sleep health should be personalized rather than built around one perfect routine. (T/F)",
     quizA: "T",
     releaseOffset: 2,
     points: 5,
     questions: [
       {
-        question: "Poor or insufficient sleep can increase pain sensitivity for some people. (True/False)",
+        question: "Good sleep health should be personalized rather than built around one perfect routine. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
       {
-        question: "Which sleep goal is generally most helpful?",
+        question: "Which is one of Professor Espie's five principles of good sleep health?",
         options: [
-          "A consistent routine with enough opportunity for sleep",
-          "Changing your bedtime dramatically every night",
-          "Trying to force perfect sleep",
-          "Relying only on weekend catch-up sleep"
+          "Perfect your sleep every night",
+          "Personalize your sleep",
+          "Measure every stage of sleep",
+          "Force yourself to sleep"
         ],
-        correctAnswer: 0
+        correctAnswer: 1
       }
     ]
   },
