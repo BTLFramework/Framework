@@ -33,6 +33,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
 import fs from "fs";
+import { startReassessmentReminderScheduler } from "./services/reassessmentReminderService";
 const authRoutes = require("./routes/authRoutes").default;
 const janeRoutes = require("./routes/janeRoutes").default;
 const patientRoutes = require("./routes/patientRoutes").default;
@@ -386,6 +387,7 @@ app.listen(serverPort, '0.0.0.0', () => {
   console.log(`✅ HTTP Server running at http://0.0.0.0:${serverPort}`);
   console.log(`🏥 Health check available at http://0.0.0.0:${serverPort}/health`);
   console.log(`👥 Patient routes available at http://0.0.0.0:${serverPort}/patients`);
+  startReassessmentReminderScheduler();
 }).on('error', (err) => {
   console.error('❌ Server failed to start:', err);
   process.exit(1);

@@ -339,45 +339,24 @@ function PatientModal({ patient, onClose }) {
 
   // Quick Actions Handlers
   const handleScheduleReassessment = async () => {
+    if (!window.confirm(`Send ${patient.name} a message to book their reassessment now?`)) return;
     try {
-      // Pick date (default +7d)
-      const defaultDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-      const dateInput = window.prompt('Enter reassessment date (YYYY-MM-DD):', defaultDate);
-      if (!dateInput) return;
-      const scheduledAt = new Date(dateInput);
-      if (Number.isNaN(scheduledAt.getTime())) {
-        alert('Invalid date. Please use YYYY-MM-DD.');
-        return;
-      }
-
       const response = await authenticatedFetch(`${API_URL}/patients/${patient.id}/reassessment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scheduledAt: scheduledAt.toISOString() })
+        body: JSON.stringify({})
       });
 
       if (response.ok) {
         setQuickActions(prev => ({ ...prev, reassessmentScheduled: true }));
-        const scheduledStr = scheduledAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        alert(`Reassessment scheduled for ${scheduledStr}`);
-
-        // Auto clinical note
-        try {
-          await authenticatedFetch(`${API_URL}/patients/${patient.id}/notes`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: `Reassessment scheduled for ${scheduledStr}.`, authorId: null })
-          });
-        } catch (e) {
-          console.warn('Failed to create clinical note for reassessment:', e);
-        }
-
+        alert(`Reassessment booking message sent to ${patient.name}.`);
       } else {
-        throw new Error('Failed to schedule reassessment');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to send reassessment reminder');
       }
     } catch (error) {
-      console.error('Error scheduling reassessment:', error);
-      alert(`Failed to schedule reassessment: ${error.message}`);
+      console.error('Error sending reassessment reminder:', error);
+      alert(`Failed to send reassessment reminder: ${error.message}`);
     }
   };
 
@@ -2086,7 +2065,7 @@ function PatientModal({ patient, onClose }) {
                     }}
                   >
                     {quickActions.reassessmentScheduled ? '✅' : '📅'} 
-                    {quickActions.reassessmentScheduled ? 'Reschedule Reassessment' : 'Schedule Reassessment'}
+                    {quickActions.reassessmentScheduled ? 'Send Reassessment Reminder Again' : 'Prompt Reassessment Booking'}
                   </button>
                   <button 
                     onClick={handleUpdateTreatmentPlan}

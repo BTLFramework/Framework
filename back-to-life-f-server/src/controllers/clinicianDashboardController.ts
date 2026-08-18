@@ -1,5 +1,6 @@
 import prisma from '../db';
 import { createTreatmentPlanPayload, reconcileBooleanSrsComponents } from '../services/clinicalIntegrationLogic';
+import { nextMonthlyReminderAt } from '../services/reassessmentReminderService';
 
 // Helpers
 const parseId = (v: string) => {
@@ -197,16 +198,41 @@ export async function updateTreatmentPlan(req: any, res: any) {
 export async function scheduleReassessment(req: any, res: any) {
   try {
     const patientId = parseId(req.params.id);
-    const { scheduledAt } = req.body ?? {};
-    const when = scheduledAt ? new Date(scheduledAt) : null;
-    if (!when || Number.isNaN(when.getTime())) return res.status(400).json({ error: 'valid scheduledAt required (ISO)' });
+    const nextReminderAt = nextMonthlyReminderAt();
 
-    const updated = await prisma.patient.update({
-      where: { id: patientId },
-      data: { nextReassessmentAt: when },
-      select: { id: true, nextReassessmentAt: true },
+    const result = await prisma.$transaction(async (tx) => {
+      const patient = await tx.patient.findUnique({
+        where: { id: patientId },
+        select: { id: true, name: true },
+      });
+      if (!patient) throw new Error('Patient not found');
+
+      const message = await tx.message.create({
+        data: {
+          patientId,
+          subject: 'Time to book your reassessment',
+          content: `Hi ${patient.name},\n\nIt’s time to book your reassessment so we can review your progress and update your plan as needed.\n\nBook here: https://movenetics.janeapp.com/#/staff_member/30\n\nIf you have any questions, send me a message here.\n\nDr. Spencer Barber`,
+          senderType: 'CLINICIAN',
+          senderName: 'Dr. Spencer Barber',
+          senderEmail: null,
+        },
+      });
+
+      const updated = await tx.patient.update({
+        where: { id: patientId },
+        data: { nextReassessmentAt: nextReminderAt },
+        select: { id: true, nextReassessmentAt: true },
+      });
+      await tx.clinicalNote.create({
+        data: {
+          patientId,
+          note: 'Reassessment booking reminder sent to patient.',
+          practitionerId: null,
+        },
+      });
+      return { patient: updated, message };
     });
-    res.json({ patient: updated });
+    res.status(201).json(result);
   } catch (err: any) {
     console.error('scheduleReassessment', err);
     res.status(400).json({ error: err.message ?? 'Bad request' });
