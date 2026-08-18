@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import LoginForm from "../components/LoginForm";
 
 function Login() {
@@ -18,15 +17,9 @@ function Login() {
           <p className="text-charcoal-600">Clinician Portal</p>
         </div>
         <LoginForm />
-        <div className="mt-6 text-center">
-          <span className="text-charcoal-600">Don't have an account? </span>
-          <Link
-            to="/register"
-            className="text-btl-600 hover:text-btl-700 font-semibold transition-colors"
-          >
-            Register
-          </Link>
-        </div>
+        <p className="mt-6 text-center text-sm text-charcoal-600">
+          Authorized practitioner access only.
+        </p>
       </div>
     </div>
   );
