@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { API_URL } from "../config/api";
+import { authenticatedFetch } from "../api/authenticatedFetch";
 
 const DashboardHeader = ({ onLogout, onRefresh, lastUpdated }) => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const DashboardHeader = ({ onLogout, onRefresh, lastUpdated }) => {
   useEffect(() => {
     const fetchUnreadCount = async () => {
       try {
-    const response = await fetch(`${API_URL}/api/messages/conversations`);
+    const response = await authenticatedFetch(`${API_URL}/api/messages/conversations`);
         
         if (response.ok) {
           const result = await response.json();

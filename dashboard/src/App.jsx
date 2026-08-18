@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Messages from "./pages/Messages";
 import SignatureRecoveryScore from "./pages/SignatureRecoveryScore";
@@ -14,20 +13,19 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
           <Route
             path="/dashboard"
-            element={<Dashboard />}
+            element={<PrivateRoute><Dashboard /></PrivateRoute>}
           />
           <Route
             path="/messages"
-            element={<Messages />}
+            element={<PrivateRoute><Messages /></PrivateRoute>}
           />
           <Route
             path="/signature-recovery-score"
-            element={<SignatureRecoveryScore />}
+            element={<PrivateRoute><SignatureRecoveryScore /></PrivateRoute>}
           />
-          <Route path="*" element={<Dashboard />} />
+          <Route path="*" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         </Routes>
       </Router>
     </>

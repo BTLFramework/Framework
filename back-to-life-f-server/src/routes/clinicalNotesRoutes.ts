@@ -5,8 +5,11 @@ import {
   updateClinicalNote, 
   deleteClinicalNote 
 } from '../controllers/clinicalNotesController';
+import { requirePractitionerAuth } from '../middleware/requirePractitionerAuth';
 
 const router = Router();
+
+router.use(requirePractitionerAuth);
 
 // Add logging middleware to this router
 router.use((req, res, next) => {

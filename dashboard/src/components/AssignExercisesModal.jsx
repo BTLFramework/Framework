@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { API_URL } from '../config/api';
+import { authenticatedFetch } from '../api/authenticatedFetch';
 import { parseTreatmentPlan } from '../helpers/assessmentScores';
 
 export default function AssignExercisesModal({ isOpen, onClose, patient, onSave }) {
@@ -17,7 +18,7 @@ export default function AssignExercisesModal({ isOpen, onClose, patient, onSave 
     if (!isOpen) return;
     setLoading(true);
     setError('');
-    fetch(`${API_URL}/patients/exercises/library`)
+    authenticatedFetch(`${API_URL}/patients/exercises/library`)
       .then(r => r.json())
       .then(json => setExercises(Array.isArray(json.exercises) ? json.exercises : []))
       .catch(() => setError('Failed to load exercises'))

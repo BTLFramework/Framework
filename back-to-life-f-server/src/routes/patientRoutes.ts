@@ -3,6 +3,7 @@ import { submitIntake, getPatientLatestScore, getAllPatientsWithScores, deletePa
 import { findPatientByEmail, getLatestSRSScore } from "../models/patientModel";
 import prisma from "../db";
 import * as clinicianCtrl from "../controllers/clinicianDashboardController";
+import { requirePractitionerAuth } from "../middleware/requirePractitionerAuth";
 
 const router = Router();
 
@@ -13,12 +14,12 @@ router.use((req, res, next) => {
 });
 
 router.post("/submit-intake", submitIntake);
-router.get("/patient/:id/score", getPatientLatestScore);
-router.get("/", getAllPatientsWithScores);
-router.delete("/:id", deletePatient);
+router.get("/patient/:id/score", requirePractitionerAuth, getPatientLatestScore);
+router.get("/", requirePractitionerAuth, getAllPatientsWithScores);
+router.delete("/:id", requirePractitionerAuth, deletePatient);
 
 // Update patient portal password for testing
-router.post("/update-portal-password", async (req: any, res: any) => {
+router.post("/update-portal-password", requirePractitionerAuth, async (req: any, res: any) => {
   try {
     const { email, password } = req.body;
     
@@ -49,7 +50,7 @@ router.post("/update-portal-password", async (req: any, res: any) => {
 });
 
 // Create patient portal account for testing
-router.post("/create-portal-account", async (req: any, res: any) => {
+router.post("/create-portal-account", requirePractitionerAuth, async (req: any, res: any) => {
   try {
     const { email, password, patientName } = req.body;
     
@@ -577,25 +578,25 @@ router.post("/activity", async (req: any, res: any) => {
 
 // ---------- Clinician Dashboard Routes ----------
 // Clinical notes
-router.get('/:id/notes', clinicianCtrl.listNotes);
-router.post('/:id/notes', clinicianCtrl.addNote);
-router.patch('/:id/notes/:noteId', clinicianCtrl.updateNote);
-router.delete('/:id/notes/:noteId', clinicianCtrl.deleteNote);
+router.get('/:id/notes', requirePractitionerAuth, clinicianCtrl.listNotes);
+router.post('/:id/notes', requirePractitionerAuth, clinicianCtrl.addNote);
+router.patch('/:id/notes/:noteId', requirePractitionerAuth, clinicianCtrl.updateNote);
+router.delete('/:id/notes/:noteId', requirePractitionerAuth, clinicianCtrl.deleteNote);
 
 // Clinician assessment
-router.post('/:id/assessment', clinicianCtrl.saveClinicianAssessment);
+router.post('/:id/assessment', requirePractitionerAuth, clinicianCtrl.saveClinicianAssessment);
 
 // Mark as reviewed
-router.patch('/:id/review', clinicianCtrl.markReviewed);
+router.patch('/:id/review', requirePractitionerAuth, clinicianCtrl.markReviewed);
 
 // Update treatment plan
-router.patch('/:id/treatment-plan', clinicianCtrl.updateTreatmentPlan);
+router.patch('/:id/treatment-plan', requirePractitionerAuth, clinicianCtrl.updateTreatmentPlan);
 
 // Schedule reassessment
-router.post('/:id/reassessment', clinicianCtrl.scheduleReassessment);
+router.post('/:id/reassessment', requirePractitionerAuth, clinicianCtrl.scheduleReassessment);
 
 // Exercises library (for clinician dashboard assignment UI)
-router.get('/exercises/library', async (_req: any, res: any) => {
+router.get('/exercises/library', requirePractitionerAuth, async (_req: any, res: any) => {
   try {
     const path = require('path');
     const baseCandidates = [

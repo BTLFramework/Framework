@@ -4,28 +4,26 @@ import prisma from "../db";
 
 export const register = async (req: any, res: any) => {
   try {
-    console.log("Registration attempt - Request body:", req.body);
+    if (process.env.ALLOW_PRACTITIONER_REGISTRATION !== "true") {
+      res.status(403).send("Practitioner registration is disabled")
+      return
+    }
     const { email, password } = req.body;
 
     if (!email || !password) {
-      console.log("Missing email or password:", { email: !!email, password: !!password });
       res.status(400).send("Email and password are required");
       return;
     }
 
-    console.log("Checking if user exists:", email);
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      console.log("User already exists:", email);
       res.status(400).send("User already exists");
       return;
     }
 
-    console.log("Creating new user:", email);
     const hashedPassword = await bcrypt.hash(password, 10);
     await prisma.user.create({ data: { email, password: hashedPassword } });
 
-    console.log("User registered successfully:", email);
     res.status(201).send("User registered");
   } catch (error) {
     console.error("Registration error:", error);

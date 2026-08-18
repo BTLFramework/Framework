@@ -4,6 +4,7 @@ import DashboardHeader from "../components/DashboardHeader";
 import { API_URL } from "../config/api";
 import { CLINICIAN } from "../config/clinician";
 import { formatClinicalDate, formatRelativeClinicalDate } from "../helpers/assessmentScores";
+import { authenticatedFetch } from "../api/authenticatedFetch";
 
 const Messages = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const Messages = () => {
     const fetchConversations = async () => {
       try {
         setLoading(true);
-    const response = await fetch(`${API_URL}/api/messages/conversations`);
+    const response = await authenticatedFetch(`${API_URL}/api/messages/conversations`);
         
         if (!response.ok) {
           throw new Error('Failed to fetch conversations');
@@ -57,7 +58,7 @@ const Messages = () => {
   const fetchConversationMessages = async (patientId) => {
     try {
       setMessagesLoading(true);
-      const response = await fetch(`${API_URL}/api/messages/conversation/${patientId}`);
+      const response = await authenticatedFetch(`${API_URL}/api/messages/conversation/${patientId}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch messages');
@@ -91,7 +92,7 @@ const Messages = () => {
     if (!newMessage.trim() || !selectedConversation) return;
 
     try {
-      const response = await fetch(`${API_URL}/api/messages/send`, {
+      const response = await authenticatedFetch(`${API_URL}/api/messages/send`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -153,7 +154,7 @@ const Messages = () => {
     if (!newMessage.trim() || !messageSubject.trim() || !selectedConversation) return;
 
     try {
-      const response = await fetch(`${API_URL}/api/messages/send`, {
+      const response = await authenticatedFetch(`${API_URL}/api/messages/send`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

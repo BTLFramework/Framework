@@ -3,6 +3,7 @@ import AssignExercisesModal from './AssignExercisesModal';
 import { API_URL } from "../config/api";
 import { CLINICIAN } from "../config/clinician";
 import { calculatePCS4Score, calculateTSK7Score, pluralizeDay } from "../helpers/assessmentScores";
+import { authenticatedFetch } from "../api/authenticatedFetch";
 
 // Helper function to get disability color based on region and score
 const getDisabilityColor = (region, score) => {
@@ -163,7 +164,7 @@ function PatientModal({ patient, onClose }) {
   // Load clinical notes from backend
   const loadClinicalNotes = async () => {
     try {
-      const resp = await fetch(`${API_URL}/patients/${patient.id}/notes`);
+      const resp = await authenticatedFetch(`${API_URL}/patients/${patient.id}/notes`);
       if (!resp.ok) return;
       const data = await resp.json();
       const notesArray = Array.isArray(data?.notes) ? data.notes : [];
@@ -270,7 +271,7 @@ function PatientModal({ patient, onClose }) {
         clinicianName: CLINICIAN.name
       };
 
-      const response = await fetch(`${API_URL}/patients/${patient.id}/assessment`, {
+      const response = await authenticatedFetch(`${API_URL}/patients/${patient.id}/assessment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -312,7 +313,7 @@ function PatientModal({ patient, onClose }) {
         clinicianName: CLINICIAN.name
       };
 
-      const response = await fetch(`${API_URL}/patients/${patient.id}/assessment`, {
+      const response = await authenticatedFetch(`${API_URL}/patients/${patient.id}/assessment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -352,7 +353,7 @@ function PatientModal({ patient, onClose }) {
 
       const sendReminder = window.confirm('Send a patient reminder ~48h before the reassessment?');
 
-      const response = await fetch(`${API_URL}/patients/${patient.id}/reassessment`, {
+      const response = await authenticatedFetch(`${API_URL}/patients/${patient.id}/reassessment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ scheduledAt: scheduledAt.toISOString() })
@@ -365,7 +366,7 @@ function PatientModal({ patient, onClose }) {
 
         // Auto clinical note
         try {
-          await fetch(`${API_URL}/patients/${patient.id}/notes`, {
+          await authenticatedFetch(`${API_URL}/patients/${patient.id}/notes`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text: `Reassessment scheduled for ${scheduledStr}. Reminder: ${sendReminder ? 'YES' : 'NO'}`, authorId: null })
@@ -380,7 +381,7 @@ function PatientModal({ patient, onClose }) {
           if (msUntil <= 48 * 60 * 60 * 1000) {
             try {
               const msg = `Hi ${patient.name},\n\nThis is a reminder for your reassessment around ${scheduledStr}. Please log in to your patient portal to confirm or message us if you need to adjust.\n\n– Back to Life Team`;
-              await fetch(`${API_URL}/api/messages/send`, {
+              await authenticatedFetch(`${API_URL}/api/messages/send`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ patientId: patient.id, subject: 'Reassessment Reminder', content: msg, senderName: CLINICIAN.name, senderEmail: CLINICIAN.email })
@@ -406,7 +407,7 @@ function PatientModal({ patient, onClose }) {
 
   const handleAssignSave = async ({ summary, ids }) => {
     try {
-      const response = await fetch(`${API_URL}/patients/${patient.id}/treatment-plan`, {
+      const response = await authenticatedFetch(`${API_URL}/patients/${patient.id}/treatment-plan`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plan: summary || '', exercises: ids || [] })
@@ -433,7 +434,7 @@ function PatientModal({ patient, onClose }) {
         reviewType: 'clinical_review'
       };
 
-      const response = await fetch(`${API_URL}/patients/${patient.id}/review`, {
+      const response = await authenticatedFetch(`${API_URL}/patients/${patient.id}/review`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -470,7 +471,7 @@ function PatientModal({ patient, onClose }) {
         clinicianName: CLINICIAN.name
       };
 
-      const response = await fetch(`${API_URL}/patients/${patient.id}/notes`, {
+      const response = await authenticatedFetch(`${API_URL}/patients/${patient.id}/notes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -508,7 +509,7 @@ function PatientModal({ patient, onClose }) {
     }
 
     try {
-      const response = await fetch(`${API_URL}/patients/${patient.id}/notes/${noteId}`, {
+      const response = await authenticatedFetch(`${API_URL}/patients/${patient.id}/notes/${noteId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -2242,7 +2243,7 @@ function PatientModal({ patient, onClose }) {
               }}
               onClick={async () => {
                 try {
-                  const response = await fetch(`${API_URL}/api/messages/send`, {
+                  const response = await authenticatedFetch(`${API_URL}/api/messages/send`, {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
@@ -2515,7 +2516,7 @@ function PatientModal({ patient, onClose }) {
                 <button 
                   onClick={async () => {
                     try {
-                      const response = await fetch(`${API_URL}/api/messages/send`, {
+                      const response = await authenticatedFetch(`${API_URL}/api/messages/send`, {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',

@@ -6,6 +6,7 @@ import DashboardHeader from "../components/DashboardHeader";
 import PatientTable from "../components/PatientTable";
 import PatientModal from "../components/PatientModal";
 import FilteredPatientsModal from "../components/FilteredPatientsModal";
+import { authenticatedFetch } from "../api/authenticatedFetch";
 
 // CACHE BUSTER: Force bundle change - timestamp: 2024-08-04-23:30
 console.log('🔥 DASHBOARD CACHE BUSTER: This should force bundle change!');
@@ -18,7 +19,7 @@ const fetchPatientsFromAPI = async () => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
     
-      const response = await fetch(`${API_URL}/patients`, {
+      const response = await authenticatedFetch(`${API_URL}/patients`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -254,7 +255,7 @@ function Dashboard() {
       
       // Delete each patient from the backend
       const deletePromises = patientIds.map(async (patientId) => {
-    const response = await fetch(`${API_URL}/patients/${patientId}`, {
+    const response = await authenticatedFetch(`${API_URL}/patients/${patientId}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',

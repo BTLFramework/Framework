@@ -244,11 +244,10 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
-// Debug middleware to log request body
+// Log the auth route without recording credentials or authorization headers.
 app.use((req, res, next) => {
   if (req.path.includes('/auth/')) {
-    console.log("Auth request body:", req.body);
-    console.log("Auth request headers:", req.headers);
+    console.log(`Auth request: ${req.method} ${req.path}`);
   }
   next();
 });

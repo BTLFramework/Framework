@@ -1,11 +1,12 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
+const { requirePractitionerAuth } = require('../middleware/requirePractitionerAuth');
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // Send message from clinician to patient
-router.post('/send', async (req, res) => {
+router.post('/send', requirePractitionerAuth, async (req, res) => {
   try {
     const { patientId, subject, content, senderName, senderEmail } = req.body;
 
@@ -59,7 +60,7 @@ router.post('/send', async (req, res) => {
 });
 
 // Get all conversations for clinician portal
-router.get('/conversations', async (req, res) => {
+router.get('/conversations', requirePractitionerAuth, async (req, res) => {
   try {
     // Get all patients who have messages
     const patients = await prisma.patient.findMany({
@@ -141,7 +142,7 @@ router.get('/conversations', async (req, res) => {
 });
 
 // Get messages for a specific conversation (clinician view)
-router.get('/conversation/:patientId', async (req, res) => {
+router.get('/conversation/:patientId', requirePractitionerAuth, async (req, res) => {
   try {
     const { patientId } = req.params;
     const { limit = 50, offset = 0 } = req.query;
@@ -305,4 +306,4 @@ router.post('/reply', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;
