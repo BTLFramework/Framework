@@ -170,12 +170,26 @@ function PatientModal({ patient, onClose }) {
 
   // Clinical Notes State
   const [clinicalNotes, setClinicalNotes] = useState([]);
+  const [clinicalNotesLoading, setClinicalNotesLoading] = useState(false);
+  const [clinicalNotesError, setClinicalNotesError] = useState('');
+  const [reviewSaving, setReviewSaving] = useState(false);
 
   // Load clinical notes from backend
   const loadClinicalNotes = async () => {
+    setClinicalNotesLoading(true);
+    setClinicalNotesError('');
     try {
       const resp = await authenticatedFetch(`${API_URL}/patients/${patient.id}/notes`);
-      if (!resp.ok) return;
+      if (!resp.ok) {
+        let message = `Unable to load clinical notes (${resp.status})`;
+        try {
+          const errorData = await resp.json();
+          message = errorData?.error || errorData?.message || message;
+        } catch (_) {
+          // Keep the status-based message when the response is not JSON.
+        }
+        throw new Error(message);
+      }
       const data = await resp.json();
       const notesArray = Array.isArray(data?.notes) ? data.notes : [];
       setClinicalNotes(notesArray.map((n) => ({
@@ -185,8 +199,11 @@ function PatientModal({ patient, onClose }) {
         createdAt: n.createdAt ?? new Date().toISOString(),
         clinicianName: n.practitioner?.name ?? "Clinician",
       })));
-    } catch (_) {
-      // no-op; keep existing notes state on failure
+    } catch (error) {
+      console.error('Error loading clinical notes:', error);
+      setClinicalNotesError(error?.message || 'Clinical notes are temporarily unavailable.');
+    } finally {
+      setClinicalNotesLoading(false);
     }
   };
 
@@ -397,6 +414,8 @@ function PatientModal({ patient, onClose }) {
   };
 
   const handleMarkAsReviewed = async () => {
+    if (reviewSaving || quickActions.reviewed) return;
+    setReviewSaving(true);
     try {
       const response = await authenticatedFetch(`${API_URL}/patients/${patient.id}/review`, {
         method: 'PATCH',
@@ -412,11 +431,20 @@ function PatientModal({ patient, onClose }) {
         setQuickActions(prev => ({ ...prev, reviewed: true }));
         alert('Patient marked as reviewed successfully!');
       } else {
-        throw new Error('Failed to mark patient as reviewed');
+        let message = `Failed to mark patient as reviewed (${response.status})`;
+        try {
+          const errorData = await response.json();
+          message = errorData?.error || errorData?.message || message;
+        } catch (_) {
+          // Keep the status-based message when the response is not JSON.
+        }
+        throw new Error(message);
       }
     } catch (error) {
       console.error('Error marking patient as reviewed:', error);
       alert(`Failed to mark patient as reviewed: ${error.message}`);
+    } finally {
+      setReviewSaving(false);
     }
   };
 
@@ -1956,7 +1984,7 @@ function PatientModal({ patient, onClose }) {
                   Clinical Notes
                 </h4>
                 
-                {clinicalNotes.length > 0 && (
+                {!clinicalNotesLoading && !clinicalNotesError && clinicalNotes.length > 0 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '20px' }}>
                     {clinicalNotes.map((note, index) => (
                       <div 
@@ -2016,7 +2044,7 @@ function PatientModal({ patient, onClose }) {
                     ))}
                   </div>
                 )}
-                <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6b7280' }}>
+                <div style={{ textAlign: 'center', padding: '40px 20px', color: clinicalNotesError ? '#b45309' : '#6b7280' }}>
                   <svg 
                     style={{ width: '48px', height: '48px', margin: '0 auto 16px', color: '#d1d5db' }} 
                     fill="none" 
@@ -2031,11 +2059,32 @@ function PatientModal({ patient, onClose }) {
                     />
                   </svg>
                   <p style={{ fontSize: '1rem', fontWeight: 500, margin: '0 0 8px 0' }}>
-                    {clinicalNotes.length === 0 ? 'No clinical notes yet' : `${clinicalNotes.length} clinical note${clinicalNotes.length === 1 ? '' : 's'}`}
+                    {clinicalNotesLoading
+                      ? 'Loading clinical notes…'
+                      : clinicalNotesError
+                        ? 'Clinical notes temporarily unavailable'
+                        : clinicalNotes.length === 0
+                          ? 'No clinical notes yet'
+                          : `${clinicalNotes.length} clinical note${clinicalNotes.length === 1 ? '' : 's'}`}
                   </p>
                   <p style={{ fontSize: '0.875rem', margin: 0 }}>
-                    {clinicalNotes.length === 0 ? 'Click "Add Note" to start documenting patient progress' : 'Click "Add Note" to add more notes'}
+                    {clinicalNotesLoading
+                      ? 'Please wait while the patient record loads.'
+                      : clinicalNotesError
+                        ? clinicalNotesError
+                        : clinicalNotes.length === 0
+                          ? 'Click "Add Note" to start documenting patient progress'
+                          : 'Click "Add Note" to add more notes'}
                   </p>
+                  {clinicalNotesError && (
+                    <button
+                      type="button"
+                      onClick={loadClinicalNotes}
+                      style={{ marginTop: '14px', padding: '8px 16px', border: '1px solid #b45309', borderRadius: '6px', background: 'white', color: '#92400e', cursor: 'pointer', fontWeight: 600 }}
+                    >
+                      Retry
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -2080,34 +2129,34 @@ function PatientModal({ patient, onClose }) {
                   </button>
                   <button 
                     onClick={handleMarkAsReviewed}
-                    disabled={quickActions.reviewed}
+                    disabled={quickActions.reviewed || reviewSaving}
                     style={{
                       padding: '8px 16px',
                       fontSize: '0.875rem',
                       fontWeight: 500,
-                      color: quickActions.reviewed ? '#9ca3af' : '#155e75',
-                      backgroundColor: quickActions.reviewed ? '#f3f4f6' : 'white',
-                      border: `1px solid ${quickActions.reviewed ? '#d1d5db' : '#155e75'}`,
+                      color: (quickActions.reviewed || reviewSaving) ? '#9ca3af' : '#155e75',
+                      backgroundColor: (quickActions.reviewed || reviewSaving) ? '#f3f4f6' : 'white',
+                      border: `1px solid ${(quickActions.reviewed || reviewSaving) ? '#d1d5db' : '#155e75'}`,
                       borderRadius: '6px',
-                      cursor: quickActions.reviewed ? 'not-allowed' : 'pointer',
+                      cursor: (quickActions.reviewed || reviewSaving) ? 'not-allowed' : 'pointer',
                       transition: 'all 0.2s ease',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '6px'
                     }}
                     onMouseOver={(e) => {
-                      if (!quickActions.reviewed) {
+                      if (!quickActions.reviewed && !reviewSaving) {
                         e.target.style.backgroundColor = '#f0fdff';
                       }
                     }}
                     onMouseOut={(e) => {
-                      if (!quickActions.reviewed) {
+                      if (!quickActions.reviewed && !reviewSaving) {
                         e.target.style.backgroundColor = 'white';
                       }
                     }}
                   >
-                    {quickActions.reviewed ? '✅' : '👁️'} 
-                    {quickActions.reviewed ? 'Marked as Reviewed' : 'Mark as Reviewed'}
+                    {quickActions.reviewed ? '✅ ' : reviewSaving ? '⏳ ' : '👁️ '}
+                    {quickActions.reviewed ? 'Marked as Reviewed' : reviewSaving ? 'Saving…' : 'Mark as Reviewed'}
                   </button>
                 </div>
               </div>
