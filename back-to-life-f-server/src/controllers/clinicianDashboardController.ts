@@ -1,6 +1,7 @@
 import prisma from '../db';
 import { createTreatmentPlanPayload, reconcileBooleanSrsComponents } from '../services/clinicalIntegrationLogic';
 import { nextMonthlyReminderAt } from '../services/reassessmentReminderService';
+import { decodeClinicalNote, encodeClinicalNote } from '../services/clinicalNoteType';
 
 // Helpers
 const parseId = (v: string) => {
@@ -17,7 +18,12 @@ export async function listNotes(req: any, res: any) {
       where: { patientId },
       orderBy: { createdAt: 'desc' },
     });
-    res.json({ notes });
+    res.json({
+      notes: notes.map((note) => {
+        const decoded = decodeClinicalNote(note.note);
+        return { ...note, note: decoded.text, type: decoded.type };
+      }),
+    });
   } catch (err: any) {
     console.error('listNotes', err);
     res.status(400).json({ error: err.message ?? 'Bad request' });
@@ -27,17 +33,18 @@ export async function listNotes(req: any, res: any) {
 export async function addNote(req: any, res: any) {
   try {
     const patientId = parseId(req.params.id);
-    const { text, authorId } = req.body ?? {};
+    const { text, authorId, type } = req.body ?? {};
     if (!text || typeof text !== 'string') return res.status(400).json({ error: 'text required' });
 
     const note = await prisma.clinicalNote.create({
       data: { 
         patientId, 
-        note: text, 
+        note: encodeClinicalNote(text, type),
         practitionerId: authorId ? parseId(authorId) : null 
       },
     });
-    res.status(201).json({ note });
+    const decoded = decodeClinicalNote(note.note);
+    res.status(201).json({ note: { ...note, note: decoded.text, type: decoded.type } });
   } catch (err: any) {
     console.error('addNote', err);
     res.status(400).json({ error: err.message ?? 'Bad request' });
@@ -48,15 +55,22 @@ export async function updateNote(req: any, res: any) {
   try {
     const patientId = parseId(req.params.id);
     const noteId = parseId(req.params.noteId);
-    const { text } = req.body ?? {};
+    const { text, type } = req.body ?? {};
     if (!text || typeof text !== 'string') return res.status(400).json({ error: 'text required' });
 
     // Ensure note belongs to patient
     const existing = await prisma.clinicalNote.findUnique({ where: { id: noteId } });
     if (!existing || existing.patientId !== patientId) return res.status(404).json({ error: 'Note not found' });
 
-    const note = await prisma.clinicalNote.update({ where: { id: noteId }, data: { note: text } });
-    res.json({ note });
+    const existingDecoded = decodeClinicalNote(existing.note);
+    const note = await prisma.clinicalNote.update({
+      where: { id: noteId },
+      data: {
+        note: encodeClinicalNote(text, type === undefined ? existingDecoded.type : type),
+      },
+    });
+    const decoded = decodeClinicalNote(note.note);
+    res.json({ note: { ...note, note: decoded.text, type: decoded.type } });
   } catch (err: any) {
     console.error('updateNote', err);
     res.status(400).json({ error: err.message ?? 'Bad request' });

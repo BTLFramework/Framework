@@ -470,7 +470,7 @@ function PatientModal({ patient, onClose }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text: noteData.text, authorId: null })
+        body: JSON.stringify({ text: noteData.text, type: noteData.type, authorId: null })
       });
 
       if (response.ok) {
@@ -479,7 +479,7 @@ function PatientModal({ patient, onClose }) {
         const newNote = {
           id: savedNote.id,
           text: savedNote.note,
-          type: newNoteType,
+          type: savedNote.type || newNoteType,
           createdAt: savedNote.createdAt,
           clinicianName: CLINICIAN.name
         };
