@@ -2,7 +2,7 @@
   "type": "form",
   "title": "Week 1 Check-In",
   "subtitle": "Notice what you learned, what you tried, and what your recovery needs next.",
-  "description": "This is a reflection, not a test. Honest answers help you and your practitioner focus on what matters.",
+  "description": "This is a reflection, not a test. Honest answers can help you focus on what matters and prepare for conversations with your practitioner.",
   "sections": [
     {
       "title": "What stood out?",
@@ -62,8 +62,8 @@
         },
         {
           "type": "textarea",
-          "label": "Is there anything you want your practitioner to know?",
-          "placeholder": "Questions, concerns, wins, or barriers...",
+          "label": "What is one point you may want to discuss with your practitioner?",
+          "placeholder": "A question, concern, win, or barrier to bring to your next conversation...",
           "rows": 3
         }
       ]

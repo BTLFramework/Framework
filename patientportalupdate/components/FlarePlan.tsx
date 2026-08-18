@@ -166,7 +166,7 @@ Follow your clinician's advice and seek urgent care for new or concerning sympto
                 <Award className="w-8 h-8 text-yellow-600" />
                 <span className="text-2xl font-bold text-yellow-800">+5 Recovery Points Earned!</span>
               </div>
-              <p className="text-yellow-700">Great work creating your personalized flare management strategy!</p>
+              <p className="text-yellow-700">Great work creating your personalized flare management strategy. Download the quick-reference card if you want to keep a copy.</p>
             </div>
 
             {/* Plan Summary */}
