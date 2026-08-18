@@ -26,7 +26,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "What can influence pain?",
     subtitle: "How context, protection, and safety can change your experience",
-    assetPath: "/insight/pain-influences-week1-summary.json",
+    assetPath: "/insight/ps-danger.mp4",
     quizQ: "Which can help create a sense of safety during recovery?",
     quizA: "A manageable movement you feel confident doing",
     releaseOffset: 0,
