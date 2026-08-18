@@ -2170,7 +2170,7 @@ function PatientModal({ patient, onClose }) {
               }}
               onClick={handleScheduleReassessment}
             >
-              {quickActions.reassessmentScheduled ? '✅ Send Reassessment Reminder Again' : '📅 Send Reassessment Reminder'}
+              📅 Schedule Follow-up
             </button>
           </div>
         </div>
