@@ -888,6 +888,7 @@ export const getAllPatientsWithScores = async (_req: any, res: any) => {
         pcs4: latestScore?.pcs4 || null,
         tsk7: latestScore?.tsk7 || null,
         treatmentPlan: patient.treatmentPlan || null,
+        nextReassessmentAt: patient.nextReassessmentAt || null,
         lastUpdate: latestScore?.date || patient.createdAt,
         notes: [], // Clinical notes would come from a separate table
         // Real recovery points data from database

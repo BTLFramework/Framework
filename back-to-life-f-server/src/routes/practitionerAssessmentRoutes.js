@@ -26,6 +26,11 @@ router.post('/save', async (req, res) => {
     const section2Score = calculateSectionScore(section2Items);
     const totalScore = Math.round((section1Score + section2Score) * 10) / 10;
 
+    const previousAssessment = await prisma.practitionerAssessment.findFirst({
+      where: { patientId: parseInt(patientId) },
+      orderBy: [{ date: 'desc' }, { id: 'desc' }]
+    });
+
     // Save to database
     const assessment = await prisma.practitionerAssessment.create({
       data: {
@@ -89,11 +94,16 @@ router.post('/save', async (req, res) => {
     });
 
     // Update the patient's SRS score to include practitioner points
-    await updatePatientSRSScore(patientId, totalScore);
+    const srsScore = await updatePatientSRSScore(
+      patientId,
+      totalScore,
+      previousAssessment?.totalPractitionerScore || 0
+    );
 
     res.json({
       success: true,
       assessment,
+      srsScore,
       message: 'Practitioner assessment saved successfully'
     });
 
@@ -142,7 +152,7 @@ function calculateSectionScore(items) {
 }
 
 // Helper function to update patient SRS score
-async function updatePatientSRSScore(patientId, practitionerScore) {
+async function updatePatientSRSScore(patientId, practitionerScore, previousPractitionerScore = 0) {
   try {
     // Get the latest SRS score for this patient
     const latestSRS = await prisma.sRSScore.findFirst({
@@ -151,9 +161,11 @@ async function updatePatientSRSScore(patientId, practitionerScore) {
     });
 
     if (latestSRS) {
-      // Calculate new total SRS score including practitioner points
-      const baseScore = latestSRS.srsScore;
-      const newTotalScore = Math.min(11, baseScore + practitionerScore);
+      // SRSScore is an integer. Replace the previous practitioner contribution
+      // so editing/re-saving an assessment cannot repeatedly inflate the score.
+      const previousPoints = Math.round(previousPractitionerScore);
+      const nextPoints = Math.round(practitionerScore);
+      const newTotalScore = Math.max(0, Math.min(11, latestSRS.srsScore - previousPoints + nextPoints));
       
       // Update the SRS score
       await prisma.sRSScore.update({
@@ -164,10 +176,13 @@ async function updatePatientSRSScore(patientId, practitionerScore) {
         }
       });
 
-      console.log(`Updated SRS score for patient ${patientId}: ${baseScore} + ${practitionerScore} = ${newTotalScore}`);
+      console.log(`Updated SRS score for patient ${patientId}: replacing ${previousPoints} with ${nextPoints} = ${newTotalScore}`);
+      return newTotalScore;
     }
+    return null;
   } catch (error) {
     console.error('Error updating patient SRS score:', error);
+    throw error;
   }
 }
 

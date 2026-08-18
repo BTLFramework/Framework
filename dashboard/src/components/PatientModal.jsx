@@ -153,7 +153,7 @@ function PatientModal({ patient, onClose }) {
 
   // Quick Actions State
   const [quickActions, setQuickActions] = useState({
-    reassessmentScheduled: false,
+    reassessmentScheduled: Boolean(patient?.nextReassessmentAt),
     treatmentPlanUpdated: false,
     reviewed: false
   });
@@ -271,7 +271,7 @@ function PatientModal({ patient, onClose }) {
         clinicianName: CLINICIAN.name
       };
 
-      const response = await authenticatedFetch(`${API_URL}/patients/${patient.id}/assessment`, {
+      const response = await authenticatedFetch(`${API_URL}/api/practitioner-assessment/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -284,8 +284,7 @@ function PatientModal({ patient, onClose }) {
         console.log('Assessment saved successfully:', result);
         alert('Practitioner assessment saved successfully!');
         
-        // TODO: Refresh patient data to show updated SRS score
-        // This would typically trigger a refresh of the patient list
+        window.location.reload();
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to save assessment');
@@ -324,10 +323,10 @@ function PatientModal({ patient, onClose }) {
       if (response.ok) {
         const result = await response.json();
         console.log('Clinician assessment saved successfully:', result);
-        alert('Clinician assessment saved successfully!');
-        
-        // TODO: Refresh patient data to show updated SRS score
-        // This would typically trigger a refresh of the patient list
+        alert(result.srsScore == null
+          ? 'Clinician assessment saved. No SRS record was available to update.'
+          : `Clinician assessment saved. SRS is now ${result.srsScore}/11.`);
+        window.location.reload();
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to save assessment');
@@ -351,8 +350,6 @@ function PatientModal({ patient, onClose }) {
         return;
       }
 
-      const sendReminder = window.confirm('Send a patient reminder ~48h before the reassessment?');
-
       const response = await authenticatedFetch(`${API_URL}/patients/${patient.id}/reassessment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -369,28 +366,12 @@ function PatientModal({ patient, onClose }) {
           await authenticatedFetch(`${API_URL}/patients/${patient.id}/notes`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: `Reassessment scheduled for ${scheduledStr}. Reminder: ${sendReminder ? 'YES' : 'NO'}`, authorId: null })
+            body: JSON.stringify({ text: `Reassessment scheduled for ${scheduledStr}.`, authorId: null })
           });
         } catch (e) {
           console.warn('Failed to create clinical note for reassessment:', e);
         }
 
-        // Send immediate reminder if within 48h
-        if (sendReminder) {
-          const msUntil = scheduledAt.getTime() - Date.now();
-          if (msUntil <= 48 * 60 * 60 * 1000) {
-            try {
-              const msg = `Hi ${patient.name},\n\nThis is a reminder for your reassessment around ${scheduledStr}. Please log in to your patient portal to confirm or message us if you need to adjust.\n\n– Back to Life Team`;
-              await authenticatedFetch(`${API_URL}/api/messages/send`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ patientId: patient.id, subject: 'Reassessment Reminder', content: msg, senderName: CLINICIAN.name, senderEmail: CLINICIAN.email })
-              });
-            } catch (e) {
-              console.warn('Failed to send immediate reassessment reminder:', e);
-            }
-          }
-        }
       } else {
         throw new Error('Failed to schedule reassessment');
       }
@@ -481,11 +462,12 @@ function PatientModal({ patient, onClose }) {
 
       if (response.ok) {
         const result = await response.json();
+        const savedNote = result.note;
         const newNote = {
-          id: result.noteId || Date.now(),
-          text: newNoteText.trim(),
+          id: savedNote.id,
+          text: savedNote.note,
           type: newNoteType,
-          createdAt: new Date().toISOString(),
+          createdAt: savedNote.createdAt,
           clinicianName: CLINICIAN.name
         };
         
@@ -2082,65 +2064,55 @@ function PatientModal({ patient, onClose }) {
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                   <button 
                     onClick={handleScheduleReassessment}
-                    disabled={quickActions.reassessmentScheduled}
                     style={{
                       padding: '8px 16px',
                       fontSize: '0.875rem',
                       fontWeight: 500,
-                      color: quickActions.reassessmentScheduled ? '#9ca3af' : '#155e75',
-                      backgroundColor: quickActions.reassessmentScheduled ? '#f3f4f6' : 'white',
-                      border: `1px solid ${quickActions.reassessmentScheduled ? '#d1d5db' : '#155e75'}`,
+                      color: '#155e75',
+                      backgroundColor: 'white',
+                      border: '1px solid #155e75',
                       borderRadius: '6px',
-                      cursor: quickActions.reassessmentScheduled ? 'not-allowed' : 'pointer',
+                      cursor: 'pointer',
                       transition: 'all 0.2s ease',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '6px'
                     }}
                     onMouseOver={(e) => {
-                      if (!quickActions.reassessmentScheduled) {
-                        e.target.style.backgroundColor = '#f0fdff';
-                      }
+                      e.target.style.backgroundColor = '#f0fdff';
                     }}
                     onMouseOut={(e) => {
-                      if (!quickActions.reassessmentScheduled) {
-                        e.target.style.backgroundColor = 'white';
-                      }
+                      e.target.style.backgroundColor = 'white';
                     }}
                   >
                     {quickActions.reassessmentScheduled ? '✅' : '📅'} 
-                    {quickActions.reassessmentScheduled ? 'Reassessment Scheduled' : 'Schedule Reassessment'}
+                    {quickActions.reassessmentScheduled ? 'Reschedule Reassessment' : 'Schedule Reassessment'}
                   </button>
                   <button 
                     onClick={handleUpdateTreatmentPlan}
-                    disabled={quickActions.treatmentPlanUpdated}
                     style={{
                       padding: '8px 16px',
                       fontSize: '0.875rem',
                       fontWeight: 500,
-                      color: quickActions.treatmentPlanUpdated ? '#9ca3af' : '#155e75',
-                      backgroundColor: quickActions.treatmentPlanUpdated ? '#f3f4f6' : 'white',
-                      border: `1px solid ${quickActions.treatmentPlanUpdated ? '#d1d5db' : '#155e75'}`,
+                      color: '#155e75',
+                      backgroundColor: 'white',
+                      border: '1px solid #155e75',
                       borderRadius: '6px',
-                      cursor: quickActions.treatmentPlanUpdated ? 'not-allowed' : 'pointer',
+                      cursor: 'pointer',
                       transition: 'all 0.2s ease',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '6px'
                     }}
                     onMouseOver={(e) => {
-                      if (!quickActions.treatmentPlanUpdated) {
-                        e.target.style.backgroundColor = '#f0fdff';
-                      }
+                      e.target.style.backgroundColor = '#f0fdff';
                     }}
                     onMouseOut={(e) => {
-                      if (!quickActions.treatmentPlanUpdated) {
-                        e.target.style.backgroundColor = 'white';
-                      }
+                      e.target.style.backgroundColor = 'white';
                     }}
                   >
                     {quickActions.treatmentPlanUpdated ? '✅' : '📋'} 
-                    {quickActions.treatmentPlanUpdated ? 'Treatment Plan Updated' : 'Update Treatment Plan'}
+                    {quickActions.treatmentPlanUpdated ? 'Update Treatment Plan Again' : 'Update Treatment Plan'}
                   </button>
                   <button 
                     onClick={handleMarkAsReviewed}

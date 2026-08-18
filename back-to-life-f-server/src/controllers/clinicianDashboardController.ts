@@ -1,4 +1,5 @@
 import prisma from '../db';
+import { createTreatmentPlanPayload, reconcileBooleanSrsComponents } from '../services/clinicalIntegrationLogic';
 
 // Helpers
 const parseId = (v: string) => {
@@ -81,17 +82,38 @@ export async function deleteNote(req: any, res: any) {
 export async function saveClinicianAssessment(req: any, res: any) {
   try {
     const patientId = parseId(req.params.id);
-    const { recoveryMilestoneAchieved, clinicalProgressVerified, comments } = req.body ?? {};
+    const body = req.body ?? {};
+    const recoveryMilestone = !!(body.recoveryMilestone ?? body.recoveryMilestoneAchieved);
+    const clinicalProgressVerified = !!body.clinicalProgressVerified;
 
-    const assessment = await prisma.clinicianAssessment.create({
-      data: {
-        patientId,
-        recoveryMilestoneAchieved: !!recoveryMilestoneAchieved,
-        clinicalProgressVerified: !!clinicalProgressVerified,
-        comments: comments ?? null,
-      },
+    const result = await prisma.$transaction(async (tx) => {
+      const latestScore = await tx.sRSScore.findFirst({
+        where: { patientId },
+        orderBy: [{ date: 'desc' }, { id: 'desc' }],
+      });
+      const assessment = await tx.clinicianAssessment.create({
+        data: {
+          patientId,
+          recoveryMilestoneAchieved: recoveryMilestone,
+          clinicalProgressVerified,
+          comments: typeof body.comments === 'string' && body.comments.trim() ? body.comments.trim() : null,
+        },
+      });
+      if (!latestScore) return { assessment, srsScore: null };
+
+      const srsScore = reconcileBooleanSrsComponents(
+        latestScore.srsScore,
+        [!!latestScore.recoveryMilestone, !!latestScore.clinicalProgressVerified],
+        [recoveryMilestone, clinicalProgressVerified],
+      );
+
+      await tx.sRSScore.update({
+        where: { id: latestScore.id },
+        data: { recoveryMilestone, clinicalProgressVerified, clinicianAssessed: true, srsScore },
+      });
+      return { assessment, srsScore };
     });
-    res.status(201).json({ assessment });
+    res.status(201).json(result);
   } catch (err: any) {
     console.error('saveClinicianAssessment', err);
     res.status(400).json({ error: err.message ?? 'Bad request' });
@@ -119,14 +141,13 @@ export async function updateTreatmentPlan(req: any, res: any) {
   try {
     const patientId = parseId(req.params.id);
     const { plan, exercises } = req.body ?? {};
-    if (!plan || typeof plan !== 'string') return res.status(400).json({ error: 'plan required' });
+    const summary = typeof plan === 'string' ? plan.trim() : '';
+    const hasExerciseUpdate = Array.isArray(exercises);
+    const planPayload = createTreatmentPlanPayload(plan, exercises);
+    if (planPayload === null) return res.status(400).json({ error: 'plan or exercises required' });
 
     // If exercises are provided, store a JSON payload inside treatmentPlan for now
     // { summary: string, assignedExercises: string[] }
-    const planPayload = Array.isArray(exercises) && exercises.length > 0
-      ? JSON.stringify({ summary: plan, assignedExercises: exercises, updatedAt: new Date().toISOString() })
-      : plan;
-
     const updated = await prisma.patient.update({
       where: { id: patientId },
       data: { treatmentPlan: planPayload },
@@ -134,7 +155,8 @@ export async function updateTreatmentPlan(req: any, res: any) {
     });
 
     // Auto-create a clinical note documenting the treatment plan update
-    let noteText = `✅ Treatment Plan Updated\n\n${plan}`;
+    let noteText = '✅ Treatment Plan Updated';
+    if (summary) noteText += `\n\n${summary}`;
     if (Array.isArray(exercises) && exercises.length > 0) {
       noteText += `\n\n📋 Assigned Exercises (${exercises.length}):\n`;
       // Try to load exercise names for better documentation
