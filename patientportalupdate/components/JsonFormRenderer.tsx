@@ -37,12 +37,13 @@ interface FormData {
 
 interface JsonFormRendererProps {
   formData: FormData;
-  onComplete: (data: any) => void;
+  onComplete: (data: Record<string, unknown>) => Promise<boolean>;
 }
 
 export default function JsonFormRenderer({ formData, onComplete }: JsonFormRendererProps) {
   const [formValues, setFormValues] = useState<Record<string, any>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleFieldChange = (sectionIndex: number, fieldIndex: number, value: any) => {
     const fieldKey = `${sectionIndex}-${fieldIndex}`;
@@ -52,9 +53,23 @@ export default function JsonFormRenderer({ formData, onComplete }: JsonFormRende
     }));
   };
 
-  const handleSubmit = () => {
-    setIsSubmitted(true);
-    onComplete(formValues);
+  const handleSubmit = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
+    const saved = await onComplete({
+      kind: "guided-form",
+      title: formData.title,
+      sections: formData.sections.map((section, sectionIndex) => ({
+        title: section.title,
+        fields: section.fields.map((field, fieldIndex) => ({
+          label: field.label,
+          type: field.type,
+          value: formValues[`${sectionIndex}-${fieldIndex}`] ?? null
+        }))
+      }))
+    });
+    if (saved) setIsSubmitted(true);
+    setIsSaving(false);
   };
 
   const renderField = (field: FormField, sectionIndex: number, fieldIndex: number) => {
@@ -186,10 +201,10 @@ export default function JsonFormRenderer({ formData, onComplete }: JsonFormRende
       ))}
 
       <div className="text-center">
-        <Button onClick={handleSubmit} size="lg">
-          {formData.submitText}
+        <Button onClick={handleSubmit} size="lg" disabled={isSaving}>
+          {isSaving ? "Saving…" : formData.submitText}
         </Button>
       </div>
     </div>
   );
-} 
+}

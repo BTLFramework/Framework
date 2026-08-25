@@ -3,7 +3,16 @@
 
 const API_BASE_URL = '';
 
-export const completeInsight = async (patientId: string, insightId: string) => {
+export interface InsightResponseSubmission {
+  insightTitle: string;
+  response: Record<string, unknown>;
+}
+
+export const completeInsight = async (
+  patientId: string,
+  insightId: string,
+  submission?: InsightResponseSubmission
+) => {
   try {
     console.log(`🎯 Completing insight ${insightId} for patient ${patientId}`);
     
@@ -14,7 +23,8 @@ export const completeInsight = async (patientId: string, insightId: string) => {
       },
       body: JSON.stringify({ 
         insightId, 
-        patientId 
+        patientId,
+        ...submission
       }),
     });
 
@@ -31,4 +41,4 @@ export const completeInsight = async (patientId: string, insightId: string) => {
     console.error('❌ Error completing insight:', error);
     throw error;
   }
-}; 
+};

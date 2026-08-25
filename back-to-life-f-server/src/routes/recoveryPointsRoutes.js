@@ -8,6 +8,7 @@ const {
   INSIGHT_ACTION_PREFIX,
   calculateInsightStatus
 } = require('../services/insightProgression');
+const { verifyToken } = require('../services/jwtService');
 
 // Use centralized Prisma instance with fallback
 let prisma;
@@ -47,6 +48,48 @@ async function getInsightStatus(patient) {
   });
 }
 
+function requireMatchingPatient(req, res, patient) {
+  const token = req.cookies?.patientToken;
+  const payload = token ? verifyToken(token) : null;
+
+  if (!payload || payload.role !== 'patient') {
+    res.status(401).json({ success: false, error: 'Patient sign-in is required' });
+    return false;
+  }
+  if (Number(payload.patientId) !== patient.id) {
+    res.status(403).json({ success: false, error: 'This patient record is not available to this account' });
+    return false;
+  }
+  return true;
+}
+
+function validateInsightResponse(response, insightTitle) {
+  if (response === undefined) return { response: undefined, insightTitle: undefined };
+  if (!response || typeof response !== 'object' || Array.isArray(response)) {
+    throw new Error('Recovery Insight response must be a structured object');
+  }
+
+  const serialized = JSON.stringify(response);
+  if (serialized.length > 30000) {
+    throw new Error('Recovery Insight response is too large');
+  }
+
+  const title = String(insightTitle || '').trim();
+  if (!title || title.length > 160) {
+    throw new Error('Recovery Insight title is invalid');
+  }
+  return { response, insightTitle: title };
+}
+
+async function saveInsightResponse(patientId, insightId, insightTitle, response) {
+  if (response === undefined) return;
+  await prisma.insightResponse.upsert({
+    where: { patientId_insightId: { patientId, insightId } },
+    create: { patientId, insightId, insightTitle, response },
+    update: { insightTitle, response, submittedAt: new Date() }
+  });
+}
+
 // Durable Recovery Insight progression. Upcoming titles remain visible in the
 // patient portal, but only the next sequential, calendar-eligible lesson opens.
 router.get('/insights/status/:patientIdentifier', async (req, res) => {
@@ -55,6 +98,7 @@ router.get('/insights/status/:patientIdentifier', async (req, res) => {
     if (!patient) {
       return res.status(404).json({ success: false, error: 'Patient not found' });
     }
+    if (!requireMatchingPatient(req, res, patient)) return;
 
     return res.json({ success: true, data: await getInsightStatus(patient) });
   } catch (error) {
@@ -65,15 +109,23 @@ router.get('/insights/status/:patientIdentifier', async (req, res) => {
 
 router.post('/insights/complete', async (req, res) => {
   try {
-    const { patientId, insightId } = req.body;
+    const { patientId, insightId, insightTitle, response } = req.body;
     const patient = await resolvePatient(patientId);
     const numericInsightId = parseInt(insightId, 10);
 
     if (!patient) {
       return res.status(404).json({ success: false, error: 'Patient not found' });
     }
+    if (!requireMatchingPatient(req, res, patient)) return;
     if (!insightSequence.includes(numericInsightId)) {
       return res.status(400).json({ success: false, error: 'Unknown Recovery Insight' });
+    }
+
+    let validatedSubmission;
+    try {
+      validatedSubmission = validateInsightResponse(response, insightTitle);
+    } catch (validationError) {
+      return res.status(400).json({ success: false, error: validationError.message });
     }
 
     const action = `${INSIGHT_ACTION_PREFIX}${numericInsightId}`;
@@ -81,6 +133,12 @@ router.post('/insights/complete', async (req, res) => {
       where: { patientId: patient.id, category: 'EDUCATION', action }
     });
     if (duplicate) {
+      await saveInsightResponse(
+        patient.id,
+        numericInsightId,
+        validatedSubmission.insightTitle,
+        validatedSubmission.response
+      );
       return res.json({
         success: true,
         alreadyCompleted: true,
@@ -104,6 +162,15 @@ router.post('/insights/complete', async (req, res) => {
         data: status
       });
     }
+
+    // Save structured reflection answers before awarding points. If the later
+    // completion step is interrupted, retrying is safe because this is an upsert.
+    await saveInsightResponse(
+      patient.id,
+      numericInsightId,
+      validatedSubmission.insightTitle,
+      validatedSubmission.response
+    );
 
     const pointsResult = await recoveryPointsService.addRecoveryPoints(
       patient.id,

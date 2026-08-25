@@ -23,7 +23,7 @@ import {
 
 interface FlarePlanProps {
   id?: string;
-  onComplete?: (data: FlarePlanData) => void;
+  onComplete?: (data: FlarePlanData) => Promise<boolean>;
 }
 
 export interface FlarePlanData {
@@ -60,15 +60,19 @@ export default function FlarePlan({ id, onComplete }: FlarePlanProps) {
     notes: ""
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [showQuickCard, setShowQuickCard] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSaving) return;
     if (formData.warningSign.trim() && 
         formData.immediateActions.some(action => action.trim()) &&
         formData.followUpActions.some(action => action.trim())) {
-      setIsSubmitted(true);
-      onComplete?.(formData);
+      setIsSaving(true);
+      const saved = await onComplete?.(formData);
+      if (saved !== false) setIsSubmitted(true);
+      setIsSaving(false);
     }
   };
 
@@ -541,12 +545,12 @@ Follow your clinician's advice and seek urgent care for new or concerning sympto
               <Button 
                 type="submit" 
                 className="px-8 py-4 text-lg bg-transparent text-btl-600 shadow-none disabled:text-btl-600 disabled:opacity-100"
-                disabled={!formData.warningSign.trim() || 
+                disabled={isSaving || !formData.warningSign.trim() ||
                          !formData.immediateActions.some(a => a.trim()) ||
                          !formData.followUpActions.some(a => a.trim())}
               >
                 <Star className="w-5 h-5 mr-2" />
-                Complete Session & Earn +5 Points
+                {isSaving ? "Saving Your Plan…" : "Complete Session & Earn +5 Points"}
               </Button>
               <p className="text-sm text-gray-600 mt-3">
                 Your flare plan will be saved and accessible whenever you need it

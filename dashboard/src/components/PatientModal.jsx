@@ -22,6 +22,26 @@ const practitionerAssessmentFromApi = (assessment) => Object.fromEntries(
   }])
 );
 
+const displayInsightValue = (value) => {
+  if (Array.isArray(value)) return value.filter(Boolean).join(', ') || 'No response';
+  if (value === null || value === undefined || value === '') return 'No response';
+  if (typeof value === 'object') return JSON.stringify(value);
+  return String(value);
+};
+
+const insightResponseFields = (response) => {
+  if (Array.isArray(response?.fields)) return response.fields;
+  if (Array.isArray(response?.sections)) {
+    return response.sections.flatMap((section) =>
+      (section.fields || []).map((field) => ({
+        ...field,
+        label: section.title ? `${section.title} — ${field.label}` : field.label
+      }))
+    );
+  }
+  return [];
+};
+
 // Helper function to get disability color based on region and score
 const getDisabilityColor = (region, score) => {
   const regionLower = region?.toLowerCase();
@@ -198,6 +218,9 @@ function PatientModal({ patient, onClose }) {
   const [clinicalNotesLoading, setClinicalNotesLoading] = useState(false);
   const [clinicalNotesError, setClinicalNotesError] = useState('');
   const [reviewSaving, setReviewSaving] = useState(false);
+  const [insightResponses, setInsightResponses] = useState([]);
+  const [insightResponsesLoading, setInsightResponsesLoading] = useState(false);
+  const [insightResponsesError, setInsightResponsesError] = useState('');
 
   // Load clinical notes from backend
   const loadClinicalNotes = async () => {
@@ -237,6 +260,26 @@ function PatientModal({ patient, onClose }) {
     if (patient?.id) {
       loadClinicalNotes();
     }
+  }, [patient?.id]);
+
+  const loadInsightResponses = async () => {
+    setInsightResponsesLoading(true);
+    setInsightResponsesError('');
+    try {
+      const response = await authenticatedFetch(`${API_URL}/patients/${patient.id}/insight-responses`);
+      if (!response.ok) throw new Error(`Unable to load patient reflections (${response.status})`);
+      const result = await response.json();
+      setInsightResponses(Array.isArray(result?.responses) ? result.responses : []);
+    } catch (error) {
+      console.error('Error loading Recovery Insight responses:', error);
+      setInsightResponsesError(error?.message || 'Patient reflections are temporarily unavailable.');
+    } finally {
+      setInsightResponsesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (patient?.id) loadInsightResponses();
   }, [patient?.id]);
   const [showAddNoteModal, setShowAddNoteModal] = useState(false);
   const [newNoteText, setNewNoteText] = useState('');
@@ -595,7 +638,8 @@ function PatientModal({ patient, onClose }) {
             {[
               { id: 'overview', label: 'Overview' },
               { id: 'assessments', label: 'Assessments' },
-              { id: 'notes', label: 'Notes' }
+              { id: 'notes', label: 'Notes' },
+              { id: 'reflections', label: 'Patient Reflections' }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -2074,6 +2118,57 @@ function PatientModal({ patient, onClose }) {
                   </button>
                 </div>
               </div>
+            </div>
+          )}
+
+          {activeTab === 'reflections' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              <div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#155e75', margin: 0 }}>
+                  Recovery Insight Responses
+                </h3>
+                <p style={{ margin: '6px 0 0', color: '#64748b', fontSize: '0.875rem' }}>
+                  Patient-authored learning and planning responses. These are read-only and remain separate from clinical notes.
+                </p>
+              </div>
+
+              {insightResponsesLoading && (
+                <div style={{ padding: '28px', textAlign: 'center', color: '#64748b' }}>Loading patient reflections…</div>
+              )}
+
+              {insightResponsesError && (
+                <div style={{ padding: '18px', border: '1px solid #fed7aa', borderRadius: '10px', background: '#fff7ed', color: '#9a3412' }}>
+                  <div>{insightResponsesError}</div>
+                  <button type="button" onClick={loadInsightResponses} style={{ marginTop: '10px', padding: '7px 12px', border: '1px solid #9a3412', borderRadius: '6px', background: 'white', color: '#9a3412', cursor: 'pointer' }}>
+                    Retry
+                  </button>
+                </div>
+              )}
+
+              {!insightResponsesLoading && !insightResponsesError && insightResponses.length === 0 && (
+                <div style={{ padding: '36px 20px', textAlign: 'center', border: '1px dashed #cbd5e1', borderRadius: '12px', color: '#64748b' }}>
+                  No patient reflection forms have been submitted yet.
+                </div>
+              )}
+
+              {!insightResponsesLoading && !insightResponsesError && insightResponses.map((entry) => (
+                <article key={entry.id} style={{ border: '1px solid #bae6fd', borderRadius: '12px', overflow: 'hidden', background: 'white' }}>
+                  <div style={{ padding: '14px 18px', background: 'linear-gradient(135deg, #ecfeff 0%, #f8fafc 100%)', borderBottom: '1px solid #bae6fd' }}>
+                    <div style={{ fontWeight: 700, color: '#155e75' }}>{entry.insightTitle}</div>
+                    <div style={{ marginTop: '3px', fontSize: '0.75rem', color: '#64748b' }}>
+                      Submitted {new Date(entry.submittedAt).toLocaleString()}
+                    </div>
+                  </div>
+                  <div style={{ padding: '8px 18px 16px' }}>
+                    {insightResponseFields(entry.response).map((field, index) => (
+                      <div key={`${field.label}-${index}`} style={{ padding: '11px 0', borderBottom: index < insightResponseFields(entry.response).length - 1 ? '1px solid #e2e8f0' : 'none' }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569', marginBottom: '4px' }}>{field.label}</div>
+                        <div style={{ fontSize: '0.9rem', color: '#0f172a', whiteSpace: 'pre-wrap' }}>{displayInsightValue(field.value)}</div>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              ))}
             </div>
           )}
         </div>

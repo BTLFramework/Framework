@@ -583,6 +583,34 @@ router.post('/:id/notes', requirePractitionerAuth, clinicianCtrl.addNote);
 router.patch('/:id/notes/:noteId', requirePractitionerAuth, clinicianCtrl.updateNote);
 router.delete('/:id/notes/:noteId', requirePractitionerAuth, clinicianCtrl.deleteNote);
 
+// Patient-authored Recovery Insight responses are kept separate from the
+// clinician's legal notes and exposed read-only in the practitioner portal.
+router.get('/:id/insight-responses', requirePractitionerAuth, async (req: any, res: any) => {
+  const patientId = Number.parseInt(req.params.id, 10);
+  if (!Number.isInteger(patientId)) {
+    return res.status(400).json({ success: false, error: 'Invalid patient ID' });
+  }
+
+  try {
+    const responses = await prisma.insightResponse.findMany({
+      where: { patientId },
+      orderBy: { submittedAt: 'desc' },
+      select: {
+        id: true,
+        insightId: true,
+        insightTitle: true,
+        response: true,
+        submittedAt: true,
+        updatedAt: true
+      }
+    });
+    return res.json({ success: true, responses });
+  } catch (error) {
+    console.error('Error loading Recovery Insight responses:', error);
+    return res.status(500).json({ success: false, error: 'Unable to load Recovery Insight responses' });
+  }
+});
+
 // Clinician assessment
 router.post('/:id/assessment', requirePractitionerAuth, clinicianCtrl.saveClinicianAssessment);
 

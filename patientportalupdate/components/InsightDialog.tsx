@@ -363,14 +363,25 @@ export default function InsightDialog({
     }
   }, [insight, jsonFormData, isLoadingForm]);
 
-  const handleFlarePlanComplete = (data: FlarePlanData) => {
+  const handleFlarePlanComplete = async (data: FlarePlanData) => {
     setFlarePlanData(data);
-    void handleComplete();
+    return handleComplete({
+      kind: "flare-plan",
+      fields: [
+        { label: "Early warning sign", value: data.warningSign },
+        { label: "Common triggers", value: data.commonTriggers },
+        { label: "Immediate actions", value: data.immediateActions.filter(Boolean) },
+        { label: "Follow-up actions", value: data.followUpActions.filter(Boolean) },
+        { label: "Personal check-in threshold", value: `${data.intensityThreshold}/10` },
+        { label: "Support contact", value: data.emergencyContact },
+        { label: "Signs the plan is helping", value: data.successIndicators },
+        { label: "Notes", value: data.notes }
+      ]
+    });
   };
 
-  const handleJsonFormComplete = (data: any) => {
-    setJsonFormData(data);
-    void handleComplete();
+  const handleJsonFormComplete = async (data: any) => {
+    return handleComplete(data);
   };
 
   const handleQuizComplete = () => {
@@ -378,7 +389,7 @@ export default function InsightDialog({
     setQuizCompleted(true);
     setShowQuiz(false); // Close the quiz popup
     // Immediately complete the insight after quiz
-    handleComplete();
+    void handleComplete();
   };
 
   // DEV MODE: Allow testing completion popup for already completed insights
@@ -391,13 +402,13 @@ export default function InsightDialog({
     }, 2000);
   };
 
-  const handleComplete = async () => {
+  const handleComplete = async (response?: Record<string, unknown>) => {
     console.log('🎯 handleComplete called with patientId:', patientId, 'insightId:', insightId);
     
     // Prevent multiple submissions
     if (isSubmitting) {
       console.log('🎯 Already submitting, ignoring duplicate call');
-      return;
+      return false;
     }
 
     setIsSubmitting(true);
@@ -411,7 +422,13 @@ export default function InsightDialog({
       console.log('🎯 Using validPatientId:', validPatientId);
       
       console.log('🎯 Step 1: Calling completeInsight...');
-      const insightResult = await completeInsight(validPatientId, insightId.toString());
+      const insightResult = await completeInsight(
+        validPatientId,
+        insightId.toString(),
+        response && insight
+          ? { insightTitle: insight.title, response }
+          : undefined
+      );
       console.log('🎯 Step 1 result:', insightResult);
       
       console.log('🎯 Step 2: Refreshing recovery data...');
@@ -434,13 +451,15 @@ export default function InsightDialog({
       setTimeout(() => {
         onClose();
       }, 2000);
+      return true;
     } catch (err) {
       console.error('Insight complete failed', err);
       toast({
         title: "Error",
-        description: "Something went wrong—please try again.",
+        description: err instanceof Error ? err.message : "Something went wrong—please try again.",
         variant: "destructive",
       });
+      return false;
     } finally {
       setIsSubmitting(false);
     }

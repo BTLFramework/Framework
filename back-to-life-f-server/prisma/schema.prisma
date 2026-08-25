@@ -36,6 +36,21 @@ model Patient {
   taskCompletions   TaskCompletion[]
   clinicalNotes    ClinicalNote[]
   clinicianAssessments ClinicianAssessment[]
+  insightResponses  InsightResponse[]
+}
+
+model InsightResponse {
+  id          Int      @id @default(autoincrement())
+  patientId   Int
+  insightId   Int
+  insightTitle String
+  response    Json
+  submittedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@unique([patientId, insightId])
+  @@index([patientId, submittedAt])
 }
 
 model SRSDaily {

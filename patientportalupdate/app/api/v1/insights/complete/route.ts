@@ -17,7 +17,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const response = await fetch(`${backendUrl}/api/recovery-points/insights/complete`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: request.headers.get('cookie') || ''
+      },
       body: JSON.stringify(body),
       cache: 'no-store'
     });
@@ -43,7 +46,10 @@ export async function GET(request: NextRequest) {
   try {
     const response = await fetch(
       `${backendUrl}/api/recovery-points/insights/status/${encodeURIComponent(patientId)}`,
-      { cache: 'no-store' }
+      {
+        headers: { Cookie: request.headers.get('cookie') || '' },
+        cache: 'no-store'
+      }
     );
     return forwardResponse(response);
   } catch (error) {
