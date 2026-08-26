@@ -50,3 +50,32 @@ test('all local insight JSON files are valid JSON', () => {
     assert.doesNotThrow(() => JSON.parse(fs.readFileSync(path.join(insightDir, file), 'utf8')), file)
   }
 })
+
+test('known broken or mislabeled external resources are not used', () => {
+  assert.doesNotMatch(library, /3qk6VYVXZd8|7tRdDqXgsJ0|03U7tn6xkHo/)
+  assert.equal((library.match(/2n7FOBFMvXg/g) || []).length, 1)
+})
+
+test('referenced local curriculum assets avoid unsupported clinical promises', () => {
+  const assetPaths = values(/assetPath:\s*"([^\"]+)"/g)
+    .filter((assetPath) => assetPath.startsWith('/insight/') && assetPath.endsWith('.json'))
+  const referencedContent = assetPaths
+    .filter((assetPath) => fs.existsSync(path.join(root, 'public', assetPath)))
+    .map((assetPath) => fs.readFileSync(path.join(root, 'public', assetPath), 'utf8'))
+    .join('\n')
+  const reviewedText = `${library}\n${referencedContent}`
+
+  assert.doesNotMatch(reviewedText, /accelerates? healing|speeds? tissue repair|slows? healing/i)
+  assert.doesNotMatch(reviewedText, /prevents stiffness|safe to move test/i)
+  assert.doesNotMatch(reviewedText, /brain (creates|decides) pain/i)
+  assert.doesNotMatch(reviewedText, /anti-inflammatory foods can support tissue healing/i)
+})
+
+test('all referenced local curriculum assets use supported formats', () => {
+  const assetPaths = values(/assetPath:\s*"([^\"]+)"/g)
+  const unsupported = assetPaths.filter((assetPath) =>
+    assetPath.startsWith('/insight/') && !assetPath.endsWith('.json') && !assetPath.endsWith('.mp4')
+  )
+
+  assert.deepEqual(unsupported, [])
+})

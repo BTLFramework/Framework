@@ -1,63 +1,16 @@
 {
   "timeMinutes": 2,
   "level": "Intermediate",
-  "why": "Managing emotions can lower pain intensity by reducing threat signaling.",
+  "why": "Pain and emotional well-being can affect one another. Supporting either may make recovery easier to navigate, even when symptoms do not immediately change.",
   "slides": [
-    {
-      "id": 1,
-      "title": "Pain-Emotion Connection",
-      "content": "Emotions and pain influence each other through shared brain pathways",
-      "backgroundColor": "#fce7f3",
-      "textColor": "#be185d"
-    },
-    {
-      "id": 2,
-      "title": "Anxiety Amplifies Pain",
-      "content": "Stress and anxiety can increase pain sensitivity by activating threat responses",
-      "backgroundColor": "#fbcfe8",
-      "textColor": "#9f1239"
-    },
-    {
-      "id": 3,
-      "title": "Emotional Regulation",
-      "content": "Managing emotions through mindfulness and CBT can help reduce pain intensity",
-      "backgroundColor": "#fdf2f8",
-      "textColor": "#831843"
-    },
-    {
-      "id": 4,
-      "title": "Shared Brain Pathways",
-      "content": "Pain and emotional processing share brain regions, explaining why stress, anxiety, and depression amplify pain signals.",
-      "backgroundColor": "#e0f2fe",
-      "textColor": "#075985"
-    },
-    {
-      "id": 5,
-      "title": "Practical Application",
-      "content": "Emotional regulation techniques like deep breathing and mindfulness can be used during pain flares to reduce intensity.",
-      "backgroundColor": "#f0fdf4",
-      "textColor": "#166534"
-    },
-    {
-      "id": 7,
-      "title": "Myth vs Fact",
-      "content": "Myth: Pain is purely physical. Fact: Emotions and thoughts modulate pain perception.",
-      "backgroundColor": "#fce7f3",
-      "textColor": "#be185d"
-    },
-    {
-      "id": 6,
-      "title": "Try this today",
-      "content": "2 minutes of slow nasal breathing (4‑6 breaths/min) during a flare.",
-      "backgroundColor": "#eff6ff",
-      "textColor": "#1e40af",
-      "resourceLink": "https://medlineplus.gov/ency/patientinstructions/000417.htm",
-      "resourceLabel": "Read Full MedlinePlus Article"
-    }
+    {"id": 1, "title": "A Two-Way Relationship", "content": "Living with pain can affect mood, sleep, relationships, and stress. Those experiences can also influence symptoms and participation.", "backgroundColor": "#fce7f3", "textColor": "#9d174d"},
+    {"id": 2, "title": "Your Pain Is Still Real", "content": "An emotional influence does not mean pain is imaginary or ‘all in your head.’ Whole-person care considers both physical and psychosocial factors.", "backgroundColor": "#fbcfe8", "textColor": "#9f1239"},
+    {"id": 3, "title": "Skills Can Help", "content": "CBT, ACT, pacing, relaxation, and social support may help some people reduce distress or improve participation. Effects vary and none is a guaranteed pain reliever.", "backgroundColor": "#fdf2f8", "textColor": "#831843"},
+    {"id": 4, "title": "Choose Support Early", "content": "Speak with a qualified professional if anxiety, low mood, trauma, or hopelessness is persistent, worsening, or interfering with daily life.", "backgroundColor": "#e0f2fe", "textColor": "#075985"},
+    {"id": 5, "title": "Try One Grounding Step", "content": "Name what you are feeling, notice one thing around you, and choose one manageable next action. Stop any exercise that feels unhelpful.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://www.nice.org.uk/guidance/ng193/chapter/Recommendations", "resourceLabel": "NICE: chronic pain recommendations"}
   ],
   "autoplay": false,
   "interval": 5000,
   "showDots": true,
   "showArrows": true
 }
-

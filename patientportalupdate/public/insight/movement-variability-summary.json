@@ -1,52 +1,13 @@
 {
   "timeMinutes": 2,
-  "level": "Intermediate",
-  "why": "Changing positions regularly prevents stiffness and reduces pain by keeping tissues mobile and circulation flowing.",
+  "level": "Beginner",
+  "why": "Changing positions and movement can provide comfort and help you participate, but there is no single perfect posture or required break schedule.",
   "slides": [
-    {
-      "id": 1,
-      "title": "Movement Variability",
-      "content": "Varying your positions and movements throughout the day prevents stiffness and reduces pain",
-      "backgroundColor": "#ecfdf5",
-      "textColor": "#065f46"
-    },
-    {
-      "id": 2,
-      "title": "Why It Matters",
-      "content": "Staying in one position for too long can increase stiffness, reduce circulation, and amplify pain signals",
-      "backgroundColor": "#d1fae5",
-      "textColor": "#047857"
-    },
-    {
-      "id": 3,
-      "title": "Practical Tips",
-      "content": "Set hourly reminders to change positions; alternate sitting and standing; take micro-breaks every 30 minutes",
-      "backgroundColor": "#a7f3d0",
-      "textColor": "#059669"
-    },
-    {
-      "id": 4,
-      "title": "Evidence Base",
-      "content": "Research shows that movement variability reduces musculoskeletal pain and improves function in office workers",
-      "backgroundColor": "#6ee7b7",
-      "textColor": "#10b981"
-    },
-    {
-      "id": 6,
-      "title": "Myth vs Fact",
-      "content": "Myth: Rest is always best for pain. Fact: Gentle movement often reduces stiffness and pain.",
-      "backgroundColor": "#34d399",
-      "textColor": "#059669"
-    },
-    {
-      "id": 5,
-      "title": "Try this today",
-      "content": "Set 3 phone alarms for position changes; do 2-minute movement breaks at each alarm",
-      "backgroundColor": "#eff6ff",
-      "textColor": "#1e40af",
-      "resourceLink": "https://www.physio-pedia.com/Movement_Variability",
-      "resourceLabel": "Read Physiopedia Guide"
-    }
+    {"id": 1, "title": "More Than One Good Position", "content": "Bodies can use many positions. A posture is not automatically harmful because it looks different from an idealized picture.", "backgroundColor": "#ecfdf5", "textColor": "#065f46"},
+    {"id": 2, "title": "Comfort Can Change", "content": "Staying in one position may feel uncomfortable for some people. A position change or brief movement can be a useful option—not a rule everyone must follow.", "backgroundColor": "#d1fae5", "textColor": "#047857"},
+    {"id": 3, "title": "Choose a Workable Dose", "content": "Try alternating tasks, positions, or movement breaks at intervals that fit your symptoms, work, and goals.", "backgroundColor": "#a7f3d0", "textColor": "#059669"},
+    {"id": 4, "title": "Build Capacity Too", "content": "Variety can help with comfort, while gradually building strength, endurance, and confidence can support longer-term participation.", "backgroundColor": "#6ee7b7", "textColor": "#047857"},
+    {"id": 5, "title": "Try This Today", "content": "Choose one point in your day to change position or move briefly. Notice whether it changes comfort or function, then adjust the plan.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://www.iasp-pain.org/resources/fact-sheets/back-pain-education/", "resourceLabel": "Read the IASP back-pain education fact sheet"}
   ],
   "autoplay": false,
   "interval": 5000,

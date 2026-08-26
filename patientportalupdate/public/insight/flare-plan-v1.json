@@ -2,7 +2,7 @@
   "type": "form",
   "title": "Flare Up Plan",
   "subtitle": "Build your personalized flare up plan to stay in control when symptoms spike.",
-  "description": "Create your personalized plan for managing pain flares and staying calm during difficult moments.",
+  "description": "Create a plan for a familiar flare pattern. New, rapidly worsening, or concerning symptoms may need timely assessment rather than being managed as a routine flare.",
   "sections": [
     {
       "title": "Step 1: Identify Your Early Warning Signs",
@@ -107,7 +107,19 @@
       ]
     },
     {
-      "title": "Step 4: Your Action Plan",
+      "title": "Step 4: Know When the Pattern Is Different",
+      "description": "Write down changes that should prompt you to seek clinical or urgent advice instead of following the usual flare plan.",
+      "fields": [
+        {
+          "type": "textarea",
+          "label": "Symptoms or changes that mean I should seek advice:",
+          "placeholder": "Use guidance from your clinician and local emergency resources...",
+          "rows": 3
+        }
+      ]
+    },
+    {
+      "title": "Step 5: Your Action Plan",
       "description": "Put it all together - what will you do when you notice early warning signs?",
       "fields": [
         {
@@ -131,4 +143,4 @@
   ],
   "submitText": "Save My Flare Plan",
   "successMessage": "Your personalized flare plan has been saved! Review it regularly and update as needed."
-} 
+}

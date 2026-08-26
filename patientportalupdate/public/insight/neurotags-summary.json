@@ -1,52 +1,13 @@
 {
   "timeMinutes": 3,
-  "level": "Advanced",
-  "why": "Understanding neurotags helps you recognize how your brain creates pain patterns and how to change them.",
+  "level": "Intermediate",
+  "why": "Pain is a real protective experience influenced by the body, nervous system, context, expectations, emotions, and past learning.",
   "slides": [
-    {
-      "id": 1,
-      "title": "Neurotags 101",
-      "content": "Neurotags are networks in your brain that can create pain even when tissues are healing",
-      "backgroundColor": "#f3e8ff",
-      "textColor": "#6b21a8"
-    },
-    {
-      "id": 2,
-      "title": "Brain Networks",
-      "content": "Your brain has millions of connections that can amplify or reduce pain signals based on context and experience",
-      "backgroundColor": "#e9d5ff",
-      "textColor": "#7c3aed"
-    },
-    {
-      "id": 3,
-      "title": "Changing Patterns",
-      "content": "Through movement, education, and positive experiences, you can rewire these networks to reduce pain sensitivity",
-      "backgroundColor": "#ddd6fe",
-      "textColor": "#8b5cf6"
-    },
-    {
-      "id": 4,
-      "title": "Clinical Applications",
-      "content": "Neurotag training is used in chronic pain management, phantom limb pain, and complex regional pain syndrome",
-      "backgroundColor": "#c4b5fd",
-      "textColor": "#a855f7"
-    },
-    {
-      "id": 6,
-      "title": "Myth vs Fact",
-      "content": "Myth: Only hard exercise helps pain. Fact: Imagery and mapping can reduce pain too.",
-      "backgroundColor": "#a78bfa",
-      "textColor": "#c084fc"
-    },
-    {
-      "id": 5,
-      "title": "Try this today",
-      "content": "10 left/right recognition taps: is this a left or right hand?",
-      "backgroundColor": "#eff6ff",
-      "textColor": "#1e40af",
-      "resourceLink": "https://noigroup.com/neurotags/",
-      "resourceLabel": "Read NOI Group Guide"
-    }
+    {"id": 1, "title": "Pain Is Real", "content": "Pain is not imaginary. It is a protective experience produced by a complex nervous system using information from many sources.", "backgroundColor": "#f3e8ff", "textColor": "#6b21a8"},
+    {"id": 2, "title": "Context Can Matter", "content": "Symptoms can be influenced by injury, health, sleep, stress, beliefs, environment, memory, and what an activity means to you.", "backgroundColor": "#e9d5ff", "textColor": "#7c3aed"},
+    {"id": 3, "title": "Pain Is Not a Damage Meter", "content": "Pain can be intense without providing a precise measure of tissue damage. This does not mean symptoms should be dismissed or that every activity is automatically safe.", "backgroundColor": "#ddd6fe", "textColor": "#6d28d9"},
+    {"id": 4, "title": "Learning Can Change", "content": "Supportive education and carefully chosen activity may help some people build confidence and function. The plan should fit the person and presentation.", "backgroundColor": "#c4b5fd", "textColor": "#5b21b6"},
+    {"id": 5, "title": "Ask a Better Question", "content": "Instead of asking only ‘How much does it hurt?’, also ask ‘What can I do, what matters to me, and what response would be sensible today?’", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://www.tamethebeast.org/", "resourceLabel": "Explore Tame the Beast pain education"}
   ],
   "autoplay": false,
   "interval": 5000,

@@ -2,7 +2,7 @@
   "meta": {
     "time": "5 min",
     "level": "Beginner",
-    "why": "Breaking big goals into small, achievable steps prevents overwhelm and builds confidence. This systematic approach increases your chances of success and reduces fear of failure."
+    "why": "Breaking a meaningful goal into manageable steps can make planning and review easier. The steps can change as you learn."
   },
   "hero": {
     "title": "Goal Ladder Mini-Tool",
@@ -13,9 +13,9 @@
     {
       "title": "**Start Small**",
       "content": [
-        "Make first step so easy you can't fail",
-        "Success builds confidence and momentum",
-        "Small wins create positive feedback loops",
+        "Choose a first step that feels manageable",
+        "Notice what you learn from each attempt",
+        "Recognize progress without demanding perfection",
         "Each step prepares you for the next"
       ]
     },
@@ -49,9 +49,9 @@
   ],
   "microAction": {
     "title": "Build Your Ladder",
-    "description": "Think of one recovery goal. Break it into 5 small steps, starting with something you can do today. Write them down and commit to step 1.",
-    "action": "Complete your first ladder step within 24 hours"
+    "description": "Think of one recovery goal. Break it into several possible steps and choose a realistic starting point. Review the plan with your clinician if safety or progression is uncertain.",
+    "action": "Choose your first manageable step"
   },
-  "resourceLink": "https://www.psychologytoday.com/us/blog/the-power-prime/201201/goal-setting-why-smart-goals-are-dumb",
-  "resourceLabel": "Learn more about effective goal setting"
+  "resourceLink": "https://painhealth.csse.uwa.edu.au/pain-module/pacing-and-goal-setting/",
+  "resourceLabel": "UWA PainHEALTH: pacing and goal setting"
 }

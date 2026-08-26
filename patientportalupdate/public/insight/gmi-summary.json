@@ -1,63 +1,16 @@
 {
   "timeMinutes": 3,
   "level": "Intermediate",
-  "why": "GMI reduces pain by retraining the brain's movement maps.",
+  "why": "Graded motor imagery is a structured approach sometimes used for particular persistent pain conditions. Evidence and suitability vary.",
   "slides": [
-    {
-      "id": 1,
-      "title": "Retrain Your Brain",
-      "content": "Graded Motor Imagery uses mental practice to reduce pain and improve movement",
-      "backgroundColor": "#fef3c7",
-      "textColor": "#92400e"
-    },
-    {
-      "id": 2,
-      "title": "Three Stages",
-      "content": "Progress through left/right discrimination, motor imagery, then mirror therapy",
-      "backgroundColor": "#fed7aa",
-      "textColor": "#9a3412"
-    },
-    {
-      "id": 3,
-      "title": "Brain Mapping",
-      "content": "GMI helps normalize your brain's movement maps, reducing protective pain responses",
-      "backgroundColor": "#ffedd5",
-      "textColor": "#7c2d12"
-    },
-    {
-      "id": 4,
-      "title": "Clinical Applications",
-      "content": "GMI is effective for complex regional pain syndrome, phantom limb pain, and chronic musculoskeletal conditions.",
-      "backgroundColor": "#e0f2fe",
-      "textColor": "#075985"
-    },
-    {
-      "id": 5,
-      "title": "Evidence-Based Practice",
-      "content": "GMI is supported by neuroscience research showing measurable brain changes and pain reduction in clinical trials.",
-      "backgroundColor": "#f0fdf4",
-      "textColor": "#166534"
-    },
-    {
-      "id": 7,
-      "title": "Myth vs Fact",
-      "content": "Myth: Only hard exercise helps pain. Fact: Imagery and mapping can reduce pain too.",
-      "backgroundColor": "#fef3c7",
-      "textColor": "#92400e"
-    },
-    {
-      "id": 6,
-      "title": "Try this today",
-      "content": "10 left/right recognition taps: is this a left or right hand?",
-      "backgroundColor": "#eff6ff",
-      "textColor": "#1e40af",
-      "resourceLink": "https://www.noigroup.com/graded-motor-imagery/",
-      "resourceLabel": "Visit NOI Group GMI Hub"
-    }
+    {"id": 1, "title": "What Is GMI?", "content": "Graded motor imagery is a sequence of brain- and movement-based tasks that may be considered when ordinary movement feels highly threatening or difficult.", "backgroundColor": "#fef3c7", "textColor": "#92400e"},
+    {"id": 2, "title": "The Usual Sequence", "content": "Programs commonly progress through left/right discrimination, imagined movement, and mirror therapy. The dose and order should be individualized.", "backgroundColor": "#fed7aa", "textColor": "#9a3412"},
+    {"id": 3, "title": "Evidence Has Limits", "content": "Research is most established in conditions such as complex regional pain syndrome and phantom-limb pain, but certainty is limited and results do not apply equally to every pain problem.", "backgroundColor": "#ffedd5", "textColor": "#7c2d12"},
+    {"id": 4, "title": "Not a Test of Willpower", "content": "Difficulty with imagery or laterality does not mean you are failing. A clinician can help decide whether this approach fits your presentation.", "backgroundColor": "#e0f2fe", "textColor": "#075985"},
+    {"id": 5, "title": "Discuss Before Practising", "content": "If this lesson seems relevant, ask your clinician whether a structured GMI program is appropriate instead of assuming it is a universal pain treatment.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://www.noigroup.com/graded-motor-imagery/", "resourceLabel": "Explore the NOI Group GMI overview"}
   ],
   "autoplay": false,
   "interval": 5000,
   "showDots": true,
   "showArrows": true
 }
-

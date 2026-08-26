@@ -1,56 +1,16 @@
 {
   "timeMinutes": 2,
   "level": "Beginner",
-  "why": "Anti-inflammatory eating supports healing and reduces pain sensitivity.",
+  "why": "Regular, balanced eating can support general health, energy, and participation in recovery. No single food is a treatment for pain.",
   "slides": [
-    {
-      "id": 1,
-      "title": "Anti-Inflammatory Foods",
-      "content": "Foods rich in omega-3s, antioxidants, and fiber can help reduce inflammation and support tissue healing",
-      "backgroundColor": "#f0fdf4",
-      "textColor": "#166534"
-    },
-    {
-      "id": 2,
-      "title": "Foods That Fight Inflammation",
-      "content": "Leafy greens, berries, fatty fish, nuts, and olive oil are powerful anti-inflammatory foods",
-      "backgroundColor": "#ecfdf5",
-      "textColor": "#065f46"
-    },
-    {
-      "id": 3,
-      "title": "Foods to Limit",
-      "content": "Processed foods; refined sugars; trans fats — increase inflammation and slow recovery.",
-      "backgroundColor": "#fef2f2",
-      "textColor": "#991b1b"
-    },
-    {
-      "id": 4,
-      "title": "Omega-3 Benefits",
-      "content": "Fatty fish, walnuts, and flaxseeds provide omega-3s that reduce inflammatory markers and support healing.",
-      "backgroundColor": "#e0f2fe",
-      "textColor": "#075985"
-    },
-    {
-      "id": 6,
-      "title": "Myth vs Fact",
-      "content": "Myth: All fats are bad. Fact: Omega‑3 fats are anti‑inflammatory and beneficial.",
-      "backgroundColor": "#f0fdf4",
-      "textColor": "#166534"
-    },
-    {
-      "id": 5,
-      "title": "Try this today",
-      "content": "Swap one processed snack for a handful of nuts and berries.",
-      "backgroundColor": "#eff6ff",
-      "textColor": "#1e40af",
-      "resourceLink": "https://www.health.harvard.edu/staying-healthy/foods-that-fight-inflammation",
-      "resourceLabel": "Read Full Harvard Guide"
-    }
+    {"id": 1, "title": "Food Supports the Whole Person", "content": "Nutrition can support general health, energy, and recovery habits, but pain is influenced by many factors and cannot be reduced to one food or nutrient.", "backgroundColor": "#f0fdf4", "textColor": "#166534"},
+    {"id": 2, "title": "Build a Sustainable Pattern", "content": "A varied pattern with vegetables and fruit, whole grains, protein foods, and unsaturated fats is a practical starting point for many adults.", "backgroundColor": "#ecfdf5", "textColor": "#065f46"},
+    {"id": 3, "title": "Avoid Food Fear", "content": "Labels such as ‘good,’ ‘bad,’ or ‘inflammatory’ can oversimplify nutrition. Your overall pattern, preferences, access, culture, and medical needs matter.", "backgroundColor": "#fef2f2", "textColor": "#991b1b"},
+    {"id": 4, "title": "Personal Needs Vary", "content": "Allergies, digestive conditions, diabetes, kidney disease, eating-disorder history, and other concerns may require individualized advice from a qualified professional.", "backgroundColor": "#e0f2fe", "textColor": "#075985"},
+    {"id": 5, "title": "Try One Practical Step", "content": "Choose one realistic addition—such as a fruit, vegetable, protein food, or planned meal—rather than chasing a perfect diet.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://food-guide.canada.ca/en/", "resourceLabel": "Explore Canada's Food Guide"}
   ],
   "autoplay": false,
   "interval": 5000,
   "showDots": true,
   "showArrows": true
 }
-

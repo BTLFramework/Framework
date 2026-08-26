@@ -1,0 +1,60 @@
+{
+  "type": "form",
+  "title": "Putting the Framework Together",
+  "subtitle": "Choose a small, realistic plan for the week ahead",
+  "description": "Recovery is rarely about one perfect technique. Use this check-in to connect what you have learned about symptoms, sleep, stress, movement, pacing, support, and meaningful activity. Your answers can help guide a conversation with your clinician; they are not a diagnosis or a substitute for medical advice.",
+  "sections": [
+    {
+      "title": "Notice the pattern",
+      "fields": [
+        {
+          "type": "checkbox",
+          "label": "Which factors seem most relevant to your symptoms or participation right now?",
+          "options": [
+            "Sleep or fatigue",
+            "Stress or mood",
+            "Activity level or pacing",
+            "Confidence with movement",
+            "Work, home, or social demands",
+            "Support from other people",
+            "A new or changing symptom I want assessed"
+          ]
+        },
+        {
+          "type": "textarea",
+          "label": "What pattern have you noticed?",
+          "placeholder": "For example: what tends to help, what tends to make participation harder, and what remains uncertain?",
+          "rows": 3
+        }
+      ]
+    },
+    {
+      "title": "Choose the next experiment",
+      "fields": [
+        {
+          "type": "text",
+          "label": "One meaningful activity I want to support:",
+          "placeholder": "Choose something that matters to you"
+        },
+        {
+          "type": "text",
+          "label": "One manageable action I will try:",
+          "placeholder": "Keep it specific and realistic"
+        },
+        {
+          "type": "text",
+          "label": "How I will adjust if symptoms increase:",
+          "placeholder": "Use your flare plan, modify the dose, seek advice, or choose another appropriate response"
+        },
+        {
+          "type": "textarea",
+          "label": "What would I like to discuss with my clinician?",
+          "placeholder": "Questions, concerns, barriers, or changes in symptoms",
+          "rows": 3
+        }
+      ]
+    }
+  ],
+  "submitText": "Save My Integration Plan",
+  "successMessage": "Your plan has been saved. Small experiments and honest review can help you and your clinician decide what comes next."
+}

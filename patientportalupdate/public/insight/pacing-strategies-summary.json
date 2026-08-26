@@ -1,52 +1,13 @@
 {
   "timeMinutes": 3,
   "level": "Intermediate",
-  "why": "Pacing helps you build activity tolerance gradually without triggering flare-ups or setbacks.",
+  "why": "Pacing can help you organize activity and recovery around a manageable baseline rather than repeatedly cycling between overdoing and stopping.",
   "slides": [
-    {
-      "id": 1,
-      "title": "Pacing Strategies",
-      "content": "Pacing means gradually increasing activity while staying within your body's current tolerance levels",
-      "backgroundColor": "#f0f9ff",
-      "textColor": "#075985"
-    },
-    {
-      "id": 2,
-      "title": "The 50% Rule",
-      "content": "Start with 50% of what you think you can do, then gradually increase by 10-20% weekly if no flare-ups",
-      "backgroundColor": "#e0f2fe",
-      "textColor": "#0c4a6e"
-    },
-    {
-      "id": 3,
-      "title": "Activity Planning",
-      "content": "Break activities into smaller chunks; take regular breaks; alternate between different types of tasks",
-      "backgroundColor": "#bae6fd",
-      "textColor": "#075985"
-    },
-    {
-      "id": 4,
-      "title": "Flare-Up Prevention",
-      "content": "Listen to early warning signs; stop before you're exhausted; plan rest periods throughout the day",
-      "backgroundColor": "#7dd3fc",
-      "textColor": "#0c4a6e"
-    },
-    {
-      "id": 6,
-      "title": "Myth vs Fact",
-      "content": "Myth: Push through pain to build tolerance. Fact: Gradual pacing prevents setbacks and builds confidence.",
-      "backgroundColor": "#38bdf8",
-      "textColor": "#075985"
-    },
-    {
-      "id": 5,
-      "title": "Try this today",
-      "content": "Plan tomorrow's activities using the 50% rule; schedule regular breaks every 30-45 minutes",
-      "backgroundColor": "#eff6ff",
-      "textColor": "#1e40af",
-      "resourceLink": "https://painhealth.csse.uwa.edu.au/pain-module/pacing-and-goal-setting/",
-      "resourceLabel": "Read UWA Pacing Guide"
-    }
+    {"id": 1, "title": "What Pacing Means", "content": "Pacing is a flexible planning strategy. It can involve choosing priorities, breaking tasks up, varying demands, and adjusting the dose using your goals and response.", "backgroundColor": "#f0f9ff", "textColor": "#075985"},
+    {"id": 2, "title": "There Is No Universal Percentage", "content": "Fixed rules such as always starting at 50% or increasing by 10% do not fit everyone. Establish a realistic baseline with your clinician when needed.", "backgroundColor": "#e0f2fe", "textColor": "#0c4a6e"},
+    {"id": 3, "title": "Avoid the Boom-Bust Cycle", "content": "Doing far more on a good day and then needing prolonged recovery can make routines less predictable. A steadier plan may be easier to build on.", "backgroundColor": "#bae6fd", "textColor": "#075985"},
+    {"id": 4, "title": "Pacing Is Not Permanent Avoidance", "content": "The aim is meaningful participation. Depending on your plan, capacity can be progressed over time rather than holding activity below the same limit forever.", "backgroundColor": "#7dd3fc", "textColor": "#0c4a6e"},
+    {"id": 5, "title": "Try This Today", "content": "Choose one activity, estimate a manageable dose, and note your response during it and later. Use that information to plan the next attempt.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://painhealth.csse.uwa.edu.au/pain-module/pacing-and-goal-setting/", "resourceLabel": "UWA PainHEALTH: pacing and goal setting"}
   ],
   "autoplay": false,
   "interval": 5000,

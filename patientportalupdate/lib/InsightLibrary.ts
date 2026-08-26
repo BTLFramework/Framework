@@ -131,13 +131,13 @@ export const insightLibrary: Insight[] = [
     title: "Movement as a recovery tool",
     subtitle: "Find a manageable dose and build from there",
     assetPath: "/insight/motion-lotion-summary.json", // Summary card with movement science content
-    quizQ: "Gentle movement can help reduce pain sensitivity. (T/F)",
+    quizQ: "A manageable amount of movement can support function and confidence for many people. (T/F)",
     quizA: "T",
     releaseOffset: 4,
     points: 5,
     questions: [
       {
-        question: "Gentle movement can help reduce pain sensitivity. (True/False)",
+        question: "A manageable amount of movement can support function and confidence for many people. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
@@ -197,61 +197,61 @@ export const insightLibrary: Insight[] = [
         correctAnswer: 1
       },
       {
-        question: "What is the primary role of pain?",
+        question: "Which statement best describes pain?",
         options: [
-          "To punish you for injury",
-          "To protect you from perceived threats",
-          "To limit all movement",
-          "To indicate weakness"
+          "It is a punishment for injury",
+          "It is a real protective experience influenced by many sources of information",
+          "It always tells you to stop all movement",
+          "It is a sign of personal weakness"
         ],
         correctAnswer: 1
       },
       {
-        question: "According to pain neuroscience, pain is an output of the:",
+        question: "Which information can contribute to a pain experience?",
         options: [
-          "Spinal cord only",
-          "Brain",
-          "Muscles",
-          "Damaged tissues"
+          "Tissue and nerve information only",
+          "Stress and expectations only",
+          "Biological, psychological, and social information in context",
+          "Imaging results only"
         ],
-        correctAnswer: 1
+        correctAnswer: 2
       }
     ]
   },
   {
     id: 31,
     week: 2,
-    track: "StressMood",
-    title: "The Science of Pain",
-    subtitle: "How pain is produced and why it can change",
-    assetPath: "https://www.youtube.com/watch?v=03U7tn6xkHo", // TEDx talk on pain science
-    quizQ: "The brain can amplify or reduce pain signals based on context. (T/F)",
+    track: "PainScience",
+    title: "Why pain can vary",
+    subtitle: "Explore pain neuroscience resources from Alberta Health Services",
+    assetPath: "https://www.albertahealthservices.ca/services/Page11132.aspx",
+    quizQ: "Changes in pain can be influenced by more than changes in tissue condition alone. (T/F)",
     quizA: "T",
     releaseOffset: 1,
     points: 5,
     questions: [
       {
-        question: "The brain can amplify or reduce pain signals based on context. (True/False)",
+        question: "Changes in pain can be influenced by more than changes in tissue condition alone. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
       {
-        question: "Which factor does NOT influence pain perception?",
+        question: "Which can influence a person's pain experience?",
         options: [
-          "Stress levels",
-          "Past experiences",
-          "Your shoe size",
-          "Current mood"
+          "Health and tissue information",
+          "Sleep, stress, and past experience",
+          "Context and expectations",
+          "All of the above"
         ],
-        correctAnswer: 2
+        correctAnswer: 3
       },
       {
-        question: "Pain can persist even after tissues have healed because:",
+        question: "Which is the most accurate response to persistent pain?",
         options: [
-          "The brain is broken",
-          "The nervous system remains sensitized",
-          "You're imagining it",
-          "You need more medication"
+          "It proves the person is imagining symptoms",
+          "It can involve ongoing biological and psychosocial influences that deserve assessment and individualized care",
+          "It always means new tissue damage",
+          "It has one cause in every person"
         ],
         correctAnswer: 1
       }
@@ -264,13 +264,13 @@ export const insightLibrary: Insight[] = [
     title: "Flare-Up Management",
     subtitle: "Practical strategies for managing pain spikes",
     assetPath: "https://www.paintoolkit.org/resources/flare-up-management/", // Pain Toolkit - Flare-Up Management Guide
-    quizQ: "Flare-ups are a normal part of recovery. (T/F)",
+    quizQ: "A flare-up can happen without erasing all of your recovery progress. (T/F)",
     quizA: "T",
     releaseOffset: 2,
     points: 5,
     questions: [
       {
-        question: "Flare-ups are a normal part of recovery. (True/False)",
+        question: "A flare-up can happen without erasing all of your recovery progress. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
@@ -299,27 +299,27 @@ export const insightLibrary: Insight[] = [
   {
     id: 33,
     week: 2,
-    track: "SuccessStory",
-    title: "Recovery Success Stories",
-    subtitle: "Real patients who turned their pain around",
-    assetPath: "https://www.youtube.com/watch?v=3qk6VYVXZd8", // Recovery Success Stories - Real patient testimonials
-    quizQ: "Success stories can increase your confidence in recovery. (T/F)",
+    track: "SelfEfficacy",
+    title: "Real recovery experiences",
+    subtitle: "Learn from other people without treating their path as a prescription",
+    assetPath: "https://www.tamethebeast.org/stories",
+    quizQ: "Another person's recovery story can offer ideas, but it cannot predict your outcome. (T/F)",
     quizA: "T",
     releaseOffset: 3,
     points: 5,
     questions: [
       {
-        question: "Success stories can increase your confidence in recovery. (True/False)",
+        question: "Another person's recovery story can offer ideas, but it cannot predict your outcome. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
       {
-        question: "What is a key factor in most recovery success stories?",
+        question: "What is the most useful way to approach a recovery story?",
         options: [
-          "Expensive treatments",
-          "Consistent effort and belief",
-          "Avoiding all movement",
-          "Quick fixes"
+          "Copy the person's plan exactly",
+          "Notice useful ideas and discuss what fits your situation",
+          "Assume the same timeline will apply to you",
+          "Use it as proof that one treatment works for everyone"
         ],
         correctAnswer: 1
       }
@@ -332,13 +332,13 @@ export const insightLibrary: Insight[] = [
     title: "Pacing Strategies",
     subtitle: "Finding the right balance between rest and activity",
     assetPath: "/insight/pacing-strategies-summary.json", // Summary card with link to NHS pacing guide
-    quizQ: "Pacing means gradually increasing activity without overloading. (T/F)",
+    quizQ: "Pacing helps you plan a manageable amount of activity and recovery rather than repeatedly overdoing it. (T/F)",
     quizA: "T",
     releaseOffset: 4,
     points: 5,
     questions: [
       {
-        question: "Pacing means gradually increasing activity without overloading. (True/False)",
+        question: "Pacing helps you plan a manageable amount of activity and recovery rather than repeatedly overdoing it. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
@@ -369,37 +369,37 @@ export const insightLibrary: Insight[] = [
     week: 2,
     track: "SelfEfficacy",
     title: "Sleep & Recovery",
-    subtitle: "How quality sleep accelerates healing",
+    subtitle: "How sleep can influence symptoms, energy, and participation",
     assetPath: "/insight/sleep-recovery-summary.json", // Summary card with link to NHS guide
-    quizQ: "Quality sleep is essential for tissue repair. (T/F)",
+    quizQ: "Sleep and pain can influence one another. (T/F)",
     quizA: "T",
     releaseOffset: 5,
     points: 5,
     questions: [
       {
-        question: "Quality sleep is essential for tissue repair. (True/False)",
+        question: "Sleep and pain can influence one another. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
       {
-        question: "What is the ideal sleep duration for recovery?",
+        question: "Which statement about sleep duration is most accurate?",
         options: [
-          "4-5 hours",
-          "6-7 hours",
-          "7-9 hours",
-          "10-12 hours"
+          "Everyone needs exactly eight hours",
+          "Individual needs vary; many adults are advised to get at least seven hours regularly",
+          "More sleep is always better",
+          "Sleep duration never matters"
         ],
-        correctAnswer: 2
+        correctAnswer: 1
       },
       {
-        question: "Poor sleep can:",
+        question: "A difficult period of sleep may affect:",
         options: [
-          "Increase pain sensitivity",
-          "Slow healing",
-          "Both of the above",
-          "Neither of the above"
+          "Pain sensitivity, energy, and mood",
+          "Only bone strength",
+          "Everyone in exactly the same way",
+          "Nothing related to recovery"
         ],
-        correctAnswer: 2
+        correctAnswer: 0
       }
     ]
   },
@@ -434,35 +434,35 @@ export const insightLibrary: Insight[] = [
     week: 3,
     track: "PainScience",
     title: "Nutrition for Recovery",
-    subtitle: "Anti-inflammatory foods that support healing",
+    subtitle: "Balanced eating to support health, energy, and participation",
     assetPath: "/insight/nutrition-summary.json", // Summary card with link to Harvard guide
-    quizQ: "Anti-inflammatory foods can support tissue healing. (T/F)",
+    quizQ: "No single food is a treatment for pain. (T/F)",
     quizA: "T",
     releaseOffset: 0,
     points: 5,
     questions: [
       {
-        question: "Anti-inflammatory foods can support tissue healing. (True/False)",
+        question: "No single food is a treatment for pain. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
       {
-        question: "Which food is known for anti-inflammatory properties?",
+        question: "Which is the most useful general approach?",
         options: [
-          "Processed sugar",
-          "Leafy greens",
-          "Fried foods",
-          "White bread"
+          "Eliminate entire food groups without advice",
+          "Build a varied, sustainable eating pattern that fits your needs",
+          "Treat one food as medicine for pain",
+          "Judge foods only as good or bad"
         ],
         correctAnswer: 1
       },
       {
-        question: "Foods that can increase inflammation include:",
+        question: "When should nutrition advice be individualized by a qualified professional?",
         options: [
-          "Berries and nuts",
-          "Vegetables",
-          "Processed foods and refined sugars",
-          "Fatty fish"
+          "Never",
+          "Only for athletes",
+          "When health conditions, allergies, access, or eating concerns affect the plan",
+          "Only after pain is gone"
         ],
         correctAnswer: 2
       }
@@ -486,7 +486,7 @@ export const insightLibrary: Insight[] = [
         correctAnswer: 1
       },
       {
-        question: "What is more important than 'perfect posture'?",
+        question: "Which is a reasonable alternative to chasing one 'perfect posture'?",
         options: [
           "Staying rigid",
           "Movement variability",
@@ -496,12 +496,12 @@ export const insightLibrary: Insight[] = [
         correctAnswer: 1
       },
       {
-        question: "The best posture is:",
+        question: "Which statement is most accurate?",
         options: [
-          "The one you hold the longest",
-          "The next posture",
-          "Military-style rigid",
-          "Completely relaxed"
+          "One posture prevents pain for everyone",
+          "Comfortable posture and position changes can both be options",
+          "Rigid posture is always safest",
+          "Slouching always causes injury"
         ],
         correctAnswer: 1
       }
@@ -514,35 +514,35 @@ export const insightLibrary: Insight[] = [
     title: "Return to Work Strategies",
     subtitle: "Managing pain while returning to daily activities",
     assetPath: "/insight/return-to-work-summary.json", // Summary card with link to clinical guide
-    quizQ: "Gradual exposure to work tasks is safer than avoiding them. (T/F)",
+    quizQ: "A return-to-work plan should consider the person, job demands, symptoms, risk, and available support. (T/F)",
     quizA: "T",
     releaseOffset: 2,
     points: 5,
     questions: [
       {
-        question: "Gradual exposure to work tasks is safer than avoiding them. (True/False)",
+        question: "A return-to-work plan should consider the person, job demands, symptoms, risk, and available support. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
       {
-        question: "What is the best approach for returning to work?",
+        question: "Which is often useful when it fits the person's situation?",
         options: [
           "All or nothing",
-          "Gradual, paced return",
+          "An individualized plan with appropriate modifications and review",
           "Wait until 100% pain-free",
           "Push through severe pain"
         ],
         correctAnswer: 1
       },
       {
-        question: "Avoiding work due to pain can lead to:",
+        question: "Which statement is most accurate?",
         options: [
-          "Faster recovery",
-          "Increased fear and disability",
-          "Complete healing",
-          "Stronger muscles"
+          "Everyone should return immediately",
+          "Everyone must be pain-free first",
+          "Work participation can be helpful, but safety and readiness are individualized",
+          "Symptoms should always be ignored"
         ],
-        correctAnswer: 1
+        correctAnswer: 2
       }
     ]
   },
@@ -562,16 +562,16 @@ export const insightLibrary: Insight[] = [
     id: 41,
     week: 3,
     track: "PainScience",
-    title: "CBT for Pain",
-    subtitle: "Cognitive Behavioral Therapy basics",
-    assetPath: "https://www.youtube.com/watch?v=7tRdDqXgsJ0", // CBT for Pain - Cognitive Behavioral Therapy for chronic pain
-    quizQ: "CBT can help change pain-related thoughts and behaviors. (T/F)",
+    title: "CBT skills for persistent pain",
+    subtitle: "How thoughts, actions, emotions, and symptoms can interact",
+    assetPath: "https://www.va.gov/PAINMANAGEMENT/CBT_CP/Veterans.asp",
+    quizQ: "CBT for pain aims to improve coping and participation; it does not mean pain is imaginary. (T/F)",
     quizA: "T",
     releaseOffset: 4,
     points: 5,
     questions: [
       {
-        question: "CBT can help change pain-related thoughts and behaviors. (True/False)",
+        question: "CBT for pain aims to improve coping and participation; it does not mean pain is imaginary. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
@@ -590,7 +590,7 @@ export const insightLibrary: Insight[] = [
         options: [
           "Eliminate all pain immediately",
           "Ignore your pain",
-          "Change how you think about and respond to pain",
+          "Develop skills for responding to pain and supporting valued activity",
           "Avoid all activities"
         ],
         correctAnswer: 2
@@ -666,16 +666,16 @@ export const insightLibrary: Insight[] = [
     id: 44,
     week: 4,
     track: "PainScience",
-    title: "MBSR for Pain",
-    subtitle: "Mindfulness-Based Stress Reduction techniques",
-    assetPath: "https://www.youtube.com/watch?v=2n7FOBFMvXg", // Jon Kabat-Zinn - Mindfulness for Pain (founder of MBSR)
-    quizQ: "Mindfulness can reduce pain intensity and distress. (T/F)",
+    title: "Mindfulness attitudes",
+    subtitle: "An introduction to non-judgmental awareness",
+    assetPath: "https://www.youtube.com/watch?v=2n7FOBFMvXg", // Jon Kabat-Zinn discusses nine mindfulness attitudes
+    quizQ: "Mindfulness may help some people relate differently to symptoms or distress, but results vary. (T/F)",
     quizA: "T",
     releaseOffset: 0,
     points: 5,
     questions: [
       {
-        question: "Mindfulness can reduce pain intensity and distress. (True/False)",
+        question: "Mindfulness may help some people relate differently to symptoms or distress, but results vary. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
@@ -690,12 +690,12 @@ export const insightLibrary: Insight[] = [
         correctAnswer: 1
       },
       {
-        question: "MBSR was developed by:",
+        question: "Which is a useful way to approach a mindfulness exercise?",
         options: [
-          "A pharmaceutical company",
-          "Jon Kabat-Zinn",
-          "A yoga instructor",
-          "A physical therapist"
+          "Force symptoms to disappear",
+          "Notice the present experience without grading yourself",
+          "Use it to prove pain is psychological",
+          "Continue even if it feels unsafe or distressing"
         ],
         correctAnswer: 1
       }
@@ -708,13 +708,13 @@ export const insightLibrary: Insight[] = [
     title: "Graded Motor Imagery",
     subtitle: "Using your mind to retrain movement",
     assetPath: "/insight/gmi-summary.json", // Summary card with link to NOI Group
-    quizQ: "Mental imagery can help reduce pain and improve movement. (T/F)",
+    quizQ: "Graded motor imagery may suit some conditions, but it is not a universal pain treatment. (T/F)",
     quizA: "T",
     releaseOffset: 1,
     points: 5,
     questions: [
       {
-        question: "Mental imagery can help reduce pain and improve movement. (True/False)",
+        question: "Graded motor imagery may suit some conditions, but it is not a universal pain treatment. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
@@ -729,12 +729,12 @@ export const insightLibrary: Insight[] = [
         correctAnswer: 1
       },
       {
-        question: "GMI helps retrain your:",
+        question: "What should guide whether GMI is used?",
         options: [
-          "Muscles only",
-          "Joints",
-          "Brain's movement maps",
-          "Bones"
+          "A social-media trend",
+          "The same protocol for everyone",
+          "The person's condition, response, and clinical plan",
+          "Pain intensity alone"
         ],
         correctAnswer: 2
       }
@@ -747,33 +747,33 @@ export const insightLibrary: Insight[] = [
     title: "Movement Variability",
     subtitle: "Why changing positions matters",
     assetPath: "/insight/movement-variability-summary.json", // Summary card with link to Physiopedia guide
-    quizQ: "Staying in one position for long periods increases stiffness. (T/F)",
+    quizQ: "Changing position can be a comfort option, but there is no single perfect posture schedule. (T/F)",
     quizA: "T",
     releaseOffset: 2,
     points: 5,
     questions: [
       {
-        question: "Staying in one position for long periods increases stiffness. (True/False)",
+        question: "Changing position can be a comfort option, but there is no single perfect posture schedule. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
       {
-        question: "What is the benefit of movement variability?",
+        question: "Why might someone choose movement variability?",
         options: [
           "It confuses your body",
-          "It prevents tissue adaptation to one position",
+          "A position change may improve comfort or help vary task demands",
           "It causes more pain",
-          "It's not beneficial"
+          "It guarantees pain relief"
         ],
         correctAnswer: 1
       },
       {
-        question: "The best posture is:",
+        question: "Which statement is most accurate?",
         options: [
-          "Perfect alignment",
-          "The next one",
-          "Complete stillness",
-          "Maximum slouching"
+          "Perfect alignment is required",
+          "There are many acceptable positions and movement options",
+          "Complete stillness is always safest",
+          "Maximum slouching is required"
         ],
         correctAnswer: 1
       }
@@ -834,16 +834,16 @@ export const insightLibrary: Insight[] = [
     id: 49,
     week: 4,
     track: "SelfEfficacy",
-    title: "Movement Quality vs. Quantity",
-    subtitle: "Why how you move matters",
+    title: "Finding the right movement dose",
+    subtitle: "Balance control, capacity, confidence, and your goals",
     assetPath: "/insight/movement-quality-summary.json", // Summary card replacement
-    quizQ: "Quality movement is more important than sheer volume. (T/F)",
+    quizQ: "Movement choices should consider both how an activity is performed and whether the dose fits the person. (T/F)",
     quizA: "T",
     releaseOffset: 5,
     points: 5,
     questions: [
       {
-        question: "Quality movement is more important than sheer volume. (True/False)",
+        question: "Movement choices should consider both how an activity is performed and whether the dose fits the person. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
@@ -899,10 +899,10 @@ export const insightLibrary: Insight[] = [
     id: 51,
     week: 5,
     track: "PainScience",
-    title: "Neurotags 101",
-    subtitle: "Networks that create pain",
+    title: "Pain and learned associations",
+    subtitle: "How context, memory, and experience can influence protection",
     assetPath: "/insight/neurotags-summary.json", // Summary card with link to NOI Group guide
-    quizQ: "Neurotags are networks in your brain that can create pain. (T/F)",
+    quizQ: "Pain is influenced by many factors, including context and past experience. (T/F)",
     quizA: "T",
     releaseOffset: 0,
     points: 5
@@ -911,10 +911,10 @@ export const insightLibrary: Insight[] = [
     id: 52,
     week: 5,
     track: "StressMood",
-    title: "Gratitude & pain",
-    subtitle: "Simple journal practice",
+    title: "A brief gratitude practice",
+    subtitle: "Notice something meaningful without dismissing what is difficult",
     assetPath: "/insight/gratitude-summary.json", // Summary card replacement
-    quizQ: "Gratitude practice can help reduce pain sensitivity. (T/F)",
+    quizQ: "Gratitude can coexist with pain and difficult emotions. (T/F)",
     quizA: "T",
     releaseOffset: 1,
     points: 5
@@ -947,10 +947,10 @@ export const insightLibrary: Insight[] = [
     id: 55,
     week: 5,
     track: "PainScience",
-    title: "Reassure & re-load",
-    subtitle: "Safe to move test",
-    assetPath: "https://www.youtube.com/watch?v=2n7FOBFMvXg", // Reassure & Re-load - Safe to move test for pain recovery
-    quizQ: "The 'safe to move test' helps build confidence in movement. (T/F)",
+    title: "Making sense of pain and movement",
+    subtitle: "Build confidence with an individualized, gradual approach",
+    assetPath: "https://www.tamethebeast.org/",
+    quizQ: "Pain does not provide a precise measure of tissue damage, but new or concerning symptoms still deserve assessment. (T/F)",
     quizA: "T",
     releaseOffset: 4,
     points: 5
@@ -988,13 +988,13 @@ export const insightLibrary: Insight[] = [
     title: "Sticky thoughts vs. sticky tissues",
     subtitle: "Catastrophising",
     assetPath: "https://www.youtube.com/watch?v=OhNm7ZSiZls", // Russ Harris - Cognitive Defusion for Pain Management
-    quizQ: "Catastrophising can make pain feel worse than tissue damage. (T/F)",
+    quizQ: "Threat-focused thoughts can influence distress and behaviour without making pain imaginary. (T/F)",
     quizA: "T",
     releaseOffset: 0,
     points: 5,
     questions: [
       {
-        question: "Catastrophising can make pain feel worse than tissue damage. (True/False)",
+        question: "Threat-focused thoughts can influence distress and behaviour without making pain imaginary. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
@@ -1027,13 +1027,13 @@ export const insightLibrary: Insight[] = [
     title: "Stress-breath connection",
     subtitle: "Box breathing basics",
     assetPath: "https://www.youtube.com/watch?v=HhUoQ6gx6kE", // Kitaro Waga - How breathing affects the nervous system (science-based)
-    quizQ: "Box breathing can help reduce stress and pain. (T/F)",
+    quizQ: "A paced-breathing exercise may feel calming for some people, but it is optional and effects vary. (T/F)",
     quizA: "T",
     releaseOffset: 1,
     points: 5,
     questions: [
       {
-        question: "Box breathing can help reduce stress and pain. (True/False)",
+        question: "A paced-breathing exercise may feel calming for some people, but it is optional and effects vary. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
@@ -1048,14 +1048,14 @@ export const insightLibrary: Insight[] = [
         correctAnswer: 2
       },
       {
-        question: "Box breathing activates the:",
+        question: "What should you do if paced breathing makes you dizzy or uncomfortable?",
         options: [
-          "Sympathetic nervous system",
-          "Parasympathetic nervous system",
-          "Neither system",
-          "Both equally"
+          "Force a deeper breath",
+          "Hold your breath longer",
+          "Stop or return to comfortable breathing",
+          "Assume it proves something is wrong"
         ],
-        correctAnswer: 1
+        correctAnswer: 2
       }
     ]
   },
@@ -1111,10 +1111,10 @@ export const insightLibrary: Insight[] = [
     id: 64,
     week: 6,
     track: "DeepDive",
-    title: "Monthly mini-course",
-    subtitle: "5-min article + 5-Q quiz",
-    assetPath: "/insight/monthly-deepdive.md",
-    quizQ: "What was the main takeaway from this month's deep dive?",
+    title: "Putting the Framework together",
+    subtitle: "Connect the recovery tools that matter most to you",
+    assetPath: "/insight/framework-integration-week6.json",
+    quizQ: "Complete your Framework integration plan.",
     quizA: "(user input)",
     releaseOffset: 6,
     points: 5

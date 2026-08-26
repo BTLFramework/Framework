@@ -2,56 +2,56 @@
   "meta": {
     "time": "6 min",
     "level": "Intermediate",
-    "why": "Understanding your body's protection system helps you distinguish between real danger and false alarms. This knowledge can reduce fear and increase confidence in movement."
+    "why": "Symptoms are interpreted in context. Exploring what increases or decreases a sense of threat can support a more informed conversation and plan."
   },
   "hero": {
-    "title": "Protectometer",
-    "subtitle": "Finding safety cues vs danger signals",
-    "description": "Your brain has a sophisticated protection system that can sometimes overreact. Learning to identify safety cues helps calm your nervous system and reduce unnecessary pain signals."
+    "title": "Protection, Context, and Safety",
+    "subtitle": "Look for patterns without diagnosing yourself",
+    "description": "Pain is a real protective experience influenced by many kinds of information. Context can matter, but no checklist can determine by itself whether a symptom is safe or dangerous."
   },
   "tiles": [
     {
-      "title": "**Danger Signals**",
+      "title": "**Seek timely assessment**",
       "content": [
-        "Sudden, sharp pain with movement",
-        "Pain that worsens with activity",
-        "Swelling, redness, or heat",
-        "Loss of function or strength"
+        "New or rapidly worsening symptoms",
+        "Significant trauma or unexplained systemic illness",
+        "New neurological changes or loss of function",
+        "Symptoms that concern you or do not fit your usual pattern"
       ]
     },
     {
-      "title": "**Safety Cues**",
+      "title": "**Notice context**",
       "content": [
-        "Pain that improves with movement",
-        "Stiffness that warms up with activity",
-        "Pain that changes with position",
-        "No swelling or signs of inflammation"
+        "What you were doing when symptoms changed",
+        "Sleep, stress, health, and recent activity",
+        "What you expected or feared might happen",
+        "Which modifications improved comfort or function"
       ]
     },
     {
-      "title": "**Context Matters**",
+      "title": "**Avoid simple rules**",
       "content": [
-        "Stress amplifies pain signals",
-        "Past experiences influence perception",
-        "Mood affects pain sensitivity",
-        "Social support can reduce pain"
+        "Pain severity is not a precise damage meter",
+        "Pain improving with movement does not prove nothing is wrong",
+        "No swelling does not automatically prove an activity is safe",
+        "One difficult response does not always mean lasting harm"
       ]
     },
     {
-      "title": "**Building Safety**",
+      "title": "**Build an informed plan**",
       "content": [
-        "Gradual exposure to feared movements",
-        "Positive movement experiences",
-        "Education about pain science",
-        "Supportive social environment"
+        "Discuss uncertainty or concerning changes with your clinician",
+        "Use gradual, individualized activity when appropriate",
+        "Track function and participation as well as symptoms",
+        "Adjust the plan using your response and clinical guidance"
       ]
     }
   ],
   "microAction": {
-    "title": "Safety Check",
-    "description": "Think of a movement you've been avoiding. Rate your fear level (1-10) and try a very gentle version. Notice if it's actually dangerous or just uncomfortable.",
-    "action": "Practice one 'scary' movement with 50% effort"
+    "title": "Context Check",
+    "description": "Choose a familiar activity already considered appropriate for you. Note your confidence, the dose you tried, your response, and any question you want to discuss. Do not use this activity to test a new or concerning symptom.",
+    "action": "Record one movement response"
   },
-  "resourceLink": "https://www.noigroup.com/protectometer/",
-  "resourceLabel": "Explore the NOI Group Protectometer tool"
+  "resourceLink": "https://www.iasp-pain.org/resources/fact-sheets/promoting-chronic-pain-self-management-education/",
+  "resourceLabel": "IASP: chronic pain self-management education"
 }

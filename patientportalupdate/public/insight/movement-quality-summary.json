@@ -1,56 +1,16 @@
 {
   "timeMinutes": 3,
-  "level": "Advanced",
-  "why": "Understanding movement optimism helps you move with confidence, not fear of 'wrong' positions.",
+  "level": "Intermediate",
+  "why": "Useful movement is not a contest between perfect form and maximum volume. The task, dose, goals, confidence, and individual response all matter.",
   "slides": [
-    {
-      "id": 1,
-      "title": "Movement Optimism",
-      "content": "Your body has a remarkable ability to adapt to various positions and stresses. Embracing diverse movements enhances resilience and reduces injury risk.",
-      "backgroundColor": "#ecfeff",
-      "textColor": "#0e7490"
-    },
-    {
-      "id": 2,
-      "title": "Beyond Biomechanics",
-      "content": "While biomechanics matter, they don't solely dictate pain or injury. Individual variability and adaptability are just as important as 'correct' form.",
-      "backgroundColor": "#cffafe",
-      "textColor": "#155e75"
-    },
-    {
-      "id": 3,
-      "title": "Individualized Approach",
-      "content": "Tailoring exercises to your interests and goals improves outcomes. Engaging in enjoyable activities promotes adherence and overall well-being.",
-      "backgroundColor": "#bae6fd",
-      "textColor": "#0ea5e9"
-    },
-    {
-      "id": 4,
-      "title": "Movement Ecosystem",
-      "content": "Pain and function are influenced by biological, psychological, and social factors. A holistic approach considers all aspects of your life and environment.",
-      "backgroundColor": "#e0f2fe",
-      "textColor": "#075985"
-    },
-    {
-      "id": 6,
-      "title": "Myth vs Fact",
-      "content": "Myth: There's one 'correct' way to move. Fact: Your body adapts to different movement patterns safely.",
-      "backgroundColor": "#ecfeff",
-      "textColor": "#0e7490"
-    },
-    {
-      "id": 5,
-      "title": "Try this today",
-      "content": "Choose one exercise you enjoy doing. Focus on what feels good, not what looks 'perfect.' Trust your body's adaptability.",
-      "backgroundColor": "#eff6ff",
-      "textColor": "#1e40af",
-      "resourceLink": "https://www.practicehuman.com/podcast-episodes/ep-046-greg-lehman-building-a-healthy-movement-ecosystem/",
-      "resourceLabel": "Listen: Building a Healthy Movement Ecosystem"
-    }
+    {"id": 1, "title": "More Than Perfect Form", "content": "There is often more than one acceptable way to move. Technique can matter for a task without one posture being mandatory for every body.", "backgroundColor": "#ecfeff", "textColor": "#0e7490"},
+    {"id": 2, "title": "Dose Matters Too", "content": "Load, repetitions, speed, range, frequency, recovery, and current capacity can all influence how an activity is tolerated.", "backgroundColor": "#cffafe", "textColor": "#155e75"},
+    {"id": 3, "title": "Make It Meaningful", "content": "Activities that connect to your goals and preferences may be easier to practise consistently. Adherence is part of a useful plan.", "backgroundColor": "#bae6fd", "textColor": "#075985"},
+    {"id": 4, "title": "Use Feedback, Not Fear", "content": "Notice symptoms, confidence, function, and recovery after activity. Adjust thoughtfully rather than assuming every sensation means damage.", "backgroundColor": "#e0f2fe", "textColor": "#075985"},
+    {"id": 5, "title": "Try This Today", "content": "Choose one familiar exercise and a manageable dose. Note what felt controlled, what mattered to you, and what you would adjust next time.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://www.iasp-pain.org/resources/fact-sheets/back-pain-education/", "resourceLabel": "IASP: back-pain education"}
   ],
   "autoplay": false,
   "interval": 5000,
   "showDots": true,
   "showArrows": true
 }
-

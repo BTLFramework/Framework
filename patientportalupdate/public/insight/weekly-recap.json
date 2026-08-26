@@ -12,12 +12,12 @@
           "type": "checkbox",
           "label": "Which insights resonated most with you?",
           "options": [
-            "Danger vs. safety signals - Understanding how your brain processes pain",
-            "How cortisol slows healing - The impact of stress on recovery",
-            "Sleep debt + pain sensitivity - How sleep affects pain perception",
-            "My recovery evidence - Noticing meaningful signs of progress",
-            "Motion is Lotion - How gentle movement helps",
-            "Flare Up Plan - Building your personal calm-down strategy"
+            "What can influence pain? - Pain is real and influenced by many factors",
+            "Stress and recovery - Noticing how stress and recovery interact",
+            "Sleep and pain sensitivity - Looking for patterns without chasing perfect sleep",
+            "Map recovery signals - Noticing meaningful signs of progress",
+            "Movement as a recovery tool - Choosing a manageable dose",
+            "Flare plan - Preparing useful responses for difficult days"
           ]
         },
         {
@@ -72,11 +72,11 @@
           "type": "checkbox",
           "label": "Which strategies did you try this week?",
           "options": [
-            "Practiced breathing techniques when stressed",
-            "Used gentle movement to reduce pain",
-            "Applied safety signal concepts",
-            "Improved sleep habits",
-            "Used positive self-talk",
+            "Tried a calming or grounding strategy",
+            "Used a manageable amount of movement",
+            "Noticed context around symptom changes",
+            "Tried one realistic sleep-supporting change",
+            "Responded to a difficult thought more flexibly",
             "Reached out to support network",
             "Paced activities more mindfully"
           ]

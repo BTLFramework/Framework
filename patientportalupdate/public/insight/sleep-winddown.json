@@ -2,56 +2,24 @@
   "meta": {
     "time": "5 min",
     "level": "Beginner",
-    "why": "Poor sleep quality can significantly worsen pain sensitivity and slow recovery. A structured wind-down routine helps signal to your body that it's time to rest and repair."
+    "why": "A consistent wind-down can support sleep for some people. It is an experiment, not a guarantee or a test of effort."
   },
   "hero": {
     "title": "Sleep Wind-Down Checklist",
-    "subtitle": "CBT-I starter routine for better sleep",
-    "description": "Create a consistent pre-sleep routine that helps your body transition from wakefulness to restorative sleep. This evidence-based approach can improve sleep quality and reduce pain sensitivity."
+    "subtitle": "Choose a realistic routine",
+    "description": "Select a small number of changes that fit your life. If sleep problems are persistent, severe, or linked to another health concern, discuss them with an appropriate clinician."
   },
   "tiles": [
-    {
-      "title": "**Environment Setup**",
-      "content": [
-        "Keep bedroom cool (65-68°F)",
-        "Remove all screens 1 hour before bed",
-        "Use blackout curtains or eye mask",
-        "Keep room quiet or use white noise"
-      ]
-    },
-    {
-      "title": "**Wind-Down Activities**",
-      "content": [
-        "Gentle stretching or yoga",
-        "Reading (physical book, not screen)",
-        "Meditation or deep breathing",
-        "Journaling or gratitude practice"
-      ]
-    },
-    {
-      "title": "**Avoid Before Bed**",
-      "content": [
-        "Caffeine after 2 PM",
-        "Heavy meals within 3 hours",
-        "Intense exercise within 4 hours",
-        "Stressful conversations or work"
-      ]
-    },
-    {
-      "title": "**Consistency is Key**",
-      "content": [
-        "Same bedtime every night",
-        "Same wake time every morning",
-        "Weekend sleep-ins limited to 1 hour",
-        "Stick to routine even on difficult nights"
-      ]
-    }
+    {"title": "**Environment options**", "content": ["Use a temperature that feels comfortable", "Reduce unwanted light or noise where practical", "Reserve the bed for sleep when possible", "Adapt pillows or positioning for comfort"]},
+    {"title": "**Wind-down options**", "content": ["Choose a calm, familiar activity", "Dim lights if that feels helpful", "Write down unfinished tasks for tomorrow", "Use comfortable breathing rather than forcing a pattern"]},
+    {"title": "**Timing considerations**", "content": ["Notice whether caffeine timing affects you", "Avoid treating one universal cutoff as a rule", "Consider how alcohol, meals, medication, and activity affect your sleep", "Ask a clinician or pharmacist when health conditions or medication are involved"]},
+    {"title": "**Consistency without perfection**", "content": ["A regular wake time can be useful", "One difficult night is not failure", "Change one or two things at a time", "Judge patterns over several days rather than one morning"]}
   ],
   "microAction": {
-    "title": "Tonight's Wind-Down",
-    "description": "Choose 2-3 items from the checklist above and commit to doing them for the next 3 nights. Track how you feel in the morning.",
-    "action": "Set a phone reminder for 1 hour before your target bedtime"
+    "title": "Tonight's Experiment",
+    "description": "Choose one or two options to try for several nights. Record what you did and how rested or capable you felt the next day.",
+    "action": "Choose one wind-down experiment"
   },
-  "resourceLink": "https://www.sleepfoundation.org/sleep-hygiene",
-  "resourceLabel": "Learn more about sleep hygiene"
+  "resourceLink": "https://www.nhsinform.scot/illnesses-and-conditions/mental-health/mental-health-self-help-guides/sleep-problems-and-insomnia-self-help-guide/",
+  "resourceLabel": "NHS inform: sleep problems and insomnia"
 }
