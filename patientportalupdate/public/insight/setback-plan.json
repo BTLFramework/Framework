@@ -1,0 +1,24 @@
+{
+  "type": "form",
+  "title": "Prepare for Setbacks",
+  "subtitle": "A temporary increase in symptoms does not automatically mean you have lost all progress.",
+  "description": "Use your individualized clinical guidance. Seek appropriate care for new, severe, rapidly worsening, or otherwise concerning symptoms.",
+  "sections": [
+    {
+      "title": "Recognize the pattern",
+      "fields": [
+        { "type": "textarea", "label": "What are your usual early signs that a difficult period may be building?", "rows": 3 },
+        { "type": "textarea", "label": "What helps you distinguish a familiar flare from something that needs clinical advice?", "rows": 3 }
+      ]
+    },
+    {
+      "title": "Choose your response",
+      "fields": [
+        { "type": "checkbox", "label": "Which options may belong in your plan?", "options": ["Temporarily adjust the dose of activity", "Keep some comfortable movement in the day", "Use a calming or breathing strategy", "Protect sleep and regular routines", "Ask for support", "Contact my practitioner when needed"] },
+        { "type": "textarea", "label": "Write your first three steps in order.", "rows": 4 }
+      ]
+    }
+  ],
+  "submitText": "Save Setback Plan",
+  "successMessage": "Setback plan saved. A prepared response can reduce guesswork when symptoms change."
+}

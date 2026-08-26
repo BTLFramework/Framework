@@ -1,0 +1,19 @@
+{
+  "type": "form",
+  "title": "Build Your Personal Toolkit",
+  "subtitle": "Different situations may call for different tools.",
+  "description": "Choose strategies that you have tried, understand, and can use safely. A toolkit supports individualized care; it does not replace assessment or clinical advice.",
+  "sections": [
+    {
+      "title": "Choose what fits",
+      "fields": [
+        { "type": "textarea", "label": "When symptoms are calm, what helps you build capacity?", "rows": 3 },
+        { "type": "textarea", "label": "When symptoms increase, what helps you stay engaged without overdoing it?", "rows": 3 },
+        { "type": "textarea", "label": "What supports your sleep, stress, mood, or energy?", "rows": 3 },
+        { "type": "textarea", "label": "When should you ask your practitioner for guidance?", "rows": 3 }
+      ]
+    }
+  ],
+  "submitText": "Save Personal Toolkit",
+  "successMessage": "Toolkit saved. Keep refining it as you learn what works in different situations."
+}

@@ -231,7 +231,7 @@ export function RecoveryInsightDialog({
 
   const getFilteredInsights = () => {
     // Show all insights to all patients - no risk-based filtering
-    // This ensures we have enough content for daily progression (42 insights total)
+    // Seven weeks of daily content (49 insights total), unlocked sequentially.
     return insightLibrary;
   };
 

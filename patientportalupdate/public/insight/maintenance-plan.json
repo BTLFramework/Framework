@@ -1,0 +1,24 @@
+{
+  "type": "form",
+  "title": "Create Your Maintenance Plan",
+  "subtitle": "Decide what to continue, monitor, and adjust after Week 7.",
+  "description": "Maintenance is not about following a perfect routine forever. It is a flexible plan for continuing what matters and responding when life changes.",
+  "sections": [
+    {
+      "title": "Continue",
+      "fields": [
+        { "type": "checkbox", "label": "Which areas deserve ongoing attention?", "options": ["Meaningful movement or exercise", "Sleep routine", "Stress or mood support", "Pacing and activity planning", "Nutrition or hydration habits", "Social support", "Clinical follow-up"] },
+        { "type": "textarea", "label": "Which two actions are most realistic to continue?", "rows": 3 }
+      ]
+    },
+    {
+      "title": "Monitor and adjust",
+      "fields": [
+        { "type": "textarea", "label": "What signs tell you the plan needs adjusting?", "rows": 3 },
+        { "type": "textarea", "label": "When will you review the plan, and who can help?", "rows": 3 }
+      ]
+    }
+  ],
+  "submitText": "Save Maintenance Plan",
+  "successMessage": "Maintenance plan saved. It should change as your goals, health, and circumstances change."
+}

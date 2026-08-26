@@ -1,0 +1,25 @@
+{
+  "type": "form",
+  "title": "Plan a Graded Return",
+  "subtitle": "Build toward an activity that matters without making recovery all-or-nothing.",
+  "description": "This is a planning exercise, not permission to push through concerning symptoms. Follow the plan you and your practitioner have agreed upon.",
+  "sections": [
+    {
+      "title": "Choose the activity",
+      "fields": [
+        { "type": "text", "label": "What activity would you like to return to?", "placeholder": "Work task, walk, sport, hobby, household task..." },
+        { "type": "textarea", "label": "Why does this activity matter to you?", "rows": 2 }
+      ]
+    },
+    {
+      "title": "Choose a manageable starting point",
+      "fields": [
+        { "type": "text", "label": "What is the smallest useful version you could try?", "placeholder": "For example: 10 minutes, lighter resistance, fewer repetitions..." },
+        { "type": "text", "label": "How will you know the starting dose is manageable?" },
+        { "type": "textarea", "label": "What will you adjust if it is too much—or too easy?", "rows": 3 }
+      ]
+    }
+  ],
+  "submitText": "Save Graded Return Plan",
+  "successMessage": "Plan saved. Review it with your practitioner when guidance or safety considerations are needed."
+}

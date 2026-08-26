@@ -28,13 +28,10 @@ This directory contains all media assets and interactive content for the Back to
 - **Format**: Interactive carousel (JSON)
 - **Status**: ✅ Complete
 
-### Thursday - SuccessStory
-- **File**: `jess-success.mp4`
-- **Title**: "Jess's 2-week back-to-running win"
-- **Subtitle**: "Real-patient motivation clip"
-- **Source**: Jess consent
-- **Format**: MP4 video
-- **Status**: ⚠️ Placeholder (needs real content)
+### Thursday - SelfEfficacy
+- **Title**: "Find your recovery evidence"
+- **Format**: Interactive reflection
+- **Status**: ✅ Complete
 
 ### Friday - PainScience
 - **File**: `motion-lotion.mp4`
@@ -117,9 +114,7 @@ Interactive forms use a JSON schema with the following structure:
 ## Next Steps
 
 ### Content Creation
-1. **Video Content**: Source and create real video content for:
-   - `jess-success.mp4` - Patient success story
-   - `motion-lotion.mp4` - Movement education video
+1. **Video Content**: Continue reviewing expert educational videos for fit, availability, and licensing.
 
 2. **Animation Enhancement**: Consider adding more Lottie animations for:
    - Pain science concepts
@@ -133,7 +128,7 @@ Interactive forms use a JSON schema with the following structure:
 4. **Mobile Optimization**: Ensure forms work well on mobile devices
 
 ### Content Expansion
-1. **Week 2+ Insights**: Plan and create content for subsequent weeks
+1. **Curriculum Review**: Review the full seven-week sequence as evidence and resources change.
 2. **Personalization**: Adapt content based on patient progress and preferences
 3. **Multilingual Support**: Consider translations for diverse patient populations
 
@@ -152,8 +147,8 @@ All content should be properly licensed and attributed:
 ├── ps-danger.mp4            # Monday - Pain science video
 ├── cortisol.json            # Tuesday - Stress/mood animation
 ├── sleep-carousel.json      # Wednesday - Lifestyle carousel
-├── jess-success.mp4         # Thursday - Success story (placeholder)
+├── recovery-evidence-week3.json # Recovery evidence reflection
 ├── motion-lotion.mp4        # Friday - Movement video (placeholder)
 ├── flare-up-plan.json       # Saturday - Interactive form
 └── weekly-recap.json        # Sunday - Weekly reflection form
-``` 
+```

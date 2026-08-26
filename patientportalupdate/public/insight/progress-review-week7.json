@@ -1,0 +1,18 @@
+{
+  "type": "form",
+  "title": "Review Your Recovery Evidence",
+  "subtitle": "Compare what matters now with where you started.",
+  "description": "Recovery may show up in function, confidence, participation, coping, understanding, or recovery time—even when symptoms still fluctuate.",
+  "sections": [
+    {
+      "title": "Then and now",
+      "fields": [
+        { "type": "textarea", "label": "What can you do, understand, or manage differently now?", "rows": 4 },
+        { "type": "textarea", "label": "What remains difficult or important to address?", "rows": 4 },
+        { "type": "text", "label": "What change are you most proud of?" }
+      ]
+    }
+  ],
+  "submitText": "Save Progress Review",
+  "successMessage": "Progress review saved. This can help guide your next conversation and plan."
+}

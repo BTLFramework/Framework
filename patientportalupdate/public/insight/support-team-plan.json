@@ -1,0 +1,25 @@
+{
+  "type": "form",
+  "title": "Build Your Support Team",
+  "subtitle": "Specific requests are often easier for other people to understand and act on.",
+  "description": "Support can be practical, emotional, clinical, or social. The right support respects your goals and helps you participate rather than taking over.",
+  "sections": [
+    {
+      "title": "Who can help?",
+      "fields": [
+        { "type": "text", "label": "One person I can ask for practical support:" },
+        { "type": "text", "label": "One person I can talk with honestly:" },
+        { "type": "text", "label": "One healthcare question I want help answering:" }
+      ]
+    },
+    {
+      "title": "Make the request clear",
+      "fields": [
+        { "type": "textarea", "label": "What would helpful support look like this week?", "placeholder": "A specific task, check-in, ride, reminder, conversation, or accommodation...", "rows": 3 },
+        { "type": "textarea", "label": "What kind of response is not helpful for you?", "rows": 2 }
+      ]
+    }
+  ],
+  "submitText": "Save Support Plan",
+  "successMessage": "Support plan saved. You can update it as your needs change."
+}

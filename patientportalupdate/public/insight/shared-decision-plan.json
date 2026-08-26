@@ -1,0 +1,19 @@
+{
+  "type": "form",
+  "title": "Prepare for a Shared Decision",
+  "subtitle": "Your priorities and preferences belong in the care conversation.",
+  "description": "Shared decision-making combines the best available evidence, clinical judgment, and what matters to you.",
+  "sections": [
+    {
+      "title": "Prepare",
+      "fields": [
+        { "type": "text", "label": "What decision or question do you want to discuss?" },
+        { "type": "textarea", "label": "What outcome matters most to you?", "rows": 3 },
+        { "type": "textarea", "label": "What concerns, preferences, or practical limits should your practitioner know?", "rows": 3 },
+        { "type": "textarea", "label": "What options or trade-offs would you like explained?", "rows": 3 }
+      ]
+    }
+  ],
+  "submitText": "Save Discussion Notes",
+  "successMessage": "Saved. Bring these points into your next care conversation."
+}

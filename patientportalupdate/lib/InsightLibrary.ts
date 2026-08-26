@@ -549,31 +549,14 @@ export const insightLibrary: Insight[] = [
   {
     id: 40,
     week: 3,
-    track: "SuccessStory",
-    title: "Patient Story",
-    subtitle: "Recovery story coming soon",
-    assetPath: "/insight/john-success.mp4",
-    quizQ: "Chronic pain recovery is possible with the right approach. (T/F)",
-    quizA: "T",
+    track: "SelfEfficacy",
+    title: "Find your recovery evidence",
+    subtitle: "Notice small signs of capacity, confidence, and participation",
+    assetPath: "/insight/recovery-evidence-week3.json",
+    quizQ: "Complete your recovery evidence check-in.",
+    quizA: "(user input)",
     releaseOffset: 3,
-    points: 5,
-    questions: [
-      {
-        question: "Chronic pain recovery is possible with the right approach. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0
-      },
-      {
-        question: "What was key to John's recovery?",
-        options: [
-          "Surgery",
-          "Expensive medication",
-          "Gradual movement and education",
-          "Complete rest"
-        ],
-        correctAnswer: 2
-      }
-    ]
+    points: 5
   },
   {
     id: 41,
@@ -799,31 +782,14 @@ export const insightLibrary: Insight[] = [
   {
     id: 47,
     week: 4,
-    track: "SuccessStory",
-    title: "Patient Story",
-    subtitle: "Post-operative recovery story coming soon",
-    assetPath: "/insight/maria-success.mp4",
-    quizQ: "Post-surgical rehabilitation is key to full recovery. (T/F)",
-    quizA: "T",
+    track: "SelfEfficacy",
+    title: "Plan a graded return",
+    subtitle: "Break one meaningful activity into manageable steps",
+    assetPath: "/insight/graded-return-plan.json",
+    quizQ: "Complete your graded return plan.",
+    quizA: "(user input)",
     releaseOffset: 3,
-    points: 5,
-    questions: [
-      {
-        question: "Post-surgical rehabilitation is key to full recovery. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0
-      },
-      {
-        question: "What helped Maria recover fully?",
-        options: [
-          "Surgery alone",
-          "Complete rest for months",
-          "Progressive rehabilitation",
-          "Avoiding all exercise"
-        ],
-        correctAnswer: 2
-      }
-    ]
+    points: 5
   },
   {
     id: 48,
@@ -957,23 +923,23 @@ export const insightLibrary: Insight[] = [
     id: 53,
     week: 5,
     track: "Lifestyle",
-    title: "Caffeine & sleep",
-    subtitle: "The 2 pm cutoff rule",
+    title: "Caffeine and your sleep",
+    subtitle: "Test a cutoff that fits your sensitivity and schedule",
     assetPath: "/insight/caffeine-summary.json",
-    quizQ: "You should stop caffeine by 2 pm for better sleep. (T/F)",
-    quizA: "T",
+    quizQ: "Caffeine timing affects everyone in exactly the same way. (T/F)",
+    quizA: "F",
     releaseOffset: 2,
     points: 5
   },
   {
     id: 54,
     week: 5,
-    track: "SuccessStory",
-    title: "Nina's postpartum win",
-    subtitle: "Core rehab journey",
-    assetPath: "https://www.physio-pedia.com/Postpartum_Core_Rehabilitation", // Physiopedia - Postpartum Core Rehabilitation Guide
-    quizQ: "Nina's story shows the importance of postpartum core rehab. (T/F)",
-    quizA: "T",
+    track: "SelfEfficacy",
+    title: "Build your support team",
+    subtitle: "Make it easier to ask for the kind of help you need",
+    assetPath: "/insight/support-team-plan.json",
+    quizQ: "Complete your support team plan.",
+    quizA: "(user input)",
     releaseOffset: 3,
     points: 5
   },
@@ -1097,10 +1063,10 @@ export const insightLibrary: Insight[] = [
     id: 60,
     week: 6,
     track: "Lifestyle",
-    title: "Hydration & fascia",
-    subtitle: "Why water counts",
+    title: "Hydration and recovery habits",
+    subtitle: "Use thirst, routine, activity, and conditions as practical guides",
     assetPath: "/insight/hydration-fascia.json",
-    quizQ: "Proper hydration helps maintain healthy fascia. (T/F)",
+    quizQ: "Hydration needs can change with activity, heat, health, and individual circumstances. (T/F)",
     quizA: "T",
     releaseOffset: 2,
     points: 5
@@ -1108,12 +1074,12 @@ export const insightLibrary: Insight[] = [
   {
     id: 61,
     week: 6,
-    track: "SuccessStory",
-    title: "Patient Story",
-    subtitle: "New recovery story coming soon",
-    assetPath: "/insight/future-story.mp4",
-    quizQ: "Success stories can inspire and motivate recovery. (T/F)",
-    quizA: "T",
+    track: "SelfEfficacy",
+    title: "Prepare for setbacks",
+    subtitle: "Decide what you will do when symptoms temporarily increase",
+    assetPath: "/insight/setback-plan.json",
+    quizQ: "Complete your setback plan.",
+    quizA: "(user input)",
     releaseOffset: 3,
     points: 5
   },
@@ -1149,6 +1115,109 @@ export const insightLibrary: Insight[] = [
     subtitle: "5-min article + 5-Q quiz",
     assetPath: "/insight/monthly-deepdive.md",
     quizQ: "What was the main takeaway from this month's deep dive?",
+    quizA: "(user input)",
+    releaseOffset: 6,
+    points: 5
+  },
+
+  // --- Week 7: Consolidate, personalize, and continue ---
+  {
+    id: 65,
+    week: 7,
+    track: "PainScience",
+    title: "Self-management is a skill",
+    subtitle: "Build confidence through practice, problem-solving, and partnership",
+    assetPath: "https://www.iasp-pain.org/resources/fact-sheets/promoting-chronic-pain-self-management-education/",
+    quizQ: "Self-management means managing recovery entirely without professional support. (T/F)",
+    quizA: "F",
+    releaseOffset: 0,
+    points: 5,
+    questions: [
+      {
+        question: "Self-management means managing recovery entirely without professional support. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 1
+      },
+      {
+        question: "Which is a core self-management skill?",
+        options: [
+          "Waiting for someone else to make every decision",
+          "Problem-solving and choosing manageable actions",
+          "Ignoring changes in symptoms",
+          "Following the same plan regardless of context"
+        ],
+        correctAnswer: 1
+      }
+    ]
+  },
+  {
+    id: 66,
+    week: 7,
+    track: "SelfEfficacy",
+    title: "Prepare for a shared decision",
+    subtitle: "Bring your priorities, questions, and preferences into the conversation",
+    assetPath: "/insight/shared-decision-plan.json",
+    quizQ: "Complete your shared decision plan.",
+    quizA: "(user input)",
+    releaseOffset: 1,
+    points: 5
+  },
+  {
+    id: 67,
+    week: 7,
+    track: "SelfEfficacy",
+    title: "Review your recovery evidence",
+    subtitle: "Compare what matters now with where you started",
+    assetPath: "/insight/progress-review-week7.json",
+    quizQ: "Complete your progress review.",
+    quizA: "(user input)",
+    releaseOffset: 2,
+    points: 5
+  },
+  {
+    id: 68,
+    week: 7,
+    track: "SelfEfficacy",
+    title: "Build your personal toolkit",
+    subtitle: "Choose the strategies that fit different situations",
+    assetPath: "/insight/recovery-toolkit-plan.json",
+    quizQ: "Complete your personal recovery toolkit.",
+    quizA: "(user input)",
+    releaseOffset: 3,
+    points: 5
+  },
+  {
+    id: 69,
+    week: 7,
+    track: "SelfEfficacy",
+    title: "Choose your next meaningful goal",
+    subtitle: "Connect one realistic step to an activity that matters to you",
+    assetPath: "/insight/next-goal-plan.json",
+    quizQ: "Complete your next-goal plan.",
+    quizA: "(user input)",
+    releaseOffset: 4,
+    points: 5
+  },
+  {
+    id: 70,
+    week: 7,
+    track: "Lifestyle",
+    title: "Create your maintenance plan",
+    subtitle: "Decide what to continue, monitor, and adjust",
+    assetPath: "/insight/maintenance-plan.json",
+    quizQ: "Complete your maintenance plan.",
+    quizA: "(user input)",
+    releaseOffset: 5,
+    points: 5
+  },
+  {
+    id: 71,
+    week: 7,
+    track: "Recap",
+    title: "Your seven-week review",
+    subtitle: "Recognize what changed and decide what comes next",
+    assetPath: "/insight/week7-reflection.json",
+    quizQ: "Complete your seven-week review.",
     quizA: "(user input)",
     releaseOffset: 6,
     points: 5

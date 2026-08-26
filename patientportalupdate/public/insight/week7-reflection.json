@@ -1,0 +1,26 @@
+{
+  "type": "form",
+  "title": "Your Seven-Week Review",
+  "subtitle": "Recognize what changed and decide what comes next.",
+  "description": "This is not a final exam. It is a record of what you learned about your recovery and what support you may need next.",
+  "sections": [
+    {
+      "title": "What changed?",
+      "fields": [
+        { "type": "textarea", "label": "What is the most useful thing you learned?", "rows": 3 },
+        { "type": "textarea", "label": "Which strategy or action helped you most?", "rows": 3 },
+        { "type": "textarea", "label": "How has your confidence or participation changed?", "rows": 3 }
+      ]
+    },
+    {
+      "title": "What comes next?",
+      "fields": [
+        { "type": "textarea", "label": "What still needs attention?", "rows": 3 },
+        { "type": "textarea", "label": "What would you like to discuss with your practitioner?", "rows": 3 },
+        { "type": "text", "label": "One commitment I want to carry forward:" }
+      ]
+    }
+  ],
+  "submitText": "Complete Seven-Week Review",
+  "successMessage": "Seven-week review complete. Your responses can help shape the next phase of your care."
+}

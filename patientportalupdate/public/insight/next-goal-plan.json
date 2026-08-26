@@ -1,0 +1,20 @@
+{
+  "type": "form",
+  "title": "Choose Your Next Meaningful Goal",
+  "subtitle": "Start with participation, then choose a manageable next step.",
+  "description": "A useful goal connects to something you value and can be adjusted as you learn.",
+  "sections": [
+    {
+      "title": "Set the direction",
+      "fields": [
+        { "type": "text", "label": "What meaningful activity do you want to move toward?" },
+        { "type": "textarea", "label": "Why does it matter to you?", "rows": 2 },
+        { "type": "text", "label": "What is one manageable step for the next seven days?" },
+        { "type": "text", "label": "When and where will you try it?" },
+        { "type": "textarea", "label": "How could you adapt the step if circumstances change?", "rows": 3 }
+      ]
+    }
+  ],
+  "submitText": "Save Next Goal",
+  "successMessage": "Goal saved. Progress comes from learning and adjusting, not executing every plan perfectly."
+}

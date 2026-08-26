@@ -1,0 +1,49 @@
+{
+  "type": "form",
+  "title": "Find Your Recovery Evidence",
+  "subtitle": "Progress is often easier to see when you look beyond pain intensity.",
+  "description": "Notice changes in capacity, confidence, participation, recovery time, and understanding. Small changes count; honest answers are more useful than positive answers.",
+  "sections": [
+    {
+      "title": "Look for change",
+      "fields": [
+        {
+          "type": "checkbox",
+          "label": "Have you noticed any of these?",
+          "options": [
+            "I can do something for longer or more comfortably",
+            "I recover more quickly after activity",
+            "I feel less worried about a symptom or movement",
+            "I understand my patterns better",
+            "I used a strategy instead of stopping everything",
+            "I participated in something that matters to me",
+            "I have not noticed a change yet"
+          ]
+        },
+        {
+          "type": "textarea",
+          "label": "Describe one specific example.",
+          "placeholder": "What happened, and what was different?",
+          "rows": 3
+        }
+      ]
+    },
+    {
+      "title": "Use what you learned",
+      "fields": [
+        {
+          "type": "textarea",
+          "label": "What may have helped?",
+          "placeholder": "Consider pacing, movement, sleep, support, understanding, treatment, or context...",
+          "rows": 3
+        },
+        {
+          "type": "text",
+          "label": "One small action worth repeating:"
+        }
+      ]
+    }
+  ],
+  "submitText": "Save Recovery Evidence",
+  "successMessage": "Saved. This gives you and your practitioner a broader picture of recovery than pain intensity alone."
+}
