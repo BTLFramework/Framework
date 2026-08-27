@@ -1,0 +1,16 @@
+{
+  "timeMinutes": 2,
+  "level": "Beginner",
+  "why": "Recovery is better judged by patterns in function, confidence, symptoms, and participation than by one difficult day.",
+  "slides": [
+    {"id": 1, "title": "Recovery Has Variation", "content": "Symptoms, energy, confidence, and ability can rise and fall. A variable path can still be moving forward.", "backgroundColor": "#f0f9ff", "textColor": "#075985"},
+    {"id": 2, "title": "Use More Than Pain", "content": "Notice whether you can do more, recover more predictably, understand your response, or participate with greater confidence—even when pain has not disappeared.", "backgroundColor": "#e0f2fe", "textColor": "#0c4a6e"},
+    {"id": 3, "title": "Zoom Out", "content": "Compare weeks rather than hours. Ask: What is easier now? What is more consistent? What still needs adjustment?", "backgroundColor": "#bae6fd", "textColor": "#075985"},
+    {"id": 4, "title": "Your Plan Is Individual", "content": "There is no universal recovery timeline. Your presentation, goals, health, environment, and response should shape the next step.", "backgroundColor": "#dbeafe", "textColor": "#1e40af"},
+    {"id": 5, "title": "Try This Today", "content": "Write down one sign of progress that is not simply a lower pain score, and one part of the plan that may need support.", "backgroundColor": "#eff6ff", "textColor": "#1e40af"}
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}

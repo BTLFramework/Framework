@@ -223,8 +223,8 @@ export const insightLibrary: Insight[] = [
     week: 2,
     track: "PainScience",
     title: "Why pain can vary",
-    subtitle: "Explore pain neuroscience resources from Alberta Health Services",
-    assetPath: "https://www.albertahealthservices.ca/services/Page11132.aspx",
+    subtitle: "Why symptoms can change even when tissue condition has not",
+    assetPath: "/insight/pain-variability-summary.json",
     quizQ: "Changes in pain can be influenced by more than changes in tissue condition alone. (T/F)",
     quizA: "T",
     releaseOffset: 1,
@@ -263,7 +263,7 @@ export const insightLibrary: Insight[] = [
     track: "Lifestyle",
     title: "Flare-Up Management",
     subtitle: "Practical strategies for managing pain spikes",
-    assetPath: "https://www.paintoolkit.org/resources/flare-up-management/", // Pain Toolkit - Flare-Up Management Guide
+    assetPath: "/insight/flare-up-management-summary.json",
     quizQ: "A flare-up can happen without erasing all of your recovery progress. (T/F)",
     quizA: "T",
     releaseOffset: 2,
@@ -300,26 +300,26 @@ export const insightLibrary: Insight[] = [
     id: 33,
     week: 2,
     track: "SelfEfficacy",
-    title: "Real recovery experiences",
-    subtitle: "Learn from other people without treating their path as a prescription",
-    assetPath: "https://www.tamethebeast.org/stories",
-    quizQ: "Another person's recovery story can offer ideas, but it cannot predict your outcome. (T/F)",
-    quizA: "T",
+    title: "Recovery is rarely linear",
+    subtitle: "Measure the direction of recovery, not one difficult day",
+    assetPath: "/insight/recovery-not-linear-summary.json",
+    quizQ: "A difficult day means that all previous recovery progress has been lost. (T/F)",
+    quizA: "F",
     releaseOffset: 3,
     points: 5,
     questions: [
       {
-        question: "Another person's recovery story can offer ideas, but it cannot predict your outcome. (True/False)",
+        question: "A difficult day means that all previous recovery progress has been lost. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 1
       },
       {
-        question: "What is the most useful way to approach a recovery story?",
+        question: "Which is a more useful way to judge recovery?",
         options: [
-          "Copy the person's plan exactly",
-          "Notice useful ideas and discuss what fits your situation",
-          "Assume the same timeline will apply to you",
-          "Use it as proof that one treatment works for everyone"
+          "Judge it from the hardest hour of the week",
+          "Track trends in function, confidence, symptoms, and participation over time",
+          "Expect symptoms to improve in a perfectly straight line",
+          "Ignore every increase in symptoms"
         ],
         correctAnswer: 1
       }
@@ -473,8 +473,8 @@ export const insightLibrary: Insight[] = [
     week: 3,
     track: "StressMood",
     title: "Posture & Pain",
-    subtitle: "How posture affects pain perception",
-    assetPath: "https://www.youtube.com/watch?v=HvKXdbZA5Gg", // Body Logic Physio - Posture and Pain (test embedding)
+    subtitle: "There is no single perfect posture",
+    assetPath: "/insight/posture-pain-summary.json",
     quizQ: "Poor posture alone causes chronic pain. (T/F)",
     quizA: "F",
     releaseOffset: 1,
@@ -564,7 +564,7 @@ export const insightLibrary: Insight[] = [
     track: "PainScience",
     title: "CBT skills for persistent pain",
     subtitle: "How thoughts, actions, emotions, and symptoms can interact",
-    assetPath: "https://www.va.gov/PAINMANAGEMENT/CBT_CP/Veterans.asp",
+    assetPath: "/insight/cbt-pain-summary.json",
     quizQ: "CBT for pain aims to improve coping and participation; it does not mean pain is imaginary. (T/F)",
     quizA: "T",
     releaseOffset: 4,
@@ -704,39 +704,39 @@ export const insightLibrary: Insight[] = [
   {
     id: 45,
     week: 4,
-    track: "StressMood",
-    title: "Graded Motor Imagery",
-    subtitle: "Using your mind to retrain movement",
-    assetPath: "/insight/gmi-summary.json", // Summary card with link to NOI Group
-    quizQ: "Graded motor imagery may suit some conditions, but it is not a universal pain treatment. (T/F)",
+    track: "SelfEfficacy",
+    title: "Building confidence with movement",
+    subtitle: "Use manageable practice to expand what feels possible",
+    assetPath: "/insight/movement-confidence-summary.json",
+    quizQ: "A graded approach starts with a manageable challenge and adjusts using your response. (T/F)",
     quizA: "T",
     releaseOffset: 1,
     points: 5,
     questions: [
       {
-        question: "Graded motor imagery may suit some conditions, but it is not a universal pain treatment. (True/False)",
+        question: "A graded approach starts with a manageable challenge and adjusts using your response. (True/False)",
         options: ["True", "False"],
         correctAnswer: 0
       },
       {
-        question: "What is the first step in Graded Motor Imagery?",
+        question: "What is the purpose of graded movement practice?",
         options: [
-          "Mirror therapy",
-          "Left/right discrimination",
-          "Physical movement",
-          "Surgery"
+          "Prove that symptoms are imaginary",
+          "Build capacity and confidence through manageable practice",
+          "Avoid the activity permanently",
+          "Reach maximum effort immediately"
         ],
         correctAnswer: 1
       },
       {
-        question: "What should guide whether GMI is used?",
+        question: "What should guide the next step?",
         options: [
-          "A social-media trend",
-          "The same protocol for everyone",
-          "The person's condition, response, and clinical plan",
-          "Pain intensity alone"
+          "A fixed increase regardless of response",
+          "Your goals, current ability, response, and clinical plan",
+          "Whether another patient progressed faster",
+          "The belief that pain must always be ignored"
         ],
-        correctAnswer: 2
+        correctAnswer: 1
       }
     ]
   },

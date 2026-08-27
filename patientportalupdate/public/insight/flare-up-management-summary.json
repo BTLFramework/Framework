@@ -1,0 +1,16 @@
+{
+  "timeMinutes": 3,
+  "level": "Beginner",
+  "why": "A flare-up is a temporary increase in symptoms. A prepared, flexible response can reduce panic and help you return to your plan.",
+  "slides": [
+    {"id": 1, "title": "A Flare-Up Is Not a Reset", "content": "A difficult day does not erase the capacity, knowledge, or confidence you have already built.", "backgroundColor": "#f0f9ff", "textColor": "#075985"},
+    {"id": 2, "title": "First, Check the Situation", "content": "Consider whether this resembles a familiar fluctuation or follows a new injury or concerning change. Seek appropriate care when the presentation is new or unsafe.", "backgroundColor": "#e0f2fe", "textColor": "#0c4a6e"},
+    {"id": 3, "title": "Reduce the Alarm", "content": "Use the strategies that are safe and familiar to you: slower breathing, a comfortable position, gentle movement, heat or cold when appropriate, and support from someone you trust.", "backgroundColor": "#bae6fd", "textColor": "#075985"},
+    {"id": 4, "title": "Adjust—Do Not Abandon", "content": "You may temporarily modify the dose, duration, range, or intensity. Complete rest is not automatically required, and pushing through is not always useful either.", "backgroundColor": "#dbeafe", "textColor": "#1e40af"},
+    {"id": 5, "title": "Return Gradually", "content": "As the flare settles, work back toward your usual routine. Review what may have contributed without blaming yourself.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://painbc.ca/find-help/resources/downloadables/flare-ups", "resourceLabel": "Pain BC: managing flare-ups"}
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}

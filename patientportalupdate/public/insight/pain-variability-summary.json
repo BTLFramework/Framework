@@ -1,0 +1,17 @@
+{
+  "timeMinutes": 3,
+  "level": "Beginner",
+  "why": "Pain is real, but its intensity is not a direct damage meter. Understanding why it can vary helps you respond with more useful information and less alarm.",
+  "slides": [
+    {"id": 1, "title": "Pain Can Change", "content": "Symptoms can change across a day even when there has been no new injury. This does not make the experience less real.", "backgroundColor": "#f0f9ff", "textColor": "#075985"},
+    {"id": 2, "title": "The Whole Picture Matters", "content": "Tissue and nerve information matters. Sleep, stress, illness, previous experience, expectations, activity, environment, and a sense of safety can also influence protection.", "backgroundColor": "#e0f2fe", "textColor": "#0c4a6e"},
+    {"id": 3, "title": "Look for Patterns", "content": "Instead of judging one pain score in isolation, notice what was happening before it changed and how function, confidence, and symptoms trend over time.", "backgroundColor": "#bae6fd", "textColor": "#075985"},
+    {"id": 4, "title": "Variation Is Information", "content": "A change in symptoms can help you adjust the dose, timing, recovery, or strategy. It is not automatically proof of harm or failure.", "backgroundColor": "#dbeafe", "textColor": "#1e40af"},
+    {"id": 5, "title": "Do Not Ignore Warning Signs", "content": "New trauma, progressive weakness, major neurological change, fever, unexplained illness, or other concerning symptoms still require appropriate assessment.", "backgroundColor": "#fef2f2", "textColor": "#991b1b"},
+    {"id": 6, "title": "Try This Today", "content": "When symptoms change, record three things: what changed, what else was happening, and what helped you continue or recover.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://painbc.ca/find-help/self-management", "resourceLabel": "Pain BC: pain self-management resources"}
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}

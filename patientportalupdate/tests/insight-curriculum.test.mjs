@@ -52,8 +52,26 @@ test('all local insight JSON files are valid JSON', () => {
 })
 
 test('known broken or mislabeled external resources are not used', () => {
+  const insightDir = path.join(root, 'public', 'insight')
+  const localContent = fs.readdirSync(insightDir)
+    .filter((name) => name.endsWith('.json'))
+    .map((name) => fs.readFileSync(path.join(insightDir, name), 'utf8'))
+    .join('\n')
+  const curriculumContent = `${library}\n${localContent}`
+
   assert.doesNotMatch(library, /3qk6VYVXZd8|7tRdDqXgsJ0|03U7tn6xkHo/)
   assert.equal((library.match(/2n7FOBFMvXg/g) || []).length, 1)
+  assert.doesNotMatch(curriculumContent, /albertahealthservices\.ca\/services\/Page11132/)
+  assert.doesNotMatch(curriculumContent, /paintoolkit\.org\/resources\/flare-up-management/)
+  assert.doesNotMatch(curriculumContent, /tamethebeast\.org\/stories/)
+  assert.doesNotMatch(curriculumContent, /painhealth\.csse\.uwa\.edu\.au/)
+  assert.doesNotMatch(curriculumContent, /div12\.org\/wp-content/)
+  assert.doesNotMatch(curriculumContent, /va\.gov\/PAINMANAGEMENT\/CBT_CP\/Veterans/)
+})
+
+test('condition-specific GMI is not assigned in the universal curriculum', () => {
+  assert.doesNotMatch(library, /title:\s*"Graded Motor Imagery"/)
+  assert.doesNotMatch(library, /assetPath:\s*"\/insight\/gmi-summary\.json"/)
 })
 
 test('referenced local curriculum assets avoid unsupported clinical promises', () => {

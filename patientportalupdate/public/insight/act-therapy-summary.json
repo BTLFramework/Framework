@@ -1,19 +1,19 @@
 {
   "timeMinutes": 3,
   "level": "Intermediate",
-  "why": "ACT helps you live by values while reducing pain‑related distress.",
+  "why": "ACT develops psychological flexibility: making room for difficult experiences while choosing actions connected to what matters.",
   "slides": [
     {
       "id": 1,
       "title": "Acceptance & Values",
-      "content": "ACT teaches accepting pain while taking action toward what matters most in your life",
+      "content": "Acceptance does not mean liking pain, dismissing symptoms, or abandoning appropriate care. It means reducing the struggle with what cannot be changed in this moment.",
       "backgroundColor": "#faf5ff",
       "textColor": "#6b21a8"
     },
     {
       "id": 2,
       "title": "Psychological Flexibility",
-      "content": "Learn to observe thoughts and feelings without being controlled by them",
+      "content": "Learn to notice thoughts and feelings as experiences—not commands that must determine every action.",
       "backgroundColor": "#f5f3ff",
       "textColor": "#5b21b6"
     },
@@ -41,11 +41,11 @@
     {
       "id": 5,
       "title": "Try this today",
-      "content": "Notice‑Name‑Nurture: label a tough thought, breathe, and take one valued action.",
+      "content": "Choose one value—such as connection, health, learning, or independence—and one small action that expresses it today. Adjust the action to your current capacity.",
       "backgroundColor": "#eff6ff",
       "textColor": "#1e40af",
-      "resourceLink": "https://www.div12.org/wp-content/uploads/2015/06/ACT-for-Chronic-Pain-manual-McCracken.pdf",
-      "resourceLabel": "Read Full ACT Manual"
+      "resourceLink": "https://painbc.ca/find-help/self-management",
+      "resourceLabel": "Pain BC: general pain self-management resources"
     }
   ],
   "autoplay": false,
@@ -53,4 +53,3 @@
   "showDots": true,
   "showArrows": true
 }
-

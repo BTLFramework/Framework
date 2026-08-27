@@ -7,7 +7,7 @@
     {"id": 2, "title": "Common Patterns", "content": "Rumination, magnifying what a symptom might mean, and feeling helpless are sometimes grouped under the term pain catastrophizing.", "backgroundColor": "#fee2e2", "textColor": "#b91c1c"},
     {"id": 3, "title": "Not Blame", "content": "These patterns do not cause every pain problem and are not a personal failure. Physical, psychological, and social factors can interact in different ways.", "backgroundColor": "#fecaca", "textColor": "#991b1b"},
     {"id": 4, "title": "Create Some Distance", "content": "Try naming a thought—‘I am having the thought that…’—then choose the next useful action based on your goals and current situation.", "backgroundColor": "#fca5a5", "textColor": "#7f1d1d"},
-    {"id": 5, "title": "Get Support When Needed", "content": "A trained clinician can help with persistent worry, distress, or avoidance. Psychological support is part of whole-person care, not a dismissal of symptoms.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://www.va.gov/PAINMANAGEMENT/CBT_CP/Veterans.asp", "resourceLabel": "VA: CBT skills for chronic pain"}
+    {"id": 5, "title": "Get Support When Needed", "content": "A trained clinician can help with persistent worry, distress, or avoidance. Psychological support is part of whole-person care, not a dismissal of symptoms.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://painbc.ca/sites/default/files/2025-10/PBC%20Factsheet%20-%20Mental%20Health%20and%20Pain%20-%20Final.pdf", "resourceLabel": "Pain BC: mental health and persistent pain"}
   ],
   "autoplay": false,
   "interval": 5000,

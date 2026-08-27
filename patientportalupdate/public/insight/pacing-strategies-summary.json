@@ -7,7 +7,7 @@
     {"id": 2, "title": "There Is No Universal Percentage", "content": "Fixed rules such as always starting at 50% or increasing by 10% do not fit everyone. Establish a realistic baseline with your clinician when needed.", "backgroundColor": "#e0f2fe", "textColor": "#0c4a6e"},
     {"id": 3, "title": "Avoid the Boom-Bust Cycle", "content": "Doing far more on a good day and then needing prolonged recovery can make routines less predictable. A steadier plan may be easier to build on.", "backgroundColor": "#bae6fd", "textColor": "#075985"},
     {"id": 4, "title": "Pacing Is Not Permanent Avoidance", "content": "The aim is meaningful participation. Depending on your plan, capacity can be progressed over time rather than holding activity below the same limit forever.", "backgroundColor": "#7dd3fc", "textColor": "#0c4a6e"},
-    {"id": 5, "title": "Try This Today", "content": "Choose one activity, estimate a manageable dose, and note your response during it and later. Use that information to plan the next attempt.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://painhealth.csse.uwa.edu.au/pain-module/pacing-and-goal-setting/", "resourceLabel": "UWA PainHEALTH: pacing and goal setting"}
+    {"id": 5, "title": "Try This Today", "content": "Choose one activity, estimate a manageable dose, and note your response during it and later. Use that information to plan the next attempt.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://painbc.ca/sites/default/files/2022-07/Pain%20BC%20Factsheet%20-%20Pacing%20and%20Managing%20Energy.pdf", "resourceLabel": "Pain BC: pacing and managing energy"}
   ],
   "autoplay": false,
   "interval": 5000,

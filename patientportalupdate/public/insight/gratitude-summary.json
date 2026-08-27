@@ -6,7 +6,7 @@
     {"id": 1, "title": "Make Room for Both", "content": "You can notice something meaningful while also acknowledging pain, frustration, grief, or uncertainty. Gratitude should not erase difficult experiences.", "backgroundColor": "#f0fdf4", "textColor": "#166534"},
     {"id": 2, "title": "Keep It Specific", "content": "If you want to try it, write one or two specific things you appreciated and why they mattered to you.", "backgroundColor": "#dcfce7", "textColor": "#166534"},
     {"id": 3, "title": "Results Vary", "content": "Some people find this useful for attention or well-being; others do not. It is not a test of attitude and you do not need to force positivity.", "backgroundColor": "#bbf7d0", "textColor": "#15803d"},
-    {"id": 4, "title": "Try It Briefly", "content": "Write three lines: what happened, why it mattered, and whether you want to repeat or build on it.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://ggia.berkeley.edu/practice/gratitude_journal", "resourceLabel": "Berkeley Greater Good: Gratitude Journal"}
+    {"id": 4, "title": "Try It Briefly", "content": "Write three lines: what happened, why it mattered, and whether you want to repeat or build on it. If you prefer a guided practice, use Kitaro Waga's gratitude meditation section. The full video contains stronger breathwork; practise seated, never while driving or in water, and stop if you feel unwell.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://www.youtube.com/watch?v=YiALs5nSoQU&t=1477s", "resourceLabel": "Kitaro Waga: guided gratitude section"}
   ],
   "autoplay": false,
   "interval": 5000,

@@ -1,0 +1,16 @@
+{
+  "timeMinutes": 3,
+  "level": "Beginner",
+  "why": "When an activity feels difficult or threatening, manageable practice can help build capacity and confidence without treating every symptom as damage.",
+  "slides": [
+    {"id": 1, "title": "Start With the Goal", "content": "Choose an activity that matters to you. The goal is meaningful participation—not completing an arbitrary exercise perfectly.", "backgroundColor": "#f0f9ff", "textColor": "#075985"},
+    {"id": 2, "title": "Find a Manageable Version", "content": "Adjust the range, load, speed, duration, support, or environment until the task feels workable and safe for your current plan.", "backgroundColor": "#e0f2fe", "textColor": "#0c4a6e"},
+    {"id": 3, "title": "Symptoms Are One Input", "content": "Notice symptoms alongside control, confidence, function, and recovery afterward. A sensation does not automatically mean harm, but important changes should not be ignored.", "backgroundColor": "#bae6fd", "textColor": "#075985"},
+    {"id": 4, "title": "Progress From the Response", "content": "Repeat, increase, maintain, or temporarily reduce the challenge using your goals, response, and clinician's guidance—not a universal percentage.", "backgroundColor": "#dbeafe", "textColor": "#1e40af"},
+    {"id": 5, "title": "Try This Today", "content": "Choose one meaningful movement and make it one step more manageable. Record what you expected, what happened, and what you would adjust next time.", "backgroundColor": "#eff6ff", "textColor": "#1e40af"}
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}

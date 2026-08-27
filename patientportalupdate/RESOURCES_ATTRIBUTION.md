@@ -17,14 +17,7 @@ Back to Life™ patient portal uses high-quality, evidence-based educational res
   - Used under fair use for educational purposes
   - Source: TEDx Talks (YouTube)
 
-### **Government Resources (Public Domain)**
-- **U.S. Department of Veterans Affairs (VA)**
-  - Flare-Up Management Plan (FUMP)
-  - CBT for Chronic Pain Patient Guidebook
-  - Working with Pain-Related Thoughts
-  - **License:** Public domain (U.S. Government works)
-  - Source: https://www.va.gov/PAINMANAGEMENT/
-
+### **Government and Health-System Resources**
 - **National Health Service (NHS) - UK**
   - Sleep Problems Self-Help Guide
   - Pacing and Goal Setting Guide
@@ -37,23 +30,15 @@ Back to Life™ patient portal uses high-quality, evidence-based educational res
   - **License:** Public domain
   - Source: https://www.ncbi.nlm.nih.gov/
 
-### **Academic Institutions**
-- **Harvard Health Publishing**
-  - Foods That Fight Inflammation
-  - **License:** Used for educational purposes
-  - Source: https://www.health.harvard.edu/
+- **NSW Agency for Clinical Innovation Pain Management Network**
+  - Patient education on acceptance, pacing, and pain self-management
+  - Source: https://aci.health.nsw.gov.au/chronic-pain
 
-- **UC Berkeley Greater Good Science Center**
-  - Gratitude Journal Practice
-  - **License:** CC BY-NC-SA 4.0 (attribution required)
-  - Source: https://ggia.berkeley.edu/
+- **Health Canada**
+  - Canada's Food Guide and supporting evidence reviews
+  - Source: https://food-guide.canada.ca/
 
 ### **Clinical Education Resources**
-- **NOI Group (Neuro Orthopaedic Institute)**
-  - Graded Motor Imagery resources
-  - **License:** Used for clinical education
-  - Source: https://www.noigroup.com/
-
 - **Greg Lehman, MSc, DC**
   - Posture and Movement Education
   - **License:** Used for educational purposes with attribution
@@ -65,9 +50,17 @@ Back to Life™ patient portal uses high-quality, evidence-based educational res
   - Source: https://palousemindfulness.com/
 
 - **Kitaro Waga (YouTube)**
-  - Breathing technique videos (4-7-8, Box Breathing)
+  - Guided breathing and gratitude practices
   - **License:** Used under fair use for patient education
   - Source: YouTube
+
+- **Pain BC**
+  - Flare-up management, pacing, mental health, and self-management resources
+  - Source: https://painbc.ca/find-help
+
+- **Sleepwell (Dalhousie University)**
+  - Canadian CBT-I education and resource navigation
+  - Source: https://mysleepwell.ca/
 
 ### **Clinical Guidelines**
 - **Hamilton Health Sciences**
@@ -87,7 +80,7 @@ All resources are used under **Fair Use** (17 U.S.C. § 107) for:
 4. ✅ **No market harm** - Does not substitute original sources, drives traffic to them
 
 ### **Public Domain Resources**
-- All U.S. Government works (VA, NIH, CDC) are **public domain**
+- U.S. Government works used in the portal (NIH, CDC) are **public domain**
 - NHS resources are licensed under **Open Government Licence**
 - No copyright restrictions apply
 
@@ -125,11 +118,10 @@ Special thanks to:
 - **Lorimer Moseley** - Pain neuroscience education
 - **Greg Lehman** - Evidence-based movement education
 - **Jon Kabat-Zinn** - Mindfulness-Based Stress Reduction
-- **U.S. Department of Veterans Affairs** - Comprehensive pain management resources
 - **UK National Health Service** - Patient self-management guides
+- **Pain BC** - Canadian pain self-management resources
 
 ---
 
 **Last Updated:** [Current Date]  
 **Review Schedule:** Annual review of all attributions and licenses
-
