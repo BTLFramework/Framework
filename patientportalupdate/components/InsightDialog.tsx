@@ -80,7 +80,11 @@ function QuizPopup({
   }, [isOpen, insight]);
 
   useEffect(() => {
-    if (isOpen) quizBodyRef.current?.scrollTo({ top: 0 });
+    if (!isOpen) return;
+    const frame = window.requestAnimationFrame(() => {
+      quizBodyRef.current?.scrollTo({ top: 0 });
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [isOpen, quizState.currentQuestionIndex]);
 
   const handleAnswerSelect = (answerIndex: number) => {
@@ -162,7 +166,10 @@ function QuizPopup({
 
   return (
     <AssessmentDialog open={isOpen} onOpenChange={onClose}>
-      <AssessmentDialogContent className="max-w-2xl h-[80vh] flex flex-col rounded-2xl shadow-2xl bg-white p-0 overflow-hidden">
+      <AssessmentDialogContent
+        className="max-w-2xl h-[80vh] flex flex-col rounded-2xl shadow-2xl bg-white p-0 overflow-hidden"
+        onOpenAutoFocus={(event) => event.preventDefault()}
+      >
         <AssessmentDialogHeader className="bg-gradient-to-br from-btl-900 via-btl-700 to-btl-100 px-8 pt-8 pb-4 border-b border-white/40">
           <div className="flex items-center gap-6">
             <Brain className="w-10 h-10 text-white opacity-90" />
@@ -348,7 +355,11 @@ export default function InsightDialog({
   }, [insightId]);
 
   useEffect(() => {
-    if (isOpen) insightBodyRef.current?.scrollTo({ top: 0 });
+    if (!isOpen) return;
+    const frame = window.requestAnimationFrame(() => {
+      insightBodyRef.current?.scrollTo({ top: 0 });
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [isOpen, insightId]);
 
   useEffect(() => {
@@ -1608,7 +1619,10 @@ export default function InsightDialog({
   return (
     <>
       <AssessmentDialog open={isOpen} onOpenChange={onClose}>
-        <AssessmentDialogContent className="max-w-3xl h-[90vh] flex flex-col rounded-2xl shadow-2xl bg-white p-0 overflow-hidden">
+        <AssessmentDialogContent
+          className="max-w-3xl h-[90vh] flex flex-col rounded-2xl shadow-2xl bg-white p-0 overflow-hidden"
+          onOpenAutoFocus={(event) => event.preventDefault()}
+        >
           <AssessmentDialogTitle className="sr-only">{insight.title}</AssessmentDialogTitle>
           <AssessmentDialogDescription className="sr-only">{insight.subtitle}</AssessmentDialogDescription>
           
