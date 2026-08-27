@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Heart, Smile, Frown, Meh, Angry, Plus, Info, CheckCircle, Target, Activity, Gauge, Play, Headphones, Award, Brain, TrendingUp, TrendingDown, Minus, AlertTriangle, Eye, BarChart3, Lock, Clock } from "lucide-react";
 import {
   Dialog,
@@ -56,6 +56,7 @@ export function RecoveryInsightDialog({
   showActionPrompt,
   actionPrompt
 }: RecoveryInsightDialogProps) {
+  const curriculumScrollRef = useRef<HTMLDivElement>(null);
   const [selectedInsightId, setSelectedInsightId] = useState<number | null>(null);
   const [showInsightDialog, setShowInsightDialog] = useState(false);
   const [actionTaken, setActionTaken] = useState<boolean>(false);
@@ -70,6 +71,10 @@ export function RecoveryInsightDialog({
 
   // Debug mode: Check for ?unlockInsights=1 in URL
   const [debugUnlockAll, setDebugUnlockAll] = useState(false);
+
+  useEffect(() => {
+    if (open) curriculumScrollRef.current?.scrollTo({ top: 0 });
+  }, [open]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -367,7 +372,7 @@ export function RecoveryInsightDialog({
             </div>
           </div>
 
-          <div className="flex-1 p-6 pt-0 overflow-y-auto" style={{ maxHeight: '600px' }}>
+          <div ref={curriculumScrollRef} className="flex-1 p-6 pt-0 overflow-y-auto min-w-0" style={{ maxHeight: '600px' }}>
             <div className="space-y-6">
               {/* Snapshot Section */}
               <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border border-gray-200 shadow-lg p-6 hover:shadow-xl transition-all duration-300">
@@ -487,15 +492,15 @@ export function RecoveryInsightDialog({
                             'border-cyan-400 ring-2 ring-cyan-200 cursor-pointer'
                           }`}
                         >
-                          <div className="flex flex-col items-start">
+                          <div className="flex min-w-0 flex-1 flex-col items-start pr-3">
                             <span className="mb-1 text-xs font-semibold uppercase tracking-wide text-btl-600">
                               {getDayLabel(offset)}
                             </span>
-                            <h4 className="font-semibold text-base text-gray-900">{insight.title}</h4>
-                            <p className="text-sm text-gray-600">{insight.description}</p>
+                            <h4 className="font-semibold text-base text-left text-gray-900 break-words [overflow-wrap:anywhere]">{insight.title}</h4>
+                            <p className="text-sm text-left text-gray-600 break-words [overflow-wrap:anywhere]">{insight.description}</p>
                           </div>
                           {isCompleted ? (
-                            <div className="flex items-center gap-2">
+                            <div className="flex shrink-0 items-center gap-2">
                               <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">+5 pts</span>
                               <div className="w-8 h-8 rounded-full flex items-center justify-center bg-green-600 text-white shadow-md">
                                 <CheckCircle className="w-4 h-4" />
@@ -503,14 +508,14 @@ export function RecoveryInsightDialog({
                               <span className="text-xs text-green-600 font-medium">(Redo)</span>
                             </div>
                           ) : isFuture ? (
-                            <div className="flex items-center gap-2">
+                            <div className="flex shrink-0 items-center gap-2">
                               <span className="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600">+5 pts</span>
                               <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-400 text-white shadow-md">
                                 <Lock className="w-4 h-4" />
                               </div>
                             </div>
                           ) : (
-                            <div className="flex items-center gap-2">
+                            <div className="flex shrink-0 items-center gap-2">
                               <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">+5 pts</span>
                               <div className="w-8 h-8 rounded-full flex items-center justify-center bg-cyan-600 text-white shadow-md">
                                 <Play className="w-4 h-4 ml-0.5" />

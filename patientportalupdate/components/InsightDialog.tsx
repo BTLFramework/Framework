@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   AssessmentDialog,
   AssessmentDialogContent,
@@ -53,6 +53,7 @@ function QuizPopup({
   onClose: () => void; 
   onQuizComplete: () => void; 
 }) {
+  const quizBodyRef = useRef<HTMLDivElement>(null);
   const [quizState, setQuizState] = useState<QuizState>({
     isVisible: false,
     currentQuestionIndex: 0,
@@ -77,6 +78,10 @@ function QuizPopup({
       });
     }
   }, [isOpen, insight]);
+
+  useEffect(() => {
+    if (isOpen) quizBodyRef.current?.scrollTo({ top: 0 });
+  }, [isOpen, quizState.currentQuestionIndex]);
 
   const handleAnswerSelect = (answerIndex: number) => {
     setQuizState(prev => {
@@ -172,7 +177,7 @@ function QuizPopup({
           </div>
         </AssessmentDialogHeader>
         
-        <AssessmentDialogBody className="flex-1 p-6 overflow-y-auto">
+        <AssessmentDialogBody ref={quizBodyRef} className="flex-1 p-6 overflow-y-auto min-w-0">
           <div className="max-w-xl mx-auto">
             <Card className="border-2 border-btl-100 shadow-lg">
               <CardHeader className="bg-gradient-to-r from-btl-50 to-btl-100 border-b border-btl-200">
@@ -205,7 +210,7 @@ function QuizPopup({
                             variant="outline"
                             onClick={() => handleAnswerSelect(index)}
                             disabled={quizState.isSubmitted}
-                            className={`w-full h-14 text-left justify-start text-base font-medium mb-4 transition-all duration-150
+                            className={`w-full min-h-14 h-auto py-3 text-left justify-start items-start text-base font-medium mb-4 transition-all duration-150 whitespace-normal break-words
                               border-2 rounded-full
                               ${quizState.answers[quizState.currentQuestionIndex] === index
                                 ? 'bg-gradient-to-r from-yellow-100 via-yellow-200 to-yellow-100 border-yellow-500 text-yellow-900 shadow-lg font-bold'
@@ -213,8 +218,8 @@ function QuizPopup({
                               focus:ring-2 focus:ring-yellow-400 focus:z-10`}
                             tabIndex={0}
                           >
-                            <span className="mr-3 font-bold text-yellow-700">{String.fromCharCode(65 + index)}.</span>
-                            {option}
+                            <span className="mr-3 font-bold text-yellow-700 shrink-0">{String.fromCharCode(65 + index)}.</span>
+                            <span className="min-w-0 flex-1 whitespace-normal break-words leading-snug">{option}</span>
                           </Button>
                         ))}
                       </div>
@@ -301,6 +306,7 @@ export default function InsightDialog({
   onComplete, 
   patientId 
 }: InsightDialogProps) {
+  const insightBodyRef = useRef<HTMLDivElement>(null);
   console.log('🎯 InsightDialog rendered with:', { insightId, isOpen, patientId });
   
       // Check if patientId is an email and get numeric ID
@@ -340,6 +346,10 @@ export default function InsightDialog({
       setQuizCompleted(false);
     }
   }, [insightId]);
+
+  useEffect(() => {
+    if (isOpen) insightBodyRef.current?.scrollTo({ top: 0 });
+  }, [isOpen, insightId]);
 
   useEffect(() => {
     // Only load JSON as form data if it's not a special content file
@@ -1603,18 +1613,18 @@ export default function InsightDialog({
           <AssessmentDialogDescription className="sr-only">{insight.subtitle}</AssessmentDialogDescription>
           
           {/* Gradient Header with Icon, Title, Close Button */}
-          <div className="bg-gradient-to-br from-btl-900 via-btl-700 to-btl-100 px-8 pt-8 pb-4 border-b border-white/40 relative">
+          <div className="bg-gradient-to-br from-btl-900 via-btl-700 to-btl-100 px-8 pt-8 pb-4 border-b border-white/40 relative min-w-0">
             <div className="flex items-center gap-8">
               <BarChart3 className="w-12 h-12 text-white opacity-90" />
-              <div>
-                <h2 className="text-3xl font-bold text-white">{insight.title}</h2>
-                <p className="mt-2 text-btl-100 text-sm">{insight.subtitle}</p>
+              <div className="min-w-0">
+                <h2 className="text-3xl font-bold text-white break-words">{insight.title}</h2>
+                <p className="mt-2 text-btl-100 text-sm break-words">{insight.subtitle}</p>
               </div>
             </div>
           </div>
           
-          <AssessmentDialogBody className="flex-1 p-6 overflow-y-auto">
-            <div className="max-w-3xl mx-auto space-y-6">
+          <AssessmentDialogBody ref={insightBodyRef} className="flex-1 p-6 overflow-y-auto min-w-0">
+            <div className="max-w-3xl min-w-0 mx-auto space-y-6 break-words [overflow-wrap:anywhere]">
               {renderMediaContent()}
             </div>
           </AssessmentDialogBody>

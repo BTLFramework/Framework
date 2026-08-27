@@ -108,15 +108,17 @@ const AssessmentDialogProgress = ({ step, totalSteps }: AssessmentDialogProgress
   </div>
 )
 
-const AssessmentDialogBody = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
+const AssessmentDialogBody = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
   <div
+    ref={ref}
     className={cn("p-6 overflow-y-auto max-h-[calc(90vh-200px)]", className)}
     {...props}
   />
-)
+))
+AssessmentDialogBody.displayName = "AssessmentDialogBody"
 
 const AssessmentDialogFooter = ({
   className,
@@ -138,4 +140,4 @@ export {
   AssessmentDialogProgress,
   AssessmentDialogBody,
   AssessmentDialogFooter,
-} 
+}
