@@ -69,7 +69,7 @@ export function RecoveryInsightDialog({
   const [refreshKey, setRefreshKey] = useState(0);
   const [dailyCompletedInsights, setDailyCompletedInsights] = useState<number>(0);
 
-  // Debug mode: Check for ?unlockInsights=1 in URL
+  // Temporary curriculum preview for the dedicated beta patient only.
   const [debugUnlockAll, setDebugUnlockAll] = useState(false);
 
   useEffect(() => {
@@ -80,11 +80,13 @@ export function RecoveryInsightDialog({
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const unlockParam = params.get('unlockInsights');
-      const shouldUnlock = process.env.NODE_ENV !== 'production' && unlockParam === '1';
-      console.log('🔓 Debug unlock check:', { unlockParam, shouldUnlock, url: window.location.href });
+      const isBetaPreviewPatient =
+        patientId.trim().toLowerCase() === 'spencerbarberchiro+btlbeta2@gmail.com';
+      const shouldUnlock = unlockParam === '1' && isBetaPreviewPatient;
+      console.log('🔓 Recovery Insight preview check:', { unlockParam, isBetaPreviewPatient, shouldUnlock });
       setDebugUnlockAll(shouldUnlock);
     }
-  }, []);
+  }, [patientId]);
 
   // Completion and unlocking must be durable across devices, so the backend
   // Recovery Points ledger is the source of truth.
@@ -456,7 +458,7 @@ export function RecoveryInsightDialog({
                     Recovery Insights
                     {debugUnlockAll && (
                       <span className="ml-2 text-sm font-normal text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
-                        🔓 DEBUG MODE: All Unlocked
+                        🔓 BETA PREVIEW: All Unlocked
                       </span>
                     )}
                   </h3>
