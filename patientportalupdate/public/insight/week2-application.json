@@ -1,68 +1,46 @@
 {
   "type": "form",
-  "title": "Week 2 Application Check-In",
-  "subtitle": "Use this week's ideas to understand a real recovery experience.",
-  "description": "This is not a memory test. Explaining an idea in your own words and applying it to your life helps make the learning useful.",
+  "title": "What did you learn by trying?",
+  "subtitle": "Look at the overall trend rather than any single day.",
+  "description": "This week connected pain understanding with discomfort, pacing, sleep, and practical decisions. Now return to an earlier idea and one experience. You do not need to report an improvement to complete this reflection.",
   "sections": [
     {
-      "title": "Explain it simply",
-      "description": "Imagine you are explaining the idea to a friend.",
+      "title": "Remember and explain",
+      "description": "Without looking back first, choose one: Why is pain not an exact damage measure? How is pacing different from avoiding activity? Then revisit the lesson if you need a reminder.",
       "fields": [
         {
           "type": "textarea",
-          "label": "Why can symptoms change without automatically meaning that new damage has occurred?",
-          "placeholder": "In your own words...",
-          "rows": 3
-        },
-        {
-          "type": "textarea",
-          "label": "How is pacing different from avoiding activity?",
-          "placeholder": "Describe how pacing can support gradual progress...",
+          "label": "How would you explain that idea in your own words?",
+          "placeholder": "A short explanation is enough. 'I am not sure yet' is useful too.",
           "rows": 3
         }
       ]
     },
     {
-      "title": "Apply it to this week",
-      "description": "Look for one real pattern rather than a perfect answer.",
+      "title": "Compare the prediction with the experience",
+      "description": "Recall Week 1's thought–action loop. Think about one activity or sleep-support experiment, or a clearly hypothetical example if you have not tried one. What did you expect and what actually happened?",
       "fields": [
         {
           "type": "textarea",
-          "label": "Describe one symptom change or difficult day. What else was happening around it?",
-          "placeholder": "Consider activity, recovery time, sleep, stress, expectations, illness, workload, or anything else relevant...",
-          "rows": 3
-        },
-        {
-          "type": "textarea",
-          "label": "What response helped—or what might you try next time?",
-          "placeholder": "A flare-up strategy, activity adjustment, manageable movement, support, or appropriate assessment...",
+          "label": "What did you expect, and what did you learn?",
+          "placeholder": "It may have been easier, harder, unchanged, or too early to tell. What does that suggest—and what does it not prove?",
           "rows": 3
         }
       ]
     },
     {
-      "title": "Choose one experiment",
-      "description": "Use a small test to learn what supports your recovery.",
+      "title": "Choose what to build on",
+      "description": "Keep moving within your plan. Keep tools that help, adjust what does not fit, and ask when you are uncertain. A repeated difficult response may need review rather than more effort.",
       "fields": [
         {
-          "type": "text",
-          "label": "One activity or sleep-support experiment I will try:",
-          "placeholder": "Make it realistic and specific..."
-        },
-        {
-          "type": "text",
-          "label": "What will I observe?",
-          "placeholder": "Function, confidence, consistency, energy, symptoms, or participation..."
-        },
-        {
           "type": "textarea",
-          "label": "Is there anything I want to discuss with my practitioner?",
-          "placeholder": "A concern, question, pattern, or useful win...",
+          "label": "What will you repeat, adjust, or ask about next?",
+          "placeholder": "One specific next step or question. This reflection is not an urgent messaging service.",
           "rows": 3
         }
       ]
     }
   ],
-  "submitText": "Complete Week 2 Check-In",
-  "successMessage": "Week 2 complete. You are turning general recovery concepts into information you can use."
+  "submitText": "Complete reflection",
+  "successMessage": "Reflection complete. Keep your observations in mind for your next appointment."
 }

@@ -1,42 +1,53 @@
 {
-  "timeMinutes": 3,
+  "presentation": "complete",
+  "takeaway": "You don't need a stress-free life. Start with one tool that fits, notice what it helps with, and build from there.",
+  "timeMinutes": 4,
   "level": "Beginner",
-  "why": "Stress is one of several factors that can influence pain, sleep, energy, and recovery behaviours.",
+  "why": "Understand why stress belongs in the recovery conversation, then try one tool you can use between appointments.",
   "slides": [
     {
       "id": 1,
-      "title": "Stress Is a Normal Response",
-      "content": "Your stress system helps you respond to challenge. Stress is not automatically harmful, and having stress does not mean you are failing at recovery.",
+      "title": "When life is demanding",
+      "content": "You may notice that you hold more tension, sleep differently, or find familiar symptoms harder to manage during a demanding week. Stress can be part of that picture. It does not mean your pain is imagined or that stress explains everything.",
       "backgroundColor": "#f0f9ff",
       "textColor": "#075985"
     },
     {
       "id": 2,
-      "title": "When Stress Stays High",
-      "content": "Ongoing stress can affect sleep, mood, attention, muscle tension, pain sensitivity, and the energy available for helpful routines.",
+      "title": "Why it matters",
+      "content": "Stress can affect attention, sleep, muscle tension, and how you respond to discomfort. Pain can add to stress too. That is why we look at both what your body is being asked to do and what else is happening in your life.",
       "backgroundColor": "#e0f2fe",
       "textColor": "#0c4a6e"
     },
     {
       "id": 3,
-      "title": "Where Cortisol Fits",
-      "content": "Cortisol is one part of a complex stress response. It changes naturally across the day and is not a simple scorecard for whether your body is healing.",
-      "backgroundColor": "#bae6fd",
-      "textColor": "#075985"
+      "title": "You don't need a stress-free life",
+      "content": "The aim is to have ways to respond when things feel demanding. You can work on movement, daily routines, and stress together. You do not need to get one perfect before the others can help.",
+      "backgroundColor": "#dbeafe",
+      "textColor": "#1e40af"
     },
     {
       "id": 4,
-      "title": "Look at the Whole Picture",
-      "content": "Symptoms and recovery are influenced by many interacting factors. Stress may matter without being the only cause or the only thing to address.",
-      "backgroundColor": "#7dd3fc",
-      "textColor": "#0c4a6e"
+      "title": "Try comfortable breathing",
+      "content": "Sit comfortably with your feet supported. Let your breath come in gently through your nose and out through your mouth if comfortable. Keep an easy rhythm; there is no need to force a deep breath or hold it. Start with a few comfortable breaths. Stop if you feel dizzy, distressed, or unwell.",
+      "backgroundColor": "#ecfeff",
+      "textColor": "#155e75"
     },
     {
       "id": 5,
-      "title": "Try One Manageable Step",
-      "content": "Choose one option that fits today: a slower breath, brief movement, a short break, a conversation, or support from your care team.",
-      "backgroundColor": "#eff6ff",
-      "textColor": "#1e40af"
+      "title": "Pick one tool",
+      "content": "If breathing is not for you, try a brief comfortable walk, a quiet break, or speaking with someone supportive. You don't need to do all three. Pick the one that resonates with you and try to make it part of your daily routine.",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#075985"
+    },
+    {
+      "id": 6,
+      "title": "Notice what it helps with",
+      "content": "Did you feel a little steadier? Was it easier to choose your next step? Did nothing change? All are useful observations. A calming tool does not have to remove pain to be useful. We'll continue building your toolbox.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#0c4a6e",
+      "resourceLink": "https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/",
+      "resourceLabel": "Optional: NHS comfortable breathing guidance"
     }
   ],
   "autoplay": false,

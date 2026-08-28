@@ -130,7 +130,7 @@ test('week one introduces the complete MSK recovery model', () => {
 test('quiz questions may provide explanatory feedback', () => {
   assert.match(library, /explanation\?: string/)
   assert.match(library, /explanation: "Hands-on care can reduce pain/)
-  assert.match(library, /explanation: "Recovery behaviours work best as support/)
+  assert.match(library, /explanation: "You don't need to change everything at once/)
 })
 
 test('weeks two and three progress from application to daily-life capacity', () => {

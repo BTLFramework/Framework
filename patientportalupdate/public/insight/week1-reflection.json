@@ -1,74 +1,46 @@
 {
   "type": "form",
-  "title": "Week 1 Check-In",
-  "subtitle": "Notice what you learned, what you tried, and what your recovery needs next.",
-  "description": "This is a reflection, not a test. Honest answers can help you focus on what matters and prepare for conversations with your practitioner.",
+  "title": "What is starting to make sense?",
+  "subtitle": "A short review of the first week.",
+  "description": "We have introduced pain, stress, recovery foundations, the thought–action loop, movement, and a first plan for difficult days. You do not need to master everything at once. These three questions help you identify what to build on.",
   "sections": [
     {
-      "title": "What stood out?",
-      "description": "Review the main ideas from your first week.",
+      "title": "Explain one idea",
+      "description": "In your own words, explain why movement is part of recovery, or why pain intensity does not tell the whole story. If you are unsure, say what needs explaining.",
       "fields": [
-        {
-          "type": "checkbox",
-          "label": "Which topics felt most relevant?",
-          "options": [
-            "Factors that can increase or decrease protection",
-            "Stress and recovery",
-            "Sleep, food, and hydration as recovery foundations",
-            "The thought–action loop",
-            "How hands-on care and movement work together",
-            "Having a plan for symptom flare-ups"
-          ]
-        },
         {
           "type": "textarea",
           "label": "What is one idea you understand differently now?",
-          "placeholder": "In your own words...",
+          "placeholder": "Explain it as you would to someone at home, or write what still feels unclear.",
           "rows": 3
         }
       ]
     },
     {
-      "title": "What did you notice?",
-      "description": "Look for patterns without judging yourself or forcing one explanation.",
+      "title": "Notice what happened",
+      "description": "Think of one thing you tried: movement, a calming tool, or a small change to sleep, food, or hydration. No change, a difficult response, or not having tried yet are all useful to note.",
       "fields": [
         {
           "type": "textarea",
-          "label": "What seemed to help you participate in recovery this week?",
-          "placeholder": "Consider treatment, movement, sleep, stress, food, hydration, support, understanding, or anything else...",
-          "rows": 3
-        },
-        {
-          "type": "textarea",
-          "label": "What made participation more difficult?",
-          "placeholder": "What got in the way?",
+          "label": "What did you try, and what did you notice?",
+          "placeholder": "What helped, did not help, or got in the way?",
           "rows": 3
         }
       ]
     },
     {
-      "title": "Choose one next step",
-      "description": "Keep it specific and manageable.",
+      "title": "Keep the conversation going",
+      "description": "We'll continue building your toolbox. You can use this question to guide your next appointment; completing this reflection does not send an urgent message.",
       "fields": [
         {
-          "type": "text",
-          "label": "One action I will try next week:",
-          "placeholder": "For example: take a short walk after lunch three times..."
-        },
-        {
-          "type": "text",
-          "label": "What would make that action easier?",
-          "placeholder": "A reminder, support, a smaller starting point, a clearer plan..."
-        },
-        {
           "type": "textarea",
-          "label": "What is one point you may want to discuss with your practitioner?",
-          "placeholder": "A question, concern, win, or barrier to bring to your next conversation...",
+          "label": "What would you like to ask or work on next?",
+          "placeholder": "One question or manageable next step is enough.",
           "rows": 3
         }
       ]
     }
   ],
-  "submitText": "Complete Week 1 Check-In",
-  "successMessage": "Week 1 complete. Your observations help turn education into a recovery plan that fits you."
+  "submitText": "Complete reflection",
+  "successMessage": "Reflection complete. Keep your observations in mind for your next appointment."
 }

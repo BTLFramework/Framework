@@ -21,6 +21,8 @@ interface SummaryData {
   why?: string;
   sectionTitle?: string;
   sectionIntro?: string;
+  presentation?: "complete";
+  takeaway?: string;
 }
 
 export default function InsightSummaryCard({ assetPath }: { assetPath: string }) {
@@ -58,10 +60,11 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
   const why: string | undefined = (data as any)?.why;
   const sectionTitle: string | undefined = (data as any)?.sectionTitle;
   const sectionIntro: string | undefined = (data as any)?.sectionIntro;
+  const showCompleteText = data.presentation === "complete";
 
   // Top CTA if present on any slide
   const resourceSlide = data.slides.find(s => s.resourceLink && s.resourceLabel);
-  const actionSlide = data.slides.find(s => /try this/i.test(s.title || ''));
+  const actionSlide = showCompleteText ? undefined : data.slides.find(s => /try this/i.test(s.title || ''));
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -70,6 +73,9 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
         <div className="bg-gradient-to-r from-btl-50 to-btl-100 p-6 border-b border-btl-200">
           <h3 className="text-2xl font-bold text-btl-900">{data.slides[0]?.title || "Overview"}</h3>
           <p className="text-btl-700 mt-1">{why || data.slides[0]?.content || "Evidence-based recovery insight"}</p>
+          {showCompleteText && why && data.slides[0]?.content && (
+            <p className="text-btl-800 mt-4 leading-relaxed whitespace-pre-line break-words">{data.slides[0].content}</p>
+          )}
 
           {/* Meta chips */}
           <div className="mt-2 flex items-center gap-2">
@@ -108,7 +114,7 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
             // Build a single 2x2 grid section like cortisol
             const remaining = data.slides.slice(1);
             // Exclude the action slide (with resourceLink) from the grid
-            let contentTiles = remaining.filter(s => !(s.resourceLink && /try this/i.test(s.title || '')));
+            let contentTiles = showCompleteText ? remaining : remaining.filter(s => !(s.resourceLink && /try this/i.test(s.title || '')));
             // De-duplicate by title to avoid repeated entries from source data
             const seen = new Set<string>();
             contentTiles = contentTiles.filter(s => {
@@ -118,7 +124,7 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
               return true;
             });
             // Take up to 4 tiles, no padding - show exactly what we have
-            const tiles: SummarySlide[] = contentTiles.slice(0, 4);
+            const tiles: SummarySlide[] = showCompleteText ? remaining : contentTiles.slice(0, 4);
             if (tiles.length === 0) return null;
 
             return (
@@ -129,7 +135,10 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
                     <p className="text-btl-700 mt-1">{sectionIntro}</p>
                   )}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div
+                  className={showCompleteText ? "grid gap-4" : "grid grid-cols-1 md:grid-cols-2 gap-4"}
+                  style={showCompleteText ? { gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))" } : undefined}
+                >
                   {tiles.map((tile, tileIdx) => {
                     const parts = (tile.content || '')
                       .split(/\s*[•;·\u2022]|\.\s+/)
@@ -138,10 +147,12 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
                       .slice(0, 2); // keep it tight like cortisol
                     const showBullets = parts.length >= 1;
                     return (
-                      <div key={tile.id ?? tileIdx} className="bg-white rounded-xl p-4 border border-btl-200">
+                      <div key={tile.id ?? tileIdx} className="min-w-0 bg-white rounded-xl p-4 border border-btl-200">
                         <h5 className="font-semibold text-btl-900 mb-1">{tile.title}</h5>
                         {tile.content && (
-                          showBullets ? (
+                          showCompleteText ? (
+                            <p className="text-sm text-btl-700 leading-relaxed whitespace-pre-line break-words">{tile.content}</p>
+                          ) : showBullets ? (
                             <ul className="text-sm text-btl-700 space-y-1">
                               {parts.map((p, i) => (
                                 <li key={i} className="flex items-start">
@@ -192,7 +203,7 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
               <h4 className="text-xl font-bold text-white">Key Takeaway</h4>
             </div>
             <p className="text-btl-100 font-medium leading-relaxed">
-              Review the essentials above, then explore the full resource to deepen understanding. Complete the quiz to lock in learning and earn points.
+              {data.takeaway || "Review the essentials above, then explore the full resource to deepen understanding. Complete the quiz to lock in learning and earn points."}
             </p>
           </div>
         </div>
@@ -200,4 +211,3 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
     </div>
   );
 }
-

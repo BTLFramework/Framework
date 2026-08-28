@@ -1,13 +1,52 @@
 {
-  "timeMinutes": 3,
-  "level": "Intermediate",
-  "why": "Pacing can help you organize activity and recovery around a manageable baseline rather than repeatedly cycling between overdoing and stopping.",
+  "presentation": "complete",
+  "takeaway": "Look at the whole picture, use what you have learned, and bring questions to your next clinical conversation.",
+  "timeMinutes": 4,
+  "level": "Beginner",
+  "why": "Use pacing to make activity more repeatable while keeping the goal of doing more in view.",
   "slides": [
-    {"id": 1, "title": "What Pacing Means", "content": "Pacing is a flexible planning strategy. It can involve choosing priorities, breaking tasks up, varying demands, and adjusting the dose using your goals and response.", "backgroundColor": "#f0f9ff", "textColor": "#075985"},
-    {"id": 2, "title": "There Is No Universal Percentage", "content": "Fixed rules such as always starting at 50% or increasing by 10% do not fit everyone. Establish a realistic baseline with your clinician when needed.", "backgroundColor": "#e0f2fe", "textColor": "#0c4a6e"},
-    {"id": 3, "title": "Avoid the Boom-Bust Cycle", "content": "Doing far more on a good day and then needing prolonged recovery can make routines less predictable. A steadier plan may be easier to build on.", "backgroundColor": "#bae6fd", "textColor": "#075985"},
-    {"id": 4, "title": "Pacing Is Not Permanent Avoidance", "content": "The aim is meaningful participation. Depending on your plan, capacity can be progressed over time rather than holding activity below the same limit forever.", "backgroundColor": "#7dd3fc", "textColor": "#0c4a6e"},
-    {"id": 5, "title": "Try This Today", "content": "Choose one activity, estimate a manageable dose, and note your response during it and later. Use that information to plan the next attempt.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://painbc.ca/sites/default/files/2022-07/Pain%20BC%20Factsheet%20-%20Pacing%20and%20Managing%20Energy.pdf", "resourceLabel": "Pain BC: pacing and managing energy"}
+    {
+      "id": 1,
+      "title": "Find an amount you can build on",
+      "content": "On a good day, it can be tempting to catch up on everything. If that repeatedly leaves you unable to do much afterwards, a steadier amount may be easier to build on.",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#075985"
+    },
+    {
+      "id": 2,
+      "title": "What pacing actually means",
+      "content": "You can split a task, vary what you do, take a break, or adjust the amount. The purpose is to support participation, not avoid every sensation or keep activity permanently below the same limit.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#0c4a6e"
+    },
+    {
+      "id": 3,
+      "title": "A practical example",
+      "content": "Instead of completing all the household chores in one burst, someone tries a smaller block and checks how they recover. That gives them information for the next attempt. It is a learning step, not a rule that chores must always be restricted.",
+      "backgroundColor": "#dbeafe",
+      "textColor": "#1e40af"
+    },
+    {
+      "id": 4,
+      "title": "Then build",
+      "content": "Once an amount becomes manageable, consider the next step using your response and clinical plan. There is no universal percentage to add. Start with what you can do, and build from there.",
+      "backgroundColor": "#ecfeff",
+      "textColor": "#155e75"
+    },
+    {
+      "id": 5,
+      "title": "If it was too much",
+      "content": "Adjust the amount next time rather than assuming the whole activity is wrong. If the response is repeatedly difficult or different from what you expected, ask for guidance.",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#075985"
+    },
+    {
+      "id": 6,
+      "title": "Try one activity",
+      "content": "Choose a task you want to make more consistent. Decide the amount, notice the response, and review whether to repeat or adjust it. Keep the longer-term goal in view: doing the things you enjoy.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#0c4a6e"
+    }
   ],
   "autoplay": false,
   "interval": 5000,

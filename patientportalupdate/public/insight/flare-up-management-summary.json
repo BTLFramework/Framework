@@ -1,13 +1,52 @@
 {
-  "timeMinutes": 3,
+  "presentation": "complete",
+  "takeaway": "Look at the whole picture, use what you have learned, and bring questions to your next clinical conversation.",
+  "timeMinutes": 4,
   "level": "Beginner",
-  "why": "A flare-up is a temporary increase in symptoms. A prepared, flexible response can reduce panic and help you return to your plan.",
+  "why": "Become more confident responding to discomfort without either abandoning movement or forcing through it.",
   "slides": [
-    {"id": 1, "title": "A Flare-Up Is Not a Reset", "content": "A difficult day does not erase the capacity, knowledge, or confidence you have already built.", "backgroundColor": "#f0f9ff", "textColor": "#075985"},
-    {"id": 2, "title": "First, Check the Situation", "content": "Consider whether this resembles a familiar fluctuation or follows a new injury or concerning change. Seek appropriate care when the presentation is new or unsafe.", "backgroundColor": "#e0f2fe", "textColor": "#0c4a6e"},
-    {"id": 3, "title": "Reduce the Alarm", "content": "Use the strategies that are safe and familiar to you: slower breathing, a comfortable position, gentle movement, heat or cold when appropriate, and support from someone you trust.", "backgroundColor": "#bae6fd", "textColor": "#075985"},
-    {"id": 4, "title": "Adjust—Do Not Abandon", "content": "You may temporarily modify the dose, duration, range, or intensity. Complete rest is not automatically required, and pushing through is not always useful either.", "backgroundColor": "#dbeafe", "textColor": "#1e40af"},
-    {"id": 5, "title": "Return Gradually", "content": "As the flare settles, work back toward your usual routine. Review what may have contributed without blaming yourself.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://painbc.ca/find-help/resources/downloadables/flare-ups", "resourceLabel": "Pain BC: managing flare-ups"}
+    {
+      "id": 1,
+      "title": "Comfortable with some discomfort",
+      "content": "This does not mean ignoring your body. It means learning what a manageable challenge looks like for you. Your assessment and agreed plan help set that starting point; a general lesson cannot decide it for every injury.",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#075985"
+    },
+    {
+      "id": 2,
+      "title": "When the response fits the plan",
+      "content": "Imagine an agreed short walk causes familiar discomfort that settles as expected, with usual function maintained. Repeating that amount may be a useful next step. You have information to build on—not a reason to double the distance or require a pain-free day.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#0c4a6e"
+    },
+    {
+      "id": 3,
+      "title": "When the amount needs changing",
+      "content": "If the same amount repeatedly leaves you struggling with usual activities or takes longer to settle than expected, review it. You might reduce duration, load, range, or frequency, or ask for help choosing an adjustment.",
+      "backgroundColor": "#dbeafe",
+      "textColor": "#1e40af"
+    },
+    {
+      "id": 4,
+      "title": "Adjust without losing the goal",
+      "content": "Keep moving within the plan that fits your situation. Changing the amount is not giving up on the activity. It can help you find a starting point you can repeat and build on.",
+      "backgroundColor": "#ecfeff",
+      "textColor": "#155e75"
+    },
+    {
+      "id": 5,
+      "title": "When the pattern is different",
+      "content": "A new injury or new or progressive weakness is not simply a familiar flare. Seek prompt advice for concerning changes and urgent care for sudden major weakness or other emergency symptoms. Do not use a breathing exercise or movement test to rule out a problem.",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#075985"
+    },
+    {
+      "id": 6,
+      "title": "Use your toolbox",
+      "content": "For a familiar difficult day, return to the plan you discussed: a manageable amount of activity, a comfortable position, a calming tool, or appropriate support. You do not have to use every tool. Choose what fits, then notice the response.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#0c4a6e"
+    }
   ],
   "autoplay": false,
   "interval": 5000,

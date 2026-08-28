@@ -25,33 +25,33 @@ export const insightLibrary: Insight[] = [
     id: 21,
     week: 1,
     track: "PainScience",
-    title: "What can influence pain?",
-    subtitle: "How context, protection, and safety can change your experience",
+    title: "Understanding your pain",
+    subtitle: "Pain is real. Understanding it can help you decide what to do next.",
     assetPath: "/insight/ps-danger.mp4",
-    quizQ: "Which can help create a sense of safety during recovery?",
-    quizA: "A manageable movement you feel confident doing",
+    quizQ: "Someone says, 'If it hurts more today, I must have caused more damage.' What is the most useful explanation?",
+    quizA: "Pain matters, but its intensity alone cannot tell us how much damage there is.",
     releaseOffset: 0,
     points: 5,
     questions: [
       {
-        question: "Which can help create a sense of safety during recovery?",
+        question: "Someone says, 'If it hurts more today, I must have caused more damage.' What is the most useful explanation?",
         options: [
-          "A movement you must complete despite severe symptoms",
-          "A manageable movement you feel confident doing",
-          "Any exercise that makes you sweat",
-          "Avoiding every activity that feels uncertain"
+          "Pain tells us exactly how much an injury has changed.",
+          "Pain matters, but its intensity alone cannot tell us how much damage there is.",
+          "If stress is involved, the pain is mainly psychological."
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Pain is real. Injury and health matter, and so can sleep, stress, past experience, and the situation. We look at symptoms alongside function and assessment—not dismiss them or use intensity as an exact damage report."
       },
       {
-        question: "Which statement best describes pain?",
+        question: "You want to understand a change in symptoms. Which information gives the fuller picture?",
         options: [
-          "Pain always measures the amount of tissue damage",
-          "Pain is imaginary when scans are normal",
-          "Pain is a real protective experience influenced by many factors",
-          "Pain should always be ignored"
+          "The highest pain number you noticed.",
+          "Whether an exercise was uncomfortable.",
+          "What changed, what you were doing, how you functioned, and whether this is a familiar pattern."
         ],
-        correctAnswer: 2
+        correctAnswer: 2,
+        explanation: "A fuller picture helps guide the next step. New or concerning changes need advice; understanding pain is not permission to ignore them."
       }
     ]
   },
@@ -59,28 +59,33 @@ export const insightLibrary: Insight[] = [
     id: 22,
     week: 1,
     track: "StressMood",
-    title: "Stress and recovery",
-    subtitle: "Why stress deserves attention without becoming another threat",
+    title: "When stress adds to the picture",
+    subtitle: "Understand the connection, then try one tool that fits your day.",
     assetPath: "/insight/stress-recovery-summary.json",
-    quizQ: "Stress can influence recovery, but it is only one part of the picture. (T/F)",
-    quizA: "T",
+    quizQ: "After a demanding day, your familiar symptoms feel more noticeable. What can you reasonably conclude?",
+    quizA: "Stress may be part of the picture, alongside the day's activity and other factors.",
     releaseOffset: 1,
     points: 5,
     questions: [
       {
-        question: "Stress can influence sleep, pain, mood, and recovery, but it is only one part of the picture. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0
+        question: "After a demanding day, your familiar symptoms feel more noticeable. What can you reasonably conclude?",
+        options: [
+          "Stress may be part of the picture, alongside the day's activity and other factors.",
+          "Stress explains the symptoms, so physical factors no longer matter.",
+          "You need to get stress under control before recovery can continue."
+        ],
+        correctAnswer: 0,
+        explanation: "Stress can affect how you feel and respond without being the only explanation. You can support yourself while continuing your recovery plan; you do not need a stress-free life."
       },
       {
-        question: "Which is the most useful response to a stressful recovery day?",
+        question: "You try comfortable breathing and feel a little steadier, but the pain is unchanged. What does that tell you?",
         options: [
-          "Blame yourself for slowing your healing",
-          "Stop all activity until stress disappears",
-          "Choose one manageable action such as breathing, movement, rest, or support",
-          "Assume stress is the only cause of your symptoms"
+          "The exercise failed because the pain did not fall.",
+          "It may be useful for feeling steadier, even without immediate pain relief.",
+          "It proves that stress was causing the pain."
         ],
-        correctAnswer: 2
+        correctAnswer: 1,
+        explanation: "Different tools have different jobs. Feeling steadier may help you choose your next step. It does not prove a cause or guarantee pain relief. We'll continue building your toolbox."
       }
     ]
   },
@@ -88,30 +93,33 @@ export const insightLibrary: Insight[] = [
     id: 23,
     week: 1,
     track: "Lifestyle",
-    title: "The foundations of recovery",
-    subtitle: "Sleep, food, and hydration support the work your body is doing",
+    title: "Giving your body the support it needs",
+    subtitle: "Sleep, food, and hydration: useful foundations, not another list to perfect.",
     assetPath: "/insight/recovery-foundations-week1.json",
-    quizQ: "Recovery foundations need to be perfect before you can improve. (T/F)",
-    quizA: "F",
+    quizQ: "A busy week has meant irregular meals and less time for sleep. What is a practical starting point?",
+    quizA: "Choose one repeatable improvement while continuing the recovery plan.",
     releaseOffset: 2,
     points: 5,
     questions: [
       {
-        question: "Sleep, nutrition, and hydration need to be perfect before recovery can continue. (True/False)",
-        options: ["True", "False"],
+        question: "A busy week has meant irregular meals and less time for sleep. What is a practical starting point?",
+        options: [
+          "Change every routine at once so nothing is missed.",
+          "Choose one repeatable improvement while continuing the recovery plan.",
+          "Put activity on hold until sleep and eating are consistent."
+        ],
         correctAnswer: 1,
-        explanation: "These foundations support health, energy, adaptation, and participation, but perfection is neither realistic nor required. Look for the most useful next improvement."
+        explanation: "You don't need to change everything at once. A reliable meal or realistic sleep routine can support your day without turning recovery into another full-time job."
       },
       {
-        question: "A patient is sleeping poorly and regularly missing meals during a stressful week. What is the most useful first response?",
+        question: "Why are we discussing these habits alongside treatment and movement?",
         options: [
-          "Assume these habits are the sole cause of the injury",
-          "Stop movement until every habit is corrected",
-          "Choose one realistic sleep or meal anchor while continuing the recovery plan",
-          "Attempt to overhaul the entire routine immediately"
+          "They help support energy, normal body function, and participation in recovery.",
+          "They tell us which habit caused the pain.",
+          "They replace the need to build movement and strength."
         ],
-        correctAnswer: 2,
-        explanation: "Recovery behaviours work best as support, not as another source of blame or an all-or-nothing project. A realistic anchor is more likely to be repeated."
+        correctAnswer: 0,
+        explanation: "These are supports, not a diagnosis or a replacement for the rest of your care. Personal health needs and circumstances can change what is useful."
       }
     ]
   },
@@ -119,10 +127,10 @@ export const insightLibrary: Insight[] = [
     id: 24,
     week: 1,
     track: "SelfEfficacy",
-    title: "Notice the thought–action loop",
-    subtitle: "How the meaning you give symptoms can influence what happens next",
+    title: "What went through your mind?",
+    subtitle: "Learn the thought–action loop, then practise a more balanced response.",
     assetPath: "/insight/recovery-signals-week1.json",
-    quizQ: "Complete your thought–action map.",
+    quizQ: "Complete this short reflection or plan.",
     quizA: "(user input)",
     releaseOffset: 3,
     points: 5
@@ -131,35 +139,33 @@ export const insightLibrary: Insight[] = [
     id: 25,
     week: 1,
     track: "PainScience",
-    title: "Treatment creates an opportunity. Movement builds on it.",
-    subtitle: "Use improved comfort to rebuild function, confidence, and capacity",
-    assetPath: "/insight/motion-lotion-summary.json", // Summary card with movement science content
-    quizQ: "What helps turn improved comfort after treatment into longer-term progress?",
-    quizA: "T",
+    title: "Why we keep you moving",
+    subtitle: "The hands-on treatment is one piece of the puzzle.",
+    assetPath: "/insight/motion-lotion-summary.json",
+    quizQ: "Treatment has made a familiar activity more comfortable. What helps you build on that opportunity?",
+    quizA: "Practise a manageable amount of the activity within your plan.",
     releaseOffset: 4,
     points: 5,
     questions: [
       {
-        question: "What helps turn improved comfort after treatment into longer-term progress?",
+        question: "Treatment has made a familiar activity more comfortable. What helps you build on that opportunity?",
         options: [
-          "Avoiding movement so the change is protected",
-          "Using the opportunity to move and gradually rebuild function",
-          "Waiting until every sensation has disappeared",
-          "Receiving the same treatment indefinitely"
+          "Rest the area until the next appointment to preserve the change.",
+          "Use the comfortable period to do much more than usual.",
+          "Practise a manageable amount of the activity within your plan."
         ],
-        correctAnswer: 1,
-        explanation: "Hands-on care can reduce pain and make movement easier. Movement and activity then help rebuild strength, tolerance, confidence, and function."
+        correctAnswer: 2,
+        explanation: "Hands-on care can reduce pain or improve comfort for some people. Movement is how we rebuild strength, activity tolerance, and confidence. You can build gradually; treatment is not a prerequisite for moving."
       },
       {
-        question: "Which is the clearest default message about movement for most MSK patients?",
+        question: "Why repeat a manageable activity rather than just test it once?",
         options: [
-          "Keep moving, start with what you can do, and build from there",
-          "Only perform movements selected by a practitioner",
-          "Do not move an area until it is completely pain-free",
-          "Use maximum effort to test whether the area has healed"
+          "Repeated practice can build ability and help you learn how you respond.",
+          "Repetition guarantees the activity will become pain-free.",
+          "The aim is to prove you can tolerate any discomfort."
         ],
         correctAnswer: 0,
-        explanation: "You do not need the perfect exercise to begin. Specific restrictions or a more precise plan are added when the condition, goals, or response require them."
+        explanation: "Keep moving, start with what you can do, and build from there. Repeated experiences can help develop function and confidence. The amount still needs to fit your response and clinical guidance."
       }
     ]
   },
@@ -167,10 +173,10 @@ export const insightLibrary: Insight[] = [
     id: 28,
     week: 1,
     track: "SelfEfficacy",
-    title: "Build your flare-up plan",
-    subtitle: "Prepare flexible steps for a temporary increase in symptoms.",
+    title: "When a day feels more difficult",
+    subtitle: "Recovery is rarely a straight line. Start with a simple flare-up plan.",
     assetPath: "FORM:flare-up-plan",
-    quizQ: "Complete your personalized flare-up plan.",
+    quizQ: "Complete this short reflection or plan.",
     quizA: "(user input)",
     releaseOffset: 5,
     points: 5
@@ -179,10 +185,10 @@ export const insightLibrary: Insight[] = [
     id: 29,
     week: 1,
     track: "Recap",
-    title: "Week 1 check-in",
-    subtitle: "Connect this week's learning to your own recovery",
+    title: "What is starting to make sense?",
+    subtitle: "A short look at what you understand, what you tried, and what you want to ask.",
     assetPath: "/insight/week1-reflection.json",
-    quizQ: "Complete your Week 1 check-in.",
+    quizQ: "Complete this short reflection or plan.",
     quizA: "(user input)",
     releaseOffset: 6,
     points: 5
@@ -193,41 +199,33 @@ export const insightLibrary: Insight[] = [
     id: 30,
     week: 2,
     track: "PainScience",
-    title: "Understanding pain",
-    subtitle: "Retrieve the core model and apply it to a real symptom experience",
-    assetPath: "https://vimeo.com/245179549", // Understanding Pain in less than 5 minutes - Vimeo (reliable embedding)
-    quizQ: "Pain is always a sign of tissue damage. (T/F)",
-    quizA: "F",
+    title: "Pain is real. What does it tell us?",
+    subtitle: "Revisit the idea, then use it in an everyday situation.",
+    assetPath: "https://vimeo.com/245179549",
+    quizQ: "Your agreed short walk caused familiar discomfort that settled as expected. There has been no new injury or change in the pattern. What is the best-supported next step?",
+    quizA: "Repeat the agreed amount and review the response.",
     releaseOffset: 0,
     points: 5,
     questions: [
       {
-        question: "Pain is always a sign of tissue damage. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 1,
-        explanation: "Pain can accompany tissue injury, but its intensity is not a precise damage meter. New, severe, or concerning symptoms still deserve appropriate assessment."
-      },
-      {
-        question: "Which statement best describes pain?",
+        question: "Your agreed short walk caused familiar discomfort that settled as expected. There has been no new injury or change in the pattern. What is the best-supported next step?",
         options: [
-          "It is a punishment for injury",
-          "It is a real protective experience influenced by many sources of information",
-          "It always tells you to stop all movement",
-          "It is a sign of personal weakness"
+          "Wait until all discomfort has gone before trying again.",
+          "Repeat the agreed amount and review the response.",
+          "Add extra distance because one walk went well."
         ],
         correctAnswer: 1,
-        explanation: "Pain is real. The nervous system considers many sources of information when producing a protective experience."
+        explanation: "Yesterday gives you useful information for repeating the agreed step. It does not establish that a large increase is right, or make zero discomfort a new requirement. If the pattern changes, review the plan."
       },
       {
-        question: "Which information can contribute to a pain experience?",
+        question: "Which statement best explains 'pain is not a damage meter'?",
         options: [
-          "Tissue and nerve information only",
-          "Stress and expectations only",
-          "Biological, psychological, and social information in context",
-          "Imaging results only"
+          "Pain intensity is one piece of information, not an exact measurement of injury.",
+          "Pain only matters when a scan shows an injury.",
+          "Once assessed, every future symptom can be treated as harmless."
         ],
-        correctAnswer: 2,
-        explanation: "Biological, psychological, and social factors can interact. This does not make pain imaginary or reduce it to one cause."
+        correctAnswer: 0,
+        explanation: "Pain and injury can occur together, but intensity alone cannot measure damage. New symptoms still deserve attention. Use the whole picture and the guidance from your assessment."
       }
     ]
   },
@@ -235,41 +233,33 @@ export const insightLibrary: Insight[] = [
     id: 31,
     week: 2,
     track: "PainScience",
-    title: "Why pain can vary",
-    subtitle: "Use context and patterns to make sense of changing symptoms",
+    title: "Why one day can feel different",
+    subtitle: "Look at the whole picture before deciding what a change means.",
     assetPath: "/insight/pain-variability-summary.json",
-    quizQ: "Changes in pain can be influenced by more than changes in tissue condition alone. (T/F)",
-    quizA: "T",
+    quizQ: "A familiar task feels harder after a poor night's sleep and a demanding morning. What is the most useful observation?",
+    quizA: "Sleep, stress, activity, and symptoms may be interacting; look at the pattern.",
     releaseOffset: 1,
     points: 5,
     questions: [
       {
-        question: "Changes in pain can be influenced by more than changes in tissue condition alone. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "Symptoms can vary with activity, sensitivity, sleep, stress, context, expectations, health, and tissue information."
-      },
-      {
-        question: "Which can influence a person's pain experience?",
+        question: "A familiar task feels harder after a poor night's sleep and a demanding morning. What is the most useful observation?",
         options: [
-          "Health and tissue information",
-          "Sleep, stress, and past experience",
-          "Context and expectations",
-          "All of the above"
+          "The task must have become harmful.",
+          "Poor sleep is definitely the cause.",
+          "Sleep, stress, activity, and symptoms may be interacting; look at the pattern."
         ],
-        correctAnswer: 3,
-        explanation: "Looking at the whole context can reveal useful patterns without assuming that one factor explains everything."
+        correctAnswer: 2,
+        explanation: "The context can help explain variation, but it does not identify a single cause. Note what changed and how you function, rather than making a diagnosis from one difficult morning."
       },
       {
-        question: "Which is the most accurate response to persistent pain?",
+        question: "Which note would be most useful to bring to your next appointment?",
         options: [
-          "It proves the person is imagining symptoms",
-          "It can involve ongoing biological and psychosocial influences that deserve assessment and individualized care",
-          "It always means new tissue damage",
-          "It has one cause in every person"
+          "'Pain was higher, so I must be getting worse.'",
+          "'The task felt harder after a busy day; I reduced the amount and noted how long it took to settle.'",
+          "'I will wait until I can identify the exact cause before mentioning it.'"
         ],
         correctAnswer: 1,
-        explanation: "Persistent pain is real and can involve interacting biological and psychosocial influences. Assessment and care should remain individualized."
+        explanation: "Specific observations help us decide what to keep, change, or assess. You do not need to solve the cause yourself. Look at the overall trend rather than any single day."
       }
     ]
   },
@@ -277,41 +267,33 @@ export const insightLibrary: Insight[] = [
     id: 32,
     week: 2,
     track: "Lifestyle",
-    title: "Use your flare-up plan",
-    subtitle: "Practise responding to a temporary symptom increase without panic or avoidance",
+    title: "A little discomfort: what next?",
+    subtitle: "Use your flare-up plan to decide whether to continue, adjust, or ask.",
     assetPath: "/insight/flare-up-management-summary.json",
-    quizQ: "A flare-up can happen without erasing all of your recovery progress. (T/F)",
-    quizA: "T",
+    quizQ: "An agreed activity repeatedly leaves you struggling with usual tasks for longer than expected. What is the most useful response?",
+    quizA: "Review or reduce the amount and discuss the repeated response with your practitioner.",
     releaseOffset: 2,
     points: 5,
     questions: [
       {
-        question: "A flare-up can happen without erasing all of your recovery progress. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "A flare-up is information, not automatic proof that all progress has been lost. Check for anything new or concerning, then use the plan that fits the situation."
-      },
-      {
-        question: "A familiar symptom increases after a busier day, with no new concerning features. What is the most useful first response?",
+        question: "An agreed activity repeatedly leaves you struggling with usual tasks for longer than expected. What is the most useful response?",
         options: [
-          "Panic and stop all activity",
-          "Stay calm, review the context, and use your flare-up plan",
-          "Push through the pain",
-          "Ignore it completely"
+          "Keep the amount unchanged to build tolerance.",
+          "Review or reduce the amount and discuss the repeated response with your practitioner.",
+          "Stop that activity until you can be certain it will cause no symptoms."
         ],
         correctAnswer: 1,
-        explanation: "A planned response may include temporarily adjusting the dose, using helpful strategies, continuing manageable activity, and monitoring the response."
+        explanation: "This response differs from the familiar discomfort that settles as planned. Adjusting the amount is not abandoning the goal. Repeated difficulty recovering is useful information for reviewing your plan."
       },
       {
-        question: "Which plan is least likely to turn a flare-up into prolonged avoidance?",
+        question: "You notice new weakness rather than your usual symptom fluctuation. Which response fits?",
         options: [
-          "Stop every meaningful activity until all symptoms disappear",
-          "Use a flexible plan with manageable movement, recovery strategies, and clear reasons to seek help",
-          "Test the area repeatedly at maximum effort",
-          "Ignore new or concerning symptoms"
+          "Use the usual flare plan for a few days before deciding.",
+          "Increase movement to test whether it goes away.",
+          "Seek prompt clinical advice rather than treating it as a familiar flare."
         ],
-        correctAnswer: 1,
-        explanation: "A useful flare-up plan supports safe participation and includes escalation guidance. It is neither complete avoidance nor blind persistence."
+        correctAnswer: 2,
+        explanation: "New or progressive weakness needs assessment. Sudden major weakness or other emergency symptoms need urgent care. Becoming comfortable with some discomfort does not mean ignoring a change that needs help."
       }
     ]
   },
@@ -319,30 +301,33 @@ export const insightLibrary: Insight[] = [
     id: 33,
     week: 2,
     track: "SelfEfficacy",
-    title: "Recovery is rarely linear",
-    subtitle: "Measure the direction of recovery rather than one difficult hour",
+    title: "Look at the overall trend",
+    subtitle: "A difficult day is part of the picture—not the whole picture.",
     assetPath: "/insight/recovery-not-linear-summary.json",
-    quizQ: "A difficult day means that all previous recovery progress has been lost. (T/F)",
-    quizA: "F",
+    quizQ: "Your pain has varied this week, but you can walk farther and feel more confident. What is a fair summary?",
+    quizA: "There are useful signs of progress, while pain still deserves attention.",
     releaseOffset: 3,
     points: 5,
     questions: [
       {
-        question: "A difficult day means that all previous recovery progress has been lost. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 1,
-        explanation: "A difficult day may be part of recovery. Compare broader trends and look for context before deciding what it means."
-      },
-      {
-        question: "Which is a more useful way to judge recovery?",
+        question: "Your pain has varied this week, but you can walk farther and feel more confident. What is a fair summary?",
         options: [
-          "Judge it from the hardest hour of the week",
-          "Track trends in function, confidence, symptoms, and participation over time",
-          "Expect symptoms to improve in a perfectly straight line",
-          "Ignore every increase in symptoms"
+          "There is no progress unless pain falls every day.",
+          "There are useful signs of progress, while pain still deserves attention.",
+          "You have recovered, so the remaining symptoms no longer matter."
         ],
         correctAnswer: 1,
-        explanation: "Function, confidence, participation, capacity, and symptoms can each provide useful—but incomplete—information about progress."
+        explanation: "Recovery is rarely a straight line. Ability, confidence, and symptoms can change at different rates. Notice the gains without pretending the difficult parts have disappeared."
+      },
+      {
+        question: "You have had less function and worsening symptoms across several weeks. How does 'look at the trend' apply?",
+        options: [
+          "It means waiting longer because recovery always fluctuates.",
+          "It means focusing only on a positive part of the week.",
+          "It means bringing that sustained change to your practitioner for review."
+        ],
+        correctAnswer: 2,
+        explanation: "Looking at the trend works both ways. This message must not be used to dismiss deterioration or a plan that is not helping."
       }
     ]
   },
@@ -350,41 +335,33 @@ export const insightLibrary: Insight[] = [
     id: 34,
     week: 2,
     track: "PainScience",
-    title: "Pacing without avoidance",
-    subtitle: "Build consistency while continuing to expand what you can do",
-    assetPath: "/insight/pacing-strategies-summary.json", // Summary card with link to NHS pacing guide
-    quizQ: "Pacing helps you plan a manageable amount of activity and recovery rather than repeatedly overdoing it. (T/F)",
-    quizA: "T",
+    title: "Find an amount you can build on",
+    subtitle: "Pacing without avoidance: make activity more repeatable, then build.",
+    assetPath: "/insight/pacing-strategies-summary.json",
+    quizQ: "A large burst of chores regularly leaves you unable to do much the next day. Which plan offers a useful starting point?",
+    quizA: "Split the task into manageable parts and review the response.",
     releaseOffset: 4,
     points: 5,
     questions: [
       {
-        question: "Pacing helps you plan a manageable amount of activity and recovery rather than repeatedly overdoing it. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "Pacing can reduce repeated overdoing and crashing. The longer-term goal is not permanent restriction; it is sustainable progression."
-      },
-      {
-        question: "Which example best describes a boom–bust cycle?",
+        question: "A large burst of chores regularly leaves you unable to do much the next day. Which plan offers a useful starting point?",
         options: [
-          "Doing too much on good days, then crashing",
-          "Explosive workout routines",
-          "Sudden loud noises",
-          "A healthy recovery pattern"
+          "Split the task into manageable parts and review the response.",
+          "Finish the full task whenever you have a good day.",
+          "Keep reducing chores until no effort is involved."
         ],
         correctAnswer: 0,
-        explanation: "Doing far more on a good day and then needing prolonged recovery can make activity less predictable and harder to progress."
+        explanation: "Pacing is a way to make activity more repeatable. You can vary tasks, take breaks, or change the amount while keeping the longer-term goal in view."
       },
       {
-        question: "A patient has found a manageable walking amount. What is the next purpose of pacing?",
+        question: "Your current walking amount has become manageable. What is pacing for now?",
         options: [
-          "Keep that amount unchanged forever",
-          "Gradually build capacity when the response supports it",
-          "Avoid walking on any symptomatic day",
-          "Double the amount immediately"
+          "Keeping the same limit permanently to avoid uncertainty.",
+          "Considering a small next step using your response and agreed plan.",
+          "Making every walk harder regardless of how you recover."
         ],
         correctAnswer: 1,
-        explanation: "Pacing is a platform for progress. Once an activity is manageable, the dose can be adjusted gradually using the person's response and goals."
+        explanation: "Start with what you can do, and build from there. Pacing should support participation and progress, not become a permanent rule that you cannot do more."
       }
     ]
   },
@@ -392,41 +369,33 @@ export const insightLibrary: Insight[] = [
     id: 35,
     week: 2,
     track: "SelfEfficacy",
-    title: "Run a sleep-support experiment",
-    subtitle: "Choose one realistic change and observe what it affects",
-    assetPath: "/insight/sleep-recovery-summary.json", // Summary card with link to NHS guide
-    quizQ: "Sleep and pain can influence one another. (T/F)",
-    quizA: "T",
+    title: "Making sleep a little easier",
+    subtitle: "Try one sleep-support experiment that fits your life.",
+    assetPath: "/insight/sleep-recovery-summary.json",
+    quizQ: "You try a wind-down routine but still have one poor night. What is a useful next step?",
+    quizA: "Keep a feasible routine for several nights and look at the pattern.",
     releaseOffset: 5,
     points: 5,
     questions: [
       {
-        question: "Sleep and pain can influence one another. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "The relationship can run both ways: symptoms may disrupt sleep, and difficult sleep may affect sensitivity, energy, mood, and coping."
-      },
-      {
-        question: "Which statement about sleep duration is most accurate?",
+        question: "You try a wind-down routine but still have one poor night. What is a useful next step?",
         options: [
-          "Everyone needs exactly eight hours",
-          "Individual needs vary; many adults are advised to get at least seven hours regularly",
-          "More sleep is always better",
-          "Sleep duration never matters"
+          "Change the whole routine the next day.",
+          "Keep a feasible routine for several nights and look at the pattern.",
+          "Spend much longer in bed to make up for it."
         ],
         correctAnswer: 1,
-        explanation: "Sleep needs vary. General guidance is a starting point, not a pass–fail target or a reason to blame someone for symptoms."
+        explanation: "One night cannot tell you whether a routine is useful. Look at the overall trend rather than any single day. Persistent sleep difficulty may need support beyond general sleep tips."
       },
       {
-        question: "Which is the most useful first sleep experiment?",
+        question: "Which is the clearest way to understand sleep and pain?",
         options: [
-          "Change every part of the routine tonight",
-          "Choose one repeatable anchor, such as a consistent wake time, and observe the pattern",
-          "Stay in bed longer whenever sleep is difficult",
-          "Treat one poor night as failed recovery"
+          "Improving sleep guarantees that pain will improve.",
+          "Pain must improve before sleep can improve.",
+          "Pain can disturb sleep, and difficult sleep can affect how you feel and cope."
         ],
-        correctAnswer: 1,
-        explanation: "A small, repeatable experiment provides more useful information than an all-or-nothing overhaul. Persistent sleep problems may warrant individualized support."
+        correctAnswer: 2,
+        explanation: "The relationship can go both ways. Supporting sleep is one part of your toolbox, not a test you must pass before recovery can continue."
       }
     ]
   },
@@ -434,10 +403,10 @@ export const insightLibrary: Insight[] = [
     id: 36,
     week: 2,
     track: "Recap",
-    title: "Week 2 application check-in",
-    subtitle: "Explain the model in your own words and choose what to test next",
+    title: "What did you learn by trying?",
+    subtitle: "Return to an earlier idea, then choose what is worth building on.",
     assetPath: "/insight/week2-application.json",
-    quizQ: "Complete your Week 2 application check-in.",
+    quizQ: "Complete this short reflection or plan.",
     quizA: "(user input)",
     releaseOffset: 6,
     points: 5

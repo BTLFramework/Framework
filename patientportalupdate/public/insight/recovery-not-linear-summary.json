@@ -1,13 +1,45 @@
 {
-  "timeMinutes": 2,
+  "presentation": "complete",
+  "takeaway": "Look at the whole picture, use what you have learned, and bring questions to your next clinical conversation.",
+  "timeMinutes": 4,
   "level": "Beginner",
-  "why": "Recovery is better judged by patterns in function, confidence, symptoms, and participation than by one difficult day.",
+  "why": "Learn to judge recovery using more than one difficult day or one symptom score.",
   "slides": [
-    {"id": 1, "title": "Recovery Has Variation", "content": "Symptoms, energy, confidence, and ability can rise and fall. A variable path can still be moving forward.", "backgroundColor": "#f0f9ff", "textColor": "#075985"},
-    {"id": 2, "title": "Use More Than Pain", "content": "Notice whether you can do more, recover more predictably, understand your response, or participate with greater confidence—even when pain has not disappeared.", "backgroundColor": "#e0f2fe", "textColor": "#0c4a6e"},
-    {"id": 3, "title": "Zoom Out", "content": "Compare weeks rather than hours. Ask: What is easier now? What is more consistent? What still needs adjustment?", "backgroundColor": "#bae6fd", "textColor": "#075985"},
-    {"id": 4, "title": "Your Plan Is Individual", "content": "There is no universal recovery timeline. Your presentation, goals, health, environment, and response should shape the next step.", "backgroundColor": "#dbeafe", "textColor": "#1e40af"},
-    {"id": 5, "title": "Try This Today", "content": "Write down one sign of progress that is not simply a lower pain score, and one part of the plan that may need support.", "backgroundColor": "#eff6ff", "textColor": "#1e40af"}
+    {
+      "id": 1,
+      "title": "Recovery is rarely a straight line",
+      "content": "You may have good days and more challenging days. That variation does not automatically erase the work you have done. Equally, you do not need to pretend that a difficult period is progress.",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#075985"
+    },
+    {
+      "id": 2,
+      "title": "Look at the overall trend",
+      "content": "Ask what has changed across the week: what you can do, how confident you feel, how symptoms behave, and how you recover after activity. One number cannot tell the whole story.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#0c4a6e"
+    },
+    {
+      "id": 3,
+      "title": "An example of mixed progress",
+      "content": "Imagine someone who is walking farther and worrying less, but still has variable pain. Those are useful gains, and the pain still matters. The next step is to build on what is helping while reviewing what remains difficult.",
+      "backgroundColor": "#dbeafe",
+      "textColor": "#1e40af"
+    },
+    {
+      "id": 4,
+      "title": "When the trend needs attention",
+      "content": "If symptoms are worsening or you are doing less over time, bring that to your practitioner. 'Recovery is rarely a straight line' is not a reason to keep following a plan that needs review.",
+      "backgroundColor": "#ecfeff",
+      "textColor": "#155e75"
+    },
+    {
+      "id": 5,
+      "title": "What would you want us to know?",
+      "content": "Notice one specific change—or that things are unchanged. What is easier? What is harder? What have you learned about your response? Your experience helps guide the next stage, whether or not it has improved.",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#075985"
+    }
   ],
   "autoplay": false,
   "interval": 5000,

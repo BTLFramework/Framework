@@ -1,58 +1,46 @@
 {
   "type": "form",
-  "title": "Notice the Thought–Action Loop",
-  "subtitle": "A symptom, the meaning you give it, and what you do next can influence one another.",
-  "description": "This is not about thinking pain away. Pain is real. The goal is to notice when an automatic conclusion changes stress, confidence, or behaviour before you have considered the whole situation.",
+  "title": "What went through your mind?",
+  "subtitle": "Learn the thought–action loop before trying it yourself.",
+  "description": "A symptom can prompt a thought, a feeling, and an action. The thought may be understandable without being the only possible explanation. Reframing means finding a balanced response—not telling yourself that everything is fine.",
   "sections": [
     {
-      "title": "Notice the first conclusion",
-      "description": "Think about a recent familiar symptom change. What did your mind predict, and what did you do next?",
+      "title": "A worked example",
+      "description": "Imagine an agreed walk brings on familiar discomfort that settles as expected. The first thought is, 'I've made it worse.' Worry follows, and the person considers cancelling the next walk. A more balanced thought is, 'That was uncomfortable, but it settled as we discussed. I can repeat the agreed amount and review the response.' This example does not apply to a new injury or concerning change.",
       "fields": [
         {
-          "type": "checkbox",
-          "label": "Which reactions have you noticed?",
-          "options": [
-            "I immediately assumed I had caused damage",
-            "I became tense, guarded, or worried",
-            "I stopped more activity than I had planned",
-            "I pushed through to prove I was okay",
-            "I considered the pattern and adjusted calmly",
-            "I asked for help because the symptoms were new or concerning"
-          ]
-        },
-        {
           "type": "textarea",
-          "label": "What was the first thought or prediction you noticed?",
-          "placeholder": "For example: ‘I have undone my progress’ or ‘This will never settle’...",
+          "label": "What changes when the person uses the more balanced explanation?",
+          "placeholder": "Think about the next action—not whether they can make every worry disappear.",
           "rows": 3
         }
       ]
     },
     {
-      "title": "Choose a more useful next step",
-      "description": "A thought is not automatically a fact. Consider the pattern, your function, the response over time, and the clinical guidance you already have.",
+      "title": "Try it in your own words",
+      "description": "Use a familiar situation, or the example above if that is more useful. You do not need to invent a fear or disclose something personal. New or concerning symptoms should lead to appropriate advice, not an attempt to think them away.",
       "fields": [
         {
-          "type": "checkbox",
-          "label": "Which response could help you gather better information?",
-          "options": [
-            "Try a manageable version of the activity",
-            "Review the familiar pattern before assuming the worst",
-            "Modify the amount without abandoning movement",
-            "Use the plan already discussed with my practitioner",
-            "Seek assessment for something new, severe, or concerning",
-            "Remember evidence of capacity I have already built"
-          ]
-        },
+          "type": "textarea",
+          "label": "What was the first thought, and what is a more balanced response?",
+          "placeholder": "For example: 'This will ruin my week' → 'I can review the situation and choose one manageable next step.'",
+          "rows": 3
+        }
+      ]
+    },
+    {
+      "title": "Build your toolbox",
+      "description": "A useful response could be repeating a manageable activity, adjusting the amount, using a calming tool, or asking for guidance. Choose from the situation and your clinical plan.",
+      "fields": [
         {
           "type": "textarea",
-          "label": "Complete the loop: When I notice ___, my first thought is ___. A useful next step may be ___.",
-          "placeholder": "Describe one real situation and the response you want to practise...",
+          "label": "What would you do next—and why?",
+          "placeholder": "It is okay to be unsure. Write the question you would like help with instead.",
           "rows": 3
         }
       ]
     }
   ],
-  "submitText": "Save My Thought–Action Map",
-  "successMessage": "Your map is complete. You are not being asked to dismiss symptoms—only to pause, consider the whole pattern, and choose the next useful action."
+  "submitText": "Complete reflection",
+  "successMessage": "Reflection complete. Keep your observations in mind for your next appointment."
 }

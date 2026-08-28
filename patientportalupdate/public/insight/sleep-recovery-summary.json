@@ -1,51 +1,53 @@
 {
-  "timeMinutes": 2,
+  "presentation": "complete",
+  "takeaway": "Look at the whole picture, use what you have learned, and bring questions to your next clinical conversation.",
+  "timeMinutes": 4,
   "level": "Beginner",
-  "why": "Sleep can influence pain sensitivity, energy, mood, and your ability to participate in recovery.",
+  "why": "Understand the sleep–pain relationship, then choose one feasible routine rather than chasing perfect sleep.",
   "slides": [
     {
       "id": 1,
-      "title": "Sleep & Healing",
-      "content": "Sleep supports many recovery processes and can affect how sensitive, rested, and capable you feel the next day.",
-      "backgroundColor": "#dbeafe",
-      "textColor": "#1e3a8a"
+      "title": "Sleep and pain can affect each other",
+      "content": "Symptoms may interrupt sleep. Difficult sleep can affect energy, sensitivity, mood, and coping the next day. Supporting sleep belongs in the recovery plan, without making it the only explanation for pain.",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#075985"
     },
     {
       "id": 2,
-      "title": "Make Room for Sleep",
-      "content": "Most adults are advised to get at least 7 hours regularly, although individual needs and circumstances vary.",
-      "backgroundColor": "#bfdbfe",
-      "textColor": "#1e40af"
+      "title": "Make room for sleep",
+      "content": "Most adults need at least seven hours regularly, though needs and circumstances vary. The quality and regularity of sleep matter too. This is guidance, not a pass–fail target.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#0c4a6e"
     },
     {
       "id": 3,
-      "title": "Build the Conditions",
-      "content": "A reasonably consistent schedule, daytime activity, a comfortable environment, and a wind-down routine can support sleep. Choose changes that are realistic for you.",
-      "backgroundColor": "#93c5fd",
+      "title": "Choose one starting point",
+      "content": "Try a reasonably consistent wake time, a quieter wind-down, or making your sleep environment more comfortable. Shift work, caring responsibilities, and health conditions may change what is realistic. You don't need to change everything at once.",
+      "backgroundColor": "#dbeafe",
       "textColor": "#1e40af"
     },
     {
       "id": 4,
-      "title": "Sleep Is More Than Hours",
-      "content": "Timing, regularity, continuity, and how rested you feel can all matter—not only the number on the clock.",
-      "backgroundColor": "#e0f2fe",
+      "title": "Notice the pattern",
+      "content": "Choose one feasible change and observe several nights rather than judging one. Notice how rested you feel and how the routine fits your day. This is not a controlled experiment and cannot prove what caused a change.",
+      "backgroundColor": "#ecfeff",
+      "textColor": "#155e75"
+    },
+    {
+      "id": 5,
+      "title": "When tips are not enough",
+      "content": "Persistent trouble sleeping deserves discussion with a qualified professional. Structured treatment such as CBT-I can help with insomnia; it is more than general sleep tips. Do not start a sleep-restriction protocol from this lesson.",
+      "backgroundColor": "#f0f9ff",
       "textColor": "#075985"
     },
     {
       "id": 6,
-      "title": "Avoid the Perfect-Sleep Trap",
-      "content": "One difficult night does not ruin recovery. Trying to force sleep can add pressure; look for patterns over time and focus on changes you can sustain.",
-      "backgroundColor": "#dbeafe",
-      "textColor": "#1e40af"
-    },
-    {
-      "id": 5,
-      "title": "Try this tonight",
-      "content": "Choose one experiment tonight: dim the lights, reduce stimulating content, or give yourself a consistent wind-down period. If insomnia persists, CBT-I is the recommended first-line behavioural treatment—not simply more sleep-hygiene tips.",
-      "backgroundColor": "#eff6ff",
-      "textColor": "#1e40af",
+      "title": "Keep building your toolbox",
+      "content": "Look at the overall trend rather than any single day. Keep what is useful, adjust what does not fit, and ask for support when needed. One poor night does not mean recovery has failed.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#0c4a6e",
       "resourceLink": "https://mysleepwell.ca/cbti/",
-      "resourceLabel": "Sleepwell Canada: learn about CBT-I"
+      "resourceLabel": "Optional: Sleepwell Canada explains CBT-I"
     }
   ],
   "autoplay": false,

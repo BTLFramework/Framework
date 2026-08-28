@@ -1,51 +1,51 @@
 {
-  "timeMinutes": 2,
+  "presentation": "complete",
+  "takeaway": "Keep moving, start with what you can do, and build from there. We'll continue building your toolbox.",
+  "timeMinutes": 4,
   "level": "Beginner",
-  "why": "Hands-on care can create comfort and make movement easier. Movement is how we rebuild function, confidence, tolerance, and capacity.",
+  "why": "Understand why movement is part of treatment, not just something added at the end.",
   "slides": [
     {
       "id": 1,
-      "title": "Movement Rebuilds Function",
-      "content": "Movement is how your body rebuilds strength, tolerance, confidence, and function. You do not need the perfect exercise to begin.",
+      "title": "Why we keep you moving",
+      "content": "Movement is how we rebuild strength, activity tolerance, and confidence. Muscles need practice to meet the demands of walking, lifting, work, and everyday life. Over time, a suitable amount of activity can help you do more.",
       "backgroundColor": "#f0f9ff",
       "textColor": "#075985"
     },
     {
       "id": 2,
-      "title": "Treatment Opens an Opportunity",
-      "content": "Hands-on care can reduce pain, improve comfort, and make movement easier. That creates an opportunity to return to activity and build on the change.",
+      "title": "Experience matters too",
+      "content": "If an activity has been uncomfortable, it can feel uncertain to try it again. A manageable experience gives you something concrete to learn from: what you could do, how you responded, and what to adjust next time. Confidence can grow through that practice.",
       "backgroundColor": "#e0f2fe",
       "textColor": "#0c4a6e"
     },
     {
       "id": 3,
-      "title": "Use the Opportunity",
-      "content": "Walk, work, exercise, or return to ordinary activity in a way you can manage. Movement helps turn improved comfort into useful capacity.",
-      "backgroundColor": "#bae6fd",
-      "textColor": "#075985"
+      "title": "The hands-on treatment is one piece of the puzzle",
+      "content": "Hands-on care may help things settle and make movement more comfortable. When it does, that creates an opportunity to practise. It does not mean you must have treatment before you can move, or that every visit will produce the same response.",
+      "backgroundColor": "#dbeafe",
+      "textColor": "#1e40af"
     },
     {
       "id": 4,
-      "title": "Start, Then Build",
-      "content": "Keep moving, start with what you can do, and build from there. Specific restrictions or guidance are added when your condition, goals, or response require them.",
-      "backgroundColor": "#7dd3fc",
-      "textColor": "#0c4a6e"
-    },
-    {
-      "id": 6,
-      "title": "Symptoms Are Information",
-      "content": "A symptom response is information—not an automatic damage report. Consider its intensity, duration, trend, and effect on function.",
-      "backgroundColor": "#38bdf8",
-      "textColor": "#075985"
+      "title": "Keep moving",
+      "content": "Start with what you can do, and build from there. A walk, an exercise, or an ordinary activity can be part of that. The starting point should fit your current ability and any restrictions or guidance from your assessment.",
+      "backgroundColor": "#ecfeff",
+      "textColor": "#155e75"
     },
     {
       "id": 5,
-      "title": "Try this today",
-      "content": "Choose one ordinary activity you want treatment to make easier. Use today’s window of comfort to practise it at a level you can manage.",
-      "backgroundColor": "#eff6ff",
-      "textColor": "#1e40af",
-      "resourceLink": "https://www.arthritis.ca/treatment/physical-activity-guide/",
-      "resourceLabel": "Read Arthritis Society Guide"
+      "title": "Discomfort needs context",
+      "content": "Some familiar discomfort can occur during activity without meaning you have caused new damage. Look at how you function and how symptoms settle as well as how it feels in the moment. If the response is repeatedly more than expected, adjust or seek advice. New or concerning changes need assessment.",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#075985"
+    },
+    {
+      "id": 6,
+      "title": "Use what we practised",
+      "content": "Choose one activity from your plan and a manageable amount. Notice how it feels during and afterwards. The aim is not to prove you can push through; it is to build experiences you can learn from and gradually return to the things you enjoy.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#0c4a6e"
     }
   ],
   "autoplay": false,

@@ -325,9 +325,17 @@ Follow your clinician's advice and seek urgent care for new or concerning sympto
 
           {/* Introduction */}
           <div className="mb-6">
-            <h3 className="text-xl font-bold text-btl-900 mb-1">Your Personal Flare Management Plan</h3>
+            <h3 className="text-xl font-bold text-btl-900 mb-1">When a day feels more difficult</h3>
             <p className="text-btl-700 leading-relaxed">
-              Let's create a step-by-step plan to help you recognize early warning signs and take action before flares escalate.
+              Recovery is rarely a straight line. Start with one familiar pattern, one useful first step,
+              and what you will do next. You do not need a complicated plan or every tool at once.
+              If you have not had a flare-up, write that and use this to prepare a question for your practitioner.
+            </p>
+            <p className="text-btl-700 leading-relaxed mt-3">
+              For example, a familiar increase after a busy day might lead you to adjust the amount of activity,
+              try a comfortable calming strategy, and review how you respond. A new injury, new weakness,
+              or another concerning change needs appropriate advice instead of being treated as a usual flare.
+              Do not wait for a particular pain number before seeking help.
             </p>
           </div>
 
@@ -354,7 +362,7 @@ Follow your clinician's advice and seek urgent care for new or concerning sympto
             {/* Common Triggers */}
             <div className="bg-gradient-to-br from-btl-50 to-white border-2 border-btl-200 rounded-2xl p-6 shadow-sm">
               <h3 className="text-xl font-bold text-btl-900 mb-4">Common Triggers</h3>
-              <p className="text-btl-700 mb-6">Select all that apply - these patterns can help you anticipate and prevent flares</p>
+              <p className="text-btl-700 mb-6">Select any patterns you have noticed, or leave this blank. A pattern does not prove what caused the symptoms.</p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {COMMON_TRIGGERS.map(trigger => (
                   <button
