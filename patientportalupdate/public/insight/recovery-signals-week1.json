@@ -1,58 +1,58 @@
 {
   "type": "form",
-  "title": "Map Your Recovery Signals",
-  "subtitle": "Turn this week's ideas into information you can use.",
-  "description": "There are no right or wrong answers. Notice what tends to increase concern and what helps you feel more confident, supported, or able to participate.",
+  "title": "Notice the Thought–Action Loop",
+  "subtitle": "A symptom, the meaning you give it, and what you do next can influence one another.",
+  "description": "This is not about thinking pain away. Pain is real. The goal is to notice when an automatic conclusion changes stress, confidence, or behaviour before you have considered the whole situation.",
   "sections": [
     {
-      "title": "What increases concern?",
-      "description": "Think about situations—not just symptoms—that can make recovery feel harder.",
+      "title": "Notice the first conclusion",
+      "description": "Think about a recent familiar symptom change. What did your mind predict, and what did you do next?",
       "fields": [
         {
           "type": "checkbox",
-          "label": "Which factors have mattered recently?",
+          "label": "Which reactions have you noticed?",
           "options": [
-            "Poor or disrupted sleep",
-            "A stressful day",
-            "Uncertainty about what symptoms mean",
-            "Doing much more than usual",
-            "Avoiding activity because it feels unsafe",
-            "Feeling unsupported or rushed"
+            "I immediately assumed I had caused damage",
+            "I became tense, guarded, or worried",
+            "I stopped more activity than I had planned",
+            "I pushed through to prove I was okay",
+            "I considered the pattern and adjusted calmly",
+            "I asked for help because the symptoms were new or concerning"
           ]
         },
         {
           "type": "textarea",
-          "label": "What else tends to increase concern or make symptoms harder to manage?",
-          "placeholder": "Describe a situation, thought, sensation, or pattern you have noticed...",
+          "label": "What was the first thought or prediction you noticed?",
+          "placeholder": "For example: ‘I have undone my progress’ or ‘This will never settle’...",
           "rows": 3
         }
       ]
     },
     {
-      "title": "What builds confidence?",
-      "description": "Identify resources that help you feel safer or more capable—not necessarily symptom-free.",
+      "title": "Choose a more useful next step",
+      "description": "A thought is not automatically a fact. Consider the pattern, your function, the response over time, and the clinical guidance you already have.",
       "fields": [
         {
           "type": "checkbox",
-          "label": "Which could support you?",
+          "label": "Which response could help you gather better information?",
           "options": [
-            "Understanding what is happening",
-            "A manageable movement or exercise",
-            "A clear plan",
-            "Rest or a change of pace",
-            "Support from someone I trust",
-            "Remembering progress I have already made"
+            "Try a manageable version of the activity",
+            "Review the familiar pattern before assuming the worst",
+            "Modify the amount without abandoning movement",
+            "Use the plan already discussed with my practitioner",
+            "Seek assessment for something new, severe, or concerning",
+            "Remember evidence of capacity I have already built"
           ]
         },
         {
           "type": "textarea",
-          "label": "What is one confidence-building action you can try this week?",
-          "placeholder": "Choose something small and realistic...",
+          "label": "Complete the loop: When I notice ___, my first thought is ___. A useful next step may be ___.",
+          "placeholder": "Describe one real situation and the response you want to practise...",
           "rows": 3
         }
       ]
     }
   ],
-  "submitText": "Complete My Recovery Signals Map",
-  "successMessage": "Your recovery signals map is complete. Use it as a starting point—not a fixed rule—and revisit these questions as you learn more."
+  "submitText": "Save My Thought–Action Map",
+  "successMessage": "Your map is complete. You are not being asked to dismiss symptoms—only to pause, consider the whole pattern, and choose the next useful action."
 }

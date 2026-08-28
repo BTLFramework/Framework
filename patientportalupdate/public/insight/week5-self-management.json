@@ -1,0 +1,35 @@
+{
+  "type": "form",
+  "title": "Week 5 Self-Management Check-In",
+  "subtitle": "Clarify what you can manage independently and when support is useful.",
+  "description": "Good self-management does not mean doing everything alone. It means using your tools, responding proportionately, and asking for the right support when needed.",
+  "sections": [
+    {
+      "title": "Update the plan",
+      "description": "Use new experience to update an old prediction.",
+      "fields": [
+        {"type": "textarea", "label": "What activity or situation previously felt threatening or uncertain?", "placeholder": "Describe the situation and the prediction you carried into it...", "rows": 3},
+        {"type": "textarea", "label": "What new information have you gained?", "placeholder": "What can you now do, tolerate, modify, or understand differently?", "rows": 3}
+      ]
+    },
+    {
+      "title": "Continue, modify, or seek support",
+      "description": "Create guidance you can actually use.",
+      "fields": [
+        {"type": "text", "label": "I can usually continue when:", "placeholder": "Describe the response or situation..."},
+        {"type": "text", "label": "I may modify the task when:", "placeholder": "Describe what tells you the dose or strategy needs adjustment..."},
+        {"type": "textarea", "label": "I will seek appropriate support when:", "placeholder": "New or concerning symptoms, uncertainty, stalled progress, worsening function...", "rows": 3}
+      ]
+    },
+    {
+      "title": "Choose support intentionally",
+      "description": "Support should build capability, not replace it.",
+      "fields": [
+        {"type": "checkbox", "label": "Which support may be useful next?", "options": ["Clarification from my practitioner", "Help modifying an activity or exercise", "Support from family, friends, or work", "Sleep or mental-health support", "No additional support right now"]},
+        {"type": "textarea", "label": "What specific question or request will I make?", "placeholder": "Be clear about the help or information you need...", "rows": 3}
+      ]
+    }
+  ],
+  "submitText": "Complete Week 5 Check-In",
+  "successMessage": "Week 5 complete. You are building a clearer, more independent recovery decision process."
+}

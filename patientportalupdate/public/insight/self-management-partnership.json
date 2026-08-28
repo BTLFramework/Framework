@@ -1,0 +1,48 @@
+{
+  "timeMinutes": 3,
+  "level": "Intermediate",
+  "why": "Self-management means taking an active role in recovery. It does not mean handling every problem alone or avoiding appropriate care.",
+  "slides": [
+    {
+      "id": 1,
+      "title": "Use What You Know",
+      "content": "Apply the tools you have practised: understand the context, choose a manageable action, review the response, and adjust when needed.",
+      "backgroundColor": "#ecfeff",
+      "textColor": "#155e75"
+    },
+    {
+      "id": 2,
+      "title": "Solve the Next Problem",
+      "content": "Recovery plans need to change when goals, symptoms, health, work, stress, or life circumstances change. Problem-solving is part of the skill.",
+      "backgroundColor": "#cffafe",
+      "textColor": "#155e75"
+    },
+    {
+      "id": 3,
+      "title": "Keep Partnership Available",
+      "content": "Professional support may be useful for new or concerning symptoms, stalled progress, uncertainty, significant distress, or decisions that need clinical guidance.",
+      "backgroundColor": "#dbeafe",
+      "textColor": "#1e40af"
+    },
+    {
+      "id": 4,
+      "title": "Support Capability",
+      "content": "The purpose of care is not dependence or abandonment. Useful support helps you understand, decide, practise, and return to meaningful activity.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#075985"
+    },
+    {
+      "id": 5,
+      "title": "Teach It Back",
+      "content": "Complete this sentence: I can usually manage ___ by ___. I will seek support when ___.",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://www.iasp-pain.org/resources/fact-sheets/promoting-chronic-pain-self-management-education/",
+      "resourceLabel": "IASP: self-management education"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}

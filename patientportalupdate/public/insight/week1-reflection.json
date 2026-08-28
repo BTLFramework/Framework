@@ -14,9 +14,9 @@
           "options": [
             "Factors that can increase or decrease protection",
             "Stress and recovery",
-            "Sleep and pain sensitivity",
-            "My own recovery signals",
-            "Finding a manageable movement dose",
+            "Sleep, food, and hydration as recovery foundations",
+            "The thought–action loop",
+            "How hands-on care and movement work together",
             "Having a plan for symptom flare-ups"
           ]
         },
@@ -35,7 +35,7 @@
         {
           "type": "textarea",
           "label": "What seemed to help you participate in recovery this week?",
-          "placeholder": "Consider sleep, stress, movement, support, understanding, pacing, or anything else...",
+          "placeholder": "Consider treatment, movement, sleep, stress, food, hydration, support, understanding, or anything else...",
           "rows": 3
         },
         {

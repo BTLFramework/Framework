@@ -1,0 +1,79 @@
+{
+  "type": "form",
+  "title": "Week 3 Capacity Check-In",
+  "subtitle": "Connect your daily choices to the activities that matter to you.",
+  "description": "Recovery is not a test of perfect habits or perfect thinking. This check-in helps identify one useful action and the evidence it gives you.",
+  "sections": [
+    {
+      "title": "Notice capacity",
+      "description": "Progress can show up in more places than symptom intensity.",
+      "fields": [
+        {
+          "type": "checkbox",
+          "label": "Where did you notice evidence of progress?",
+          "options": [
+            "I completed more of a meaningful activity",
+            "I recovered more predictably after activity",
+            "I felt more confident trying something",
+            "I changed position or adjusted a task without panic",
+            "I responded differently to a difficult thought",
+            "I supported my energy with food, sleep, hydration, or recovery time",
+            "I asked for useful support or clarification"
+          ]
+        },
+        {
+          "type": "textarea",
+          "label": "Describe one specific example.",
+          "placeholder": "What did you do, and what did it show you?",
+          "rows": 3
+        }
+      ]
+    },
+    {
+      "title": "Test a prediction",
+      "description": "Use a CBT-style experiment without dismissing real symptoms or safety concerns.",
+      "fields": [
+        {
+          "type": "text",
+          "label": "A difficult prediction I noticed:",
+          "placeholder": "For example: If I do this, I will be unable to cope afterward..."
+        },
+        {
+          "type": "text",
+          "label": "A more balanced statement:",
+          "placeholder": "Accurate, realistic, and not falsely positive..."
+        },
+        {
+          "type": "textarea",
+          "label": "What manageable action could help test that prediction?",
+          "placeholder": "Choose an appropriate step and what you will observe...",
+          "rows": 3
+        }
+      ]
+    },
+    {
+      "title": "Act on what matters",
+      "description": "Choose a meaningful direction, then scale the action to your current capacity.",
+      "fields": [
+        {
+          "type": "text",
+          "label": "One activity, role, or value that matters to me:",
+          "placeholder": "Connection, work, parenting, recreation, independence, health..."
+        },
+        {
+          "type": "text",
+          "label": "One small action I will take toward it:",
+          "placeholder": "Specific and manageable..."
+        },
+        {
+          "type": "textarea",
+          "label": "What support or adjustment would make this easier?",
+          "placeholder": "A smaller starting point, task modification, clearer plan, or conversation with your practitioner...",
+          "rows": 3
+        }
+      ]
+    }
+  ],
+  "submitText": "Complete Week 3 Check-In",
+  "successMessage": "Week 3 complete. You are using recovery skills to build capacity in the parts of life that matter."
+}

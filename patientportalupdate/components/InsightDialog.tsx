@@ -274,6 +274,11 @@ function QuizPopup({
                         <p className="text-green-600 font-medium">
                           {isLastQuestion ? "Great job! You've completed this insight." : "Moving to next question..."}
                         </p>
+                        {currentQuestion?.explanation && (
+                          <p className="mt-2 max-w-lg text-sm leading-relaxed text-green-800">
+                            {currentQuestion.explanation}
+                          </p>
+                        )}
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-3 text-red-700 bg-red-50 border-red-200 p-6 rounded-xl">
@@ -287,6 +292,11 @@ function QuizPopup({
                             }
                           </span>
                         </p>
+                        {currentQuestion?.explanation && (
+                          <p className="max-w-lg text-sm leading-relaxed text-red-800">
+                            {currentQuestion.explanation}
+                          </p>
+                        )}
                         <Button 
                           onClick={handleRetry}
                           className="mt-2 bg-red-600 hover:bg-red-700 rounded-xl"

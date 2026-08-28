@@ -1,0 +1,68 @@
+{
+  "type": "form",
+  "title": "Your Recovery Handoff",
+  "subtitle": "Create a concise summary for your next phase of recovery.",
+  "description": "This summary records what you understand, what you can manage, what remains difficult, and what you want to discuss. Completing it does not replace clinical assessment.",
+  "sections": [
+    {
+      "title": "Understanding and confidence",
+      "description": "Identify what is clear and what may need review.",
+      "fields": [
+        {
+          "type": "rating",
+          "label": "How confident are you managing an expected difficult recovery day?",
+          "scale": 10,
+          "labels": {"1": "Not confident", "5": "Somewhat confident", "10": "Very confident"}
+        },
+        {
+          "type": "checkbox",
+          "label": "Which ideas now make sense to you?",
+          "options": [
+            "Pain is real and influenced by many kinds of information",
+            "Stress, sleep, food, hydration, and support can affect recovery participation",
+            "Hands-on care may create an opportunity that movement can build on",
+            "Pacing should support progression rather than permanent avoidance",
+            "Thoughts and emotions can influence actions without making pain imaginary",
+            "I can use context to help decide whether to continue, modify, or seek support",
+            "Recovery can fluctuate without all progress being lost"
+          ]
+        },
+        {
+          "type": "textarea",
+          "label": "Which idea remains unclear or difficult to apply?",
+          "placeholder": "A concept, strategy, or situation you want reviewed...",
+          "rows": 3
+        }
+      ]
+    },
+    {
+      "title": "Current recovery picture",
+      "description": "Focus on the barrier and goal most relevant now.",
+      "fields": [
+        {"type": "textarea", "label": "My main recovery barrier right now is:", "placeholder": "Symptoms, confidence, sleep, stress, work, time, uncertainty, support, or something else...", "rows": 3},
+        {"type": "textarea", "label": "The meaningful activity or goal I am working toward is:", "placeholder": "What are you trying to return to or build?", "rows": 3},
+        {"type": "textarea", "label": "Evidence that I am moving forward includes:", "placeholder": "Function, confidence, participation, recovery time, understanding, or another useful change...", "rows": 3}
+      ]
+    },
+    {
+      "title": "My working plan",
+      "description": "Summarize the decisions you want available on a difficult day.",
+      "fields": [
+        {"type": "textarea", "label": "When symptoms increase, my first steps are:", "placeholder": "Write the response in order...", "rows": 3},
+        {"type": "textarea", "label": "The tools that fit me best are:", "placeholder": "Movement, pacing, task changes, sleep support, regulation, social support, treatment, or other strategies...", "rows": 3},
+        {"type": "textarea", "label": "I will seek professional support when:", "placeholder": "New or concerning symptoms, worsening function, uncertainty, stalled progress, significant distress...", "rows": 3}
+      ]
+    },
+    {
+      "title": "Next conversation",
+      "description": "Use this to make the next appointment more focused.",
+      "fields": [
+        {"type": "textarea", "label": "My main question for my practitioner is:", "placeholder": "What do you most need clarified or decided?", "rows": 3},
+        {"type": "checkbox", "label": "What may need review?", "options": ["Exercise or activity progression", "Flare-up or setback plan", "Sleep, stress, or mental-health support", "Work or meaningful activity plan", "New or changing symptoms", "Need for reassessment", "No clinical review needed right now"]},
+        {"type": "text", "label": "My next manageable action:", "placeholder": "One specific action to carry forward..."}
+      ]
+    }
+  ],
+  "submitText": "Complete Recovery Handoff",
+  "successMessage": "Your seven-week recovery handoff is complete. Use it to guide the next phase and your next clinical conversation."
+}

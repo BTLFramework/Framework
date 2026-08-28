@@ -1,33 +1,33 @@
 {
   "timeMinutes": 2,
   "level": "Beginner",
-  "why": "Appropriately dosed movement can support function, confidence, and recovery.",
+  "why": "Hands-on care can create comfort and make movement easier. Movement is how we rebuild function, confidence, tolerance, and capacity.",
   "slides": [
     {
       "id": 1,
-      "title": "Motion is Lotion",
-      "content": "Movement is one recovery tool. The useful type and dose depend on you, your goals, and your current capacity.",
+      "title": "Movement Rebuilds Function",
+      "content": "Movement is how your body rebuilds strength, tolerance, confidence, and function. You do not need the perfect exercise to begin.",
       "backgroundColor": "#f0f9ff",
       "textColor": "#075985"
     },
     {
       "id": 2,
-      "title": "Why It Works",
-      "content": "Movement can support strength, mobility, confidence, and participation. It may also change pain or stiffness for some people.",
+      "title": "Treatment Opens an Opportunity",
+      "content": "Hands-on care can reduce pain, improve comfort, and make movement easier. That creates an opportunity to return to activity and build on the change.",
       "backgroundColor": "#e0f2fe",
       "textColor": "#0c4a6e"
     },
     {
       "id": 3,
-      "title": "Gentle Movement",
-      "content": "Start with a manageable dose. Some symptoms during or after activity do not automatically mean harm; use your plan and response over time to guide progression.",
+      "title": "Use the Opportunity",
+      "content": "Walk, work, exercise, or return to ordinary activity in a way you can manage. Movement helps turn improved comfort into useful capacity.",
       "backgroundColor": "#bae6fd",
       "textColor": "#075985"
     },
     {
       "id": 4,
-      "title": "Evidence Base",
-      "content": "Exercise and physical activity can improve pain and function across many musculoskeletal conditions, but the best approach is individualized.",
+      "title": "Start, Then Build",
+      "content": "Keep moving, start with what you can do, and build from there. Specific restrictions or guidance are added when your condition, goals, or response require them.",
       "backgroundColor": "#7dd3fc",
       "textColor": "#0c4a6e"
     },
@@ -41,7 +41,7 @@
     {
       "id": 5,
       "title": "Try this today",
-      "content": "Choose one manageable activity that fits your plan. Notice how you feel during it, shortly afterward, and later that day.",
+      "content": "Choose one ordinary activity you want treatment to make easier. Use today’s window of comfort to practise it at a level you can manage.",
       "backgroundColor": "#eff6ff",
       "textColor": "#1e40af",
       "resourceLink": "https://www.arthritis.ca/treatment/physical-activity-guide/",

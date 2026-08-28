@@ -1,0 +1,37 @@
+{
+  "type": "form",
+  "title": "Week 4 Graded-Capacity Check-In",
+  "subtitle": "Review one meaningful challenge and what its response taught you.",
+  "description": "The goal is not a perfect symptom response. It is to learn how attention, emotion, movement strategy, dose, and recovery affect participation.",
+  "sections": [
+    {
+      "title": "Choose the activity",
+      "description": "Use one activity that matters in your real life.",
+      "fields": [
+        {"type": "text", "label": "The activity I practised:", "placeholder": "Walking, lifting, sitting, work, sport, parenting, chores..."},
+        {"type": "text", "label": "My starting dose or step:", "placeholder": "How much, how long, or which version?"},
+        {"type": "textarea", "label": "Why did this activity matter to me?", "placeholder": "Connect it to function, independence, work, recreation, or another value...", "rows": 3}
+      ]
+    },
+    {
+      "title": "Review the response",
+      "description": "Look at more than pain intensity alone.",
+      "fields": [
+        {"type": "textarea", "label": "What did I notice during and after the activity?", "placeholder": "Symptoms, confidence, control, function, emotion, and recovery...", "rows": 3},
+        {"type": "checkbox", "label": "What might I do next?", "options": ["Repeat the same step", "Progress one part of the dose", "Modify the task or dose", "Use another regulation or recovery strategy", "Ask my practitioner for clarification"]},
+        {"type": "textarea", "label": "What information supports that decision?", "placeholder": "Explain the pattern in your own words...", "rows": 3}
+      ]
+    },
+    {
+      "title": "Notice the response loop",
+      "description": "Attention and emotion can shape actions without making symptoms imaginary.",
+      "fields": [
+        {"type": "text", "label": "A thought or emotion I noticed:", "placeholder": "What showed up?"},
+        {"type": "text", "label": "The action it pulled me toward:", "placeholder": "Avoid, brace, rush, test, adjust, ask for help..."},
+        {"type": "textarea", "label": "A useful response I can practise next time:", "placeholder": "One realistic action—not forced positivity...", "rows": 3}
+      ]
+    }
+  ],
+  "submitText": "Complete Week 4 Check-In",
+  "successMessage": "Week 4 complete. You are learning how to select, review, and adjust meaningful recovery challenges."
+}

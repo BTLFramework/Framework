@@ -1,0 +1,68 @@
+{
+  "type": "form",
+  "title": "Week 2 Application Check-In",
+  "subtitle": "Use this week's ideas to understand a real recovery experience.",
+  "description": "This is not a memory test. Explaining an idea in your own words and applying it to your life helps make the learning useful.",
+  "sections": [
+    {
+      "title": "Explain it simply",
+      "description": "Imagine you are explaining the idea to a friend.",
+      "fields": [
+        {
+          "type": "textarea",
+          "label": "Why can symptoms change without automatically meaning that new damage has occurred?",
+          "placeholder": "In your own words...",
+          "rows": 3
+        },
+        {
+          "type": "textarea",
+          "label": "How is pacing different from avoiding activity?",
+          "placeholder": "Describe how pacing can support gradual progress...",
+          "rows": 3
+        }
+      ]
+    },
+    {
+      "title": "Apply it to this week",
+      "description": "Look for one real pattern rather than a perfect answer.",
+      "fields": [
+        {
+          "type": "textarea",
+          "label": "Describe one symptom change or difficult day. What else was happening around it?",
+          "placeholder": "Consider activity, recovery time, sleep, stress, expectations, illness, workload, or anything else relevant...",
+          "rows": 3
+        },
+        {
+          "type": "textarea",
+          "label": "What response helped—or what might you try next time?",
+          "placeholder": "A flare-up strategy, activity adjustment, manageable movement, support, or appropriate assessment...",
+          "rows": 3
+        }
+      ]
+    },
+    {
+      "title": "Choose one experiment",
+      "description": "Use a small test to learn what supports your recovery.",
+      "fields": [
+        {
+          "type": "text",
+          "label": "One activity or sleep-support experiment I will try:",
+          "placeholder": "Make it realistic and specific..."
+        },
+        {
+          "type": "text",
+          "label": "What will I observe?",
+          "placeholder": "Function, confidence, consistency, energy, symptoms, or participation..."
+        },
+        {
+          "type": "textarea",
+          "label": "Is there anything I want to discuss with my practitioner?",
+          "placeholder": "A concern, question, pattern, or useful win...",
+          "rows": 3
+        }
+      ]
+    }
+  ],
+  "submitText": "Complete Week 2 Check-In",
+  "successMessage": "Week 2 complete. You are turning general recovery concepts into information you can use."
+}

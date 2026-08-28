@@ -1,0 +1,46 @@
+{
+  "timeMinutes": 3,
+  "level": "Intermediate",
+  "why": "Confidence is not ignoring symptoms. A useful self-management plan helps you decide when to continue, when to modify, and when to seek support.",
+  "slides": [
+    {
+      "id": 1,
+      "title": "Continue",
+      "content": "A familiar, expected response that settles as planned may be compatible with continuing the activity or recovery plan while monitoring the pattern.",
+      "backgroundColor": "#ecfdf5",
+      "textColor": "#166534"
+    },
+    {
+      "id": 2,
+      "title": "Modify",
+      "content": "Adjust range, load, speed, duration, position, rest, or task strategy when the current dose repeatedly interferes with function or recovery.",
+      "backgroundColor": "#fefce8",
+      "textColor": "#854d0e"
+    },
+    {
+      "id": 3,
+      "title": "Seek Support",
+      "content": "Seek appropriate assessment for new, severe, progressive, unusual, or concerning symptoms—or when the plan is not helping you move forward.",
+      "backgroundColor": "#fff1f2",
+      "textColor": "#9f1239"
+    },
+    {
+      "id": 4,
+      "title": "Use Context",
+      "content": "One sensation rarely provides the whole answer. Consider what changed, what the task required, how you responded, and whether the pattern is familiar.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#075985"
+    },
+    {
+      "id": 5,
+      "title": "Try This Today",
+      "content": "Choose one current activity and write what would tell you to continue, modify, or contact your practitioner. If you are unsure about concerning symptoms, seek appropriate advice.",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}

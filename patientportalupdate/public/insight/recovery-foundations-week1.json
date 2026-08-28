@@ -1,0 +1,55 @@
+{
+  "timeMinutes": 3,
+  "level": "Beginner",
+  "why": "Sleep, food, and hydration provide resources for energy, adaptation, and participation in recovery.",
+  "slides": [
+    {
+      "id": 1,
+      "title": "Recovery Takes Resources",
+      "content": "Your body is always adapting. Sleep, regular nourishment, and hydration help support energy, tissue processes, concentration, mood, and your ability to participate in movement and daily life.",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#075985"
+    },
+    {
+      "id": 2,
+      "title": "Sleep Supports the System",
+      "content": "Sleep can influence pain sensitivity, energy, mood, learning, and recovery behaviours. One difficult night does not erase progress, and trying to force perfect sleep can create more pressure.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#0c4a6e"
+    },
+    {
+      "id": 3,
+      "title": "Food Supports the Work",
+      "content": "Regular, balanced eating helps provide energy and nutrients for everyday function and recovery. No single food fixes pain, and eating does not need to be perfect to be useful.",
+      "backgroundColor": "#ecfdf5",
+      "textColor": "#166534"
+    },
+    {
+      "id": 4,
+      "title": "Hydration Is a Foundation",
+      "content": "Hydration supports normal body function and activity. Needs vary with the person, health, activity, and environment; more water is not automatically better.",
+      "backgroundColor": "#ecfeff",
+      "textColor": "#155e75"
+    },
+    {
+      "id": 5,
+      "title": "Support—Not Blame",
+      "content": "Poor sleep, irregular meals, or low fluid intake do not prove why you hurt. They are modifiable supports that may make recovery and participation easier when they need attention.",
+      "backgroundColor": "#fff7ed",
+      "textColor": "#9a3412"
+    },
+    {
+      "id": 6,
+      "title": "Choose One Anchor",
+      "content": "Pick one realistic action: a consistent wake time, one reliable meal, or a drink paired with a regular routine. Keep moving and following your care plan while you test it.",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://www.youtube.com/watch?v=OvQTjAlIvI8",
+      "resourceLabel": "Optional: Professor Colin Espie’s five principles of good sleep health"
+    }
+  ],
+  "autoplay": false,
+  "interval": 5000,
+  "showDots": true,
+  "showArrows": true
+}

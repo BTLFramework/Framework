@@ -16,6 +16,7 @@ export interface QuizQuestion {
   question: string;
   options: string[];
   correctAnswer: number; // Index of correct option (0-based)
+  explanation?: string; // Brief feedback shown after the patient answers
 }
 
 export const insightLibrary: Insight[] = [
@@ -87,28 +88,30 @@ export const insightLibrary: Insight[] = [
     id: 23,
     week: 1,
     track: "Lifestyle",
-    title: "Sleep and pain sensitivity",
-    subtitle: "Professor Colin Espie's five principles of good sleep health",
-    assetPath: "https://www.youtube.com/watch?v=OvQTjAlIvI8",
-    quizQ: "Good sleep health should be personalized rather than built around one perfect routine. (T/F)",
-    quizA: "T",
+    title: "The foundations of recovery",
+    subtitle: "Sleep, food, and hydration support the work your body is doing",
+    assetPath: "/insight/recovery-foundations-week1.json",
+    quizQ: "Recovery foundations need to be perfect before you can improve. (T/F)",
+    quizA: "F",
     releaseOffset: 2,
     points: 5,
     questions: [
       {
-        question: "Good sleep health should be personalized rather than built around one perfect routine. (True/False)",
+        question: "Sleep, nutrition, and hydration need to be perfect before recovery can continue. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 1,
+        explanation: "These foundations support health, energy, adaptation, and participation, but perfection is neither realistic nor required. Look for the most useful next improvement."
       },
       {
-        question: "Which is one of Professor Espie's five principles of good sleep health?",
+        question: "A patient is sleeping poorly and regularly missing meals during a stressful week. What is the most useful first response?",
         options: [
-          "Perfect your sleep every night",
-          "Personalize your sleep",
-          "Measure every stage of sleep",
-          "Force yourself to sleep"
+          "Assume these habits are the sole cause of the injury",
+          "Stop movement until every habit is corrected",
+          "Choose one realistic sleep or meal anchor while continuing the recovery plan",
+          "Attempt to overhaul the entire routine immediately"
         ],
-        correctAnswer: 1
+        correctAnswer: 2,
+        explanation: "Recovery behaviours work best as support, not as another source of blame or an all-or-nothing project. A realistic anchor is more likely to be repeated."
       }
     ]
   },
@@ -116,10 +119,10 @@ export const insightLibrary: Insight[] = [
     id: 24,
     week: 1,
     track: "SelfEfficacy",
-    title: "Map your recovery signals",
-    subtitle: "Notice what increases concern and what builds confidence",
+    title: "Notice the thought–action loop",
+    subtitle: "How the meaning you give symptoms can influence what happens next",
     assetPath: "/insight/recovery-signals-week1.json",
-    quizQ: "Complete your recovery signals map.",
+    quizQ: "Complete your thought–action map.",
     quizA: "(user input)",
     releaseOffset: 3,
     points: 5
@@ -128,28 +131,35 @@ export const insightLibrary: Insight[] = [
     id: 25,
     week: 1,
     track: "PainScience",
-    title: "Movement as a recovery tool",
-    subtitle: "Find a manageable dose and build from there",
+    title: "Treatment creates an opportunity. Movement builds on it.",
+    subtitle: "Use improved comfort to rebuild function, confidence, and capacity",
     assetPath: "/insight/motion-lotion-summary.json", // Summary card with movement science content
-    quizQ: "A manageable amount of movement can support function and confidence for many people. (T/F)",
+    quizQ: "What helps turn improved comfort after treatment into longer-term progress?",
     quizA: "T",
     releaseOffset: 4,
     points: 5,
     questions: [
       {
-        question: "A manageable amount of movement can support function and confidence for many people. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0
+        question: "What helps turn improved comfort after treatment into longer-term progress?",
+        options: [
+          "Avoiding movement so the change is protected",
+          "Using the opportunity to move and gradually rebuild function",
+          "Waiting until every sensation has disappeared",
+          "Receiving the same treatment indefinitely"
+        ],
+        correctAnswer: 1,
+        explanation: "Hands-on care can reduce pain and make movement easier. Movement and activity then help rebuild strength, tolerance, confidence, and function."
       },
       {
-        question: "Which is the best starting point for movement during recovery?",
+        question: "Which is the clearest default message about movement for most MSK patients?",
         options: [
-          "The same exercise and dose for every person",
-          "A manageable activity matched to your current ability and plan",
-          "Only movement that produces absolutely no sensation",
-          "Maximum effort to test whether you are healed"
+          "Keep moving, start with what you can do, and build from there",
+          "Only perform movements selected by a practitioner",
+          "Do not move an area until it is completely pain-free",
+          "Use maximum effort to test whether the area has healed"
         ],
-        correctAnswer: 1
+        correctAnswer: 0,
+        explanation: "You do not need the perfect exercise to begin. Specific restrictions or a more precise plan are added when the condition, goals, or response require them."
       }
     ]
   },
@@ -178,13 +188,13 @@ export const insightLibrary: Insight[] = [
     points: 5
   },
 
-  // ========= WEEK 2 - UPDATED WITH REAL RESOURCES =========
+  // ========= WEEK 2 - APPLY THE RECOVERY MODEL =========
   {
     id: 30,
     week: 2,
     track: "PainScience",
-    title: "Understanding Your Pain",
-    subtitle: "Pain neuroscience basics to reframe pain safely",
+    title: "Understanding pain",
+    subtitle: "Retrieve the core model and apply it to a real symptom experience",
     assetPath: "https://vimeo.com/245179549", // Understanding Pain in less than 5 minutes - Vimeo (reliable embedding)
     quizQ: "Pain is always a sign of tissue damage. (T/F)",
     quizA: "F",
@@ -194,7 +204,8 @@ export const insightLibrary: Insight[] = [
       {
         question: "Pain is always a sign of tissue damage. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Pain can accompany tissue injury, but its intensity is not a precise damage meter. New, severe, or concerning symptoms still deserve appropriate assessment."
       },
       {
         question: "Which statement best describes pain?",
@@ -204,7 +215,8 @@ export const insightLibrary: Insight[] = [
           "It always tells you to stop all movement",
           "It is a sign of personal weakness"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Pain is real. The nervous system considers many sources of information when producing a protective experience."
       },
       {
         question: "Which information can contribute to a pain experience?",
@@ -214,7 +226,8 @@ export const insightLibrary: Insight[] = [
           "Biological, psychological, and social information in context",
           "Imaging results only"
         ],
-        correctAnswer: 2
+        correctAnswer: 2,
+        explanation: "Biological, psychological, and social factors can interact. This does not make pain imaginary or reduce it to one cause."
       }
     ]
   },
@@ -223,7 +236,7 @@ export const insightLibrary: Insight[] = [
     week: 2,
     track: "PainScience",
     title: "Why pain can vary",
-    subtitle: "Why symptoms can change even when tissue condition has not",
+    subtitle: "Use context and patterns to make sense of changing symptoms",
     assetPath: "/insight/pain-variability-summary.json",
     quizQ: "Changes in pain can be influenced by more than changes in tissue condition alone. (T/F)",
     quizA: "T",
@@ -233,7 +246,8 @@ export const insightLibrary: Insight[] = [
       {
         question: "Changes in pain can be influenced by more than changes in tissue condition alone. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 0,
+        explanation: "Symptoms can vary with activity, sensitivity, sleep, stress, context, expectations, health, and tissue information."
       },
       {
         question: "Which can influence a person's pain experience?",
@@ -243,7 +257,8 @@ export const insightLibrary: Insight[] = [
           "Context and expectations",
           "All of the above"
         ],
-        correctAnswer: 3
+        correctAnswer: 3,
+        explanation: "Looking at the whole context can reveal useful patterns without assuming that one factor explains everything."
       },
       {
         question: "Which is the most accurate response to persistent pain?",
@@ -253,7 +268,8 @@ export const insightLibrary: Insight[] = [
           "It always means new tissue damage",
           "It has one cause in every person"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Persistent pain is real and can involve interacting biological and psychosocial influences. Assessment and care should remain individualized."
       }
     ]
   },
@@ -261,8 +277,8 @@ export const insightLibrary: Insight[] = [
     id: 32,
     week: 2,
     track: "Lifestyle",
-    title: "Flare-Up Management",
-    subtitle: "Practical strategies for managing pain spikes",
+    title: "Use your flare-up plan",
+    subtitle: "Practise responding to a temporary symptom increase without panic or avoidance",
     assetPath: "/insight/flare-up-management-summary.json",
     quizQ: "A flare-up can happen without erasing all of your recovery progress. (T/F)",
     quizA: "T",
@@ -272,27 +288,30 @@ export const insightLibrary: Insight[] = [
       {
         question: "A flare-up can happen without erasing all of your recovery progress. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 0,
+        explanation: "A flare-up is information, not automatic proof that all progress has been lost. Check for anything new or concerning, then use the plan that fits the situation."
       },
       {
-        question: "What is the best first response to a flare-up?",
+        question: "A familiar symptom increases after a busier day, with no new concerning features. What is the most useful first response?",
         options: [
           "Panic and stop all activity",
-          "Stay calm and use your flare-up plan",
+          "Stay calm, review the context, and use your flare-up plan",
           "Push through the pain",
           "Ignore it completely"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "A planned response may include temporarily adjusting the dose, using helpful strategies, continuing manageable activity, and monitoring the response."
       },
       {
-        question: "A flare-up plan should include:",
+        question: "Which plan is least likely to turn a flare-up into prolonged avoidance?",
         options: [
-          "Only medication",
-          "Complete bed rest",
-          "Multiple self-management strategies",
-          "Ignoring symptoms"
+          "Stop every meaningful activity until all symptoms disappear",
+          "Use a flexible plan with manageable movement, recovery strategies, and clear reasons to seek help",
+          "Test the area repeatedly at maximum effort",
+          "Ignore new or concerning symptoms"
         ],
-        correctAnswer: 2
+        correctAnswer: 1,
+        explanation: "A useful flare-up plan supports safe participation and includes escalation guidance. It is neither complete avoidance nor blind persistence."
       }
     ]
   },
@@ -301,7 +320,7 @@ export const insightLibrary: Insight[] = [
     week: 2,
     track: "SelfEfficacy",
     title: "Recovery is rarely linear",
-    subtitle: "Measure the direction of recovery, not one difficult day",
+    subtitle: "Measure the direction of recovery rather than one difficult hour",
     assetPath: "/insight/recovery-not-linear-summary.json",
     quizQ: "A difficult day means that all previous recovery progress has been lost. (T/F)",
     quizA: "F",
@@ -311,7 +330,8 @@ export const insightLibrary: Insight[] = [
       {
         question: "A difficult day means that all previous recovery progress has been lost. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "A difficult day may be part of recovery. Compare broader trends and look for context before deciding what it means."
       },
       {
         question: "Which is a more useful way to judge recovery?",
@@ -321,7 +341,8 @@ export const insightLibrary: Insight[] = [
           "Expect symptoms to improve in a perfectly straight line",
           "Ignore every increase in symptoms"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Function, confidence, participation, capacity, and symptoms can each provide useful—but incomplete—information about progress."
       }
     ]
   },
@@ -329,8 +350,8 @@ export const insightLibrary: Insight[] = [
     id: 34,
     week: 2,
     track: "PainScience",
-    title: "Pacing Strategies",
-    subtitle: "Finding the right balance between rest and activity",
+    title: "Pacing without avoidance",
+    subtitle: "Build consistency while continuing to expand what you can do",
     assetPath: "/insight/pacing-strategies-summary.json", // Summary card with link to NHS pacing guide
     quizQ: "Pacing helps you plan a manageable amount of activity and recovery rather than repeatedly overdoing it. (T/F)",
     quizA: "T",
@@ -340,27 +361,30 @@ export const insightLibrary: Insight[] = [
       {
         question: "Pacing helps you plan a manageable amount of activity and recovery rather than repeatedly overdoing it. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 0,
+        explanation: "Pacing can reduce repeated overdoing and crashing. The longer-term goal is not permanent restriction; it is sustainable progression."
       },
       {
-        question: "What is the 'boom-bust cycle'?",
+        question: "Which example best describes a boom–bust cycle?",
         options: [
           "Doing too much on good days, then crashing",
           "Explosive workout routines",
           "Sudden loud noises",
           "A healthy recovery pattern"
         ],
-        correctAnswer: 0
+        correctAnswer: 0,
+        explanation: "Doing far more on a good day and then needing prolonged recovery can make activity less predictable and harder to progress."
       },
       {
-        question: "The goal of pacing is to:",
+        question: "A patient has found a manageable walking amount. What is the next purpose of pacing?",
         options: [
-          "Do as little as possible",
-          "Push through pain every day",
-          "Maintain consistent activity levels",
-          "Only move on pain-free days"
+          "Keep that amount unchanged forever",
+          "Gradually build capacity when the response supports it",
+          "Avoid walking on any symptomatic day",
+          "Double the amount immediately"
         ],
-        correctAnswer: 2
+        correctAnswer: 1,
+        explanation: "Pacing is a platform for progress. Once an activity is manageable, the dose can be adjusted gradually using the person's response and goals."
       }
     ]
   },
@@ -368,8 +392,8 @@ export const insightLibrary: Insight[] = [
     id: 35,
     week: 2,
     track: "SelfEfficacy",
-    title: "Sleep & Recovery",
-    subtitle: "How sleep can influence symptoms, energy, and participation",
+    title: "Run a sleep-support experiment",
+    subtitle: "Choose one realistic change and observe what it affects",
     assetPath: "/insight/sleep-recovery-summary.json", // Summary card with link to NHS guide
     quizQ: "Sleep and pain can influence one another. (T/F)",
     quizA: "T",
@@ -379,7 +403,8 @@ export const insightLibrary: Insight[] = [
       {
         question: "Sleep and pain can influence one another. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 0,
+        explanation: "The relationship can run both ways: symptoms may disrupt sleep, and difficult sleep may affect sensitivity, energy, mood, and coping."
       },
       {
         question: "Which statement about sleep duration is most accurate?",
@@ -389,17 +414,19 @@ export const insightLibrary: Insight[] = [
           "More sleep is always better",
           "Sleep duration never matters"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Sleep needs vary. General guidance is a starting point, not a pass–fail target or a reason to blame someone for symptoms."
       },
       {
-        question: "A difficult period of sleep may affect:",
+        question: "Which is the most useful first sleep experiment?",
         options: [
-          "Pain sensitivity, energy, and mood",
-          "Only bone strength",
-          "Everyone in exactly the same way",
-          "Nothing related to recovery"
+          "Change every part of the routine tonight",
+          "Choose one repeatable anchor, such as a consistent wake time, and observe the pattern",
+          "Stay in bed longer whenever sleep is difficult",
+          "Treat one poor night as failed recovery"
         ],
-        correctAnswer: 0
+        correctAnswer: 1,
+        explanation: "A small, repeatable experiment provides more useful information than an all-or-nothing overhaul. Persistent sleep problems may warrant individualized support."
       }
     ]
   },
@@ -407,33 +434,21 @@ export const insightLibrary: Insight[] = [
     id: 36,
     week: 2,
     track: "Recap",
-    title: "Weekly reflection",
-    subtitle: "Reflect on your week",
-    assetPath: "/insight/recap-week2.json",
-    quizQ: "What was your biggest learning this week?",
+    title: "Week 2 application check-in",
+    subtitle: "Explain the model in your own words and choose what to test next",
+    assetPath: "/insight/week2-application.json",
+    quizQ: "Complete your Week 2 application check-in.",
     quizA: "(user input)",
     releaseOffset: 6,
-    points: 5,
-    questions: [
-      {
-        question: "What was your biggest learning this week?",
-        options: [
-          "Understanding pain neuroscience",
-          "Flare-up management",
-          "Pacing strategies",
-          "Sleep importance"
-        ],
-        correctAnswer: 0
-      }
-    ]
+    points: 5
   },
 
-  // ========= WEEK 3 - UPDATED WITH REAL RESOURCES =========
+  // ========= WEEK 3 - BUILD CAPACITY IN DAILY LIFE =========
   {
     id: 37,
     week: 3,
     track: "PainScience",
-    title: "Nutrition for Recovery",
+    title: "Fuel recovery without chasing a perfect diet",
     subtitle: "Balanced eating to support health, energy, and participation",
     assetPath: "/insight/nutrition-summary.json", // Summary card with link to Harvard guide
     quizQ: "No single food is a treatment for pain. (T/F)",
@@ -444,7 +459,8 @@ export const insightLibrary: Insight[] = [
       {
         question: "No single food is a treatment for pain. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 0,
+        explanation: "Food supports overall health, energy, and participation. Claims that one food treats MSK pain usually oversimplify the evidence."
       },
       {
         question: "Which is the most useful general approach?",
@@ -454,7 +470,8 @@ export const insightLibrary: Insight[] = [
           "Treat one food as medicine for pain",
           "Judge foods only as good or bad"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "A sustainable pattern that fits the person is more useful than rigid food rules or moral labels."
       },
       {
         question: "When should nutrition advice be individualized by a qualified professional?",
@@ -464,7 +481,8 @@ export const insightLibrary: Insight[] = [
           "When health conditions, allergies, access, or eating concerns affect the plan",
           "Only after pain is gone"
         ],
-        correctAnswer: 2
+        correctAnswer: 2,
+        explanation: "Health conditions, allergies, food access, cultural needs, and eating concerns can all change what appropriate advice looks like."
       }
     ]
   },
@@ -472,8 +490,8 @@ export const insightLibrary: Insight[] = [
     id: 38,
     week: 3,
     track: "StressMood",
-    title: "Posture & Pain",
-    subtitle: "There is no single perfect posture",
+    title: "Posture is an option, not a verdict",
+    subtitle: "Use comfort, variety, and task demands instead of chasing one perfect position",
     assetPath: "/insight/posture-pain-summary.json",
     quizQ: "Poor posture alone causes chronic pain. (T/F)",
     quizA: "F",
@@ -483,17 +501,19 @@ export const insightLibrary: Insight[] = [
       {
         question: "Poor posture alone causes chronic pain. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Posture can affect comfort for some people, but no single posture explains chronic pain or protects everyone from injury."
       },
       {
-        question: "Which is a reasonable alternative to chasing one 'perfect posture'?",
+        question: "Your back feels uncomfortable after a long period at a desk. What is a useful response?",
         options: [
-          "Staying rigid",
-          "Movement variability",
-          "Never slouching",
-          "Sitting perfectly straight"
+          "Hold a rigid upright posture for the rest of the day",
+          "Change position, move briefly, and adjust the task as needed",
+          "Assume the posture damaged your spine",
+          "Avoid sitting permanently"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "The posture you are in may matter less than how long you stay there, the task demands, and your individual response."
       },
       {
         question: "Which statement is most accurate?",
@@ -503,7 +523,8 @@ export const insightLibrary: Insight[] = [
           "Rigid posture is always safest",
           "Slouching always causes injury"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Comfortable positions and regular variation are options—not strict rules that must be followed perfectly."
       }
     ]
   },
@@ -511,8 +532,8 @@ export const insightLibrary: Insight[] = [
     id: 39,
     week: 3,
     track: "Lifestyle",
-    title: "Return to Work Strategies",
-    subtitle: "Managing pain while returning to daily activities",
+    title: "Return to work and meaningful activity",
+    subtitle: "Match the starting point to the demands, then build participation",
     assetPath: "/insight/return-to-work-summary.json", // Summary card with link to clinical guide
     quizQ: "A return-to-work plan should consider the person, job demands, symptoms, risk, and available support. (T/F)",
     quizA: "T",
@@ -522,7 +543,8 @@ export const insightLibrary: Insight[] = [
       {
         question: "A return-to-work plan should consider the person, job demands, symptoms, risk, and available support. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 0,
+        explanation: "Return planning should consider the person, actual task demands, safety, symptoms, confidence, support, and opportunities for modification."
       },
       {
         question: "Which is often useful when it fits the person's situation?",
@@ -532,7 +554,8 @@ export const insightLibrary: Insight[] = [
           "Wait until 100% pain-free",
           "Push through severe pain"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Appropriate modification can support participation while capacity is rebuilt. The plan should be reviewed rather than treated as permanent."
       },
       {
         question: "Which statement is most accurate?",
@@ -542,7 +565,8 @@ export const insightLibrary: Insight[] = [
           "Work participation can be helpful, but safety and readiness are individualized",
           "Symptoms should always be ignored"
         ],
-        correctAnswer: 2
+        correctAnswer: 2,
+        explanation: "Neither immediate unrestricted return nor waiting for perfect comfort fits everyone. The plan should match safety and readiness."
       }
     ]
   },
@@ -550,7 +574,7 @@ export const insightLibrary: Insight[] = [
     id: 40,
     week: 3,
     track: "SelfEfficacy",
-    title: "Find your recovery evidence",
+    title: "Find evidence that capacity is changing",
     subtitle: "Notice small signs of capacity, confidence, and participation",
     assetPath: "/insight/recovery-evidence-week3.json",
     quizQ: "Complete your recovery evidence check-in.",
@@ -562,8 +586,8 @@ export const insightLibrary: Insight[] = [
     id: 41,
     week: 3,
     track: "PainScience",
-    title: "CBT skills for persistent pain",
-    subtitle: "How thoughts, actions, emotions, and symptoms can interact",
+    title: "Test a difficult recovery prediction",
+    subtitle: "Use a practical CBT skill to move from an automatic thought to a useful action",
     assetPath: "/insight/cbt-pain-summary.json",
     quizQ: "CBT for pain aims to improve coping and participation; it does not mean pain is imaginary. (T/F)",
     quizA: "T",
@@ -573,17 +597,19 @@ export const insightLibrary: Insight[] = [
       {
         question: "CBT for pain aims to improve coping and participation; it does not mean pain is imaginary. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 0,
+        explanation: "CBT skills address real thoughts, emotions, body responses, and actions. They do not claim that pain is imaginary."
       },
       {
-        question: "What does CBT focus on?",
+        question: "You notice the thought, 'If I move today, I will make everything worse.' What is the most useful next step?",
         options: [
-          "Only physical symptoms",
-          "Thoughts, emotions, and behaviors",
-          "Medication only",
-          "Ignoring pain"
+          "Treat the prediction as proven fact",
+          "Choose a safe, manageable movement test and observe what actually happens",
+          "Ignore every symptom and use maximum effort",
+          "Stop meaningful activity indefinitely"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "A behavioural experiment tests a prediction with an appropriate action. The goal is useful evidence—not proving that symptoms do not exist."
       },
       {
         question: "CBT for pain helps you:",
@@ -593,7 +619,8 @@ export const insightLibrary: Insight[] = [
           "Develop skills for responding to pain and supporting valued activity",
           "Avoid all activities"
         ],
-        correctAnswer: 2
+        correctAnswer: 2,
+        explanation: "The aim is greater flexibility, coping, and participation—not instant symptom elimination."
       }
     ]
   },
@@ -601,8 +628,8 @@ export const insightLibrary: Insight[] = [
     id: 42,
     week: 3,
     track: "SelfEfficacy",
-    title: "ACT for Chronic Pain",
-    subtitle: "Acceptance and Commitment Therapy principles",
+    title: "Act on what matters",
+    subtitle: "Choose one values-guided action without waiting for a perfect symptom day",
     assetPath: "/insight/act-therapy-summary.json", // Summary card with link to ACT manual
     quizQ: "ACT teaches acceptance of pain while living a valued life. (T/F)",
     quizA: "T",
@@ -612,7 +639,8 @@ export const insightLibrary: Insight[] = [
       {
         question: "ACT teaches acceptance of pain while living a valued life. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 0,
+        explanation: "Acceptance means making room for the present experience while still choosing useful action. It is not resignation or withdrawal of appropriate care."
       },
       {
         question: "What is a core principle of ACT?",
@@ -622,7 +650,8 @@ export const insightLibrary: Insight[] = [
           "Avoiding all discomfort",
           "Ignoring values"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Psychological flexibility means responding to the situation in a way that serves what matters, rather than automatically obeying every thought or feeling."
       },
       {
         question: "ACT encourages you to:",
@@ -632,7 +661,8 @@ export const insightLibrary: Insight[] = [
           "Wait until pain is gone to live",
           "Avoid anything difficult"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Values can guide a small, adaptable action today. The action can be modified to current capacity."
       }
     ]
   },
@@ -640,34 +670,22 @@ export const insightLibrary: Insight[] = [
     id: 43,
     week: 3,
     track: "Recap",
-    title: "Weekly reflection",
-    subtitle: "Reflect on your week",
-    assetPath: "/insight/recap-week3.json",
-    quizQ: "What was your biggest learning this week?",
+    title: "Week 3 capacity check-in",
+    subtitle: "Connect daily choices, thoughts, and meaningful activity to your recovery",
+    assetPath: "/insight/week3-capacity.json",
+    quizQ: "Complete your Week 3 capacity check-in.",
     quizA: "(user input)",
     releaseOffset: 6,
-    points: 5,
-    questions: [
-      {
-        question: "What was your biggest learning this week?",
-        options: [
-          "Nutrition for recovery",
-          "Posture myths",
-          "CBT and ACT principles",
-          "Return to work strategies"
-        ],
-        correctAnswer: 2
-      }
-    ]
+    points: 5
   },
 
-  // ========= WEEK 4 - UPDATED WITH REAL RESOURCES =========
+  // ========= WEEK 4 - PRACTISE REGULATION AND GRADED CAPACITY =========
   {
     id: 44,
     week: 4,
     track: "PainScience",
-    title: "Mindfulness attitudes",
-    subtitle: "An introduction to non-judgmental awareness",
+    title: "Practise noticing without immediately reacting",
+    subtitle: "Try mindfulness as an optional attention skill—not a test or a cure",
     assetPath: "https://www.youtube.com/watch?v=2n7FOBFMvXg", // Jon Kabat-Zinn discusses nine mindfulness attitudes
     quizQ: "Mindfulness may help some people relate differently to symptoms or distress, but results vary. (T/F)",
     quizA: "T",
@@ -677,7 +695,8 @@ export const insightLibrary: Insight[] = [
       {
         question: "Mindfulness may help some people relate differently to symptoms or distress, but results vary. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 0,
+        explanation: "Mindfulness is one optional way to practise attention and reduce automatic reactions. It is not a guaranteed pain treatment."
       },
       {
         question: "What is a key aspect of mindfulness practice?",
@@ -687,7 +706,8 @@ export const insightLibrary: Insight[] = [
           "Distraction",
           "Avoidance"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "The aim is to notice what is present with less automatic judgment—not to deny or ignore symptoms."
       },
       {
         question: "Which is a useful way to approach a mindfulness exercise?",
@@ -697,7 +717,8 @@ export const insightLibrary: Insight[] = [
           "Use it to prove pain is psychological",
           "Continue even if it feels unsafe or distressing"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Mindfulness should not be forced. A person can stop, modify the practice, or choose another skill if it feels unhelpful or distressing."
       }
     ]
   },
@@ -705,8 +726,8 @@ export const insightLibrary: Insight[] = [
     id: 45,
     week: 4,
     track: "SelfEfficacy",
-    title: "Building confidence with movement",
-    subtitle: "Use manageable practice to expand what feels possible",
+    title: "Build confidence through practice",
+    subtitle: "Start with a meaningful, manageable challenge and expand from there",
     assetPath: "/insight/movement-confidence-summary.json",
     quizQ: "A graded approach starts with a manageable challenge and adjusts using your response. (T/F)",
     quizA: "T",
@@ -716,7 +737,8 @@ export const insightLibrary: Insight[] = [
       {
         question: "A graded approach starts with a manageable challenge and adjusts using your response. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 0,
+        explanation: "Graded practice begins at an achievable level and changes using goals, response, safety, and current capacity."
       },
       {
         question: "What is the purpose of graded movement practice?",
@@ -726,7 +748,8 @@ export const insightLibrary: Insight[] = [
           "Avoid the activity permanently",
           "Reach maximum effort immediately"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "The purpose is to build function, tolerance, and confidence—not to prove symptoms are imaginary."
       },
       {
         question: "What should guide the next step?",
@@ -736,7 +759,8 @@ export const insightLibrary: Insight[] = [
           "Whether another patient progressed faster",
           "The belief that pain must always be ignored"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Progression should be responsive rather than automatic. Comparison with another patient is not a useful dosing rule."
       }
     ]
   },
@@ -744,8 +768,8 @@ export const insightLibrary: Insight[] = [
     id: 46,
     week: 4,
     track: "Lifestyle",
-    title: "Movement Variability",
-    subtitle: "Why changing positions matters",
+    title: "Use movement variety as an option",
+    subtitle: "Change position or strategy when it improves comfort, access, or task tolerance",
     assetPath: "/insight/movement-variability-summary.json", // Summary card with link to Physiopedia guide
     quizQ: "Changing position can be a comfort option, but there is no single perfect posture schedule. (T/F)",
     quizA: "T",
@@ -755,7 +779,8 @@ export const insightLibrary: Insight[] = [
       {
         question: "Changing position can be a comfort option, but there is no single perfect posture schedule. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 0,
+        explanation: "Position changes can be useful, but they are options—not another perfect schedule patients must follow."
       },
       {
         question: "Why might someone choose movement variability?",
@@ -765,7 +790,8 @@ export const insightLibrary: Insight[] = [
           "It causes more pain",
           "It guarantees pain relief"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Variation may change comfort or task demands. It does not guarantee relief or mean a previous position was damaging."
       },
       {
         question: "Which statement is most accurate?",
@@ -775,7 +801,8 @@ export const insightLibrary: Insight[] = [
           "Complete stillness is always safest",
           "Maximum slouching is required"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Many positions and movement strategies can be acceptable. The useful choice depends on the task and the person."
       }
     ]
   },
@@ -783,8 +810,8 @@ export const insightLibrary: Insight[] = [
     id: 47,
     week: 4,
     track: "SelfEfficacy",
-    title: "Plan a graded return",
-    subtitle: "Break one meaningful activity into manageable steps",
+    title: "Build a graded return ladder",
+    subtitle: "Turn one meaningful activity into a series of achievable steps",
     assetPath: "/insight/graded-return-plan.json",
     quizQ: "Complete your graded return plan.",
     quizA: "(user input)",
@@ -795,8 +822,8 @@ export const insightLibrary: Insight[] = [
     id: 48,
     week: 4,
     track: "PainScience",
-    title: "Pain and Emotions",
-    subtitle: "The bidirectional relationship",
+    title: "Name the emotion, then choose the action",
+    subtitle: "Pain and emotional well-being can affect one another without making pain imaginary",
     assetPath: "/insight/pain-emotions-summary.json", // Summary card with link to MedlinePlus
     quizQ: "Emotions can influence pain perception. (T/F)",
     quizA: "T",
@@ -806,17 +833,19 @@ export const insightLibrary: Insight[] = [
       {
         question: "Emotions can influence pain perception. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 0,
+        explanation: "Pain can affect mood and distress, while emotional state can influence symptoms, coping, attention, and participation."
       },
       {
-        question: "Which emotion is most commonly linked to increased pain?",
+        question: "A patient feels anxious after a symptom increase. Which response is most useful?",
         options: [
-          "Joy",
-          "Anxiety",
-          "Curiosity",
-          "Excitement"
+          "Treat the anxiety as proof of new damage",
+          "Name the feeling, check for concerning changes, and choose one manageable next action",
+          "Force the feeling to disappear before moving",
+          "Ignore both the symptom and the emotion"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Naming an emotion can create space to check the situation and choose a response. Persistent or worsening distress deserves appropriate support."
       },
       {
         question: "The relationship between pain and emotions is:",
@@ -826,7 +855,8 @@ export const insightLibrary: Insight[] = [
           "Bidirectional (they affect each other)",
           "Random"
         ],
-        correctAnswer: 2
+        correctAnswer: 2,
+        explanation: "The relationship can run in both directions. This supports whole-person care; it does not reduce pain to emotion."
       }
     ]
   },
@@ -834,8 +864,8 @@ export const insightLibrary: Insight[] = [
     id: 49,
     week: 4,
     track: "SelfEfficacy",
-    title: "Finding the right movement dose",
-    subtitle: "Balance control, capacity, confidence, and your goals",
+    title: "Adjust the movement dose",
+    subtitle: "Use function, confidence, symptoms, and recovery to decide what comes next",
     assetPath: "/insight/movement-quality-summary.json", // Summary card replacement
     quizQ: "Movement choices should consider both how an activity is performed and whether the dose fits the person. (T/F)",
     quizA: "T",
@@ -845,27 +875,30 @@ export const insightLibrary: Insight[] = [
       {
         question: "Movement choices should consider both how an activity is performed and whether the dose fits the person. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 0,
+        explanation: "Technique may matter for a task, but dose, goals, confidence, current capacity, and recovery also shape whether movement is useful."
       },
       {
-        question: "What defines movement quality?",
+        question: "After an exercise, symptoms settle normally and the activity feels more confident. What is a reasonable next step?",
         options: [
-          "Speed only",
-          "How much it hurts",
-          "Control, awareness, and intention",
-          "Doing as many reps as possible"
+          "Increase every variable at once",
+          "Keep or gradually progress one part of the dose",
+          "Stop permanently because symptoms were present",
+          "Repeat at maximum effort to prove recovery"
         ],
-        correctAnswer: 2
+        correctAnswer: 1,
+        explanation: "A small progression can provide useful information while keeping the response interpretable."
       },
       {
-        question: "High-quality movement emphasizes:",
+        question: "Which response suggests the dose may need review?",
         options: [
-          "Maximum weight",
-          "Pain tolerance",
-          "Proper form and control",
-          "Speed and intensity"
+          "The task is meaningful",
+          "The person feels appropriately challenged",
+          "Function or recovery is repeatedly worse beyond the expected response",
+          "The exercise can be adapted"
         ],
-        correctAnswer: 2
+        correctAnswer: 2,
+        explanation: "Repeated difficulty recovering or loss of function may signal that the dose, strategy, or plan should be adjusted—not that all movement must stop."
       }
     ]
   },
@@ -873,51 +906,66 @@ export const insightLibrary: Insight[] = [
     id: 50,
     week: 4,
     track: "Recap",
-    title: "Weekly reflection",
-    subtitle: "Reflect on your week",
-    assetPath: "/insight/recap-week4.json",
-    quizQ: "What was your biggest learning this week?",
+    title: "Week 4 graded-capacity check-in",
+    subtitle: "Review what you noticed, practised, and learned from the response",
+    assetPath: "/insight/week4-graded-capacity.json",
+    quizQ: "Complete your Week 4 graded-capacity check-in.",
     quizA: "(user input)",
     releaseOffset: 6,
-    points: 5,
-    questions: [
-      {
-        question: "What was your biggest learning this week?",
-        options: [
-          "Mindfulness techniques",
-          "Movement variability",
-          "Pain-emotion connection",
-          "Movement quality"
-        ],
-        correctAnswer: 3
-      }
-    ]
+    points: 5
   },
 
-  // WEEK 5 (Keep existing Week 5 content - mostly good)
+  // ========= WEEK 5 - STRENGTHEN SELF-MANAGEMENT =========
   {
     id: 51,
     week: 5,
     track: "PainScience",
-    title: "Pain and learned associations",
-    subtitle: "How context, memory, and experience can influence protection",
+    title: "Update learned protection",
+    subtitle: "Use new, manageable experiences to build a broader picture of what is possible",
     assetPath: "/insight/neurotags-summary.json", // Summary card with link to NOI Group guide
     quizQ: "Pain is influenced by many factors, including context and past experience. (T/F)",
     quizA: "T",
     releaseOffset: 0,
-    points: 5
+    points: 5,
+    questions: [
+      {
+        question: "Pain is influenced by many factors, including context and past experience. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0,
+        explanation: "Past experience and context can influence protection without making pain imagined. New experiences can add information over time."
+      },
+      {
+        question: "An activity feels threatening because it previously triggered symptoms. What is a useful way to build new evidence?",
+        options: [
+          "Avoid it forever",
+          "Choose an appropriate starting point, practise it, and review the response",
+          "Perform it at maximum intensity immediately",
+          "Assume the memory is the only cause of pain"
+        ],
+        correctAnswer: 1,
+        explanation: "A manageable, meaningful experience can provide new information. Safety and clinical restrictions still matter when present."
+      }
+    ]
   },
   {
     id: 52,
     week: 5,
     track: "StressMood",
-    title: "A brief gratitude practice",
+    title: "Try a brief gratitude practice",
     subtitle: "Notice something meaningful without dismissing what is difficult",
     assetPath: "/insight/gratitude-summary.json", // Summary card replacement
     quizQ: "Gratitude can coexist with pain and difficult emotions. (T/F)",
     quizA: "T",
     releaseOffset: 1,
-    points: 5
+    points: 5,
+    questions: [
+      {
+        question: "Gratitude can coexist with pain and difficult emotions. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0,
+        explanation: "Gratitude does not require forced positivity or denial. It is an optional attention practice, not a pain treatment or test of attitude."
+      }
+    ]
   },
   {
     id: 53,
@@ -929,7 +977,26 @@ export const insightLibrary: Insight[] = [
     quizQ: "Caffeine timing affects everyone in exactly the same way. (T/F)",
     quizA: "F",
     releaseOffset: 2,
-    points: 5
+    points: 5,
+    questions: [
+      {
+        question: "Caffeine timing affects everyone in exactly the same way. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 1,
+        explanation: "Sensitivity varies. Timing, amount, medications, pregnancy, health, and routine can all matter."
+      },
+      {
+        question: "How can you learn whether caffeine timing affects your sleep?",
+        options: [
+          "Remove every possible sleep influence at once",
+          "Move the last caffeine earlier for several days and observe the pattern",
+          "Judge the result after one night",
+          "Assume caffeine never matters if you can fall asleep"
+        ],
+        correctAnswer: 1,
+        explanation: "Changing one variable for several days makes the result easier to interpret and avoids an all-or-nothing overhaul."
+      }
+    ]
   },
   {
     id: 54,
@@ -947,20 +1014,39 @@ export const insightLibrary: Insight[] = [
     id: 55,
     week: 5,
     track: "PainScience",
-    title: "Making sense of pain and movement",
-    subtitle: "Build confidence with an individualized, gradual approach",
-    assetPath: "https://www.tamethebeast.org/",
-    quizQ: "Pain does not provide a precise measure of tissue damage, but new or concerning symptoms still deserve assessment. (T/F)",
+    title: "Keep going, modify, or seek support?",
+    subtitle: "Use the situation—not fear or stubbornness—to choose the next response",
+    assetPath: "/insight/response-decision-summary.json",
+    quizQ: "A useful recovery plan includes reasons to continue, modify, and seek support. (T/F)",
     quizA: "T",
     releaseOffset: 4,
-    points: 5
+    points: 5,
+    questions: [
+      {
+        question: "A useful recovery plan includes reasons to continue, modify, and seek support. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0,
+        explanation: "Self-management is not ignoring symptoms. It includes responding proportionately and knowing when reassessment is appropriate."
+      },
+      {
+        question: "A familiar activity causes a mild, expected response that settles as planned. What is usually the most useful interpretation?",
+        options: [
+          "All activity must stop",
+          "The response can be monitored while the plan continues or is adjusted as needed",
+          "The activity must be doubled immediately",
+          "Symptoms should never be considered"
+        ],
+        correctAnswer: 1,
+        explanation: "Expected responses can be monitored in context. New, severe, progressive, or concerning symptoms should be assessed rather than forced through."
+      }
+    ]
   },
   {
     id: 56,
     week: 5,
     track: "SelfEfficacy",
-    title: "Sleep wind-down checklist",
-    subtitle: "CBT-I starter",
+    title: "Build a realistic wind-down",
+    subtitle: "Choose one or two sleep-supporting options and test them consistently",
     assetPath: "/insight/sleep-winddown.json",
     quizQ: "What is one item on your sleep wind-down checklist?",
     quizA: "(user input)",
@@ -971,22 +1057,22 @@ export const insightLibrary: Insight[] = [
     id: 57,
     week: 5,
     track: "Recap",
-    title: "Weekly reflection",
-    subtitle: "Reflect on your week",
-    assetPath: "/insight/recap-week5.json",
-    quizQ: "What was your biggest learning this week?",
+    title: "Week 5 self-management check-in",
+    subtitle: "Decide what you can manage, what you may modify, and when support is useful",
+    assetPath: "/insight/week5-self-management.json",
+    quizQ: "Complete your Week 5 self-management check-in.",
     quizA: "(user input)",
     releaseOffset: 6,
     points: 5
   },
 
-  // WEEK 6 - UPDATED WITH REAL RESOURCES
+  // ========= WEEK 6 - PREPARE FOR SETBACKS AND REAL-WORLD CHANGE =========
   {
     id: 58,
     week: 6,
     track: "PainScience",
-    title: "Sticky thoughts vs. sticky tissues",
-    subtitle: "Catastrophising",
+    title: "Unhook from a worst-case prediction",
+    subtitle: "Create distance from a threatening thought, then choose the next useful action",
     assetPath: "https://www.youtube.com/watch?v=OhNm7ZSiZls", // Russ Harris - Cognitive Defusion for Pain Management
     quizQ: "Threat-focused thoughts can influence distress and behaviour without making pain imaginary. (T/F)",
     quizA: "T",
@@ -996,27 +1082,30 @@ export const insightLibrary: Insight[] = [
       {
         question: "Threat-focused thoughts can influence distress and behaviour without making pain imaginary. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 0,
+        explanation: "Threat-focused thoughts can affect distress, confidence, and behaviour. That interaction does not make pain imagined or make the thought a personal failure."
       },
       {
-        question: "Pain catastrophizing involves:",
+        question: "Which example is a worst-case recovery prediction?",
         options: [
-          "Realistic thinking",
-          "Magnifying pain threats",
-          "Ignoring pain",
-          "Accepting pain"
+          "This is difficult, so I will review the response and adjust if needed",
+          "This sensation proves I have ruined everything and will never recover",
+          "I am unsure what this means, so I will seek appropriate advice",
+          "I can try a smaller step"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Worst-case predictions often sound certain, global, and permanent. Naming the thought can create room to examine it."
       },
       {
-        question: "To reduce catastrophizing, you should:",
+        question: "After noticing a worst-case thought, what is a useful next step?",
         options: [
-          "Focus only on worst-case scenarios",
-          "Challenge unhelpful thoughts",
-          "Avoid thinking about pain",
-          "Blame yourself"
+          "Argue with yourself until the thought disappears",
+          "Name it as a thought, check the evidence and context, then choose a proportionate action",
+          "Assume every concern is false",
+          "Blame yourself for reacting"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "The goal is not forced positivity. It is enough distance to choose an action based on the situation, your plan, and what matters."
       }
     ]
   },
@@ -1024,8 +1113,8 @@ export const insightLibrary: Insight[] = [
     id: 59,
     week: 6,
     track: "StressMood",
-    title: "Stress-breath connection",
-    subtitle: "Box breathing basics",
+    title: "Choose a regulation skill that fits",
+    subtitle: "Try comfortable paced breathing—or use another grounding strategy",
     assetPath: "https://www.youtube.com/watch?v=HhUoQ6gx6kE", // Kitaro Waga - How breathing affects the nervous system (science-based)
     quizQ: "A paced-breathing exercise may feel calming for some people, but it is optional and effects vary. (T/F)",
     quizA: "T",
@@ -1035,17 +1124,19 @@ export const insightLibrary: Insight[] = [
       {
         question: "A paced-breathing exercise may feel calming for some people, but it is optional and effects vary. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 0
+        correctAnswer: 0,
+        explanation: "Paced breathing is one optional regulation skill. Some people prefer movement, grounding, music, social support, or another approach."
       },
       {
-        question: "Box breathing involves equal counts for:",
+        question: "What is the purpose of trying a regulation skill during recovery?",
         options: [
-          "Inhale only",
-          "Exhale only",
-          "Inhale, hold, exhale, hold",
-          "Random breathing"
+          "Guarantee that symptoms disappear",
+          "Create enough steadiness to choose the next useful action",
+          "Prove that pain is caused by stress",
+          "Avoid every difficult activity"
         ],
-        correctAnswer: 2
+        correctAnswer: 1,
+        explanation: "Regulation skills can support decision-making and participation even when symptoms do not immediately change."
       },
       {
         question: "What should you do if paced breathing makes you dizzy or uncomfortable?",
@@ -1055,7 +1146,8 @@ export const insightLibrary: Insight[] = [
           "Stop or return to comfortable breathing",
           "Assume it proves something is wrong"
         ],
-        correctAnswer: 2
+        correctAnswer: 2,
+        explanation: "Breathing should remain comfortable. Stop or change the exercise if it causes dizziness, distress, or discomfort."
       }
     ]
   },
@@ -1063,20 +1155,39 @@ export const insightLibrary: Insight[] = [
     id: 60,
     week: 6,
     track: "Lifestyle",
-    title: "Hydration and recovery habits",
-    subtitle: "Use thirst, routine, activity, and conditions as practical guides",
+    title: "Make hydration easier to repeat",
+    subtitle: "Connect a realistic hydration cue to your existing routine",
     assetPath: "/insight/hydration-fascia.json",
     quizQ: "Hydration needs can change with activity, heat, health, and individual circumstances. (T/F)",
     quizA: "T",
     releaseOffset: 2,
-    points: 5
+    points: 5,
+    questions: [
+      {
+        question: "Hydration needs can change with activity, heat, health, and individual circumstances. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0,
+        explanation: "There is no single intake target that fits every person and situation. Health conditions can also change appropriate advice."
+      },
+      {
+        question: "Which approach is most likely to make hydration easier to repeat?",
+        options: [
+          "Wait until the end of every day and catch up all at once",
+          "Connect drinking to an existing cue such as meals, medication, or an activity break",
+          "Treat one missed target as failed recovery",
+          "Use the same amount in every climate and circumstance"
+        ],
+        correctAnswer: 1,
+        explanation: "A visible cue linked to an existing routine can reduce reliance on memory without turning hydration into another perfection rule."
+      }
+    ]
   },
   {
     id: 61,
     week: 6,
     track: "SelfEfficacy",
-    title: "Prepare for setbacks",
-    subtitle: "Decide what you will do when symptoms temporarily increase",
+    title: "Rehearse your setback response",
+    subtitle: "Decide what you will do before a difficult day makes decisions harder",
     assetPath: "/insight/setback-plan.json",
     quizQ: "Complete your setback plan.",
     quizA: "(user input)",
@@ -1087,20 +1198,39 @@ export const insightLibrary: Insight[] = [
     id: 62,
     week: 6,
     track: "PainScience",
-    title: "Protectometer",
-    subtitle: "Finding safety cues",
+    title: "Review protection in context",
+    subtitle: "Separate familiar recovery challenges from changes that need assessment",
     assetPath: "/insight/protectometer.json",
     quizQ: "The protectometer helps identify safety vs. danger signals. (T/F)",
     quizA: "T",
     releaseOffset: 4,
-    points: 5
+    points: 5,
+    questions: [
+      {
+        question: "Context can influence protection, but a checklist cannot determine by itself whether a symptom is safe or dangerous. (True/False)",
+        options: ["True", "False"],
+        correctAnswer: 0,
+        explanation: "Context provides useful information, but new, severe, progressive, unusual, or concerning symptoms still deserve appropriate assessment."
+      },
+      {
+        question: "Which question adds useful context without dismissing symptoms?",
+        options: [
+          "How much does it hurt—nothing else matters",
+          "What changed, what was the task, how did I respond, and is this pattern familiar?",
+          "Can I prove that this is safe by pushing harder?",
+          "Can I ignore it until it disappears?"
+        ],
+        correctAnswer: 1,
+        explanation: "A broader context check supports proportionate decisions while leaving room for clinical assessment when needed."
+      }
+    ]
   },
   {
     id: 63,
     week: 6,
     track: "SelfEfficacy",
-    title: "Goal ladder mini-tool",
-    subtitle: "Break big steps down",
+    title: "Build the next rung",
+    subtitle: "Break a meaningful goal into a step you can practise and review",
     assetPath: "/insight/goal-ladder.json",
     quizQ: "What is one small step toward your recovery goal?",
     quizA: "(user input)",
@@ -1111,8 +1241,8 @@ export const insightLibrary: Insight[] = [
     id: 64,
     week: 6,
     track: "DeepDive",
-    title: "Putting the Framework together",
-    subtitle: "Connect the recovery tools that matter most to you",
+    title: "Rehearse your complete recovery plan",
+    subtitle: "Connect symptoms, stress, foundations, movement, support, and meaningful activity",
     assetPath: "/insight/framework-integration-week6.json",
     quizQ: "Complete your Framework integration plan.",
     quizA: "(user input)",
@@ -1120,14 +1250,14 @@ export const insightLibrary: Insight[] = [
     points: 5
   },
 
-  // --- Week 7: Consolidate, personalize, and continue ---
+  // ========= WEEK 7 - CONSOLIDATE, PERSONALIZE, AND CONTINUE =========
   {
     id: 65,
     week: 7,
     track: "PainScience",
-    title: "Self-management is a skill",
-    subtitle: "Build confidence through practice, problem-solving, and partnership",
-    assetPath: "https://www.iasp-pain.org/resources/fact-sheets/promoting-chronic-pain-self-management-education/",
+    title: "Self-management includes knowing when to ask for help",
+    subtitle: "Use your tools independently while keeping appropriate care available",
+    assetPath: "/insight/self-management-partnership.json",
     quizQ: "Self-management means managing recovery entirely without professional support. (T/F)",
     quizA: "F",
     releaseOffset: 0,
@@ -1136,7 +1266,8 @@ export const insightLibrary: Insight[] = [
       {
         question: "Self-management means managing recovery entirely without professional support. (True/False)",
         options: ["True", "False"],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Self-management means taking an active role. It can include professional guidance, reassessment, and shared decisions when appropriate."
       },
       {
         question: "Which is a core self-management skill?",
@@ -1146,7 +1277,8 @@ export const insightLibrary: Insight[] = [
           "Ignoring changes in symptoms",
           "Following the same plan regardless of context"
         ],
-        correctAnswer: 1
+        correctAnswer: 1,
+        explanation: "Problem-solving helps adapt the plan when symptoms, goals, health, work, or life circumstances change."
       }
     ]
   },
@@ -1154,7 +1286,7 @@ export const insightLibrary: Insight[] = [
     id: 66,
     week: 7,
     track: "SelfEfficacy",
-    title: "Prepare for a shared decision",
+    title: "Prepare for the next clinical conversation",
     subtitle: "Bring your priorities, questions, and preferences into the conversation",
     assetPath: "/insight/shared-decision-plan.json",
     quizQ: "Complete your shared decision plan.",
@@ -1166,7 +1298,7 @@ export const insightLibrary: Insight[] = [
     id: 67,
     week: 7,
     track: "SelfEfficacy",
-    title: "Review your recovery evidence",
+    title: "Compare where you started with where you are now",
     subtitle: "Compare what matters now with where you started",
     assetPath: "/insight/progress-review-week7.json",
     quizQ: "Complete your progress review.",
@@ -1178,7 +1310,7 @@ export const insightLibrary: Insight[] = [
     id: 68,
     week: 7,
     track: "SelfEfficacy",
-    title: "Build your personal toolkit",
+    title: "Match your tools to the situation",
     subtitle: "Choose the strategies that fit different situations",
     assetPath: "/insight/recovery-toolkit-plan.json",
     quizQ: "Complete your personal recovery toolkit.",
@@ -1190,7 +1322,7 @@ export const insightLibrary: Insight[] = [
     id: 69,
     week: 7,
     track: "SelfEfficacy",
-    title: "Choose your next meaningful goal",
+    title: "Choose the next meaningful direction",
     subtitle: "Connect one realistic step to an activity that matters to you",
     assetPath: "/insight/next-goal-plan.json",
     quizQ: "Complete your next-goal plan.",
@@ -1202,7 +1334,7 @@ export const insightLibrary: Insight[] = [
     id: 70,
     week: 7,
     track: "Lifestyle",
-    title: "Create your maintenance plan",
+    title: "Create a flexible maintenance plan",
     subtitle: "Decide what to continue, monitor, and adjust",
     assetPath: "/insight/maintenance-plan.json",
     quizQ: "Complete your maintenance plan.",
@@ -1214,10 +1346,10 @@ export const insightLibrary: Insight[] = [
     id: 71,
     week: 7,
     track: "Recap",
-    title: "Your seven-week review",
-    subtitle: "Recognize what changed and decide what comes next",
-    assetPath: "/insight/week7-reflection.json",
-    quizQ: "Complete your seven-week review.",
+    title: "Create your recovery handoff",
+    subtitle: "Summarize what you understand, what remains difficult, and what support comes next",
+    assetPath: "/insight/week7-clinician-handoff.json",
+    quizQ: "Complete your recovery handoff.",
     quizA: "(user input)",
     releaseOffset: 6,
     points: 5
