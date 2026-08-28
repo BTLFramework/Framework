@@ -3,8 +3,9 @@
 import { ExternalLink, Award } from "lucide-react";
 import { useEffect, useState } from "react";
 import { BUILD_TAG } from "@/lib/buildInfo";
+import InsightLessonCarousel from "./InsightLessonCarousel";
 
-interface SummarySlide {
+export interface SummarySlide {
   id: number;
   title: string;
   content: string;
@@ -14,14 +15,14 @@ interface SummarySlide {
   resourceLabel?: string;
 }
 
-interface SummaryData {
+export interface SummaryData {
   slides: SummarySlide[];
   timeMinutes?: number;
   level?: string;
   why?: string;
   sectionTitle?: string;
   sectionIntro?: string;
-  presentation?: "complete";
+  presentation?: "complete" | "carousel";
   takeaway?: string;
 }
 
@@ -52,6 +53,10 @@ export default function InsightSummaryCard({ assetPath }: { assetPath: string })
   }
   if (error || !data?.slides?.length) {
     return <div className="flex justify-center items-center h-32 text-gray-500">No summary available</div>;
+  }
+
+  if (data.presentation === "carousel") {
+    return <InsightLessonCarousel key={assetPath} data={data} />;
   }
 
   // Meta and helper fields

@@ -49,7 +49,7 @@ test('revised summary cards opt into complete content, including later tiles and
   assert.equal(summaries.length, 7)
   for (const lesson of summaries) {
     const data = readAsset(lesson)
-    assert.equal(data.presentation, 'complete', lesson.title)
+    assert.equal(data.presentation, lesson.id === 31 ? 'carousel' : 'complete', lesson.title)
     assert.ok(data.takeaway.length > 30)
     assert.ok(data.slides.length >= 5)
     assert.equal(new Set(data.slides.map(slide => slide.id)).size, data.slides.length)
