@@ -1,5 +1,5 @@
 {
-  "presentation": "complete",
+  "presentation": "carousel",
   "takeaway": "Keep moving, start with what you can do, and build from there. We'll continue building your toolbox.",
   "timeMinutes": 4,
   "level": "Beginner",
@@ -51,5 +51,6 @@
   "autoplay": false,
   "interval": 5000,
   "showDots": true,
-  "showArrows": true
+  "showArrows": true,
+  "title": "Why we keep you moving"
 }

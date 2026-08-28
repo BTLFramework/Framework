@@ -3,14 +3,48 @@
   "level": "Beginner",
   "why": "Pain can affect thoughts, emotions, and actions—and those responses can affect participation and distress. CBT skills help you notice that cycle and choose a more useful response.",
   "slides": [
-    {"id": 1, "title": "Pain Is Real", "content": "Using a psychological skill does not mean pain is imaginary. Persistent symptoms affect the whole person, and whole-person care can include cognitive and behavioural tools.", "backgroundColor": "#f0f9ff", "textColor": "#075985"},
-    {"id": 2, "title": "Notice the Cycle", "content": "A symptom may trigger a thought, emotion, body response, and action. For example: pain, then fear, then bracing or avoidance, then less confidence.", "backgroundColor": "#e0f2fe", "textColor": "#0c4a6e"},
-    {"id": 3, "title": "Check the Thought", "content": "Ask whether the thought is a fact, a prediction, or one possible interpretation. Look for a response that is accurate without dismissing the difficulty.", "backgroundColor": "#bae6fd", "textColor": "#075985"},
-    {"id": 4, "title": "Choose a Useful Action", "content": "A useful action might be adjusting the task, using a coping strategy, asking for support, or completing a manageable part of the activity.", "backgroundColor": "#dbeafe", "textColor": "#1e40af"},
-    {"id": 5, "title": "Try It Once", "content": "Write one difficult thought from this week. Then write a more balanced statement and one action that supports your goals.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://painbc.ca/sites/default/files/2025-10/PBC%20Factsheet%20-%20Mental%20Health%20and%20Pain%20-%20Final.pdf", "resourceLabel": "Pain BC: mental health and persistent pain"}
+    {
+      "id": 1,
+      "title": "Pain Is Real",
+      "content": "Using a psychological skill does not mean pain is imaginary. Persistent symptoms affect the whole person, and whole-person care can include cognitive and behavioural tools.",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#075985"
+    },
+    {
+      "id": 2,
+      "title": "Notice the Cycle",
+      "content": "A symptom may trigger a thought, emotion, body response, and action. For example: pain, then fear, then bracing or avoidance, then less confidence.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#0c4a6e"
+    },
+    {
+      "id": 3,
+      "title": "Check the Thought",
+      "content": "Ask whether the thought is a fact, a prediction, or one possible interpretation. Look for a response that is accurate without dismissing the difficulty.",
+      "backgroundColor": "#bae6fd",
+      "textColor": "#075985"
+    },
+    {
+      "id": 4,
+      "title": "Choose a Useful Action",
+      "content": "A useful action might be adjusting the task, using a coping strategy, asking for support, or completing a manageable part of the activity.",
+      "backgroundColor": "#dbeafe",
+      "textColor": "#1e40af"
+    },
+    {
+      "id": 5,
+      "title": "Try It Once",
+      "content": "Write one difficult thought from this week. Then write a more balanced statement and one action that supports your goals.",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://painbc.ca/sites/default/files/2025-10/PBC%20Factsheet%20-%20Mental%20Health%20and%20Pain%20-%20Final.pdf",
+      "resourceLabel": "Pain BC: mental health and persistent pain"
+    }
   ],
   "autoplay": false,
   "interval": 5000,
   "showDots": true,
-  "showArrows": true
+  "showArrows": true,
+  "presentation": "carousel",
+  "title": "Test a difficult recovery prediction"
 }

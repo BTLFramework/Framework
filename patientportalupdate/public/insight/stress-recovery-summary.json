@@ -1,5 +1,5 @@
 {
-  "presentation": "complete",
+  "presentation": "carousel",
   "takeaway": "You don't need a stress-free life. Start with one tool that fits, notice what it helps with, and build from there.",
   "timeMinutes": 4,
   "level": "Beginner",
@@ -53,5 +53,6 @@
   "autoplay": false,
   "interval": 5000,
   "showDots": true,
-  "showArrows": true
+  "showArrows": true,
+  "title": "When stress adds to the picture"
 }

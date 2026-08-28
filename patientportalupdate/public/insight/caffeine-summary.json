@@ -3,15 +3,55 @@
   "level": "Beginner",
   "why": "Caffeine can make it harder to fall asleep or sleep well, but sensitivity, dose, timing, medications, pregnancy, and health conditions all matter.",
   "slides": [
-    { "id": 1, "title": "Timing Is Personal", "content": "Caffeine can remain active for hours. An afternoon cutoff may help, but there is no single clock time that fits everyone.", "backgroundColor": "#fef9c3", "textColor": "#854d0e" },
-    { "id": 2, "title": "Notice Dose and Timing", "content": "Coffee, tea, energy drinks, some soft drinks, chocolate, supplements, and medications may contain caffeine.", "backgroundColor": "#fde68a", "textColor": "#92400e" },
-    { "id": 3, "title": "Protect the Wind-Down", "content": "If sleep is difficult, try moving your last caffeine earlier or reducing the amount rather than chasing one perfect rule.", "backgroundColor": "#ffedd5", "textColor": "#9a3412" },
-    { "id": 4, "title": "Look for Your Pattern", "content": "Track caffeine timing alongside how long it takes to fall asleep, nighttime waking, and how rested you feel.", "backgroundColor": "#e0f2fe", "textColor": "#075985" },
-    { "id": 6, "title": "Avoid Absolutes", "content": "Feeling able to fall asleep does not tell the whole story, but one caffeinated drink does not guarantee a poor night either.", "backgroundColor": "#fef9c3", "textColor": "#854d0e" },
-    { "id": 5, "title": "Try a Small Experiment", "content": "For several days, keep the rest of your routine steady and move your last caffeine earlier. Notice whether sleep or daytime energy changes.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://www.nhs.uk/live-well/sleep-and-tiredness/how-to-get-to-sleep/", "resourceLabel": "NHS: How to get to sleep" }
+    {
+      "id": 1,
+      "title": "Timing Is Personal",
+      "content": "Caffeine can remain active for hours. An afternoon cutoff may help, but there is no single clock time that fits everyone.",
+      "backgroundColor": "#fef9c3",
+      "textColor": "#854d0e"
+    },
+    {
+      "id": 2,
+      "title": "Notice Dose and Timing",
+      "content": "Coffee, tea, energy drinks, some soft drinks, chocolate, supplements, and medications may contain caffeine.",
+      "backgroundColor": "#fde68a",
+      "textColor": "#92400e"
+    },
+    {
+      "id": 3,
+      "title": "Protect the Wind-Down",
+      "content": "If sleep is difficult, try moving your last caffeine earlier or reducing the amount rather than chasing one perfect rule.",
+      "backgroundColor": "#ffedd5",
+      "textColor": "#9a3412"
+    },
+    {
+      "id": 4,
+      "title": "Look for Your Pattern",
+      "content": "Track caffeine timing alongside how long it takes to fall asleep, nighttime waking, and how rested you feel.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#075985"
+    },
+    {
+      "id": 6,
+      "title": "Avoid Absolutes",
+      "content": "Feeling able to fall asleep does not tell the whole story, but one caffeinated drink does not guarantee a poor night either.",
+      "backgroundColor": "#fef9c3",
+      "textColor": "#854d0e"
+    },
+    {
+      "id": 5,
+      "title": "Try a Small Experiment",
+      "content": "For several days, keep the rest of your routine steady and move your last caffeine earlier. Notice whether sleep or daytime energy changes.",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://www.nhs.uk/live-well/sleep-and-tiredness/how-to-get-to-sleep/",
+      "resourceLabel": "NHS: How to get to sleep"
+    }
   ],
   "autoplay": false,
   "interval": 5000,
   "showDots": true,
-  "showArrows": true
+  "showArrows": true,
+  "presentation": "carousel",
+  "title": "Caffeine and your sleep"
 }

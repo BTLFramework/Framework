@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Activity, Moon, Brain, Heart, MessageCircle, Footprints } from "lucide-react";
+import { ArrowLeft, ArrowRight, Activity, Moon, Brain, Heart, MessageCircle, Footprints, ExternalLink } from "lucide-react";
 import type { SummaryData, SummarySlide } from "./InsightSummaryCard";
 
 const factors = [
@@ -43,18 +43,19 @@ export default function InsightLessonCarousel({ data }: { data: SummaryData }) {
 
   function content(slide: SummarySlide) {
     return <>
-      {slide.id === 2 && <div className="grid grid-cols-2 gap-3 my-6" aria-label="Factors that can influence pain">
+      {slide.visual === "pain-factors" && <div className="grid grid-cols-2 gap-3 my-6" aria-label="Factors that can influence pain">
         {factors.map(({ label, Icon }) => <div key={label} className="flex items-center gap-2 rounded-xl bg-btl-50 p-3 min-w-0">
           <Icon aria-hidden="true" className="w-5 h-5 shrink-0 text-btl-600" />
           <span className="text-sm font-semibold text-btl-900 break-words">{label}</span>
         </div>)}
       </div>}
       <p className="text-base leading-relaxed text-btl-800 whitespace-pre-line break-words">{slide.content}</p>
-      {slide.id === 3 && <ol aria-label="The example's approach" className="mt-6 space-y-3">
-        {["Adjust the amount", "Notice the response", "Discuss a repeated change"].map((step, n) => <li key={step} className="flex gap-3 items-center text-btl-900 font-medium">
+      {!!slide.steps?.length && <ol aria-label="The example's approach" className="mt-6 space-y-3">
+        {slide.steps.map((step, n) => <li key={step} className="flex gap-3 items-center text-btl-900 font-medium">
           <span className="rounded-full bg-btl-100 text-btl-800 w-8 h-8 shrink-0 flex items-center justify-center">{n + 1}</span>{step}
         </li>)}
       </ol>}
+      {slide.resourceLink && <a href={slide.resourceLink} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 text-btl-700 underline underline-offset-4 break-words rounded focus-visible:ring-2 focus-visible:ring-btl-600">{slide.resourceLabel || "Explore the resource"}<ExternalLink aria-hidden="true" className="w-4 h-4 shrink-0" /></a>}
     </>;
   }
 
@@ -68,18 +69,18 @@ export default function InsightLessonCarousel({ data }: { data: SummaryData }) {
     {!readAll && <div className="flex gap-1.5 mb-6" aria-hidden="true">{data.slides.map((slide, n) => <span key={slide.id} className={`h-1.5 rounded-full flex-1 ${n <= index ? "bg-btl-600" : "bg-btl-100"}`} />)}</div>}
     <div className="bg-white rounded-2xl border border-btl-200 p-5 sm:p-8">
       {readAll ? <>
-        <h3 ref={heading} tabIndex={-1} className="text-2xl font-bold mb-6 focus:outline-none">Why one day can feel different</h3>
+        <h3 ref={heading} tabIndex={-1} className="text-2xl font-bold mb-6 focus:outline-none">{data.title || data.slides[0].title}</h3>
         {data.slides.map(slide => <article key={slide.id} className="mb-8 last:mb-0">
           <h4 className="text-xl font-bold mb-3">{slide.title}</h4>{content(slide)}
         </article>)}
       </> : <>
-        <p className="text-xs uppercase tracking-widest font-semibold text-btl-600 mb-3">{["Understand", "See the whole picture", "An everyday example", "Notice", "Put it into practice", "Know when to get support"][index]}</p>
+        <p className="text-xs uppercase tracking-widest font-semibold text-btl-600 mb-3">{data.slides[index].eyebrow || "Recovery insight"}</p>
         <h3 ref={heading} tabIndex={-1} className="text-2xl sm:text-3xl font-bold leading-tight mb-5 focus:outline-none">{data.slides[index].title}</h3>
         {content(data.slides[index])}
       </>}
     </div>
     {(readAll || index === data.slides.length - 1) && <div className="mt-5 border-l-4 border-btl-600 bg-btl-50 p-4 rounded-r-xl">
-      <p className="font-semibold mb-2">Keep this with you</p><p className="leading-relaxed">{data.takeaway}</p>
+      {data.takeaway && <><p className="font-semibold mb-2">Keep this with you</p><p className="leading-relaxed">{data.takeaway}</p></>}
       <p className="mt-3 text-sm">Ready to apply it? Use “Take Quiz” below. Reading the slides alone does not complete the lesson.</p>
     </div>}
     {!readAll && <nav aria-label="Lesson slides" className="flex justify-between items-center gap-3 mt-6">

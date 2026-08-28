@@ -3,14 +3,48 @@
   "level": "Intermediate",
   "why": "Useful movement is not a contest between perfect form and maximum volume. The task, dose, goals, confidence, and individual response all matter.",
   "slides": [
-    {"id": 1, "title": "More Than Perfect Form", "content": "There is often more than one acceptable way to move. Technique can matter for a task without one posture being mandatory for every body.", "backgroundColor": "#ecfeff", "textColor": "#0e7490"},
-    {"id": 2, "title": "Dose Matters Too", "content": "Load, repetitions, speed, range, frequency, recovery, and current capacity can all influence how an activity is tolerated.", "backgroundColor": "#cffafe", "textColor": "#155e75"},
-    {"id": 3, "title": "Make It Meaningful", "content": "Activities that connect to your goals and preferences may be easier to practise consistently. Adherence is part of a useful plan.", "backgroundColor": "#bae6fd", "textColor": "#075985"},
-    {"id": 4, "title": "Use Feedback, Not Fear", "content": "Notice symptoms, confidence, function, and recovery after activity. Adjust thoughtfully rather than assuming every sensation means damage.", "backgroundColor": "#e0f2fe", "textColor": "#075985"},
-    {"id": 5, "title": "Try This Today", "content": "Choose one familiar exercise and a manageable dose. Note what felt controlled, what mattered to you, and what you would adjust next time.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://www.iasp-pain.org/resources/fact-sheets/back-pain-education/", "resourceLabel": "IASP: back-pain education"}
+    {
+      "id": 1,
+      "title": "More Than Perfect Form",
+      "content": "There is often more than one acceptable way to move. Technique can matter for a task without one posture being mandatory for every body.",
+      "backgroundColor": "#ecfeff",
+      "textColor": "#0e7490"
+    },
+    {
+      "id": 2,
+      "title": "Dose Matters Too",
+      "content": "Load, repetitions, speed, range, frequency, recovery, and current capacity can all influence how an activity is tolerated.",
+      "backgroundColor": "#cffafe",
+      "textColor": "#155e75"
+    },
+    {
+      "id": 3,
+      "title": "Make It Meaningful",
+      "content": "Activities that connect to your goals and preferences may be easier to practise consistently. Adherence is part of a useful plan.",
+      "backgroundColor": "#bae6fd",
+      "textColor": "#075985"
+    },
+    {
+      "id": 4,
+      "title": "Use Feedback, Not Fear",
+      "content": "Notice symptoms, confidence, function, and recovery after activity. Adjust thoughtfully rather than assuming every sensation means damage.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#075985"
+    },
+    {
+      "id": 5,
+      "title": "Try This Today",
+      "content": "Choose one familiar exercise and a manageable dose. Note what felt controlled, what mattered to you, and what you would adjust next time.",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://www.iasp-pain.org/resources/fact-sheets/back-pain-education/",
+      "resourceLabel": "IASP: back-pain education"
+    }
   ],
   "autoplay": false,
   "interval": 5000,
   "showDots": true,
-  "showArrows": true
+  "showArrows": true,
+  "presentation": "carousel",
+  "title": "Adjust the movement dose"
 }

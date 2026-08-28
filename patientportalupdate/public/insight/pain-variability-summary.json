@@ -10,46 +10,59 @@
       "title": "The same task, a different day",
       "content": "A familiar activity may feel different after a busy day or a poor night's sleep. That does not automatically mean the activity has become damaging. It means there is more to understand than the pain number alone.",
       "backgroundColor": "#f0f9ff",
-      "textColor": "#075985"
+      "textColor": "#075985",
+      "eyebrow": "Understand"
     },
     {
       "id": 2,
       "title": "Several things can contribute",
       "content": "Injury, health, activity, sleep, stress, expectations, and past experiences can influence pain. These factors may interact. You do not need to identify one perfect explanation, and the list does not mean every factor applies to you.",
       "backgroundColor": "#e0f2fe",
-      "textColor": "#0c4a6e"
+      "textColor": "#0c4a6e",
+      "visual": "pain-factors",
+      "eyebrow": "See the whole picture"
     },
     {
       "id": 3,
       "title": "A worked example",
       "content": "Imagine someone whose usual walk feels harder after a demanding day. They reduce the distance, note how they recover, and mention a repeated change at their next visit. They gather information instead of deciding immediately that the walk has caused harm. This is an example, not a diagnosis of your symptoms.",
       "backgroundColor": "#dbeafe",
-      "textColor": "#1e40af"
+      "textColor": "#1e40af",
+      "steps": [
+        "Adjust the amount",
+        "Notice the response",
+        "Discuss a repeated change"
+      ],
+      "eyebrow": "An everyday example"
     },
     {
       "id": 4,
       "title": "Look at the overall trend",
       "content": "What changed? What were you doing? How did you function afterwards? Was it familiar, or different from the pattern you discussed? These observations help us decide whether to keep, adjust, or review the plan.",
       "backgroundColor": "#ecfeff",
-      "textColor": "#155e75"
+      "textColor": "#155e75",
+      "eyebrow": "Notice"
     },
     {
       "id": 5,
       "title": "Use a tool, then review",
       "content": "If stress is part of the day, try the comfortable breathing or other option from Week 1. It may help you feel steadier while you decide what to do next. It does not tell you whether a symptom is safe.",
       "backgroundColor": "#f0f9ff",
-      "textColor": "#075985"
+      "textColor": "#075985",
+      "eyebrow": "Put it into practice"
     },
     {
       "id": 6,
       "title": "Know when to ask",
       "content": "New injury, new or progressive weakness, feeling unwell with symptoms, or a change that concerns you deserves clinical advice. Sudden major changes may need urgent care. Understanding variation is not a reason to dismiss something different.",
       "backgroundColor": "#e0f2fe",
-      "textColor": "#0c4a6e"
+      "textColor": "#0c4a6e",
+      "eyebrow": "Know when to get support"
     }
   ],
   "autoplay": false,
   "interval": 5000,
   "showDots": true,
-  "showArrows": true
+  "showArrows": true,
+  "title": "Why one day can feel different"
 }

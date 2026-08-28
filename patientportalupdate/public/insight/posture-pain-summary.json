@@ -51,5 +51,7 @@
   "autoplay": false,
   "interval": 5000,
   "showDots": true,
-  "showArrows": true
+  "showArrows": true,
+  "presentation": "carousel",
+  "title": "Posture is an option, not a verdict"
 }

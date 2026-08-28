@@ -6,6 +6,9 @@ import { BUILD_TAG } from "@/lib/buildInfo";
 import InsightLessonCarousel from "./InsightLessonCarousel";
 
 export interface SummarySlide {
+  eyebrow?: string;
+  visual?: "pain-factors";
+  steps?: string[];
   id: number;
   title: string;
   content: string;
@@ -16,6 +19,7 @@ export interface SummarySlide {
 }
 
 export interface SummaryData {
+  title?: string;
   slides: SummarySlide[];
   timeMinutes?: number;
   level?: string;

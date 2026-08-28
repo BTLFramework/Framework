@@ -3,14 +3,48 @@
   "level": "Intermediate",
   "why": "Work participation can support recovery for many people, but timing, duties, risk, symptoms, and workplace support need an individualized plan.",
   "slides": [
-    {"id": 1, "title": "Start With the Person and the Job", "content": "A suitable return depends on your health, job demands, goals, workplace options, and clinical assessment—not a universal timeline.", "backgroundColor": "#f0f9ff", "textColor": "#1e40af"},
-    {"id": 2, "title": "Modifications May Help", "content": "Temporary changes to duties, hours, pace, equipment, or breaks can support participation when they match the situation.", "backgroundColor": "#fef3c7", "textColor": "#92400e"},
-    {"id": 3, "title": "Communicate Clearly", "content": "When appropriate, agree on current abilities, relevant restrictions, review points, and who needs to know what—while respecting privacy.", "backgroundColor": "#e0e7ff", "textColor": "#3730a3"},
-    {"id": 4, "title": "Pain-Free Is Not Always Required", "content": "Some people can safely participate before symptoms reach zero; others require more assessment or restriction. Symptoms and function should be interpreted in context.", "backgroundColor": "#e0f2fe", "textColor": "#075985"},
-    {"id": 5, "title": "Plan One Useful Conversation", "content": "Write down one work demand, one current ability, and one possible modification to discuss with your clinician or workplace contact.", "backgroundColor": "#eff6ff", "textColor": "#1e40af", "resourceLink": "https://www.ccohs.ca/oshanswers/psychosocial/rtw/rtw_program.html", "resourceLabel": "CCOHS: return-to-work programs"}
+    {
+      "id": 1,
+      "title": "Start With the Person and the Job",
+      "content": "A suitable return depends on your health, job demands, goals, workplace options, and clinical assessment—not a universal timeline.",
+      "backgroundColor": "#f0f9ff",
+      "textColor": "#1e40af"
+    },
+    {
+      "id": 2,
+      "title": "Modifications May Help",
+      "content": "Temporary changes to duties, hours, pace, equipment, or breaks can support participation when they match the situation.",
+      "backgroundColor": "#fef3c7",
+      "textColor": "#92400e"
+    },
+    {
+      "id": 3,
+      "title": "Communicate Clearly",
+      "content": "When appropriate, agree on current abilities, relevant restrictions, review points, and who needs to know what—while respecting privacy.",
+      "backgroundColor": "#e0e7ff",
+      "textColor": "#3730a3"
+    },
+    {
+      "id": 4,
+      "title": "Pain-Free Is Not Always Required",
+      "content": "Some people can safely participate before symptoms reach zero; others require more assessment or restriction. Symptoms and function should be interpreted in context.",
+      "backgroundColor": "#e0f2fe",
+      "textColor": "#075985"
+    },
+    {
+      "id": 5,
+      "title": "Plan One Useful Conversation",
+      "content": "Write down one work demand, one current ability, and one possible modification to discuss with your clinician or workplace contact.",
+      "backgroundColor": "#eff6ff",
+      "textColor": "#1e40af",
+      "resourceLink": "https://www.ccohs.ca/oshanswers/psychosocial/rtw/rtw_program.html",
+      "resourceLabel": "CCOHS: return-to-work programs"
+    }
   ],
   "autoplay": false,
   "interval": 5000,
   "showDots": true,
-  "showArrows": true
+  "showArrows": true,
+  "presentation": "carousel",
+  "title": "Return to work and meaningful activity"
 }

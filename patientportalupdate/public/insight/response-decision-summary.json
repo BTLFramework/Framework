@@ -42,5 +42,7 @@
   "autoplay": false,
   "interval": 5000,
   "showDots": true,
-  "showArrows": true
+  "showArrows": true,
+  "presentation": "carousel",
+  "title": "Keep going, modify, or seek support?"
 }
