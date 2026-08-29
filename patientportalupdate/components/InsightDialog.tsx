@@ -42,7 +42,7 @@ interface QuizState {
 }
 
 // Quiz Popup Component
-function QuizPopup({ 
+export function QuizPopup({
   insight, 
   isOpen, 
   onClose, 
@@ -125,29 +125,22 @@ function QuizPopup({
       score: isCorrect ? prev.score + 1 : prev.score
     }));
 
-    if (isCorrect) {
-      console.log('🎯 Answer is correct! Moving to next question or completing...');
-      // Move to next question or complete quiz
-      setTimeout(() => {
-        if (quizState.currentQuestionIndex < quizState.totalQuestions - 1) {
-          // Move to next question
-          console.log('🎯 Moving to next question...');
-          setQuizState(prev => ({
-            ...prev,
-            currentQuestionIndex: prev.currentQuestionIndex + 1,
-            isSubmitted: false,
-            isCorrect: null
-          }));
-        } else {
-          // Quiz completed successfully
-          console.log('🎯 Quiz completed successfully! Calling onQuizComplete()');
-          onQuizComplete();
-          // Don't close here - let parent handle it
-        }
-      }, 1500);
-    } else {
+    if (!isCorrect) {
       console.log('🎯 Answer is incorrect! Quiz not completed.');
     }
+  };
+
+  const handleCorrectContinue = () => {
+    if (quizState.currentQuestionIndex < quizState.totalQuestions - 1) {
+      setQuizState(prev => ({
+        ...prev,
+        currentQuestionIndex: prev.currentQuestionIndex + 1,
+        isSubmitted: false,
+        isCorrect: null
+      }));
+      return;
+    }
+    onQuizComplete();
   };
 
   const handleRetry = () => {
@@ -167,33 +160,32 @@ function QuizPopup({
   return (
     <AssessmentDialog open={isOpen} onOpenChange={onClose}>
       <AssessmentDialogContent
-        className="max-w-2xl h-[80vh] flex flex-col rounded-2xl shadow-2xl bg-white p-0 overflow-hidden"
+        className="max-w-2xl h-[80vh] flex flex-col rounded-2xl shadow-2xl bg-slate-50 p-0 overflow-hidden"
         onOpenAutoFocus={(event) => event.preventDefault()}
       >
-        <AssessmentDialogHeader className="bg-gradient-to-br from-btl-900 via-btl-700 to-btl-100 px-8 pt-8 pb-4 border-b border-white/40">
-          <div className="flex items-center gap-6">
-            <Brain className="w-10 h-10 text-white opacity-90" />
+        <AssessmentDialogHeader className="bg-gradient-to-r from-btl-900 to-btl-700 px-6 sm:px-8 pt-7 pb-5 border-b border-white/30">
+          <div className="flex items-center gap-4">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/15"><Brain className="w-6 h-6 text-white" /></span>
             <div>
               <AssessmentDialogTitle className="text-2xl font-bold text-white">
                 Knowledge Check
               </AssessmentDialogTitle>
               <AssessmentDialogDescription className="text-btl-100 text-sm">
-                Test your understanding to complete this insight
+                Apply the lesson to an everyday recovery decision
               </AssessmentDialogDescription>
             </div>
           </div>
         </AssessmentDialogHeader>
         
-        <AssessmentDialogBody ref={quizBodyRef} className="flex-1 p-6 overflow-y-auto min-w-0">
+        <AssessmentDialogBody ref={quizBodyRef} className="flex-1 p-4 sm:p-6 overflow-y-auto min-w-0">
           <div className="max-w-xl mx-auto">
-            <Card className="border-2 border-btl-100 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-btl-50 to-btl-100 border-b border-btl-200">
+            <Card className="rounded-2xl border border-btl-200 shadow-none overflow-hidden">
+              <CardHeader className="bg-white border-b border-btl-100">
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-3 text-btl-800">
-                    <Award className="h-6 w-6 text-yellow-500" />
                     Question {quizState.currentQuestionIndex + 1} of {quizState.totalQuestions}
                   </CardTitle>
-                  <div className="w-16 h-2 bg-btl-200 rounded-full overflow-hidden">
+                  <div className="w-24 h-1.5 bg-btl-100 rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-btl-600 transition-all duration-300"
                       style={{ width: `${((quizState.currentQuestionIndex + 1) / quizState.totalQuestions) * 100}%` }}
@@ -203,7 +195,7 @@ function QuizPopup({
               </CardHeader>
               
               <CardContent className="p-6 space-y-6">
-                <div className="bg-white rounded-lg p-6 border border-btl-200">
+                <div className="bg-white">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     {currentQuestion ? currentQuestion.question : insight.quizQ}
                   </h3>
@@ -217,15 +209,15 @@ function QuizPopup({
                             variant="outline"
                             onClick={() => handleAnswerSelect(index)}
                             disabled={quizState.isSubmitted}
-                            className={`w-full min-h-14 h-auto py-3 text-left justify-start items-start text-base font-medium mb-4 transition-all duration-150 whitespace-normal break-words
-                              border-2 rounded-full
+                            className={`w-full min-h-14 h-auto px-4 py-3 text-left justify-start items-start text-base font-medium transition-all duration-150 whitespace-normal break-words
+                              border rounded-xl
                               ${quizState.answers[quizState.currentQuestionIndex] === index
-                                ? 'bg-gradient-to-r from-yellow-100 via-yellow-200 to-yellow-100 border-yellow-500 text-yellow-900 shadow-lg font-bold'
-                                : 'bg-white border-gray-300 text-gray-700 hover:bg-btl-50 hover:border-btl-400 shadow-sm'}
-                              focus:ring-2 focus:ring-yellow-400 focus:z-10`}
+                                ? 'bg-btl-50 border-btl-600 text-btl-900 ring-2 ring-btl-100'
+                                : 'bg-white border-slate-200 text-slate-700 hover:bg-btl-50 hover:border-btl-300'}
+                              focus:ring-2 focus:ring-btl-500 focus:z-10`}
                             tabIndex={0}
                           >
-                            <span className="mr-3 font-bold text-yellow-700 shrink-0">{String.fromCharCode(65 + index)}.</span>
+                            <span className="mr-3 flex h-7 w-7 items-center justify-center rounded-full bg-btl-100 font-bold text-btl-800 shrink-0">{String.fromCharCode(65 + index)}</span>
                             <span className="min-w-0 flex-1 whitespace-normal break-words leading-snug">{option}</span>
                           </Button>
                         ))}
@@ -259,33 +251,34 @@ function QuizPopup({
                     <Button 
                       onClick={handleQuizSubmit}
                       disabled={quizState.answers[quizState.currentQuestionIndex] === undefined}
-                      className="px-8 py-3 text-base font-semibold bg-gradient-to-r from-btl-600 to-btl-700 hover:from-btl-700 hover:to-btl-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 rounded-full"
+                      className="px-7 py-3 text-base font-semibold bg-btl-600 hover:bg-btl-700 text-white transition-colors rounded-xl"
                       size="lg"
                     >
                       {isLastQuestion ? 'Complete Quiz' : 'Next Question'}
                     </Button>
                   </div>
                 ) : (
-                  <div className="text-center p-6 rounded-xl border-2">
+                  <div className="text-center rounded-xl">
                     {quizState.isCorrect ? (
-                      <div className="flex flex-col items-center gap-3 text-green-700 bg-green-50 border-green-200 p-6 rounded-xl">
-                        <CheckCircle className="h-12 w-12 text-green-500" />
-                        <h3 className="text-xl font-bold text-green-800">Correct!</h3>
-                        <p className="text-green-600 font-medium">
-                          {isLastQuestion ? "Great job! You've completed this insight." : "Moving to next question..."}
-                        </p>
+                      <div className="flex flex-col items-center gap-3 text-btl-800 bg-btl-50 border border-btl-200 p-6 rounded-xl">
+                        <CheckCircle className="h-10 w-10 text-btl-600" />
+                        <h3 className="text-xl font-bold text-btl-900">That fits the lesson</h3>
+                        <p className="text-btl-700 font-medium">Take a moment to review why this response fits.</p>
                         {currentQuestion?.explanation && (
-                          <p className="mt-2 max-w-lg text-sm leading-relaxed text-green-800">
+                          <p className="mt-2 max-w-lg text-sm leading-relaxed text-btl-800">
                             {currentQuestion.explanation}
                           </p>
                         )}
+                        <Button onClick={handleCorrectContinue} className="mt-2 rounded-xl bg-btl-600 px-6 hover:bg-btl-700">
+                          {isLastQuestion ? "Finish knowledge check" : "Continue"}
+                        </Button>
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center gap-3 text-red-700 bg-red-50 border-red-200 p-6 rounded-xl">
-                        <XCircle className="h-12 w-12 text-red-500" />
-                        <h3 className="text-xl font-bold text-red-800">Incorrect</h3>
-                        <p className="text-red-600">
-                          The correct answer was: <span className="font-semibold">
+                      <div className="flex flex-col items-center gap-3 text-slate-700 bg-slate-50 border border-slate-200 p-6 rounded-xl">
+                        <XCircle className="h-10 w-10 text-slate-500" />
+                        <h3 className="text-xl font-bold text-slate-900">Take another look</h3>
+                        <p className="text-slate-700">
+                          The best-supported response here is: <span className="font-semibold">
                             {currentQuestion 
                               ? currentQuestion.options[currentQuestion.correctAnswer]
                               : insight.quizA
@@ -293,13 +286,13 @@ function QuizPopup({
                           </span>
                         </p>
                         {currentQuestion?.explanation && (
-                          <p className="max-w-lg text-sm leading-relaxed text-red-800">
+                          <p className="max-w-lg text-sm leading-relaxed text-slate-700">
                             {currentQuestion.explanation}
                           </p>
                         )}
                         <Button 
                           onClick={handleRetry}
-                          className="mt-2 bg-red-600 hover:bg-red-700 rounded-xl"
+                            className="mt-2 bg-btl-600 hover:bg-btl-700 rounded-xl"
                         >
                           Try Again
                         </Button>

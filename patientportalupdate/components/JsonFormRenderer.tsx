@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, ClipboardPenLine } from "lucide-react";
 
 interface FormField {
   type: string;
@@ -86,6 +86,7 @@ export default function JsonFormRenderer({ formData, onComplete }: JsonFormRende
               placeholder={field.placeholder}
               value={value || ''}
               onChange={(e) => handleFieldChange(sectionIndex, fieldIndex, e.target.value)}
+              className="min-h-12 rounded-xl border-btl-200 focus-visible:ring-btl-600"
             />
           </div>
         );
@@ -100,6 +101,7 @@ export default function JsonFormRenderer({ formData, onComplete }: JsonFormRende
               rows={field.rows || 3}
               value={value || ''}
               onChange={(e) => handleFieldChange(sectionIndex, fieldIndex, e.target.value)}
+              className="rounded-xl border-btl-200 focus-visible:ring-btl-600 leading-relaxed"
             />
           </div>
         );
@@ -110,7 +112,7 @@ export default function JsonFormRenderer({ formData, onComplete }: JsonFormRende
             <Label className="text-base font-medium">{field.label}</Label>
             <div className="space-y-2">
               {field.options?.map((option, optionIndex) => (
-                <div key={optionIndex} className="flex items-center space-x-2">
+                <div key={optionIndex} className="flex items-start gap-3 rounded-xl border border-btl-100 bg-btl-50/60 p-3">
                   <Checkbox
                     id={`${fieldKey}-${optionIndex}`}
                     checked={value?.includes(option) || false}
@@ -135,7 +137,7 @@ export default function JsonFormRenderer({ formData, onComplete }: JsonFormRende
         return (
           <div key={fieldIndex} className="space-y-3">
             <Label className="text-base font-medium">{field.label}</Label>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2">
               {Array.from({ length: field.scale || 10 }, (_, i) => i + 1).map((rating) => (
                 <Button
                   key={rating}
@@ -143,7 +145,7 @@ export default function JsonFormRenderer({ formData, onComplete }: JsonFormRende
                   variant={value === rating ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleFieldChange(sectionIndex, fieldIndex, rating)}
-                  className="w-10 h-10 rounded-full"
+                  className="w-10 h-10 shrink-0 rounded-xl border-btl-200 data-[state=checked]:bg-btl-600"
                 >
                   {rating}
                 </Button>
@@ -164,14 +166,14 @@ export default function JsonFormRenderer({ formData, onComplete }: JsonFormRende
 
   if (isSubmitted) {
     return (
-      <Card className="bg-green-50 border-green-200">
+      <Card className="rounded-2xl bg-btl-50 border-btl-200 shadow-none">
         <CardContent className="pt-6">
           <div className="text-center">
-            <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-2" />
-            <h3 className="text-lg font-semibold text-green-800 mb-1">
-              Form Completed!
+            <CheckCircle className="h-12 w-12 text-btl-600 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-btl-900 mb-1">
+              Reflection saved
             </h3>
-            <p className="text-green-600">{formData.successMessage}</p>
+            <p className="text-btl-700">{formData.successMessage}</p>
           </div>
         </CardContent>
       </Card>
@@ -179,20 +181,24 @@ export default function JsonFormRenderer({ formData, onComplete }: JsonFormRende
   }
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">{formData.title}</h2>
-        <p className="text-gray-600 mb-4">{formData.subtitle}</p>
-        <p className="text-gray-700">{formData.description}</p>
+    <div className="w-full max-w-2xl space-y-5 text-btl-900">
+      <div className="rounded-2xl border border-btl-200 bg-btl-50 p-5 sm:p-6">
+        <div className="mb-3 flex items-center gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-btl-600 text-white"><ClipboardPenLine className="h-5 w-5" /></span>
+          <div><p className="text-xs font-semibold uppercase tracking-widest text-btl-600">Guided reflection</p><h2 className="text-2xl font-bold leading-tight">{formData.title}</h2></div>
+        </div>
+        <p className="font-medium text-btl-800 mb-2">{formData.subtitle}</p>
+        <p className="text-btl-700 leading-relaxed">{formData.description}</p>
       </div>
 
       {formData.sections.map((section, sectionIndex) => (
-        <Card key={sectionIndex}>
-          <CardHeader>
-            <CardTitle className="text-lg">{section.title}</CardTitle>
-            <p className="text-gray-600">{section.description}</p>
+        <Card key={sectionIndex} className="rounded-2xl border-btl-200 shadow-none overflow-hidden">
+          <CardHeader className="border-b border-btl-100 bg-white pb-4">
+            <div className="flex items-start gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-btl-100 font-bold text-btl-800">{sectionIndex + 1}</span><div>
+            <CardTitle className="text-lg text-btl-900">{section.title}</CardTitle>
+            <p className="mt-1 text-sm leading-relaxed text-btl-700">{section.description}</p></div></div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5 pt-5">
             {section.fields.map((field, fieldIndex) => 
               renderField(field, sectionIndex, fieldIndex)
             )}
@@ -200,8 +206,8 @@ export default function JsonFormRenderer({ formData, onComplete }: JsonFormRende
         </Card>
       ))}
 
-      <div className="text-center">
-        <Button onClick={handleSubmit} size="lg" disabled={isSaving}>
+      <div className="flex justify-end">
+        <Button onClick={handleSubmit} size="lg" disabled={isSaving} className="min-h-12 rounded-xl bg-btl-600 px-6 text-white hover:bg-btl-700">
           {isSaving ? "Saving…" : formData.submitText}
         </Button>
       </div>

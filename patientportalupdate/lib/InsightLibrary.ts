@@ -426,12 +426,6 @@ export const insightLibrary: Insight[] = [
     points: 5,
     questions: [
       {
-        question: "No single food is a treatment for pain. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "Food supports overall health, energy, and participation. Claims that one food treats MSK pain usually oversimplify the evidence."
-      },
-      {
         question: "Which is the most useful general approach?",
         options: [
           "Eliminate entire food groups without advice",
@@ -468,12 +462,6 @@ export const insightLibrary: Insight[] = [
     points: 5,
     questions: [
       {
-        question: "Poor posture alone causes chronic pain. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 1,
-        explanation: "Posture can affect comfort for some people, but no single posture explains chronic pain or protects everyone from injury."
-      },
-      {
         question: "Your back feels uncomfortable after a long period at a desk. What is a useful response?",
         options: [
           "Hold a rigid upright posture for the rest of the day",
@@ -509,12 +497,6 @@ export const insightLibrary: Insight[] = [
     releaseOffset: 2,
     points: 5,
     questions: [
-      {
-        question: "A return-to-work plan should consider the person, job demands, symptoms, risk, and available support. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "Return planning should consider the person, actual task demands, safety, symptoms, confidence, support, and opportunities for modification."
-      },
       {
         question: "Which is often useful when it fits the person's situation?",
         options: [
@@ -564,12 +546,6 @@ export const insightLibrary: Insight[] = [
     points: 5,
     questions: [
       {
-        question: "CBT for pain aims to improve coping and participation; it does not mean pain is imaginary. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "CBT skills address real thoughts, emotions, body responses, and actions. They do not claim that pain is imaginary."
-      },
-      {
         question: "You notice the thought, 'If I move today, I will make everything worse.' What is the most useful next step?",
         options: [
           "Treat the prediction as proven fact",
@@ -606,21 +582,15 @@ export const insightLibrary: Insight[] = [
     points: 5,
     questions: [
       {
-        question: "ACT teaches acceptance of pain while living a valued life. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "Acceptance means making room for the present experience while still choosing useful action. It is not resignation or withdrawal of appropriate care."
-      },
-      {
-        question: "What is a core principle of ACT?",
+        question: "A meaningful activity matters to you, but you keep waiting for a symptom-free day. Which response best fits this lesson?",
         options: [
-          "Fighting pain constantly",
-          "Psychological flexibility",
-          "Avoiding all discomfort",
-          "Ignoring values"
+          "Wait until every uncomfortable thought and sensation is gone",
+          "Choose a manageable step toward what matters while making room for the present experience",
+          "Force the activity at full intensity to prove symptoms do not matter",
+          "Give up the goal so it cannot cause disappointment"
         ],
         correctAnswer: 1,
-        explanation: "Psychological flexibility means responding to the situation in a way that serves what matters, rather than automatically obeying every thought or feeling."
+        explanation: "ACT builds psychological flexibility: responding to the present situation while staying connected to what matters. Acceptance is not resignation, symptom dismissal, or forcing activity."
       },
       {
         question: "ACT encourages you to:",
@@ -662,21 +632,15 @@ export const insightLibrary: Insight[] = [
     points: 5,
     questions: [
       {
-        question: "Mindfulness may help some people relate differently to symptoms or distress, but results vary. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "Mindfulness is one optional way to practise attention and reduce automatic reactions. It is not a guaranteed pain treatment."
-      },
-      {
-        question: "What is a key aspect of mindfulness practice?",
+        question: "During a brief mindfulness practice, your attention repeatedly wanders. What is the most useful response?",
         options: [
-          "Ignoring pain",
-          "Non-judgmental awareness",
-          "Distraction",
-          "Avoidance"
+          "Treat the wandering as failure and stop",
+          "Notice where attention went and gently return without grading yourself",
+          "Force every sensation out of awareness",
+          "Use the exercise to decide whether your symptoms are safe"
         ],
         correctAnswer: 1,
-        explanation: "The aim is to notice what is present with less automatic judgment—not to deny or ignore symptoms."
+        explanation: "Attention wandering is expected. Noticing and returning with less automatic judgment is part of the practice—not evidence that you did it incorrectly."
       },
       {
         question: "Which is a useful way to approach a mindfulness exercise?",
@@ -704,21 +668,15 @@ export const insightLibrary: Insight[] = [
     points: 5,
     questions: [
       {
-        question: "A graded approach starts with a manageable challenge and adjusts using your response. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "Graded practice begins at an achievable level and changes using goals, response, safety, and current capacity."
-      },
-      {
-        question: "What is the purpose of graded movement practice?",
+        question: "You want to return to carrying groceries, but the full task currently feels like too much. Which plan best fits graded practice?",
         options: [
-          "Prove that symptoms are imaginary",
-          "Build capacity and confidence through manageable practice",
-          "Avoid the activity permanently",
-          "Reach maximum effort immediately"
+          "Avoid carrying anything until you feel completely certain",
+          "Choose a manageable load or distance, practise it, and review the response before progressing",
+          "Carry the maximum amount immediately to test whether you are recovered",
+          "Use pain intensity alone to decide that the task caused damage"
         ],
         correctAnswer: 1,
-        explanation: "The purpose is to build function, tolerance, and confidence—not to prove symptoms are imaginary."
+        explanation: "Graded practice uses achievable experiences to build function, tolerance, and confidence. The starting point and next step should reflect the task, current capacity, response, safety, and goals."
       },
       {
         question: "What should guide the next step?",
@@ -745,12 +703,6 @@ export const insightLibrary: Insight[] = [
     releaseOffset: 2,
     points: 5,
     questions: [
-      {
-        question: "Changing position can be a comfort option, but there is no single perfect posture schedule. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "Position changes can be useful, but they are options—not another perfect schedule patients must follow."
-      },
       {
         question: "Why might someone choose movement variability?",
         options: [
@@ -800,12 +752,6 @@ export const insightLibrary: Insight[] = [
     points: 5,
     questions: [
       {
-        question: "Emotions can influence pain perception. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "Pain can affect mood and distress, while emotional state can influence symptoms, coping, attention, and participation."
-      },
-      {
         question: "A patient feels anxious after a symptom increase. Which response is most useful?",
         options: [
           "Treat the anxiety as proof of new damage",
@@ -817,15 +763,15 @@ export const insightLibrary: Insight[] = [
         explanation: "Naming an emotion can create space to check the situation and choose a response. Persistent or worsening distress deserves appropriate support."
       },
       {
-        question: "The relationship between pain and emotions is:",
+        question: "Your symptoms and frustration have both increased during a difficult week. Which explanation is most useful?",
         options: [
-          "One-way (pain affects emotions)",
-          "Non-existent",
-          "Bidirectional (they affect each other)",
-          "Random"
+          "The frustration proves the symptoms are psychological",
+          "Pain and emotions can influence one another, so both can be acknowledged without reducing one to the other",
+          "Only the pain matters; emotions should be ignored",
+          "The emotions must disappear before movement can help"
         ],
-        correctAnswer: 2,
-        explanation: "The relationship can run in both directions. This supports whole-person care; it does not reduce pain to emotion."
+        correctAnswer: 1,
+        explanation: "Pain can affect mood, sleep, and stress; emotions and stress can also influence symptoms, coping, attention, and participation. That does not make pain imaginary or mean emotion explains everything."
       }
     ]
   },
@@ -841,12 +787,6 @@ export const insightLibrary: Insight[] = [
     releaseOffset: 5,
     points: 5,
     questions: [
-      {
-        question: "Movement choices should consider both how an activity is performed and whether the dose fits the person. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "Technique may matter for a task, but dose, goals, confidence, current capacity, and recovery also shape whether movement is useful."
-      },
       {
         question: "After an exercise, symptoms settle normally and the activity feels more confident. What is a reasonable next step?",
         options: [
@@ -898,10 +838,14 @@ export const insightLibrary: Insight[] = [
     points: 5,
     questions: [
       {
-        question: "Pain is influenced by many factors, including context and past experience. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "Past experience and context can influence protection without making pain imagined. New experiences can add information over time."
+        question: "A familiar movement still feels threatening because it previously triggered symptoms. What is the most useful interpretation?",
+        options: [
+          "The feeling proves the movement is currently unsafe",
+          "Past experience may be influencing protection, so use an appropriate starting point and gather new information",
+          "Ignore the feeling and immediately test the movement at maximum effort"
+        ],
+        correctAnswer: 1,
+        explanation: "Past experience and context can influence protection without making pain imagined. A manageable, appropriate experience can add information; it does not require ignoring symptoms or assuming safety."
       },
       {
         question: "An activity feels threatening because it previously triggered symptoms. What is a useful way to build new evidence?",
@@ -929,10 +873,24 @@ export const insightLibrary: Insight[] = [
     points: 5,
     questions: [
       {
-        question: "Gratitude can coexist with pain and difficult emotions. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
+        question: "You had a difficult day and notice one small moment you appreciated. Which response best fits this practice?",
+        options: [
+          "The positive moment means the difficult parts should no longer matter",
+          "Both can be true: the day was difficult and the moment was meaningful",
+          "You should keep searching until gratitude changes your pain"
+        ],
+        correctAnswer: 1,
         explanation: "Gratitude does not require forced positivity or denial. It is an optional attention practice, not a pain treatment or test of attitude."
+      },
+      {
+        question: "The practice feels forced today. What is a reasonable response?",
+        options: [
+          "Use a neutral observation or leave it and choose another useful tool",
+          "Treat that as a failure of recovery",
+          "Write something positive that you do not believe"
+        ],
+        correctAnswer: 0,
+        explanation: "A gratitude practice is optional. A neutral observation or another recovery tool may fit better; the goal is not to perform positivity or suppress difficult emotions."
       }
     ]
   },
@@ -949,10 +907,14 @@ export const insightLibrary: Insight[] = [
     points: 5,
     questions: [
       {
-        question: "Caffeine timing affects everyone in exactly the same way. (True/False)",
-        options: ["True", "False"],
+        question: "A friend drinks coffee late and sleeps well, but you are unsure whether it affects you. What is the most useful conclusion?",
+        options: [
+          "Their response proves late caffeine is harmless for you",
+          "Individual responses vary, so test a realistic timing change and observe your own pattern",
+          "One poor night proves caffeine is the only cause"
+        ],
         correctAnswer: 1,
-        explanation: "Sensitivity varies. Timing, amount, medications, pregnancy, health, and routine can all matter."
+        explanation: "Sensitivity varies. Timing, amount, medications, pregnancy, health, and routine can all matter. A small personal experiment is more useful than copying someone else or judging one night."
       },
       {
         question: "How can you learn whether caffeine timing affects your sleep?",
@@ -992,10 +954,14 @@ export const insightLibrary: Insight[] = [
     points: 5,
     questions: [
       {
-        question: "A useful recovery plan includes reasons to continue, modify, and seek support. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "Self-management is not ignoring symptoms. It includes responding proportionately and knowing when reassessment is appropriate."
+        question: "Your usual exercise now produces a new and concerning change. What best fits a useful recovery plan?",
+        options: [
+          "Continue unchanged because self-management means never asking for help",
+          "Pause and seek appropriate advice rather than treating it as the usual response",
+          "Assume every future exercise will be unsafe"
+        ],
+        correctAnswer: 1,
+        explanation: "Self-management is not ignoring symptoms. It includes responding proportionately, distinguishing familiar responses from concerning changes, and knowing when reassessment is appropriate."
       },
       {
         question: "A familiar activity causes a mild, expected response that settles as planned. What is usually the most useful interpretation?",
@@ -1049,12 +1015,6 @@ export const insightLibrary: Insight[] = [
     points: 5,
     questions: [
       {
-        question: "Threat-focused thoughts can influence distress and behaviour without making pain imaginary. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "Threat-focused thoughts can affect distress, confidence, and behaviour. That interaction does not make pain imagined or make the thought a personal failure."
-      },
-      {
         question: "Which example is a worst-case recovery prediction?",
         options: [
           "This is difficult, so I will review the response and adjust if needed",
@@ -1090,12 +1050,6 @@ export const insightLibrary: Insight[] = [
     releaseOffset: 1,
     points: 5,
     questions: [
-      {
-        question: "A paced-breathing exercise may feel calming for some people, but it is optional and effects vary. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "Paced breathing is one optional regulation skill. Some people prefer movement, grounding, music, social support, or another approach."
-      },
       {
         question: "What is the purpose of trying a regulation skill during recovery?",
         options: [
@@ -1133,10 +1087,14 @@ export const insightLibrary: Insight[] = [
     points: 5,
     questions: [
       {
-        question: "Hydration needs can change with activity, heat, health, and individual circumstances. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "There is no single intake target that fits every person and situation. Health conditions can also change appropriate advice."
+        question: "Your activity and weather change substantially this week. What is the best way to think about hydration?",
+        options: [
+          "Use the same rigid target regardless of context",
+          "Use practical cues and circumstances, while following individualized medical advice when relevant",
+          "Drink as much as possible because more is always better"
+        ],
+        correctAnswer: 1,
+        explanation: "There is no single intake target that fits every person and situation. Activity, heat, health, medications, pregnancy, and fluid restrictions can change appropriate advice."
       },
       {
         question: "Which approach is most likely to make hydration easier to repeat?",
@@ -1176,10 +1134,14 @@ export const insightLibrary: Insight[] = [
     points: 5,
     questions: [
       {
-        question: "Context can influence protection, but a checklist cannot determine by itself whether a symptom is safe or dangerous. (True/False)",
-        options: ["True", "False"],
-        correctAnswer: 0,
-        explanation: "Context provides useful information, but new, severe, progressive, unusual, or concerning symptoms still deserve appropriate assessment."
+        question: "A checklist suggests several familiar contributors, but you also notice a new progressive symptom. What should carry the decision?",
+        options: [
+          "The checklist proves the change is harmless",
+          "The new progressive change deserves appropriate assessment despite the familiar context",
+          "Push harder to test whether the symptom is serious"
+        ],
+        correctAnswer: 1,
+        explanation: "Context provides useful information, but a checklist cannot establish safety. New, severe, progressive, unusual, or concerning symptoms still deserve appropriate assessment."
       },
       {
         question: "Which question adds useful context without dismissing symptoms?",
@@ -1233,10 +1195,14 @@ export const insightLibrary: Insight[] = [
     points: 5,
     questions: [
       {
-        question: "Self-management means managing recovery entirely without professional support. (True/False)",
-        options: ["True", "False"],
+        question: "You are managing most days confidently but encounter a change you do not understand. What does good self-management look like?",
+        options: [
+          "Keep it private because asking for guidance means losing independence",
+          "Use your tools and seek appropriate guidance or reassessment when the situation calls for it",
+          "Abandon your own decision-making and wait for someone else to direct every step"
+        ],
         correctAnswer: 1,
-        explanation: "Self-management means taking an active role. It can include professional guidance, reassessment, and shared decisions when appropriate."
+        explanation: "Self-management means taking an active role, not doing everything alone. It can include professional guidance, reassessment, and shared decisions when appropriate."
       },
       {
         question: "Which is a core self-management skill?",
@@ -1324,6 +1290,16 @@ export const insightLibrary: Insight[] = [
     points: 5
   }
 ];
+
+// Keep the legacy single-question fields aligned for older consumers while the
+// patient portal uses the richer structured question set.
+for (const insight of insightLibrary) {
+  const firstQuestion = insight.questions?.[0];
+  if (firstQuestion) {
+    insight.quizQ = firstQuestion.question;
+    insight.quizA = firstQuestion.options[firstQuestion.correctAnswer];
+  }
+}
 
 export const getInsightById = (id: number): Insight | undefined => {
   return insightLibrary.find(insight => insight.id === id);
