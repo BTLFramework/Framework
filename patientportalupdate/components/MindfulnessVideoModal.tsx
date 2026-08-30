@@ -17,6 +17,8 @@ interface MindfulnessVideoModalProps {
     title: string;
     description: string;
     duration: string;
+    videoId: string;
+    source: string;
     icon: React.ReactNode;
     color: string;
   };
@@ -62,30 +64,30 @@ export function MindfulnessVideoModal({ practice, open, onClose, onComplete }: M
         ];
       case 'nsdr':
         return [
-          "Lie down in a comfortable position",
+          "Choose a safe place where you can lie down and fully rest",
           "Close your eyes and relax your body",
-          "Focus on your natural breathing",
-          "Allow your mind to wander without judgment",
-          "If thoughts arise, gently return to your breath",
-          "Stay in this state of deep rest"
+          "Follow Kitaro's guidance without forcing your breathing",
+          "Allow thoughts and sensations to come and go without needing to fix them",
+          "If your attention wanders, gently return to the guidance",
+          "Take a moment before standing when the practice finishes"
         ];
       case 'lymph':
         return [
-          "Start in a comfortable standing position",
-          "Gently bounce on the balls of your feet",
-          "Add gentle arm movements in circular motions",
-          "Breathe deeply and rhythmically",
-          "Move slowly and mindfully",
-          "Feel the gentle flow of movement"
+          "Follow the sequence gently rather than pressing firmly",
+          "Use a comfortable position and range of movement",
+          "Keep your breathing relaxed throughout",
+          "This is an optional movement practice, not a treatment for a medical condition",
+          "Skip any step that is uncomfortable or inappropriate for you",
+          "Stop and seek appropriate advice if you have concerning symptoms"
         ];
       case 'mindshift':
         return [
-          "Identify the current thought or emotion",
-          "Acknowledge it without judgment",
-          "Consider alternative perspectives",
-          "Reframe the situation positively",
-          "Focus on what you can control",
-          "Practice self-compassion"
+          "Watch for the distinction between a stressor and your response to it",
+          "Notice how mindset can change the way a demand is interpreted",
+          "Choose one idea that feels relevant rather than trying to use everything",
+          "Connect that idea to a current, manageable situation",
+          "Choose one response that is within your control",
+          "Aim for a balanced response—not forced positivity"
         ];
       default:
         return [
@@ -116,17 +118,17 @@ export function MindfulnessVideoModal({ practice, open, onClose, onComplete }: M
         ];
       case 'lymph':
         return [
-          "Keep movements gentle and fluid",
-          "Maintain good posture",
-          "Breathe naturally and deeply",
-          "Feel the energy flowing through you"
+          "Keep pressure and movement comfortable",
+          "There is no need to chase a strong sensation",
+          "Breathe normally; do not force or hold your breath",
+          "Use it as a brief movement break if it feels useful"
         ];
       case 'mindshift':
         return [
-          "Be kind to yourself",
-          "Remember that thoughts are not facts",
-          "Focus on growth and learning",
-          "Practice gratitude and acceptance"
+          "Stress is not a personal failure",
+          "Thoughts and predictions are information—not always facts",
+          "Confidence can grow from manageable action",
+          "Use the lesson to create options, not another rule to perfect"
         ];
       default:
         return [
@@ -166,7 +168,7 @@ export function MindfulnessVideoModal({ practice, open, onClose, onComplete }: M
           <div className="flex items-center gap-2 mt-8 mb-4 text-btl-100">
             <div className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5 text-sm whitespace-nowrap transition-all duration-200 hover:bg-white/25 hover:border-white/50 hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60 group">
               <Target className="w-5 h-5 stroke-2" />
-              <span>5-10 mins</span>
+              <span>{practice.duration}</span>
             </div>
             <div className="flex items-center gap-2 bg-white/15 border border-white/30 rounded-full px-4 py-1.5 text-sm whitespace-nowrap transition-all duration-200 hover:bg-white/25 hover:border-white/50 hover:scale-105 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/60 group">
               <Activity className="w-5 h-5 stroke-2" />
@@ -188,14 +190,17 @@ export function MindfulnessVideoModal({ practice, open, onClose, onComplete }: M
             <div className="mb-8 p-2 max-w-2xl mx-auto">
               <div className="aspect-video rounded-xl overflow-hidden bg-gray-100">
                 <iframe
-                  src="https://www.youtube.com/embed/lcUlprEmMtA"
-                  title="Mindfulness Video"
+                  src={`https://www.youtube-nocookie.com/embed/${practice.videoId}`}
+                  title={`${practice.title} — ${practice.source}`}
                   className="w-full h-full"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
               </div>
+              <p className="mt-3 text-sm text-gray-600">
+                Video: <span className="font-medium text-btl-800">{practice.source}</span>
+              </p>
             </div>
 
             {/* Instructions Section */}
@@ -280,4 +285,4 @@ export function MindfulnessVideoModal({ practice, open, onClose, onComplete }: M
       </AssessmentDialogContent>
     </AssessmentDialog>
   );
-} 
+}

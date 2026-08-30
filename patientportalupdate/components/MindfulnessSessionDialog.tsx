@@ -31,6 +31,8 @@ const MINDFULNESS_TRACKS = [
     title: 'Breathwork',
     description: 'Deep breathing exercises for stress relief',
     duration: '5–10 min',
+    videoId: 'lcUlprEmMtA',
+    source: 'Guided breathing practice',
     icon: <Wind className="w-6 h-6" />,
     color: 'from-cyan-500 to-cyan-600'
   },
@@ -38,23 +40,29 @@ const MINDFULNESS_TRACKS = [
     id: 'nsdr',
     title: 'NSDR',
     description: 'Non-sleep deep rest for recovery',
-    duration: '5–10 min',
+    duration: '10–20 min',
+    videoId: 'OHRfUWdgflM',
+    source: 'Kitaro Waga',
     icon: <Brain className="w-6 h-6" />,
     color: 'from-cyan-500 to-cyan-600'
   },
   {
     id: 'lymph',
     title: 'Lymph Flow',
-    description: 'Gentle movement for lymphatic drainage',
+    description: 'A brief, gentle movement and self-massage routine',
     duration: '5–10 min',
+    videoId: 'm7ZIHCa2qeA',
+    source: 'Big 6 lymphatic exercise',
     icon: <Droplets className="w-6 h-6" />,
     color: 'from-cyan-500 to-cyan-600'
   },
   {
     id: 'mindshift',
     title: 'Mindshift',
-    description: 'Cognitive reframing techniques',
-    duration: '5–10 min',
+    description: 'Understand stress, mindset, and how resilience can be practised',
+    duration: '15–20 min',
+    videoId: 'MH6oKWWAHq0',
+    source: 'Kitaro Waga',
     icon: <Zap className="w-6 h-6" />,
     color: 'from-cyan-500 to-cyan-600'
   }
