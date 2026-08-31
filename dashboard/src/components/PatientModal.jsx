@@ -1009,7 +1009,7 @@ function PatientModal({ patient, onClose }) {
                     color: '#d97706',
                     fontWeight: '600'
                   }}>
-                    <strong>Reviewed:</strong> No
+                    <strong>Reviewed:</strong> {reviewedAt ? 'Yes' : 'No'}
                   </span>
                 </div>
               </div>

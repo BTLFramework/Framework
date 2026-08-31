@@ -7,6 +7,7 @@ import PatientTable from "../components/PatientTable";
 import PatientModal from "../components/PatientModal";
 import FilteredPatientsModal from "../components/FilteredPatientsModal";
 import { authenticatedFetch } from "../api/authenticatedFetch";
+import { getEngagementStatus, isLowEngagement } from "../helpers/engagement";
 
 // CACHE BUSTER: Force bundle change - timestamp: 2024-08-04-23:30
 console.log('🔥 DASHBOARD CACHE BUSTER: This should force bundle change!');
@@ -53,14 +54,7 @@ const fetchPatientsFromAPI = async () => {
         completionRate: 0
       };
       
-      // Calculate days since intake to determine if engagement assessment is appropriate
-      const daysSinceIntake = Math.floor((new Date() - new Date(patient.intakeDate)) / (1000 * 60 * 60 * 24));
-      
-      const engagementStatus = patient.engagement || 
-        (daysSinceIntake < 7 ? 'new_patient' : // Don't assess engagement for first week
-         recoveryPoints.completionRate >= 80 ? 'highly_engaged' :
-         recoveryPoints.completionRate >= 60 ? 'engaged' :
-         recoveryPoints.completionRate >= 40 ? 'moderate' : 'low_engagement');
+      const engagementStatus = getEngagementStatus(recoveryPoints, patient.intakeDate);
       
       return {
         // Spread all original API fields first
@@ -354,8 +348,7 @@ function Dashboard() {
   const followupDue = patients.filter(p => needsFollowUp(p.lastUpdate)).length;
   
   const lowEngagement = patients.filter(p => {
-    const daysSinceIntake = Math.floor((new Date() - new Date(p.intakeDate)) / (1000 * 60 * 60 * 24));
-    return p.recoveryPoints && p.recoveryPoints.completionRate < 50 && daysSinceIntake >= 7;
+    return isLowEngagement(p.recoveryPoints, p.intakeDate);
   }).length;
 
   // Loading state

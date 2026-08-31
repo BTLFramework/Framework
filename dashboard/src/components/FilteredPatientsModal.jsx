@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import PatientTable from "./PatientTable";
 import PatientModal from "./PatientModal";
+import { isLowEngagement } from "../helpers/engagement";
 
 export default function FilteredPatientsModal({ 
   isOpen, 
@@ -48,10 +49,7 @@ export default function FilteredPatientsModal({
         return patients.filter(p => needsFollowUp(p.lastUpdate));
       
       case 'low_engagement':
-        return patients.filter(p => {
-          const daysSinceIntake = Math.floor((new Date() - new Date(p.intakeDate)) / (1000 * 60 * 60 * 24));
-          return p.recoveryPoints && p.recoveryPoints.completionRate < 50 && daysSinceIntake >= 7;
-        });
+        return patients.filter(p => isLowEngagement(p.recoveryPoints, p.intakeDate));
       
       default:
         return patients;
@@ -234,4 +232,4 @@ export default function FilteredPatientsModal({
       )}
     </>
   );
-} 
+}

@@ -2,6 +2,7 @@ import React from "react";
 import { format } from "date-fns";
 import SRSDisplay from "./SRSDisplay";
 import { calendarDaysSince, parseClinicalDate } from "../helpers/assessmentScores";
+import { getEngagementStatus } from "../helpers/engagement";
 
 export default function PatientTable({
   patients,
@@ -93,30 +94,12 @@ export default function PatientTable({
     return patient.nextAppointment || null;
   };
 
-  const getEngagementStatus = (recoveryPoints, intakeDate) => {
-    // Handle case where recoveryPoints might be undefined or null
-    if (!recoveryPoints) return "unknown";
-    
-    // Calculate days since intake to determine if engagement assessment is appropriate
-    const daysSinceIntake = Math.floor((new Date() - new Date(intakeDate)) / (1000 * 60 * 60 * 24));
-    
-    // Don't assess engagement for first week
-    if (daysSinceIntake < 7) return "new_patient";
-    
-    const { completionRate = 0, trend = "stable", streakDays = 0 } = recoveryPoints;
-    
-    if (completionRate >= 80 && streakDays >= 5) return "highly-engaged";
-    if (completionRate >= 60 && trend !== "declining") return "engaged";
-    if (completionRate >= 40 || trend === "improving") return "moderate";
-    return "low-engagement";
-  };
-
   const getEngagementLabel = (status) => {
     switch (status) {
-      case "highly-engaged": return "Highly Engaged";
+      case "highly_engaged": return "Highly Engaged";
       case "engaged": return "Engaged";
       case "moderate": return "Moderate";
-      case "low-engagement": return "Low Engagement";
+      case "low_engagement": return "Low Engagement";
       case "new_patient": return "New Patient";
       case "unknown": return "No Data";
       default: return "Unknown";
@@ -255,10 +238,10 @@ export default function PatientTable({
           </select>
           <select className="filter-select">
             <option value="">All Engagement</option>
-            <option value="highly-engaged">Highly Engaged</option>
+            <option value="highly_engaged">Highly Engaged</option>
             <option value="engaged">Engaged</option>
             <option value="moderate">Moderate</option>
-            <option value="low-engagement">Low Engagement</option>
+            <option value="low_engagement">Low Engagement</option>
           </select>
         </div>
       </div>
