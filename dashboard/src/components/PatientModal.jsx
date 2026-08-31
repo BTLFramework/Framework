@@ -1345,6 +1345,26 @@ function PatientModal({ patient, onClose }) {
                 <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '8px 0 20px' }}>
                   This detailed assessment is the practitioner contribution to the 11-point SRS. Saving replaces the previous practitioner contribution; it does not stack additional points.
                 </p>
+                <div style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                  marginBottom: '20px'
+                }}>
+                  {['0 — Not resolved', '0.5 — Partly resolved', '1 — Resolved'].map((label) => (
+                    <span key={label} style={{
+                      padding: '6px 10px',
+                      borderRadius: '999px',
+                      background: '#ecfeff',
+                      border: '1px solid #a5f3fc',
+                      color: '#155e75',
+                      fontSize: '0.75rem',
+                      fontWeight: 600
+                    }}>
+                      {label}
+                    </span>
+                  ))}
+                </div>
                 {practitionerAssessmentLoading && (
                   <div style={{ padding: '10px 12px', marginBottom: '16px', borderRadius: '8px', background: '#f0f9ff', color: '#0369a1' }}>
                     Loading the saved practitioner assessment…
@@ -1390,9 +1410,9 @@ function PatientModal({ patient, onClose }) {
                         backgroundColor: practitionerAssessment.neurological.selected ? 'white' : '#f9fafb'
                       }}
                     >
-                      <option value="0">0</option>
-                      <option value="0.5">0.5</option>
-                      <option value="1">1</option>
+                      <option value="0">0 — Not resolved</option>
+                      <option value="0.5">0.5 — Partly resolved</option>
+                      <option value="1">1 — Resolved</option>
                     </select>
                     <input 
                       type="text" 
@@ -1431,9 +1451,9 @@ function PatientModal({ patient, onClose }) {
                         backgroundColor: practitionerAssessment.mechanical.selected ? 'white' : '#f9fafb'
                       }}
                     >
-                      <option value="0">0</option>
-                      <option value="0.5">0.5</option>
-                      <option value="1">1</option>
+                      <option value="0">0 — Not resolved</option>
+                      <option value="0.5">0.5 — Partly resolved</option>
+                      <option value="1">1 — Resolved</option>
                     </select>
                     <input 
                       type="text" 
@@ -1472,9 +1492,9 @@ function PatientModal({ patient, onClose }) {
                         backgroundColor: practitionerAssessment.orthopedic.selected ? 'white' : '#f9fafb'
                       }}
                     >
-                      <option value="0">0</option>
-                      <option value="0.5">0.5</option>
-                      <option value="1">1</option>
+                      <option value="0">0 — Not resolved</option>
+                      <option value="0.5">0.5 — Partly resolved</option>
+                      <option value="1">1 — Resolved</option>
                     </select>
                     <input 
                       type="text" 
@@ -1513,9 +1533,9 @@ function PatientModal({ patient, onClose }) {
                         backgroundColor: practitionerAssessment.provocative.selected ? 'white' : '#f9fafb'
                       }}
                     >
-                      <option value="0">0</option>
-                      <option value="0.5">0.5</option>
-                      <option value="1">1</option>
+                      <option value="0">0 — Not resolved</option>
+                      <option value="0.5">0.5 — Partly resolved</option>
+                      <option value="1">1 — Resolved</option>
                     </select>
                     <input 
                       type="text" 
@@ -1592,9 +1612,9 @@ function PatientModal({ patient, onClose }) {
                         backgroundColor: practitionerAssessment.rom.selected ? 'white' : '#f9fafb'
                       }}
                     >
-                      <option value="0">0</option>
-                      <option value="0.5">0.5</option>
-                      <option value="1">1</option>
+                      <option value="0">0 — Not resolved</option>
+                      <option value="0.5">0.5 — Partly resolved</option>
+                      <option value="1">1 — Resolved</option>
                     </select>
                     <input 
                       type="text" 
@@ -1633,9 +1653,9 @@ function PatientModal({ patient, onClose }) {
                         backgroundColor: practitionerAssessment.functional.selected ? 'white' : '#f9fafb'
                       }}
                     >
-                      <option value="0">0</option>
-                      <option value="0.5">0.5</option>
-                      <option value="1">1</option>
+                      <option value="0">0 — Not resolved</option>
+                      <option value="0.5">0.5 — Partly resolved</option>
+                      <option value="1">1 — Resolved</option>
                     </select>
                     <input 
                       type="text" 
@@ -1674,15 +1694,16 @@ function PatientModal({ patient, onClose }) {
                         backgroundColor: practitionerAssessment.movement.selected ? 'white' : '#f9fafb'
                       }}
                     >
-                      <option value="0">0</option>
-                      <option value="0.5">0.5</option>
-                      <option value="1">1</option>
+                      <option value="0">0 — Not resolved</option>
+                      <option value="0.5">0.5 — Partly resolved</option>
+                      <option value="1">1 — Resolved</option>
                     </select>
                     <input 
                       type="text" 
                       placeholder="Clinical details..."
                       value={practitionerAssessment.movement.notes}
                       onChange={(e) => handlePractitionerAssessmentChange('movement', 'notes', e.target.value)}
+                      disabled={!practitionerAssessment.movement.selected}
                       style={{ 
                         padding: '4px 8px', 
                         borderRadius: '4px', 
@@ -1714,9 +1735,9 @@ function PatientModal({ patient, onClose }) {
                         backgroundColor: practitionerAssessment.strength.selected ? 'white' : '#f9fafb'
                       }}
                     >
-                      <option value="0">0</option>
-                      <option value="0.5">0.5</option>
-                      <option value="1">1</option>
+                      <option value="0">0 — Not resolved</option>
+                      <option value="0.5">0.5 — Partly resolved</option>
+                      <option value="1">1 — Resolved</option>
                     </select>
                     <input 
                       type="text" 
@@ -1755,9 +1776,9 @@ function PatientModal({ patient, onClose }) {
                         backgroundColor: practitionerAssessment.balance.selected ? 'white' : '#f9fafb'
                       }}
                     >
-                      <option value="0">0</option>
-                      <option value="0.5">0.5</option>
-                      <option value="1">1</option>
+                      <option value="0">0 — Not resolved</option>
+                      <option value="0.5">0.5 — Partly resolved</option>
+                      <option value="1">1 — Resolved</option>
                     </select>
                     <input 
                       type="text" 
@@ -1796,9 +1817,9 @@ function PatientModal({ patient, onClose }) {
                         backgroundColor: practitionerAssessment.stability.selected ? 'white' : '#f9fafb'
                       }}
                     >
-                      <option value="0">0</option>
-                      <option value="0.5">0.5</option>
-                      <option value="1">1</option>
+                      <option value="0">0 — Not resolved</option>
+                      <option value="0.5">0.5 — Partly resolved</option>
+                      <option value="1">1 — Resolved</option>
                     </select>
                     <input 
                       type="text" 
@@ -1837,9 +1858,9 @@ function PatientModal({ patient, onClose }) {
                         backgroundColor: practitionerAssessment.treatment.selected ? 'white' : '#f9fafb'
                       }}
                     >
-                      <option value="0">0</option>
-                      <option value="0.5">0.5</option>
-                      <option value="1">1</option>
+                      <option value="0">0 — Not resolved</option>
+                      <option value="0.5">0.5 — Partly resolved</option>
+                      <option value="1">1 — Resolved</option>
                     </select>
                     <input 
                       type="text" 
