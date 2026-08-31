@@ -29,6 +29,7 @@ interface InsightDialogProps {
   onClose: () => void;
   onComplete?: (insightId: number, points?: number, result?: any) => void;
   patientId: string;
+  betaPreview?: boolean;
 }
 
 interface QuizState {
@@ -314,7 +315,8 @@ export default function InsightDialog({
   isOpen, 
   onClose, 
   onComplete, 
-  patientId 
+  patientId,
+  betaPreview = false
 }: InsightDialogProps) {
   const insightBodyRef = useRef<HTMLDivElement>(null);
   console.log('🎯 InsightDialog rendered with:', { insightId, isOpen, patientId });
@@ -451,7 +453,8 @@ export default function InsightDialog({
         insightId.toString(),
         response && insight
           ? { insightTitle: insight.title, response }
-          : undefined
+          : undefined,
+        betaPreview
       );
       console.log('🎯 Step 1 result:', insightResult);
       

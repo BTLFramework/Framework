@@ -3,15 +3,24 @@ const assert = require('node:assert/strict');
 const { insightSequence } = require('../src/config/insightSequence');
 const {
   calculateInsightStatus,
-  getSequentialCompletedIds
+  getSequentialCompletedIds,
+  isBetaInsightPreviewPatient
 } = require('../src/services/insightProgression');
 
 const atNoon = value => new Date(`${value}T12:00:00`);
 const record = (id, date) => ({ action: `INSIGHT:${id}`, date: atNoon(date) });
 
-test('the curriculum contains six weeks of unique daily lessons', () => {
-  assert.equal(insightSequence.length, 42);
-  assert.equal(new Set(insightSequence).size, 42);
+test('beta insight preview is restricted to the dedicated beta account', () => {
+  assert.equal(isBetaInsightPreviewPatient({ email: 'spencerbarberchiro+btlbeta2@gmail.com' }), true);
+  assert.equal(isBetaInsightPreviewPatient({ email: 'SPENCERBARBERCHIRO+BTLBETA2@GMAIL.COM' }), true);
+  assert.equal(isBetaInsightPreviewPatient({ email: 'patient@example.com' }), false);
+  assert.equal(isBetaInsightPreviewPatient(null), false);
+});
+
+test('the curriculum contains seven weeks of unique daily lessons', () => {
+  assert.equal(insightSequence.length, 49);
+  assert.equal(new Set(insightSequence).size, 49);
+  assert.deepEqual(insightSequence.slice(-7), [65, 66, 67, 68, 69, 70, 71]);
 });
 
 test('non-sequential records cannot skip a locked lesson', () => {

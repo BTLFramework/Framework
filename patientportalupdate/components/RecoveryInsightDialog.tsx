@@ -189,6 +189,8 @@ export function RecoveryInsightDialog({
     setAvailableInsightId(status?.availableInsightId ?? null);
     setCompletedToday(Boolean(status?.completedToday));
 
+    if (result?.betaPreview) return;
+
     if (result?.alreadyCompleted) return;
 
     const pointsEarned = points || 0;
@@ -566,6 +568,7 @@ export function RecoveryInsightDialog({
             onClose={handleCloseInsightDialog}
             onComplete={handleInsightComplete}
             patientId={patientId}
+            betaPreview={debugUnlockAll}
           />
         )}
       </Dialog>

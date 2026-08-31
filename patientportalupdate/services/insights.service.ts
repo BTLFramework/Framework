@@ -11,7 +11,8 @@ export interface InsightResponseSubmission {
 export const completeInsight = async (
   patientId: string,
   insightId: string,
-  submission?: InsightResponseSubmission
+  submission?: InsightResponseSubmission,
+  betaPreview = false
 ) => {
   try {
     console.log(`🎯 Completing insight ${insightId} for patient ${patientId}`);
@@ -24,6 +25,7 @@ export const completeInsight = async (
       body: JSON.stringify({ 
         insightId, 
         patientId,
+        betaPreview,
         ...submission
       }),
     });

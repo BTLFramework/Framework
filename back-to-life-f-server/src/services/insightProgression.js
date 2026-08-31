@@ -1,6 +1,11 @@
 const { insightSequence } = require('../config/insightSequence');
 
 const INSIGHT_ACTION_PREFIX = 'INSIGHT:';
+const BETA_INSIGHT_PREVIEW_EMAIL = 'spencerbarberchiro+btlbeta2@gmail.com';
+
+function isBetaInsightPreviewPatient(patient) {
+  return String(patient?.email || '').trim().toLowerCase() === BETA_INSIGHT_PREVIEW_EMAIL;
+}
 
 function startOfCalendarDay(date = new Date()) {
   const result = new Date(date);
@@ -52,8 +57,10 @@ function calculateInsightStatus({ records, enrollmentDate, now = new Date() }) {
 }
 
 module.exports = {
+  BETA_INSIGHT_PREVIEW_EMAIL,
   INSIGHT_ACTION_PREFIX,
   calculateInsightStatus,
   getSequentialCompletedIds,
+  isBetaInsightPreviewPatient,
   startOfCalendarDay
 };

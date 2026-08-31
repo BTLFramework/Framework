@@ -6,7 +6,8 @@ const { rpActions } = require('../config/recoveryPointsConfig');
 const { insightSequence } = require('../config/insightSequence');
 const {
   INSIGHT_ACTION_PREFIX,
-  calculateInsightStatus
+  calculateInsightStatus,
+  isBetaInsightPreviewPatient
 } = require('../services/insightProgression');
 const { verifyToken } = require('../services/jwtService');
 
@@ -109,7 +110,7 @@ router.get('/insights/status/:patientIdentifier', async (req, res) => {
 
 router.post('/insights/complete', async (req, res) => {
   try {
-    const { patientId, insightId, insightTitle, response } = req.body;
+    const { patientId, insightId, insightTitle, response, betaPreview = false } = req.body;
     const patient = await resolvePatient(patientId);
     const numericInsightId = parseInt(insightId, 10);
 
@@ -126,6 +127,28 @@ router.post('/insights/complete', async (req, res) => {
       validatedSubmission = validateInsightResponse(response, insightTitle);
     } catch (validationError) {
       return res.status(400).json({ success: false, error: validationError.message });
+    }
+
+    // Permit curriculum review only for the dedicated beta account. This saves
+    // structured reflections for clinician review but does not award points or
+    // alter the patient's sequential curriculum progress.
+    if (betaPreview === true) {
+      if (!isBetaInsightPreviewPatient(patient)) {
+        return res.status(403).json({ success: false, error: 'Beta preview is not available for this account' });
+      }
+      await saveInsightResponse(
+        patient.id,
+        numericInsightId,
+        validatedSubmission.insightTitle,
+        validatedSubmission.response
+      );
+      return res.json({
+        success: true,
+        betaPreview: true,
+        alreadyCompleted: false,
+        pointsAdded: 0,
+        data: await getInsightStatus(patient)
+      });
     }
 
     const action = `${INSIGHT_ACTION_PREFIX}${numericInsightId}`;
