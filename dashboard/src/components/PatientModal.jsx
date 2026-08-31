@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import AssignExercisesModal from './AssignExercisesModal';
 import { API_URL } from "../config/api";
 import { CLINICIAN } from "../config/clinician";
-import { calculatePCS4Score, calculateTSK7Score, pluralizeDay } from "../helpers/assessmentScores";
+import { calculatePCS4Score, calculateTSK7Score, parseTreatmentPlan, pluralizeDay } from "../helpers/assessmentScores";
 import { authenticatedFetch } from "../api/authenticatedFetch";
 
 const PRACTITIONER_ASSESSMENT_KEYS = [
@@ -215,6 +215,7 @@ function PatientModal({ patient, onClose }) {
 
   // Clinical Notes State
   const [clinicalNotes, setClinicalNotes] = useState([]);
+  const [showAllNotes, setShowAllNotes] = useState(false);
   const [clinicalNotesLoading, setClinicalNotesLoading] = useState(false);
   const [clinicalNotesError, setClinicalNotesError] = useState('');
   const [reviewSaving, setReviewSaving] = useState(false);
@@ -246,7 +247,7 @@ function PatientModal({ patient, onClose }) {
         type: n.type ?? "general",
         createdAt: n.createdAt ?? new Date().toISOString(),
         clinicianName: n.practitioner?.name ?? "Clinician",
-      })));
+      })).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
     } catch (error) {
       console.error('Error loading clinical notes:', error);
       setClinicalNotesError(error?.message || 'Clinical notes are temporarily unavailable.');
@@ -321,6 +322,7 @@ function PatientModal({ patient, onClose }) {
 
   // Beliefs
   const beliefs = patient.beliefs || [];
+  const treatmentPlan = parseTreatmentPlan(patient.treatmentPlan);
   
   // Practitioner Assessment Handlers
   const handlePractitionerAssessmentChange = (category, field, value) => {
@@ -634,10 +636,12 @@ function PatientModal({ patient, onClose }) {
 
         {/* Tab Navigation */}
         <div style={{ borderBottom: '1px solid #e5e7eb' }}>
-          <nav style={{ display: 'flex', padding: '0 24px' }}>
+          <nav style={{ display: 'flex', padding: '0 24px', overflowX: 'auto' }}>
             {[
               { id: 'overview', label: 'Overview' },
               { id: 'assessments', label: 'Assessments' },
+              { id: 'clinical', label: 'Clinical Review' },
+              { id: 'plan', label: 'Treatment Plan' },
               { id: 'notes', label: 'Notes' },
               { id: 'reflections', label: 'Patient Reflections' }
             ].map((tab) => (
@@ -653,6 +657,7 @@ function PatientModal({ patient, onClose }) {
                   background: 'transparent',
                   border: 'none',
                   cursor: 'pointer',
+                  flexShrink: 0,
                   transition: 'all 0.2s ease'
                 }}
               >
@@ -1172,13 +1177,13 @@ function PatientModal({ patient, onClose }) {
             </div>
           )}
 
-          {activeTab === 'notes' && (
+          {(activeTab === 'notes' || activeTab === 'clinical') && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#155e75', margin: 0 }}>
-                  Clinical Notes & Flags
+                  {activeTab === 'notes' ? 'Clinical Notes' : 'Clinical Review'}
                 </h3>
-                <button 
+                {activeTab === 'notes' && <button
                   onClick={() => setShowAddNoteModal(true)}
                   style={{
                     padding: '10px 16px',
@@ -1195,9 +1200,10 @@ function PatientModal({ patient, onClose }) {
                   onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
                 >
                   Add Note
-                </button>
+                </button>}
               </div>
               
+              {activeTab === 'clinical' && <>
               {/* Clinical Flags */}
               <div 
                 style={{
@@ -1929,6 +1935,9 @@ function PatientModal({ patient, onClose }) {
                 </div>
               </div>
 
+              </>}
+
+              {activeTab === 'notes' && <>
               {/* Notes Area */}
               <div 
                 style={{
@@ -1944,7 +1953,7 @@ function PatientModal({ patient, onClose }) {
                 
                 {!clinicalNotesLoading && !clinicalNotesError && clinicalNotes.length > 0 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '20px' }}>
-                    {clinicalNotes.map((note, index) => (
+                    {(showAllNotes ? clinicalNotes : clinicalNotes.slice(0, 5)).map((note) => (
                       <div 
                         key={note.id} 
                         style={{
@@ -2000,6 +2009,15 @@ function PatientModal({ patient, onClose }) {
                         </div>
                       </div>
                     ))}
+                    {clinicalNotes.length > 5 && (
+                      <button
+                        type="button"
+                        onClick={() => setShowAllNotes((current) => !current)}
+                        style={{ alignSelf: 'center', padding: '9px 16px', border: '1px solid #155e75', borderRadius: '8px', background: 'white', color: '#155e75', fontWeight: 600, cursor: 'pointer' }}
+                      >
+                        {showAllNotes ? 'Show newest 5 notes' : `View all notes (${clinicalNotes.length})`}
+                      </button>
+                    )}
                   </div>
                 )}
                 <div style={{ textAlign: 'center', padding: '40px 20px', color: clinicalNotesError ? '#b45309' : '#6b7280' }}>
@@ -2045,10 +2063,12 @@ function PatientModal({ patient, onClose }) {
                   )}
                 </div>
               </div>
+              </>}
 
               {/* Quick Actions */}
               <div 
                 style={{
+                  display: activeTab === 'clinical' ? 'block' : 'none',
                   background: '#f9fafb',
                   padding: '20px',
                   borderRadius: '12px',
@@ -2121,6 +2141,41 @@ function PatientModal({ patient, onClose }) {
             </div>
           )}
 
+          {activeTab === 'plan' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#155e75', margin: 0 }}>Treatment Plan</h3>
+                <p style={{ margin: '6px 0 0', color: '#64748b', fontSize: '0.875rem' }}>
+                  Review the current plan and clinician-assigned movement program.
+                </p>
+              </div>
+              <div style={{ background: 'linear-gradient(135deg, #ecfeff 0%, #ffffff 100%)', border: '1px solid #bae6fd', borderRadius: '12px', padding: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '14px', marginBottom: '18px' }}>
+                  <div><div style={{ fontSize: '0.75rem', color: '#64748b' }}>Assessment Region</div><div style={{ fontWeight: 700, color: '#155e75' }}>{patient.region || 'Unavailable'}</div></div>
+                  <div><div style={{ fontSize: '0.75rem', color: '#64748b' }}>Current Phase</div><div style={{ fontWeight: 700, color: '#155e75' }}>{phase}</div></div>
+                  <div><div style={{ fontSize: '0.75rem', color: '#64748b' }}>Assigned Exercises</div><div style={{ fontWeight: 700, color: '#155e75' }}>{treatmentPlan.assignedExercises.length}</div></div>
+                </div>
+                <div style={{ marginBottom: '18px' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569', marginBottom: '6px' }}>Plan Summary</div>
+                  <div style={{ padding: '12px', borderRadius: '8px', background: 'white', border: '1px solid #e2e8f0', color: '#334155', whiteSpace: 'pre-wrap' }}>
+                    {treatmentPlan.summary || 'No treatment-plan summary has been recorded yet.'}
+                  </div>
+                </div>
+                <div style={{ marginBottom: '18px' }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569', marginBottom: '6px' }}>Exercise IDs</div>
+                  {treatmentPlan.assignedExercises.length > 0 ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {treatmentPlan.assignedExercises.map((exerciseId) => <span key={exerciseId} style={{ padding: '6px 9px', borderRadius: '999px', background: '#cffafe', color: '#155e75', fontSize: '0.8rem', fontWeight: 600 }}>{exerciseId}</span>)}
+                    </div>
+                  ) : <div style={{ color: '#64748b', fontSize: '0.875rem' }}>The portal is currently using automatic exercise selection.</div>}
+                </div>
+                <button type="button" onClick={handleUpdateTreatmentPlan} style={{ padding: '10px 16px', border: 'none', borderRadius: '8px', background: 'linear-gradient(135deg, #155e75 0%, #0891b2 100%)', color: 'white', fontWeight: 700, cursor: 'pointer' }}>
+                  📋 Update Treatment Plan
+                </button>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'reflections' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               <div>
@@ -2181,6 +2236,8 @@ function PatientModal({ patient, onClose }) {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '12px',
             borderTop: '1px solid #e5e7eb',
             borderBottomLeftRadius: '16px',
             borderBottomRightRadius: '16px'
@@ -2189,7 +2246,14 @@ function PatientModal({ patient, onClose }) {
           <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
             Patient ID: {patient.id} • Last updated: {formatDate(patient.updatedAt)}
           </div>
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            <button
+              type="button"
+              onClick={handleUpdateTreatmentPlan}
+              style={{ padding: '10px 20px', color: '#155e75', border: '2px solid #155e75', borderRadius: '8px', background: 'white', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer' }}
+            >
+              📋 Update Plan
+            </button>
             <button 
               style={{
                 padding: '10px 20px',
