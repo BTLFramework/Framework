@@ -2065,7 +2065,7 @@ function PatientModal({ patient, onClose }) {
               </div>
               </>}
 
-              {/* Quick Actions */}
+              {/* Review Status */}
               <div 
                 style={{
                   display: activeTab === 'clinical' ? 'block' : 'none',
@@ -2076,35 +2076,9 @@ function PatientModal({ patient, onClose }) {
                 }}
               >
                 <h4 style={{ fontSize: '1rem', fontWeight: 600, color: '#374151', marginBottom: '16px', margin: 0 }}>
-                  Quick Actions
+                  Review Status
                 </h4>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                  <button 
-                    onClick={handleUpdateTreatmentPlan}
-                    style={{
-                      padding: '8px 16px',
-                      fontSize: '0.875rem',
-                      fontWeight: 500,
-                      color: '#155e75',
-                      backgroundColor: 'white',
-                      border: '1px solid #155e75',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
-                    onMouseOver={(e) => {
-                      e.target.style.backgroundColor = '#f0fdff';
-                    }}
-                    onMouseOut={(e) => {
-                      e.target.style.backgroundColor = 'white';
-                    }}
-                  >
-                    {quickActions.treatmentPlanUpdated ? '✅' : '📋'} 
-                    {quickActions.treatmentPlanUpdated ? 'Update Treatment Plan Again' : 'Update Treatment Plan'}
-                  </button>
                   <button 
                     onClick={handleMarkAsReviewed}
                     disabled={quickActions.reviewed || reviewSaving}
