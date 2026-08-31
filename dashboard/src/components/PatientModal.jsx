@@ -220,6 +220,7 @@ function PatientModal({ patient, onClose }) {
   const [clinicalNotesError, setClinicalNotesError] = useState('');
   const [reviewSaving, setReviewSaving] = useState(false);
   const [insightResponses, setInsightResponses] = useState([]);
+  const [showAllReflections, setShowAllReflections] = useState(false);
   const [insightResponsesLoading, setInsightResponsesLoading] = useState(false);
   const [insightResponsesError, setInsightResponsesError] = useState('');
 
@@ -270,7 +271,8 @@ function PatientModal({ patient, onClose }) {
       const response = await authenticatedFetch(`${API_URL}/patients/${patient.id}/insight-responses`);
       if (!response.ok) throw new Error(`Unable to load patient reflections (${response.status})`);
       const result = await response.json();
-      setInsightResponses(Array.isArray(result?.responses) ? result.responses : []);
+      setInsightResponses((Array.isArray(result?.responses) ? result.responses : [])
+        .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt)));
     } catch (error) {
       console.error('Error loading Recovery Insight responses:', error);
       setInsightResponsesError(error?.message || 'Patient reflections are temporarily unavailable.');
@@ -2182,6 +2184,23 @@ function PatientModal({ patient, onClose }) {
                 </p>
               </div>
 
+              {!insightResponsesLoading && !insightResponsesError && insightResponses.length > 0 && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '12px' }}>
+                  <div style={{ padding: '14px 16px', borderRadius: '10px', background: '#ecfeff', border: '1px solid #a5f3fc' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#0e7490', fontWeight: 700 }}>RESPONSES RECEIVED</div>
+                    <div style={{ marginTop: '4px', fontSize: '1.35rem', fontWeight: 800, color: '#155e75' }}>{insightResponses.length}</div>
+                  </div>
+                  <div style={{ padding: '14px 16px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 700 }}>LATEST RESPONSE</div>
+                    <div style={{ marginTop: '4px', fontSize: '0.9rem', fontWeight: 700, color: '#334155' }}>{new Date(insightResponses[0].submittedAt).toLocaleDateString()}</div>
+                  </div>
+                  <div style={{ padding: '14px 16px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 700 }}>LATEST LESSON</div>
+                    <div style={{ marginTop: '4px', fontSize: '0.9rem', fontWeight: 700, color: '#334155' }}>{insightResponses[0].insightTitle}</div>
+                  </div>
+                </div>
+              )}
+
               {insightResponsesLoading && (
                 <div style={{ padding: '28px', textAlign: 'center', color: '#64748b' }}>Loading patient reflections…</div>
               )}
@@ -2201,7 +2220,7 @@ function PatientModal({ patient, onClose }) {
                 </div>
               )}
 
-              {!insightResponsesLoading && !insightResponsesError && insightResponses.map((entry) => (
+              {!insightResponsesLoading && !insightResponsesError && (showAllReflections ? insightResponses : insightResponses.slice(0, 5)).map((entry) => (
                 <article key={entry.id} style={{ border: '1px solid #bae6fd', borderRadius: '12px', overflow: 'hidden', background: 'white' }}>
                   <div style={{ padding: '14px 18px', background: 'linear-gradient(135deg, #ecfeff 0%, #f8fafc 100%)', borderBottom: '1px solid #bae6fd' }}>
                     <div style={{ fontWeight: 700, color: '#155e75' }}>{entry.insightTitle}</div>
@@ -2219,6 +2238,16 @@ function PatientModal({ patient, onClose }) {
                   </div>
                 </article>
               ))}
+
+              {!insightResponsesLoading && !insightResponsesError && insightResponses.length > 5 && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllReflections((current) => !current)}
+                  style={{ alignSelf: 'center', padding: '9px 16px', border: '1px solid #0891b2', borderRadius: '8px', background: 'white', color: '#155e75', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  {showAllReflections ? 'Show newest 5 responses' : `View all responses (${insightResponses.length})`}
+                </button>
+              )}
             </div>
           )}
         </div>
