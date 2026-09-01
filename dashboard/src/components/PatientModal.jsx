@@ -163,6 +163,11 @@ function PatientModal({ patient, onClose }) {
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [messageText, setMessageText] = useState('');
   const [messageSubject, setMessageSubject] = useState('');
+  const [treatmentPlan, setTreatmentPlan] = useState(() => parseTreatmentPlan(patient?.treatmentPlan));
+
+  useEffect(() => {
+    setTreatmentPlan(parseTreatmentPlan(patient?.treatmentPlan));
+  }, [patient?.id, patient?.treatmentPlan]);
   
   // Practitioner Assessment State
   const [practitionerAssessment, setPractitionerAssessment] = useState(createBlankPractitionerAssessment);
@@ -324,8 +329,6 @@ function PatientModal({ patient, onClose }) {
 
   // Beliefs
   const beliefs = patient.beliefs || [];
-  const treatmentPlan = parseTreatmentPlan(patient.treatmentPlan);
-  
   // Practitioner Assessment Handlers
   const handlePractitionerAssessmentChange = (category, field, value) => {
     setPractitionerAssessment(prev => ({
@@ -438,6 +441,8 @@ function PatientModal({ patient, onClose }) {
         body: JSON.stringify({ plan: summary || '', exercises: ids || [] })
       });
       if (!response.ok) throw new Error('Failed to update treatment plan');
+      const result = await response.json();
+      setTreatmentPlan(parseTreatmentPlan(result?.patient?.treatmentPlan));
       setQuickActions(prev => ({ ...prev, treatmentPlanUpdated: true }));
       setShowAssignExercises(false);
       // Backend now auto-creates a clinical note when treatment plan updates.
@@ -2335,7 +2340,7 @@ function PatientModal({ patient, onClose }) {
         <AssignExercisesModal
           isOpen={showAssignExercises}
           onClose={() => setShowAssignExercises(false)}
-          patient={patient}
+          patient={{ ...patient, treatmentPlan }}
           onSave={handleAssignSave}
         />
       )}
