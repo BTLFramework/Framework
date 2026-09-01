@@ -930,7 +930,7 @@ function PatientModal({ patient, onClose }) {
                         alignItems: 'center',
                         gap: '4px'
                       }}>
-                        <span>{patient.recoveryPoints?.weeklyPoints || 0}</span>
+                        <span>{patient.recoveryPoints?.thisWeek ?? patient.recoveryPoints?.weeklyPoints ?? 0}</span>
                       </span>
                     </div>
                   </div>
