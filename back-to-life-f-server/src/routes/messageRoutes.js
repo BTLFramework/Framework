@@ -1,6 +1,7 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const { requirePractitionerAuth } = require('../middleware/requirePractitionerAuth');
+const { requirePatientAccess } = require('../middleware/requirePatientAuth');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -192,7 +193,7 @@ router.get('/conversation/:patientId', requirePractitionerAuth, async (req, res)
 });
 
 // Get messages for a patient (for patient portal)
-router.get('/patient/:patientId', async (req, res) => {
+router.get('/patient/:patientId', requirePatientAccess, async (req, res) => {
   try {
     const { patientId } = req.params;
     const { limit = 50, offset = 0 } = req.query;
@@ -232,7 +233,7 @@ router.get('/patient/:patientId', async (req, res) => {
 });
 
 // Mark all messages as read for a patient (when they view messages page)
-router.patch('/patient/:patientId/mark-read', async (req, res) => {
+router.patch('/patient/:patientId/mark-read', requirePatientAccess, async (req, res) => {
   try {
     const { patientId } = req.params;
 
@@ -264,7 +265,7 @@ router.patch('/patient/:patientId/mark-read', async (req, res) => {
 });
 
 // Send message from patient to clinician
-router.post('/reply', async (req, res) => {
+router.post('/reply', requirePatientAccess, async (req, res) => {
   try {
     const { patientId, subject, content, senderName } = req.body;
 

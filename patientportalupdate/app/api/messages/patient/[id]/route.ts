@@ -10,6 +10,7 @@ export async function GET(
 
     const response = await fetch(`${backendUrl}/api/messages/patient/${id}`, {
       cache: 'no-store',
+      headers: { Cookie: request.headers.get('cookie') || '' },
     });
     const data = await response.json();
 

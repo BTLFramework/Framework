@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 export async function PATCH(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -11,7 +11,10 @@ export async function PATCH(
     const { id } = await params;
     const response = await fetch(
       `${backendUrl}/api/messages/patient/${encodeURIComponent(id)}/mark-read`,
-      { method: 'PATCH' }
+      {
+        method: 'PATCH',
+        headers: { Cookie: request.headers.get('cookie') || '' },
+      }
     );
     const data = await response.json();
 
