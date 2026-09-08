@@ -18,7 +18,7 @@ interface Message {
 
 export default function MessagesPage() {
   const router = useRouter()
-  const { patient, isAuthenticated } = useAuth()
+  const { patient, isAuthenticated, loading: authLoading } = useAuth()
   const [selectedConversation, setSelectedConversation] = useState(1)
   const [newMessage, setNewMessage] = useState("")
   const [messages, setMessages] = useState<Message[]>([])
@@ -28,6 +28,12 @@ export default function MessagesPage() {
 
   // Ref for auto-scrolling to bottom
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.replace('/login')
+    }
+  }, [authLoading, isAuthenticated, router])
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -53,6 +59,7 @@ export default function MessagesPage() {
 
   // Fetch messages from API
   useEffect(() => {
+    if (authLoading) return
     if (!isAuthenticated || !patientId) {
       setLoading(false)
       return
@@ -116,7 +123,7 @@ export default function MessagesPage() {
     }
 
     fetchMessages()
-  }, [isAuthenticated, patientId])
+  }, [authLoading, isAuthenticated, patientId])
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !patientId) return
