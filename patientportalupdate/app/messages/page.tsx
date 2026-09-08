@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { ArrowLeft, Send, Search, Phone, CalendarDays, MessageCircle } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
+import { latestChronologicalMessage, newestFirstToChronological } from "@/lib/messageOrder"
 
 interface Message {
   id: number
@@ -43,7 +44,7 @@ export default function MessagesPage() {
   // Get patient ID from auth context
   const patientId = patient?.id;
 
-  const latestMessage = messages[0]
+  const latestMessage = latestChronologicalMessage(messages)
   const conversations = [
     {
       id: 1,
@@ -80,7 +81,7 @@ export default function MessagesPage() {
 
         if (result.success) {
           // Format messages for display
-          const formattedMessages = result.messages.map((msg: any) => ({
+          const formattedMessages = newestFirstToChronological(result.messages).map((msg: any) => ({
             id: msg.id,
             senderId: msg.senderType === 'CLINICIAN' ? 1 : 'me',
             senderName: msg.senderName,
@@ -159,7 +160,7 @@ export default function MessagesPage() {
       isOwn: true,
         }
 
-        setMessages(prev => [newMsg, ...prev])
+        setMessages(prev => [...prev, newMsg])
       setNewMessage("")
       } else {
         throw new Error(result.error || 'Failed to send message')
