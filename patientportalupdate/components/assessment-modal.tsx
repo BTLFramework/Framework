@@ -2,6 +2,7 @@
 
 import { X, ArrowRight, CheckCircle, Calendar, FileText } from "lucide-react"
 import { calculateTSK7Score } from "@/lib/assessmentScores"
+import { formatClinicalDate } from "@/lib/clinicalDate"
 
 // Utility function for missing data badge
 function MissingBadge() {
@@ -45,14 +46,6 @@ export function AssessmentModal({ assessment, onClose }: AssessmentModalProps) {
     // Here you would navigate to the actual assessment form
     alert(`Starting ${assessment.title}...`)
     onClose()
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
   }
 
   const getPhaseByScore = (score: number) => {
@@ -100,7 +93,7 @@ export function AssessmentModal({ assessment, onClose }: AssessmentModalProps) {
                 <div>
                   <p className="font-medium text-btl-900">Form Completed</p>
                   <p className="text-sm text-btl-700">
-                    Completed on {formatDate(assessment.completedDate || assessment.date)}
+                    Completed on {formatClinicalDate(assessment.completedDate || assessment.date)}
                   </p>
                 </div>
               </div>
@@ -236,7 +229,7 @@ export function AssessmentModal({ assessment, onClose }: AssessmentModalProps) {
                   <p className="text-sm text-btl-700">
                     {assessment.status === "due"
                       ? "This assessment is ready to complete"
-                      : `This assessment will be available on ${formatDate(assessment.date)}`}
+                      : `This assessment will be available on ${formatClinicalDate(assessment.date)}`}
                   </p>
                 </div>
               </div>
@@ -268,7 +261,7 @@ export function AssessmentModal({ assessment, onClose }: AssessmentModalProps) {
                     disabled
                     className="w-full bg-btl-100 text-btl-400 py-3 px-4 rounded-xl font-semibold flex items-center justify-center space-x-2 cursor-not-allowed"
                   >
-                    <span>Locked until {formatDate(assessment.date)}</span>
+                    <span>Locked until {formatClinicalDate(assessment.date)}</span>
                   </button>
                 )}
               </div>

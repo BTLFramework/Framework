@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { FileText, Clock, CheckCircle, AlertTriangle, Calendar, Eye, ArrowRight } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
+import { formatClinicalDate } from "@/lib/clinicalDate"
 
 interface AssessmentsSectionProps {
   onAssessmentClick: (assessment: any) => void
@@ -41,15 +42,6 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
     return { fourWeekDate, eightWeekDate }
   }
 
-  // Format date helper
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    })
-  }
-
   // Get status info based on completion status
   const getStatusInfo = (status: string, date: string, dueDate?: string) => {
     switch (status) {
@@ -57,19 +49,19 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
         return {
           icon: CheckCircle,
           color: "text-emerald-600 bg-emerald-100 border-emerald-200",
-          timeInfo: `Completed ${formatDate(new Date(date))}`
+          timeInfo: `Completed ${formatClinicalDate(date)}`
         }
       case "due":
         return {
           icon: AlertTriangle,
           color: "text-orange-600 bg-orange-100 border-orange-200",
-          timeInfo: `Due ${formatDate(new Date(dueDate || date))}`
+          timeInfo: `Due ${formatClinicalDate(dueDate || date)}`
         }
       case "upcoming":
         return {
           icon: Calendar,
           color: "text-blue-600 bg-blue-100 border-blue-200",
-          timeInfo: `Due ${formatDate(new Date(dueDate || date))}`
+          timeInfo: `Due ${formatClinicalDate(dueDate || date)}`
         }
       default:
         return {
@@ -182,7 +174,7 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
         const getCompletionDate = (formType: string, scheduledDate: Date) => {
           const score = srsScores.find((candidate: any) => matchesFormType(candidate, formType))
           const completedAt = score?.completedAt || score?.date || score?.createdAt
-          return score ? formatDate(completedAt ? new Date(completedAt) : scheduledDate) : undefined
+          return score ? formatClinicalDate(completedAt || scheduledDate) : undefined
         }
 
         const forms: IntakeForm[] = [
@@ -191,7 +183,7 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
             title: "Initial Intake Form",
             description: "Your first assessment to establish your SRS (Signature Recovery Score).",
             status: initialCompleted ? "completed" : "due",
-            date: formatDate(intakeDate),
+            date: formatClinicalDate(intakeDate),
             completedDate: initialCompleted ? getCompletionDate('Intake', intakeDate) : undefined,
             formData: getFormData('Intake') || getFormData('Initial'),
             actionButton: initialCompleted ? "View Results" : "Complete Form",
@@ -202,8 +194,8 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
             title: "4 Week Follow-up Intake",
             description: "Progress assessment to track your recovery journey",
             status: fourWeekCompleted ? "completed" : fourWeekOverdue ? "due" : "upcoming",
-            date: formatDate(fourWeekDate),
-            dueDate: formatDate(fourWeekDate),
+            date: formatClinicalDate(fourWeekDate),
+            dueDate: formatClinicalDate(fourWeekDate),
             completedDate: fourWeekCompleted ? getCompletionDate('4-Week Follow-up', fourWeekDate) : undefined,
             formData: getFormData('4-Week Follow-up'),
             actionButton: fourWeekCompleted ? "View Results" : "Start Assessment",
@@ -214,8 +206,8 @@ export function AssessmentsSection({ onAssessmentClick }: AssessmentsSectionProp
             title: "8 Week Follow-up Intake",
             description: "Final assessment to evaluate long-term progress",
             status: eightWeekCompleted ? "completed" : eightWeekOverdue ? "due" : "upcoming",
-            date: formatDate(eightWeekDate),
-            dueDate: formatDate(eightWeekDate),
+            date: formatClinicalDate(eightWeekDate),
+            dueDate: formatClinicalDate(eightWeekDate),
             completedDate: eightWeekCompleted ? getCompletionDate('8-Week Follow-up', eightWeekDate) : undefined,
             formData: getFormData('8-Week Follow-up'),
             actionButton: eightWeekCompleted ? "View Results" : "Start Assessment",

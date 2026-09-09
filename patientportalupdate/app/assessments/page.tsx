@@ -5,6 +5,7 @@ import { ArrowLeft, FileText, Clock, CheckCircle, AlertTriangle, Calendar } from
 import { useRouter } from "next/navigation"
 import { AssessmentModal } from "@/components/assessment-modal"
 import { useAuth } from "@/hooks/useAuth"
+import { formatClinicalDate } from "@/lib/clinicalDate"
 
 interface IntakeForm {
   id: string
@@ -39,15 +40,6 @@ export default function AssessmentsPage() {
     return { fourWeekDate, eightWeekDate }
   }
 
-  // Format date helper
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    })
-  }
-
   // Get status info based on completion status
   const getStatusInfo = (status: string, date: string, dueDate?: string) => {
     switch (status) {
@@ -55,19 +47,19 @@ export default function AssessmentsPage() {
         return {
           icon: CheckCircle,
           color: "text-emerald-600 bg-emerald-100 border-emerald-200",
-          timeInfo: `Completed ${formatDate(new Date(date))}`
+          timeInfo: `Completed ${formatClinicalDate(date)}`
         }
       case "due":
         return {
           icon: AlertTriangle,
           color: "text-orange-600 bg-orange-100 border-orange-200",
-          timeInfo: `Due ${formatDate(new Date(dueDate || date))}`
+          timeInfo: `Due ${formatClinicalDate(dueDate || date)}`
         }
       case "upcoming":
         return {
           icon: Calendar,
           color: "text-btl-800 bg-btl-100 border-btl-400",
-          timeInfo: `Due ${formatDate(new Date(dueDate || date))}`
+          timeInfo: `Due ${formatClinicalDate(dueDate || date)}`
         }
       default:
         return {
@@ -223,7 +215,7 @@ export default function AssessmentsPage() {
             candidate.region === formData.region
           )
           const completedAt = score?.completedAt || score?.date || score?.createdAt
-          return formatDate(completedAt ? new Date(completedAt) : scheduledDate)
+          return formatClinicalDate(completedAt || scheduledDate)
         }
 
         const forms: IntakeForm[] = [
@@ -232,7 +224,7 @@ export default function AssessmentsPage() {
             title: "Initial Intake Form",
             description: "Your first assessment to establish your SRS (Signature Recovery Score).",
             status: initialCompleted ? "completed" : "due",
-            date: formatDate(intakeDate),
+            date: formatClinicalDate(intakeDate),
             completedDate: initialCompleted ? getCompletionDate('Intake', intakeDate) : undefined,
             formData: getFormData('Intake'),
             actionButton: initialCompleted ? "View Results" : "Complete Form",
@@ -243,8 +235,8 @@ export default function AssessmentsPage() {
             title: "4 Week Follow-up Intake",
             description: "Progress assessment to track your recovery journey",
             status: fourWeekCompleted ? "completed" : fourWeekOverdue ? "due" : "upcoming",
-            date: formatDate(fourWeekDate),
-            dueDate: formatDate(fourWeekDate),
+            date: formatClinicalDate(fourWeekDate),
+            dueDate: formatClinicalDate(fourWeekDate),
             completedDate: fourWeekCompleted ? getCompletionDate('4-Week Follow-up', fourWeekDate) : undefined,
             formData: getFormData('4-Week Follow-up'),
             actionButton: fourWeekCompleted ? "View Results" : "Start Assessment",
@@ -255,8 +247,8 @@ export default function AssessmentsPage() {
             title: "8 Week Follow-up Intake",
             description: "Final assessment to evaluate long-term progress",
             status: eightWeekCompleted ? "completed" : eightWeekOverdue ? "due" : "upcoming",
-            date: formatDate(eightWeekDate),
-            dueDate: formatDate(eightWeekDate),
+            date: formatClinicalDate(eightWeekDate),
+            dueDate: formatClinicalDate(eightWeekDate),
             completedDate: eightWeekCompleted ? getCompletionDate('8-Week Follow-up', eightWeekDate) : undefined,
             formData: getFormData('8-Week Follow-up'),
             actionButton: eightWeekCompleted ? "View Results" : "Start Assessment",
