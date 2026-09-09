@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import AssignExercisesModal from './AssignExercisesModal';
 import { API_URL } from "../config/api";
 import { CLINICIAN } from "../config/clinician";
-import { calculatePCS4Score, calculateTSK7Score, parseTreatmentPlan, pluralizeDay } from "../helpers/assessmentScores";
+import { calculatePCS4Score, calculateTSK7Score, isPractitionerAssessmentComplete, parseTreatmentPlan, pluralizeDay } from "../helpers/assessmentScores";
 import { authenticatedFetch } from "../api/authenticatedFetch";
 
 const PRACTITIONER_ASSESSMENT_KEYS = [
@@ -366,6 +366,10 @@ function PatientModal({ patient, onClose }) {
   
   const handleSavePractitionerAssessment = async () => {
     if (practitionerAssessmentLoading || practitionerAssessmentError || practitionerAssessmentSaving) return;
+    if (!isPractitionerAssessmentComplete(practitionerAssessment)) {
+      alert('Select at least one applicable criterion in each section before saving.');
+      return;
+    }
     setPractitionerAssessmentSaving(true);
     try {
       const assessmentData = {

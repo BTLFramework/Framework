@@ -14,8 +14,15 @@ function blankAssessment() {
   );
 }
 
-test('unchecked criteria contribute zero even if a stale UI score is present', () => {
-  const result = normalizePractitionerAssessment(blankAssessment());
+test('rejects an assessment with no applicable criteria selected', () => {
+  assert.throws(() => normalizePractitionerAssessment(blankAssessment()), /complete practitioner assessment is required/);
+});
+
+test('accepts explicit zero scores when each section has an applicable criterion', () => {
+  const body = blankAssessment();
+  body.neurological = { selected: true, score: '0', notes: 'Still present' };
+  body.rom = { selected: true, score: '0', notes: 'Still limited' };
+  const result = normalizePractitionerAssessment(body);
   assert.equal(result.totalPractitionerScore, 0);
   assert.equal(result.items.neurological.score, 0);
 });
@@ -33,6 +40,7 @@ test('calculates and caps each detailed section at one point', () => {
 
 test('rejects out-of-range practitioner scores', () => {
   const body = blankAssessment();
+  body.neurological = { selected: true, score: '0', notes: '' };
   body.rom = { selected: true, score: '4', notes: '' };
   assert.throws(() => normalizePractitionerAssessment(body), /score must be/);
 });

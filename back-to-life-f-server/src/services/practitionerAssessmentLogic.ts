@@ -28,8 +28,13 @@ export function normalizePractitionerAssessment(body: Record<string, unknown>) {
   const items = Object.fromEntries(
     [...SECTION_1_KEYS, ...SECTION_2_KEYS].map((key) => [key, normalizeAssessmentItem(body[key], key)]),
   ) as Record<string, AssessmentItem>;
-  const section1Score = calculateAssessmentSection(SECTION_1_KEYS.map((key) => items[key]));
-  const section2Score = calculateAssessmentSection(SECTION_2_KEYS.map((key) => items[key]));
+  const section1Items = SECTION_1_KEYS.map((key) => items[key]);
+  const section2Items = SECTION_2_KEYS.map((key) => items[key]);
+  if (!section1Items.some((item) => item.selected) || !section2Items.some((item) => item.selected)) {
+    throw new Error('A complete practitioner assessment is required: select at least one applicable criterion in each section');
+  }
+  const section1Score = calculateAssessmentSection(section1Items);
+  const section2Score = calculateAssessmentSection(section2Items);
   return {
     items,
     section1Score,

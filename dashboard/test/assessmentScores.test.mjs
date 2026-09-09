@@ -1,6 +1,6 @@
 import test from "node:test"
 import assert from "node:assert/strict"
-import { calculatePCS4Score, calculateTSK7Score, calendarDaysSince, formatClinicalDate, formatRelativeClinicalDate, parseClinicalDate, parseTreatmentPlan, pluralizeDay } from "../src/helpers/assessmentScores.js"
+import { calculatePCS4Score, calculateTSK7Score, calendarDaysSince, formatClinicalDate, formatRelativeClinicalDate, isPractitionerAssessmentComplete, parseClinicalDate, parseTreatmentPlan, pluralizeDay } from "../src/helpers/assessmentScores.js"
 
 test("PCS-4 uses its documented 0-16 range", () => {
   assert.equal(calculatePCS4Score({ 1: 1, 2: 0, 3: 2, 4: 1 }), 4)
@@ -19,6 +19,18 @@ test("incomplete TSK-7 data remains unavailable", () => {
 test("day label is grammatically correct", () => {
   assert.equal(pluralizeDay(1), "1 day")
   assert.equal(pluralizeDay(2), "2 days")
+})
+
+test("practitioner assessment requires an applicable criterion in both sections", () => {
+  const assessment = {
+    neurological: { selected: true },
+    mechanical: { selected: false },
+    rom: { selected: false },
+    functional: { selected: false },
+  }
+  assert.equal(isPractitionerAssessmentComplete(assessment), false)
+  assessment.rom.selected = true
+  assert.equal(isPractitionerAssessmentComplete(assessment), true)
 })
 
 test("existing manual treatment plans retain their selected exercises", () => {

@@ -24,6 +24,13 @@ export const calculateTSK7Score = (responses) => {
 
 export const pluralizeDay = (count) => `${count} ${count === 1 ? "day" : "days"}`
 
+export const isPractitionerAssessmentComplete = (assessment) => {
+  const section1 = ['neurological', 'mechanical', 'orthopedic', 'provocative']
+  const section2 = ['rom', 'functional', 'movement', 'strength', 'balance', 'stability', 'treatment']
+  const hasSelectedItem = (keys) => keys.some((key) => assessment?.[key]?.selected === true)
+  return hasSelectedItem(section1) && hasSelectedItem(section2)
+}
+
 export const parseClinicalDate = (value) => {
   if (!value) return null
   const text = String(value)
