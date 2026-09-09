@@ -344,6 +344,8 @@ export default function InsightDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
+  const [pointsAwarded, setPointsAwarded] = useState(0);
+  const [wasAlreadyCompleted, setWasAlreadyCompleted] = useState(false);
 
   useEffect(() => {
     if (insightId) {
@@ -356,6 +358,8 @@ export default function InsightDialog({
       setIsLoadingForm(false);
       setShowQuiz(false);
       setQuizCompleted(false);
+      setPointsAwarded(0);
+      setWasAlreadyCompleted(false);
     }
   }, [insightId]);
 
@@ -418,16 +422,6 @@ export default function InsightDialog({
     void handleComplete();
   };
 
-  // DEV MODE: Allow testing completion popup for already completed insights
-  const handleTestCompletion = () => {
-    console.log('🎯 DEV MODE: Testing completion popup');
-    setIsCompleted(true);
-    // Auto-close after showing celebration
-    setTimeout(() => {
-      onClose();
-    }, 2000);
-  };
-
   const handleComplete = async (response?: Record<string, unknown>) => {
     console.log('🎯 handleComplete called with patientId:', patientId, 'insightId:', insightId);
     
@@ -467,6 +461,9 @@ export default function InsightDialog({
       }
       
       console.log('🎯 Step 3: Setting isCompleted to show congratulations...');
+      const awarded = Number(insightResult.pointsAdded || 0);
+      setPointsAwarded(awarded);
+      setWasAlreadyCompleted(Boolean(insightResult.alreadyCompleted) || awarded === 0);
       setIsCompleted(true);                                              // Show congratulations message
       
       // Call onComplete callback
@@ -1667,7 +1664,9 @@ export default function InsightDialog({
                       color: '#155fa0',
                     }}
                   >
-                                            +{insight?.points || 5} Recovery Points Earned! 🎉
+                    {wasAlreadyCompleted
+                      ? 'Lesson reviewed — no additional points.'
+                      : `+${pointsAwarded} Recovery Points Earned! 🎉`}
                   </span>
                 </div>
               </div>
@@ -1703,15 +1702,6 @@ export default function InsightDialog({
                insight?.assetPath?.startsWith('FORM:') ? 'Complete Session' : 'Take Quiz'}
             </button>
             
-            {/* DEV MODE: Test completion popup button for completed insights */}
-            {isCompleted && (
-              <button
-                onClick={handleTestCompletion}
-                className="ml-2 px-4 py-2 rounded-full font-medium bg-yellow-500 text-white hover:bg-yellow-600 transition-colors"
-              >
-                Test Popup
-              </button>
-            )}
           </AssessmentDialogFooter>
 
         </AssessmentDialogContent>

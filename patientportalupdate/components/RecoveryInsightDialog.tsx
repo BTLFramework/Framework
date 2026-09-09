@@ -69,24 +69,9 @@ export function RecoveryInsightDialog({
   const [refreshKey, setRefreshKey] = useState(0);
   const [dailyCompletedInsights, setDailyCompletedInsights] = useState<number>(0);
 
-  // Temporary curriculum preview for the dedicated beta patient only.
-  const [debugUnlockAll, setDebugUnlockAll] = useState(false);
-
   useEffect(() => {
     if (open) curriculumScrollRef.current?.scrollTo({ top: 0 });
   }, [open]);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const unlockParam = params.get('unlockInsights');
-      const isBetaPreviewPatient =
-        patientId.trim().toLowerCase() === 'spencerbarberchiro+btlbeta2@gmail.com';
-      const shouldUnlock = unlockParam === '1' && isBetaPreviewPatient;
-      console.log('🔓 Recovery Insight preview check:', { unlockParam, isBetaPreviewPatient, shouldUnlock });
-      setDebugUnlockAll(shouldUnlock);
-    }
-  }, [patientId]);
 
   // Completion and unlocking must be durable across devices, so the backend
   // Recovery Points ledger is the source of truth.
@@ -458,18 +443,13 @@ export function RecoveryInsightDialog({
                 <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border border-gray-200 shadow-lg p-6 hover:shadow-xl transition-all duration-300">
                   <h3 className="text-xl font-semibold text-gray-900 mb-6">
                     Recovery Insights
-                    {debugUnlockAll && (
-                      <span className="ml-2 text-sm font-normal text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
-                        🔓 BETA PREVIEW: All Unlocked
-                      </span>
-                    )}
                   </h3>
                   <div className="space-y-4" key={refreshKey}>
                     {filteredInsights.map((insight, i) => {
                       if (!insight) return null;
                       const offset = insight.releaseOffset;
                       const isCompleted = completedInsights.includes(Number(insight.id));
-                      const isAvailable = debugUnlockAll || Number(insight.id) === availableInsightId;
+                      const isAvailable = Number(insight.id) === availableInsightId;
                       const isFuture = !isCompleted && !isAvailable;
 
                       // Calculate week and day labels
@@ -568,7 +548,6 @@ export function RecoveryInsightDialog({
             onClose={handleCloseInsightDialog}
             onComplete={handleInsightComplete}
             patientId={patientId}
-            betaPreview={debugUnlockAll}
           />
         )}
       </Dialog>

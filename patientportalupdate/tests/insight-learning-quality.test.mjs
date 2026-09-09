@@ -31,6 +31,16 @@ test('quiz feedback waits for the patient and does not auto-advance', () => {
   assert.ok(!component.includes('setTimeout(() => {\n        if (quizState.currentQuestionIndex'))
 })
 
+test('production insight completion distinguishes a redo from newly earned points', () => {
+  const insightDialog = fs.readFileSync(path.join(root, 'components/InsightDialog.tsx'), 'utf8')
+  const recoveryDialog = fs.readFileSync(path.join(root, 'components/RecoveryInsightDialog.tsx'), 'utf8')
+
+  assert.ok(insightDialog.includes('Lesson reviewed — no additional points.'))
+  assert.ok(!insightDialog.includes('Test Popup'))
+  assert.ok(!recoveryDialog.includes('unlockInsights'))
+  assert.ok(!recoveryDialog.includes('BETA PREVIEW: All Unlocked'))
+})
+
 test('legacy quiz fallbacks are synchronized from structured questions', () => {
   assert.ok(source.includes('insight.quizQ = firstQuestion.question'))
   assert.ok(source.includes('insight.quizA = firstQuestion.options[firstQuestion.correctAnswer]'))
