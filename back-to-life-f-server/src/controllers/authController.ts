@@ -1,6 +1,12 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import prisma from "../db";
+import { sendPractitionerPasswordResetEmail } from "../services/emailService";
+import {
+  generatePractitionerPasswordResetToken,
+  readPractitionerPasswordResetSubject,
+  verifyPractitionerPasswordResetToken,
+} from "../services/practitionerPasswordReset";
 
 const normalizeEmail = (value: unknown) =>
   typeof value === "string" ? value.trim().toLowerCase() : "";
@@ -12,6 +18,22 @@ const isStrongPassword = (value: unknown) =>
   /[A-Z]/.test(value) &&
   /\d/.test(value) &&
   /[^A-Za-z0-9]/.test(value);
+
+const resetRequestTimes = new Map<string, number>();
+const RESET_REQUEST_COOLDOWN_MS = 60_000;
+const RESET_RESPONSE = {
+  message: "If that clinician account exists, a password reset link has been emailed.",
+};
+
+const practitionerPortalUrl = () => {
+  const configured = process.env.PRACTITIONER_PORTAL_URL || "https://dashboard-three-taupe-47.vercel.app";
+  try {
+    const url = new URL(configured);
+    return `${url.origin}${url.pathname.replace(/\/$/, "")}`;
+  } catch {
+    return "https://dashboard-three-taupe-47.vercel.app";
+  }
+};
 
 export const bootstrapStatus = async (_req: any, res: any) => {
   try {
@@ -127,5 +149,74 @@ export const login = async (req: any, res: any) => {
     res.json({ token });
   } catch (error) {
     res.status(500).send("Internal server error");
+  }
+};
+
+export const requestPractitionerPasswordReset = async (req: any, res: any) => {
+  const email = normalizeEmail(req.body?.email);
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    res.json(RESET_RESPONSE);
+    return;
+  }
+
+  try {
+    const now = Date.now();
+    const lastRequest = resetRequestTimes.get(email) || 0;
+    if (now - lastRequest < RESET_REQUEST_COOLDOWN_MS) {
+      res.json(RESET_RESPONSE);
+      return;
+    }
+    resetRequestTimes.set(email, now);
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (user) {
+      const token = generatePractitionerPasswordResetToken(user, now);
+      const resetLink = `${practitionerPortalUrl()}/reset-password?token=${encodeURIComponent(token)}`;
+      await sendPractitionerPasswordResetEmail(user.email, resetLink);
+    }
+    res.json(RESET_RESPONSE);
+  } catch (error) {
+    console.error("Practitioner password reset request error:", error);
+    res.json(RESET_RESPONSE);
+  }
+};
+
+export const resetPractitionerPassword = async (req: any, res: any) => {
+  const token = req.body?.token;
+  const password = req.body?.password;
+  if (!isStrongPassword(password)) {
+    res.status(400).json({
+      error: "Password must be at least 10 characters and include uppercase, lowercase, a number, and a symbol",
+    });
+    return;
+  }
+
+  const subject = readPractitionerPasswordResetSubject(token);
+  if (!subject) {
+    res.status(400).json({ error: "This password reset link is invalid or has expired" });
+    return;
+  }
+
+  try {
+    const user = await prisma.user.findUnique({ where: { id: subject.id } });
+    if (!user || user.email.trim().toLowerCase() !== subject.email || !verifyPractitionerPasswordResetToken(token, user)) {
+      res.status(400).json({ error: "This password reset link is invalid or has expired" });
+      return;
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const updated = await prisma.user.updateMany({
+      where: { id: user.id, password: user.password },
+      data: { password: hashedPassword },
+    });
+    if (updated.count !== 1) {
+      res.status(409).json({ error: "This password reset link has already been used" });
+      return;
+    }
+    resetRequestTimes.delete(user.email.trim().toLowerCase());
+    res.json({ message: "Password updated. You can now sign in." });
+  } catch (error) {
+    console.error("Practitioner password reset error:", error);
+    res.status(500).json({ error: "Unable to reset the password right now" });
   }
 };

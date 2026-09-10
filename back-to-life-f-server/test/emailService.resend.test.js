@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 
 require('ts-node/register/transpile-only');
 
-const { sendWelcomeEmail } = require('../src/services/emailService');
+const { sendWelcomeEmail, sendPractitionerPasswordResetEmail } = require('../src/services/emailService');
 
 const originalEnv = { ...process.env };
 const originalFetch = global.fetch;
@@ -62,4 +62,25 @@ test('fails fast when Resend credentials are absent', async () => {
 
   assert.equal(sent, false);
   assert.equal(fetchCalled, false);
+});
+
+test('sends a clinician password reset link without exposing it in the subject', async () => {
+  process.env.EMAIL_PROVIDER = 'resend';
+  process.env.RESEND_API_KEY = 'test-key';
+  process.env.EMAIL_FROM = 'Back to Life <welcome@example.com>';
+  const resetLink = 'https://dashboard-three-taupe-47.vercel.app/reset-password?token=signed-token';
+
+  global.fetch = async (_url, options) => {
+    const payload = JSON.parse(options.body);
+    assert.deepEqual(payload.to, ['clinician@example.com']);
+    assert.equal(payload.subject, 'Reset your Back to Life clinician password');
+    assert.doesNotMatch(payload.subject, /signed-token/);
+    assert.match(payload.text, /signed-token/);
+    return { ok: true, status: 200, text: async () => '' };
+  };
+
+  assert.equal(
+    await sendPractitionerPasswordResetEmail('clinician@example.com', resetLink),
+    true
+  );
 });

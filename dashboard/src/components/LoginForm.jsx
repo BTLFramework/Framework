@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLogin } from "../hooks/useLogin";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { bootstrapPractitioner, getPractitionerSetupStatus } from "../api/auth";
 
 function LoginForm() {
@@ -62,10 +62,13 @@ function LoginForm() {
         </div>
       )}
       <div>
-        <label className="block text-sm font-medium text-charcoal-700 mb-2">
+        <label htmlFor="practitioner-email" className="block text-sm font-medium text-charcoal-700 mb-2">
           Email Address
         </label>
         <input
+          id="practitioner-email"
+          name="email"
+          autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email"
@@ -75,10 +78,13 @@ function LoginForm() {
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-charcoal-700 mb-2">
+        <label htmlFor="practitioner-password" className="block text-sm font-medium text-charcoal-700 mb-2">
           Password
         </label>
         <input
+          id="practitioner-password"
+          name="password"
+          autoComplete={setupRequired ? "new-password" : "current-password"}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Enter your password"
@@ -89,10 +95,13 @@ function LoginForm() {
       </div>
       {setupRequired && (
         <div>
-          <label className="block text-sm font-medium text-charcoal-700 mb-2">
+          <label htmlFor="practitioner-confirm-password" className="block text-sm font-medium text-charcoal-700 mb-2">
             Confirm Password
           </label>
           <input
+            id="practitioner-confirm-password"
+            name="confirm-password"
+            autoComplete="new-password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Re-enter your password"
@@ -120,6 +129,13 @@ function LoginForm() {
                 ? "Signing In..."
                 : "Sign In"}
       </button>
+      {!setupRequired && !checkingSetup && (
+        <div className="text-center">
+          <Link to="/forgot-password" className="text-sm font-medium text-btl-700 hover:text-btl-900 underline underline-offset-2">
+            Forgot password?
+          </Link>
+        </div>
+      )}
       {loginMutation.isSuccess && (
         <div className="text-btl-600 text-center font-medium">Login successful!</div>
       )}

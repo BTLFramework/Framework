@@ -189,6 +189,77 @@ export const sendWelcomeEmail = async (emailData: EmailData): Promise<boolean> =
   }
 };
 
+export const sendPractitionerPasswordResetEmail = async (
+  email: string,
+  resetLink: string
+): Promise<boolean> => {
+  const subject = 'Reset your Back to Life clinician password';
+  const body = [
+    'A password reset was requested for your Back to Life clinician account.',
+    '',
+    `Reset your password: ${resetLink}`,
+    '',
+    'This link expires in 30 minutes and can only be used once.',
+    'If you did not request this reset, you can ignore this email.',
+  ].join('\n');
+
+  try {
+    if ((process.env.EMAIL_PROVIDER || '').toLowerCase() === 'resend') {
+      const apiKey = process.env.RESEND_API_KEY;
+      const from = process.env.EMAIL_FROM;
+      if (!apiKey || !from) {
+        console.error('❌ Password reset email not sent: RESEND_API_KEY and EMAIL_FROM must be configured');
+        return false;
+      }
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      try {
+        const response = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from,
+            to: [email],
+            subject,
+            text: body,
+            html: escapeHtml(body).replace(/\n/g, '<br>'),
+          }),
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          console.error(`❌ Resend rejected password reset email (${response.status})`);
+          return false;
+        }
+        console.log(`✅ Password reset email accepted for delivery to ${email}`);
+        return true;
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      console.error('❌ Password reset email not sent: EMAIL_USER and EMAIL_PASS must be configured');
+      return false;
+    }
+    await createTransporter().sendMail({
+      from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+      to: email,
+      subject,
+      text: body,
+      html: escapeHtml(body).replace(/\n/g, '<br>'),
+    });
+    console.log(`✅ Password reset email sent to ${email}`);
+    return true;
+  } catch (error) {
+    console.error('❌ Error sending practitioner password reset email:', error);
+    return false;
+  }
+};
+
 // For development/testing - log email instead of sending
 export const sendWelcomeEmailDev = async (emailData: EmailData): Promise<boolean> => {
   const { subject, body } = renderWelcomeEmail(emailData);
