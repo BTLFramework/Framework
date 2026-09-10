@@ -63,3 +63,22 @@ test('a missed patient catches up sequentially one lesson per day', () => {
   assert.equal(status.availableInsightId, insightSequence[1]);
   assert.deepEqual(status.completedInsightIds, [insightSequence[0]]);
 });
+
+test('the next lesson does not unlock at UTC midnight before Edmonton midnight', () => {
+  const completion = new Date('2026-09-10T04:30:00.000Z'); // Sep 9 at 10:30 PM in Edmonton
+  const beforeLocalMidnight = calculateInsightStatus({
+    records: [{ action: `INSIGHT:${insightSequence[0]}`, date: completion }],
+    enrollmentDate: new Date('2026-09-08T00:00:00.000Z'),
+    now: new Date('2026-09-10T05:30:00.000Z'), // Sep 9 at 11:30 PM in Edmonton
+  });
+  assert.equal(beforeLocalMidnight.completedToday, true);
+  assert.equal(beforeLocalMidnight.availableInsightId, null);
+
+  const afterLocalMidnight = calculateInsightStatus({
+    records: [{ action: `INSIGHT:${insightSequence[0]}`, date: completion }],
+    enrollmentDate: new Date('2026-09-08T00:00:00.000Z'),
+    now: new Date('2026-09-10T06:01:00.000Z'), // Sep 10 at 12:01 AM in Edmonton
+  });
+  assert.equal(afterLocalMidnight.completedToday, false);
+  assert.equal(afterLocalMidnight.availableInsightId, insightSequence[1]);
+});
