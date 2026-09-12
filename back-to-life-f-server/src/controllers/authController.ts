@@ -172,7 +172,13 @@ export const requestPractitionerPasswordReset = async (req: any, res: any) => {
     if (user) {
       const token = generatePractitionerPasswordResetToken(user, now);
       const resetLink = `${practitionerPortalUrl()}/reset-password?token=${encodeURIComponent(token)}`;
-      await sendPractitionerPasswordResetEmail(user.email, resetLink);
+      const delivered = await sendPractitionerPasswordResetEmail(user.email, resetLink);
+      if (!delivered) {
+        res.status(503).json({
+          error: "We couldn't send the reset email. Please try again shortly or contact support.",
+        });
+        return;
+      }
     }
     res.json(RESET_RESPONSE);
   } catch (error) {

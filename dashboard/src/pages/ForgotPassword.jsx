@@ -6,16 +6,18 @@ function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitting(true);
     setMessage("");
+    setError("");
     try {
       const { data } = await requestPractitionerPasswordReset(email);
       setMessage(data?.message || "If that clinician account exists, a reset link has been emailed.");
-    } catch {
-      setMessage("We could not request a reset right now. Please try again shortly.");
+    } catch (requestError) {
+      setError(requestError?.response?.data?.error || "We could not request a reset right now. Please try again shortly.");
     } finally {
       setSubmitting(false);
     }
@@ -45,9 +47,9 @@ function ForgotPassword() {
         </button>
       </form>
       {message && <div className="mt-5 text-center text-sm text-charcoal-700" role="status" aria-live="polite">{message}</div>}
+      {error && <div className="mt-5 text-center text-sm text-red-700" role="alert">{error}</div>}
     </PractitionerAuthLayout>
   );
 }
 
 export default ForgotPassword;
-
