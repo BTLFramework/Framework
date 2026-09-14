@@ -55,6 +55,7 @@ export function QuizPopup({
   onQuizComplete: () => void; 
 }) {
   const quizBodyRef = useRef<HTMLDivElement>(null);
+  const [legacyTextAnswer, setLegacyTextAnswer] = useState("");
   const [quizState, setQuizState] = useState<QuizState>({
     isVisible: false,
     currentQuestionIndex: 0,
@@ -68,6 +69,7 @@ export function QuizPopup({
   useEffect(() => {
     if (isOpen && insight) {
       const totalQuestions = insight.questions?.length || 1;
+      setLegacyTextAnswer("");
       setQuizState({
         isVisible: true,
         currentQuestionIndex: 0,
@@ -114,8 +116,13 @@ export function QuizPopup({
       console.log('🎯 Multiple choice - correctAnswer:', correctAnswer, 'isCorrect:', isCorrect);
     } else {
       // Legacy single question
-      const answerText = currentAnswer === 0 ? "T" : currentAnswer === 1 ? "F" : "";
-      isCorrect = answerText.toUpperCase() === insight.quizA.toUpperCase();
+      const expectsWrittenResponse = insight.quizA.trim().toLowerCase() === "(user input)";
+      const answerText = expectsWrittenResponse
+        ? legacyTextAnswer.trim()
+        : currentAnswer === 0 ? "T" : currentAnswer === 1 ? "F" : "";
+      isCorrect = expectsWrittenResponse
+        ? answerText.length > 0
+        : answerText.toUpperCase() === insight.quizA.toUpperCase();
       console.log('🎯 Legacy question - answerText:', answerText, 'expected:', insight.quizA, 'isCorrect:', isCorrect);
     }
     
@@ -157,6 +164,7 @@ export function QuizPopup({
   // Get current question data
   const currentQuestion = insight.questions?.[quizState.currentQuestionIndex];
   const isLastQuestion = quizState.currentQuestionIndex === quizState.totalQuestions - 1;
+  const expectsWrittenResponse = !currentQuestion && insight.quizA.trim().toLowerCase() === "(user input)";
 
   return (
     <AssessmentDialog open={isOpen} onOpenChange={onClose}>
@@ -223,6 +231,21 @@ export function QuizPopup({
                           </Button>
                         ))}
                       </div>
+                    ) : expectsWrittenResponse ? (
+                      <label className="block space-y-2 text-sm font-medium text-slate-700">
+                        <span>Your response</span>
+                        <textarea
+                          value={legacyTextAnswer}
+                          onChange={(event) => {
+                            setLegacyTextAnswer(event.target.value);
+                            handleAnswerSelect(0);
+                          }}
+                          disabled={quizState.isSubmitted}
+                          rows={4}
+                          className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base font-normal text-slate-900 focus:border-btl-500 focus:outline-none focus:ring-2 focus:ring-btl-100 disabled:bg-slate-100"
+                          placeholder="Write a brief response"
+                        />
+                      </label>
                     ) : (
                       // Legacy true/false question
                       <div className="grid grid-cols-2 gap-3">
@@ -251,7 +274,7 @@ export function QuizPopup({
                   <div className="flex justify-center">
                     <Button 
                       onClick={handleQuizSubmit}
-                      disabled={quizState.answers[quizState.currentQuestionIndex] === undefined}
+                      disabled={quizState.answers[quizState.currentQuestionIndex] === undefined || (expectsWrittenResponse && !legacyTextAnswer.trim())}
                       className="px-7 py-3 text-base font-semibold bg-btl-600 hover:bg-btl-700 text-white transition-colors rounded-xl"
                       size="lg"
                     >

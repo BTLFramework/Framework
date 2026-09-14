@@ -46,6 +46,13 @@ test('legacy quiz fallbacks are synchronized from structured questions', () => {
   assert.ok(source.includes('insight.quizA = firstQuestion.options[firstQuestion.correctAnswer]'))
 })
 
+test('legacy user-input checks render and accept a written response', () => {
+  const component = fs.readFileSync(path.join(root, 'components/InsightDialog.tsx'), 'utf8')
+  assert.ok(component.includes('expectsWrittenResponse'))
+  assert.ok(component.includes('legacyTextAnswer.trim()'))
+  assert.ok(component.includes('placeholder="Write a brief response"'))
+})
+
 test('guided reflection styling preserves labelled response payloads', () => {
   const component = fs.readFileSync(path.join(root, 'components/JsonFormRenderer.tsx'), 'utf8')
   assert.ok(component.includes('kind: "guided-form"'))
