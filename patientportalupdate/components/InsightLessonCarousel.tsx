@@ -17,6 +17,7 @@ const factors = [
 export default function InsightLessonCarousel({ data }: { data: SummaryData }) {
   const [index, setIndex] = useState(0);
   const [readAll, setReadAll] = useState(false);
+  const [hasViewedAllSlides, setHasViewedAllSlides] = useState(false);
   const root = useRef<HTMLElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const interacted = useRef(false);
@@ -35,6 +36,12 @@ export default function InsightLessonCarousel({ data }: { data: SummaryData }) {
     }
     root.current?.scrollIntoView({ block: "start", behavior: "auto" });
   }, [index, readAll]);
+
+  useEffect(() => {
+    if (readAll || index === data.slides.length - 1) {
+      setHasViewedAllSlides(true);
+    }
+  }, [data.slides.length, index, readAll]);
 
   const go = (next: number) => {
     interacted.current = true;
@@ -61,9 +68,11 @@ export default function InsightLessonCarousel({ data }: { data: SummaryData }) {
 
   return <section ref={root} aria-label="Recovery lesson" className="w-full max-w-2xl mx-auto text-btl-900">
     <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-      <p className="text-sm font-semibold" aria-live="polite">{readAll ? "Full lesson" : `${index + 1} of ${data.slides.length}`} · At your own pace</p>
-      <button type="button" aria-pressed={readAll} className="text-sm underline underline-offset-4 rounded px-2 py-2 focus-visible:ring-2 focus-visible:ring-btl-600" onClick={() => { interacted.current = true; setReadAll(!readAll); }}>
-        {readAll ? "Back to slides" : "Read all"}
+      <p className="text-sm font-semibold" aria-live="polite">
+        {readAll ? "Full lesson" : `${index + 1} of ${data.slides.length}`} · {hasViewedAllSlides ? "All slides viewed" : "At your own pace"}
+      </p>
+      <button type="button" className="text-sm underline underline-offset-4 rounded px-2 py-2 focus-visible:ring-2 focus-visible:ring-btl-600" onClick={() => { interacted.current = true; setReadAll(!readAll); }}>
+        {readAll ? "Back to slides" : "View full lesson"}
       </button>
     </div>
     {!readAll && <div className="flex gap-1.5 mb-6" aria-hidden="true">{data.slides.map((slide, n) => <span key={slide.id} className={`h-1.5 rounded-full flex-1 ${n <= index ? "bg-btl-600" : "bg-btl-100"}`} />)}</div>}
