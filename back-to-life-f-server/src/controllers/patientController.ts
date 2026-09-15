@@ -918,6 +918,13 @@ export const deletePatient = async (req: any, res: any) => {
 
     // Use a transaction to ensure all or nothing is deleted
     await prisma.$transaction(async (tx) => {
+      // These two legacy relations do not currently use database-level
+      // cascading deletes, so remove them explicitly before the patient.
+      await tx.practitionerAssessment.deleteMany({
+        where: { patientId: patientId },
+      });
+      console.log(`Deleted practitioner assessments for patient ID: ${patientId}`);
+
       // 1. Delete all related SRSScore records
       await tx.sRSScore.deleteMany({
         where: { patientId: patientId },
