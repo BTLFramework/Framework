@@ -41,6 +41,17 @@ test('production insight completion distinguishes a redo from newly earned point
   assert.ok(!recoveryDialog.includes('BETA PREVIEW: All Unlocked'))
 })
 
+test('sleep wind-down links to the current NHS Inform self-help guide', () => {
+  const sleepWinddown = JSON.parse(
+    fs.readFileSync(path.join(root, 'public/insight/sleep-winddown.json'), 'utf8')
+  )
+
+  assert.equal(
+    sleepWinddown.resourceLink,
+    'https://www.nhsinform.scot/illnesses-and-conditions/sleep-problems-and-insomnia-self-help-guide/'
+  )
+})
+
 test('legacy quiz fallbacks are synchronized from structured questions', () => {
   assert.ok(source.includes('insight.quizQ = firstQuestion.question'))
   assert.ok(source.includes('insight.quizA = firstQuestion.options[firstQuestion.correctAnswer]'))
