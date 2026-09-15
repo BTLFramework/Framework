@@ -4,11 +4,12 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/backend/:path*",
+      "destination": "https://framework-production-92f5.up.railway.app/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "env": {
-    "VITE_API_URL": "https://framework-production-92f5.up.railway.app"
-  }
+  ]
 }

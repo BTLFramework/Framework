@@ -4,6 +4,8 @@ export const registerUser = (data) => axios.post("/auth/register", data);
 export const loginUser = (data) => axios.post("/auth/login", data);
 export const getPractitionerSetupStatus = () => axios.get("/auth/bootstrap-status");
 export const bootstrapPractitioner = (data) => axios.post("/auth/bootstrap", data);
+export const getPractitionerSession = () => axios.get("/auth/session");
+export const logoutPractitioner = () => axios.post("/auth/logout");
 
 export const requestPractitionerPasswordReset = (email) =>
   axios.post("/auth/request-password-reset", { email });

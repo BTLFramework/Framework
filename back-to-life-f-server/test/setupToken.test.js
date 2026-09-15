@@ -1,33 +1,27 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 
-require('ts-node/register/transpile-only');
+const root = path.resolve(__dirname, '..');
+const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 
-process.env.SETUP_SECRET = 'beta-test-setup-secret';
-const {
-  generateSetupLink,
-  generateSetupToken,
-  verifySetupToken,
-} = require('../src/services/jwtService');
-
-test('setup tokens bind both the email and patient id', () => {
-  const token = generateSetupToken('patient@example.com', 42);
-  const payload = verifySetupToken(token);
-
-  assert.equal(payload.email, 'patient@example.com');
-  assert.equal(payload.patientId, 42);
-  assert.equal(payload.type, 'setup');
+test('patient setup tokens are opaque, hashed, expiring, and single-use', () => {
+  const service = read('src/services/patientSetupToken.ts');
+  assert.match(service, /randomBytes\(32\)\.toString\("base64url"\)/);
+  assert.match(service, /createHash\("sha256"\)/);
+  assert.match(service, /SETUP_TOKEN_LIFETIME_MS = 24 \* 60 \* 60 \* 1000/);
+  assert.match(service, /usedAt:\s*null/);
+  assert.match(service, /expiresAt:\s*\{\s*gt:\s*now\s*\}/);
+  assert.match(service, /consumed\.count !== 1/);
 });
 
-test('setup links point to the real create-account route', () => {
-  const link = generateSetupLink(
-    'patient@example.com',
-    42,
-    'https://framework-six-umber.vercel.app'
-  );
-
-  assert.match(link, /^https:\/\/framework-six-umber\.vercel\.app\/create-account\?token=/);
-  const token = new URL(link).searchParams.get('token');
-  const payload = verifySetupToken(token);
-  assert.equal(payload.patientId, 42);
+test('intake links use the stored opaque token and the portal consumes it', () => {
+  const intake = read('src/controllers/patientController.ts');
+  const routes = read('src/routes/patientPortalRoutes2.ts');
+  assert.match(intake, /await issuePatientSetupToken\(patient\.id\)/);
+  assert.match(intake, /\/create-account\?token=/);
+  assert.match(routes, /await verifyPatientSetupToken\(token\)/);
+  assert.match(routes, /await consumePatientSetupToken\(/);
+  assert.doesNotMatch(routes, /verifySetupToken/);
 });

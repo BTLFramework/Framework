@@ -34,8 +34,7 @@ function LoginForm() {
       }
       setCreatingAccount(true);
       bootstrapPractitioner({ email, password })
-        .then(({ data }) => {
-          localStorage.setItem("token", data.token);
+        .then(() => {
           navigate("/dashboard");
         })
         .catch((error) => setSetupError(error.response?.data?.error || "Account setup failed"))
@@ -46,8 +45,7 @@ function LoginForm() {
     loginMutation.mutate(
       { email, password },
       {
-        onSuccess: (res) => {
-          localStorage.setItem("token", res.data.token);
+        onSuccess: () => {
           navigate("/dashboard");
         },
       }

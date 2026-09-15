@@ -5,6 +5,7 @@ import { API_URL } from "../config/api";
 import { CLINICIAN } from "../config/clinician";
 import { formatClinicalDate, formatRelativeClinicalDate } from "../helpers/assessmentScores";
 import { authenticatedFetch } from "../api/authenticatedFetch";
+import { logoutPractitioner } from "../api/auth";
 
 const Messages = () => {
   const navigate = useNavigate();
@@ -211,9 +212,12 @@ const Messages = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await logoutPractitioner();
+    } finally {
+      navigate("/login");
+    }
   };
 
   const handleRefresh = () => {

@@ -81,6 +81,33 @@ test('production CORS does not trust arbitrary Vercel applications', () => {
   assert.ok(!app.includes('regexMatch'))
 })
 
+test('practitioner dashboard keeps session tokens out of browser storage', () => {
+  const axios = read('../dashboard/src/api/axios.js')
+  const authenticatedFetch = read('../dashboard/src/api/authenticatedFetch.js')
+  const login = read('../dashboard/src/components/LoginForm.jsx')
+
+  for (const source of [axios, authenticatedFetch, login]) {
+    assert.ok(!source.includes('localStorage.setItem("token"'))
+    assert.ok(!source.includes('localStorage.getItem("token"'))
+    assert.ok(!source.includes('Bearer ${token}'))
+  }
+  assert.match(axios, /withCredentials:\s*true/)
+  assert.match(authenticatedFetch, /credentials:\s*"include"/)
+  assert.match(authenticatedFetch, /X-Requested-With/)
+})
+
+test('patient setup links are database-backed and atomically single-use', () => {
+  const setupService = read('src/services/patientSetupToken.ts')
+  const portalRoutes = read('src/routes/patientPortalRoutes2.ts')
+
+  assert.match(setupService, /randomBytes\(32\)/)
+  assert.match(setupService, /tokenHash/)
+  assert.match(setupService, /usedAt:\s*null/)
+  assert.match(setupService, /expiresAt:\s*\{\s*gt:\s*now\s*\}/)
+  assert.match(portalRoutes, /consumePatientSetupToken/)
+  assert.doesNotMatch(portalRoutes, /verifySetupToken/)
+})
+
 test('rate limiting blocks repeated requests without recording request content', () => {
   const middleware = createRateLimit({ windowMs: 60_000, max: 2, message: 'Slow down' })
   const result = { nextCalls: 0, statusCode: null, body: null, retryAfter: null }

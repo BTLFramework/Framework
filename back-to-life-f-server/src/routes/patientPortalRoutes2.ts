@@ -1,5 +1,5 @@
 import express from 'express';
-import { verifySetupToken, verifyToken } from '../services/jwtService';
+import { verifyToken } from '../services/jwtService';
 import { 
   findPatientPortalByEmail, 
   updatePatientPortalPassword 
@@ -7,6 +7,7 @@ import {
 import { isStrongPatientPassword, verifyPatientPassword } from '../services/patientPasswordService';
 import { requirePatientAccess } from '../middleware/requirePatientAuth';
 import { createRateLimit } from '../middleware/rateLimit';
+import { consumePatientSetupToken, verifyPatientSetupToken } from '../services/patientSetupToken';
 
 const router = express.Router();
 const loginRateLimit = createRateLimit({
@@ -21,25 +22,15 @@ router.get('/verify-setup-token/:token', async (req: any, res: any) => {
   try {
     const { token } = req.params;
     
-    const payload = verifySetupToken(token);
+    const identity = await verifyPatientSetupToken(token);
     
-    if (!payload) {
+    if (!identity) {
       return res.status(400).json({ error: 'Invalid or expired token' });
     }
     
-    const patientPortal = await findPatientPortalByEmail(payload.email);
-    
-    if (!patientPortal) {
-      return res.status(404).json({ error: 'Patient portal account not found' });
-    }
-
-    if (payload.type !== 'setup' || payload.patientId !== patientPortal.patientId) {
-      return res.status(400).json({ error: 'Invalid setup token for this patient' });
-    }
-    
     res.json({
-      email: payload.email,
-      patientName: patientPortal.patient.name,
+      email: identity.email,
+      patientName: identity.patientName,
       isValid: true
     });
   } catch (error) {
@@ -61,24 +52,14 @@ router.post('/set-password', async (req: any, res: any) => {
       });
     }
     
-    const payload = verifySetupToken(token);
-    
-    if (!payload) {
-      return res.status(400).json({ error: 'Invalid or expired token' });
+    const identity = await consumePatientSetupToken(token, password);
+    if (!identity) {
+      return res.status(400).json({ error: 'Invalid, expired, or already used token' });
     }
-    
-    const patientPortal = await findPatientPortalByEmail(payload.email);
-
-    if (!patientPortal || payload.type !== 'setup' || payload.patientId !== patientPortal.patientId) {
-      return res.status(400).json({ error: 'Invalid setup token for this patient' });
-    }
-
-    // Update password
-    await updatePatientPortalPassword(payload.email, password);
     
     res.json({ 
       message: 'Password set successfully',
-      email: payload.email
+      email: identity.email
     });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
@@ -100,34 +81,19 @@ router.post('/create-account', async (req: any, res: any) => {
       });
     }
 
-    const payload = verifySetupToken(setupToken);
-
-    if (!payload || payload.type !== 'setup' || payload.email.toLowerCase() !== email.toLowerCase()) {
-      return res.status(400).json({ error: 'Invalid or expired account setup link.' });
+    const identity = await consumePatientSetupToken(
+      setupToken,
+      password,
+      { email, patientName }
+    );
+    if (!identity) {
+      return res.status(400).json({ error: 'This account setup link is invalid, expired, or has already been used.' });
     }
-    
-    // Find existing patient portal account (created during intake)
-    const patientPortal = await findPatientPortalByEmail(email);
-    
-    if (!patientPortal) {
-      return res.status(404).json({ error: 'Patient portal account not found. Please complete your intake form first.' });
-    }
-
-    if (payload.patientId !== patientPortal.patientId) {
-      return res.status(409).json({ error: 'This setup link does not belong to this patient account.' });
-    }
-
-    if (patientPortal.patient.name.trim().toLowerCase() !== patientName.trim().toLowerCase()) {
-      return res.status(409).json({ error: 'The intake identity does not match this patient account. Please contact the clinic.' });
-    }
-    
-    // Update the password (replacing the temporary one)
-    await updatePatientPortalPassword(email, password);
     
     res.json({ 
       message: 'Account created successfully',
-      email: email,
-      patientName: patientName
+      email: identity.email,
+      patientName: identity.patientName
     });
   } catch (error) {
     console.error('Create account error:', error);

@@ -4,10 +4,13 @@ import {
   bootstrapStatus,
   register,
   login,
+  logoutPractitioner,
+  practitionerSession,
   requestPractitionerPasswordReset,
   resetPractitionerPassword,
 } from "../controllers/authController";
 import { createRateLimit } from "../middleware/rateLimit";
+import { requirePractitionerAuth } from "../middleware/requirePractitionerAuth";
 
 const router = express.Router();
 const loginRateLimit = createRateLimit({
@@ -19,6 +22,8 @@ const loginRateLimit = createRateLimit({
 
 router.post("/register", register);
 router.post("/login", loginRateLimit, login);
+router.get("/session", requirePractitionerAuth, practitionerSession);
+router.post("/logout", logoutPractitioner);
 router.post("/request-password-reset", requestPractitionerPasswordReset);
 router.post("/reset-password", resetPractitionerPassword);
 router.get("/bootstrap-status", bootstrapStatus);

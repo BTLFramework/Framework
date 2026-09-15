@@ -62,6 +62,8 @@ Providers to verify: Railway, Vercel, database provider, Resend, Gmail/Google Wo
 - Patient password hashes are excluded from patient API queries.
 - Welcome emails do not state a recovery phase, score, or assessment details.
 - Logs were reduced to avoid names, email addresses, patient IDs, scores, message subjects, and assessment bodies.
+- Practitioner authentication now uses a secure HTTP-only, SameSite session cookie routed through the dashboard origin; bearer tokens are no longer stored in browser storage.
+- Patient account-setup links now use random, hashed, database-backed tokens that expire after 24 hours and are atomically consumed once.
 
 ## Open items before real-patient beta
 
@@ -71,12 +73,10 @@ Providers to verify: Railway, Vercel, database provider, Resend, Gmail/Google Wo
 4. Set written retention periods for clinical records, messages, audit data, application logs, and backups.
 5. Verify encrypted backups and perform a documented restore test.
 6. Implement a durable security audit trail for practitioner access and changes to clinical records.
-7. Move practitioner authentication from browser local storage to a secure HTTP-only cookie.
-8. Make patient setup links one-time use and document revocation/reissue handling.
-9. Add and test an in-product privacy-notice acknowledgement after the notice is approved.
-10. Run an access/export/correction/deletion procedure using a beta record.
-11. Complete the incident-response tabletop exercise in `INCIDENT_RESPONSE.md`.
+7. Add and test an in-product privacy-notice acknowledgement after the notice is approved.
+8. Run an access/export/correction/deletion procedure using a beta record.
+9. Complete the incident-response tabletop exercise in `INCIDENT_RESPONSE.md`.
 
 ## Release gate
 
-Do not mark the system ready for real patient information until items 1-5 are complete and documented. Items 6-11 should be completed before expanding beyond a tightly controlled beta.
+Do not mark the system ready for real patient information until every open item above is complete, evidenced, and approved by the custodian.

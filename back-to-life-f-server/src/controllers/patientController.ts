@@ -8,7 +8,7 @@ import {
 } from "../models/patientModel";
 import { PrismaClient } from "@prisma/client";
 import { sendWelcomeEmail, sendWelcomeEmailDev } from "../services/emailService";
-import { generateSetupLink, generateSetupToken } from "../services/jwtService";
+import { issuePatientSetupToken } from "../services/patientSetupToken";
 import { getExistingPatientIntakeConflict } from "../services/onboardingIdentity";
 
 // TSK-7 calculation function (standardized across all apps)
@@ -656,10 +656,10 @@ export const submitIntake = async (req: any, res: any) => {
     
     // Generate setup link
     const baseUrl = process.env.PATIENT_PORTAL_URL || 'http://localhost:3000';
-    const setupToken = portalAccountExists ? undefined : generateSetupToken(normalizedEmail, patient.id);
+    const setupToken = portalAccountExists ? undefined : await issuePatientSetupToken(patient.id);
     const setupLink = portalAccountExists
       ? `${baseUrl}/login`
-      : generateSetupLink(normalizedEmail, patient.id, baseUrl);
+      : `${baseUrl.replace(/\/$/, '')}/create-account?token=${encodeURIComponent(setupToken!)}`;
     
     const emailSent = process.env.NODE_ENV === 'production'
       ? await sendWelcomeEmail({

@@ -7,6 +7,10 @@ import {
   readPractitionerPasswordResetSubject,
   verifyPractitionerPasswordResetToken,
 } from "../services/practitionerPasswordReset";
+import {
+  clearPractitionerSessionCookie,
+  setPractitionerSessionCookie,
+} from "../services/practitionerSession";
 
 const normalizeEmail = (value: unknown) =>
   typeof value === "string" ? value.trim().toLowerCase() : "";
@@ -84,7 +88,8 @@ export const bootstrapPractitioner = async (req: any, res: any) => {
     const token = jwt.sign({ userId: user.id }, jwtSecret, {
       expiresIn: "1h",
     });
-    res.status(201).json({ token });
+    setPractitionerSessionCookie(res, token);
+    res.status(201).json({ message: "Practitioner account created", practitioner: { id: user.id, email } });
   } catch (error: any) {
     if (error?.message === "PRACTITIONER_ALREADY_CONFIGURED" || error?.code === "P2002") {
       res.status(409).json({ error: "Practitioner setup has already been completed" });
@@ -151,10 +156,34 @@ export const login = async (req: any, res: any) => {
       expiresIn: "1h",
     });
 
-    res.json({ token });
+    setPractitionerSessionCookie(res, token);
+    res.json({ message: "Login successful", practitioner: { id: user.id, email: user.email } });
   } catch (error) {
     res.status(500).send("Internal server error");
   }
+};
+
+export const practitionerSession = async (req: any, res: any) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: Number(req.practitioner?.userId) },
+      select: { id: true, email: true },
+    });
+    if (!user) {
+      clearPractitionerSessionCookie(res);
+      res.status(401).json({ error: "Practitioner session is invalid" });
+      return;
+    }
+    res.json({ authenticated: true, practitioner: user });
+  } catch (error) {
+    console.error("Practitioner session check error:", error);
+    res.status(503).json({ error: "Unable to verify practitioner session" });
+  }
+};
+
+export const logoutPractitioner = (_req: any, res: any) => {
+  clearPractitionerSessionCookie(res);
+  res.json({ message: "Logged out" });
 };
 
 export const requestPractitionerPasswordReset = async (req: any, res: any) => {

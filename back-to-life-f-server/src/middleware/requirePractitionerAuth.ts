@@ -1,13 +1,15 @@
 import jwt from "jsonwebtoken"
+import { PRACTITIONER_SESSION_COOKIE } from "../services/practitionerSession"
 
 export const requirePractitionerAuth = (req: any, res: any, next: any) => {
-  const authorization = req.headers.authorization
-  const token = typeof authorization === "string" && authorization.startsWith("Bearer ")
-    ? authorization.slice(7).trim()
-    : ""
+  const token = req.cookies?.[PRACTITIONER_SESSION_COOKIE]
 
   if (!token) {
     return res.status(401).json({ error: "Practitioner authentication required" })
+  }
+
+  if (req.get?.("X-Requested-With") !== "XMLHttpRequest") {
+    return res.status(403).json({ error: "Practitioner request verification failed" })
   }
 
   const secret = process.env.JWT_SECRET

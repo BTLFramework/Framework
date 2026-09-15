@@ -7,6 +7,7 @@ import PatientTable from "../components/PatientTable";
 import PatientModal from "../components/PatientModal";
 import FilteredPatientsModal from "../components/FilteredPatientsModal";
 import { authenticatedFetch } from "../api/authenticatedFetch";
+import { logoutPractitioner } from "../api/auth";
 import { getEngagementStatus, isLowEngagement } from "../helpers/engagement";
 
 // CACHE BUSTER: Force bundle change - timestamp: 2024-08-04-23:30
@@ -177,9 +178,12 @@ function Dashboard() {
       return () => clearInterval(interval);
     }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await logoutPractitioner();
+    } finally {
+      navigate("/login");
+    }
   };
 
   const filteredPatients = useMemo(() => {
