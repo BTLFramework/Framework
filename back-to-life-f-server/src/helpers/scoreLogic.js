@@ -177,7 +177,6 @@ const {
 // Baseline (Intake) SRS Calculation - Range: 0-9 points
 function computeBaselineSRS(formData, clinicianData = {}) {
   console.log('🔢 Backend: Starting Baseline SRS Calculation');
-  console.log('📊 Form data:', formData);
   
   let points = 0;
   const breakdown = [];
@@ -329,8 +328,6 @@ function computeBaselineSRS(formData, clinicianData = {}) {
 // Follow-up SRS Calculation - Range: 0-11 points
 function computeFollowUpSRS(baselineData, currentData, clinicianData = {}) {
   console.log('🔢 Backend: Starting Follow-up SRS Calculation');
-  console.log('📊 Baseline data:', baselineData);
-  console.log('📊 Current data:', currentData);
   
   let points = 0;
   const breakdown = [];
@@ -528,4 +525,4 @@ module.exports = {
   getPhase,
   calculateDisabilityPercentage,
   validateAssessmentData
-}; 
+};

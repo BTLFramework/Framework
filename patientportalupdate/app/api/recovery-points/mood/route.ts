@@ -10,6 +10,7 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Cookie': request.headers.get('cookie') || '',
       },
       body: JSON.stringify(body),
     });
@@ -32,4 +33,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

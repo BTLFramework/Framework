@@ -10,23 +10,10 @@ export default function CreateAccountPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Get patient data from URL parameters
     const urlParams = new URLSearchParams(window.location.search)
-    const urlPatientData = urlParams.get('patientData')
     const setupToken = urlParams.get('token')
     
-    if (urlPatientData) {
-      try {
-        const data = JSON.parse(urlPatientData)
-        setPatientData(data)
-        // Clean up URL
-        window.history.replaceState({}, document.title, window.location.pathname)
-      } catch (error) {
-        console.error('Error parsing patient data:', error)
-        // Continue without patient data - allow direct account creation
-        setPatientData(null)
-      }
-    } else if (setupToken) {
+    if (setupToken) {
       fetch(`/api/patient-portal/verify-setup-token/${encodeURIComponent(setupToken)}`, {
         credentials: 'include'
       })
@@ -43,7 +30,6 @@ export default function CreateAccountPage() {
         .finally(() => setLoading(false))
       return
     } else {
-      // No patient data - allow direct account creation
       setPatientData(null)
     }
     
@@ -80,7 +66,7 @@ export default function CreateAccountPage() {
       setupToken={patientData?.setupToken}
       onSuccess={handleAccountCreated}
       onBack={handleBack}
-      isDirectSignup={!patientData}
+      isDirectSignup={false}
     />
   )
 }

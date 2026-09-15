@@ -1,5 +1,4 @@
 export const completeInsight = async (patientId: string, insightId: string) => {
-  console.log('🎯 Completing insight', insightId, 'for patient', patientId);
   
   try {
     const response = await fetch('/api/v1/insights/complete', {
@@ -24,4 +23,4 @@ export const completeInsight = async (patientId: string, insightId: string) => {
     console.error('❌ Error completing insight:', error);
     throw error;
   }
-}; 
+};

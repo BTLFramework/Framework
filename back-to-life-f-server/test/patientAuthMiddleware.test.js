@@ -50,6 +50,16 @@ test('patient reply body must match the signed patient ID', () => {
   assert.equal(invoke({ token, body: { patientId: 9 } }).statusCode, 403)
 })
 
+test('patient data routes accept only the signed patient ID or email', () => {
+  const token = patientToken(6)
+
+  assert.equal(invoke({ token, params: { id: '6' } }).nextCalled, true)
+  assert.equal(invoke({ token, params: { id: '7' } }).statusCode, 403)
+  assert.equal(invoke({ token, params: { email: 'PATIENT@example.com' } }).nextCalled, true)
+  assert.equal(invoke({ token, params: { email: 'other@example.com' } }).statusCode, 403)
+  assert.equal(invoke({ token, body: { email: 'patient@example.com' } }).nextCalled, true)
+})
+
 test('expired and practitioner tokens cannot access patient messages', () => {
   const expired = patientToken(6, { expiresIn: -1 })
   const practitioner = jwt.sign({ userId: 1 }, 'test-patient-secret', { expiresIn: '1h' })

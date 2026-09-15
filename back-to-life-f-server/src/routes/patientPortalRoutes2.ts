@@ -4,9 +4,17 @@ import {
   findPatientPortalByEmail, 
   updatePatientPortalPassword 
 } from '../models/patientModel';
-import { verifyPatientPassword } from '../services/patientPasswordService';
+import { isStrongPatientPassword, verifyPatientPassword } from '../services/patientPasswordService';
+import { requirePatientAccess } from '../middleware/requirePatientAuth';
+import { createRateLimit } from '../middleware/rateLimit';
 
 const router = express.Router();
+const loginRateLimit = createRateLimit({
+  windowMs: 15 * 60_000,
+  max: 20,
+  message: 'Too many sign-in attempts. Please wait and try again.',
+  key: (req) => `${req.ip}:${String(req.body?.email || '').trim().toLowerCase()}`,
+});
 
 // Verify setup token and get patient info
 router.get('/verify-setup-token/:token', async (req: any, res: any) => {
@@ -47,6 +55,11 @@ router.post('/set-password', async (req: any, res: any) => {
     if (!token || !password) {
       return res.status(400).json({ error: 'Token and password are required' });
     }
+    if (!isStrongPatientPassword(password)) {
+      return res.status(400).json({
+        error: 'Password must be at least 10 characters and include uppercase, lowercase, a number, and a symbol'
+      });
+    }
     
     const payload = verifySetupToken(token);
     
@@ -73,10 +86,6 @@ router.post('/set-password', async (req: any, res: any) => {
 });
 
 // Test route to see which file is being used
-router.get('/test-route', (req: any, res: any) => {
-  res.json({ message: 'TypeScript file is being used' });
-});
-
 // Create account for patient portal (after intake completion)
 router.post('/create-account', async (req: any, res: any) => {
   try {
@@ -84,6 +93,11 @@ router.post('/create-account', async (req: any, res: any) => {
     
     if (!email || !password || !patientName || !setupToken) {
       return res.status(400).json({ error: 'A valid intake setup link is required to create an account.' });
+    }
+    if (!isStrongPatientPassword(password)) {
+      return res.status(400).json({
+        error: 'Password must be at least 10 characters and include uppercase, lowercase, a number, and a symbol'
+      });
     }
 
     const payload = verifySetupToken(setupToken);
@@ -110,8 +124,6 @@ router.post('/create-account', async (req: any, res: any) => {
     // Update the password (replacing the temporary one)
     await updatePatientPortalPassword(email, password);
     
-    console.log(`✅ Password updated for patient: ${email}`);
-    
     res.json({ 
       message: 'Account created successfully',
       email: email,
@@ -124,44 +136,33 @@ router.post('/create-account', async (req: any, res: any) => {
 });
 
 // Patient login
-router.post('/login', async (req: any, res: any) => {
+router.post('/login', loginRateLimit, async (req: any, res: any) => {
   try {
     const { email, password } = req.body;
     
-    console.log(`🔐 Login attempt for: ${email}`);
-    
     if (!email || !password) {
-      console.log('❌ Missing email or password');
       return res.status(400).json({ error: 'Email and password are required' });
     }
     
     const patientPortal = await findPatientPortalByEmail(email);
     
     if (!patientPortal) {
-      console.log(`❌ No patient portal account found for: ${email}`);
       return res.status(401).json({ error: 'Invalid email or password' });
     }
     
-    console.log(`🔍 Found patient portal account for: ${email}`);
     const passwordCheck = await verifyPatientPassword(patientPortal.password, password);
 
     if (!passwordCheck.valid) {
-      console.log(`❌ Password mismatch for: ${email}`);
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
     if (passwordCheck.needsUpgrade) {
       await updatePatientPortalPassword(patientPortal.email, password);
-      console.log(`🔒 Upgraded legacy password storage for: ${email}`);
     }
-    
-    console.log(`✅ Password match for: ${email}`);
     
     // Generate JWT token for patient
     const { generatePatientToken } = require('../services/jwtService');
     const token = generatePatientToken(patientPortal);
-    
-    console.log(`🎫 JWT token generated for: ${email}`);
     
     // Set JWT as HTTP-only cookie
     res.cookie('patientToken', token, {
@@ -171,8 +172,6 @@ router.post('/login', async (req: any, res: any) => {
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
       path: '/',
     });
-    
-    console.log(`✅ Login successful for: ${email}`);
     
     res.json({
       message: 'Login successful',
@@ -226,37 +225,8 @@ router.get("/profile", async (req: any, res: any) => {
 });
 
 // Test endpoint with mock patient data (no authentication required)
-router.get('/test-profile', async (req: any, res: any) => {
-  try {
-    // Mock patient data for testing the beautiful dashboard
-    const mockPatient = {
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@example.com",
-      srsScores: [
-        {
-          id: 1,
-          srsScore: 7,
-          confidence: 8,
-          groc: 2,
-          date: new Date().toISOString(),
-          psfs: [
-            { activity: "Walking", score: 8 },
-            { activity: "Lifting groceries", score: 6 },
-            { activity: "Playing with kids", score: 7 }
-          ]
-        }
-      ]
-    };
-    
-    res.json(mockPatient);
-  } catch (error) {
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
 // Get assigned exercises for movement session
-router.get('/exercises/:email', async (req: any, res: any) => {
+router.get('/exercises/:email', requirePatientAccess, async (req: any, res: any) => {
   try {
     const { email } = req.params;
     const { getAssignedExercisesByEmail } = require('../models/patientModel');
@@ -279,7 +249,7 @@ router.post('/logout', (req: any, res: any) => {
 });
 
 // Get all SRS scores for a patient by ID
-router.get('/patients/:id/srs-scores', async (req: any, res: any) => {
+router.get('/patients/:id/srs-scores', requirePatientAccess, async (req: any, res: any) => {
   try {
     const { id } = req.params;
     const { findPatientById } = require('../models/patientModel');

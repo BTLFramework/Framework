@@ -213,19 +213,6 @@ export default function IntakeFormPage() {
       const result = await response.json()
 
       if (result.success) {
-        // Store intake data in localStorage for the portal
-        localStorage.setItem('btl_intake_data', JSON.stringify(formData))
-
-        // Store patient data for the portal
-        const patientData = {
-          name: formData.patientName,
-          email: formData.email,
-          score: `${result.data.srsScore}/11`,
-          phase: result.data.phase,
-          timestamp: new Date().toISOString()
-        }
-        localStorage.setItem('btl_patient_data', JSON.stringify(patientData))
-
         toast({
           title: "Intake Form Submitted!",
           description: `Welcome ${formData.patientName}! Your recovery journey begins now.`,

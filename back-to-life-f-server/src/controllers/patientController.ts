@@ -49,8 +49,6 @@ import { intakeRules, followUpRules, getPhase } from '../config/srsConfig';
 // Standardized SRS calculation function using centralized configuration
 const calculateSRS = async (formData: any, previousData?: any) => {
   console.log('🔢 Backend: Starting standardized SRS calculation');
-  console.log('📊 Form data:', formData);
-  console.log('📊 Previous data:', previousData);
   
   // Intake always uses the baseline model, even if the email already exists.
   if (formData.formType !== 'Follow-Up') {
@@ -572,10 +570,10 @@ export const submitIntake = async (req: any, res: any) => {
     }
     
     if (!patient) {
-      console.log('Creating new patient:', patientName, normalizedEmail, date);
+      console.log('Creating new patient record');
       // Create new patient
       const newPatient = await createPatient(patientName.trim(), normalizedEmail, new Date(date), dob);
-      console.log('Patient created:', newPatient);
+      console.log('Patient record created');
       
       // Create patient portal account (with temporary password)
       const tempPassword = Math.random().toString(36).slice(-8); // Simple temp password
@@ -590,7 +588,7 @@ export const submitIntake = async (req: any, res: any) => {
       // Get the full patient record with relations
       patient = await findPatientByEmail(normalizedEmail);
     } else {
-      console.log('Patient already exists:', patient);
+      console.log('Existing patient record found');
       // Get previous data for SRS calculation
       previousData = await getLatestSRSScore(patient.id);
     }
@@ -605,7 +603,7 @@ export const submitIntake = async (req: any, res: any) => {
       recoveryMilestone, clinicalProgressVerified, patientId: patient.id
     }, previousData);
     
-    console.log('🔢 SRS Score calculated:', srsScore, 'Type:', typeof srsScore);
+    console.log('🔢 SRS score calculated');
     
     // NEW: Calculate continuous SRS components (0-100 scale)
     const continuousSRS = calculateContinuousSRS({
@@ -648,9 +646,9 @@ export const submitIntake = async (req: any, res: any) => {
       clinicalProgressVerified: clinicalProgressVerified || false
     };
     
-    console.log('Adding comprehensive SRS score:', srsData);
+    console.log('Adding SRS score');
     const srsScoreRecord = await addSRSScore(patient.id, srsData);
-    console.log('SRS score added:', srsScoreRecord);
+    console.log('SRS score added');
     
     // Determine phase and send welcome email
     const phase = getPhaseByScore(srsScore);
@@ -692,10 +690,10 @@ export const submitIntake = async (req: any, res: any) => {
       message: `${formType || 'Intake'} assessment processed successfully. Patient ${formType === 'Follow-Up' ? 'progress updated' : 'enrolled'} in Back to Life program.`
     });
   } catch (err) {
-    console.error('Error in submitIntake:', err);
+    console.error('Error processing intake submission');
     res.status(500).json({ 
       success: false,
-      error: (err as Error).message 
+      error: 'The intake submission could not be completed'
     });
   }
 };
@@ -736,13 +734,6 @@ const calculateContinuousSRS = (formData: any) => {
   
   // Calculate continuous SRS: 4-way average
   const continuousSRS = (pain + functionScore + (100 - psychLoad) + (100 - fa)) / 4;
-  
-  console.log('📊 Continuous SRS Components:');
-  console.log(`   Pain: ${pain.toFixed(1)}/100`);
-  console.log(`   Function: ${functionScore.toFixed(1)}/100`);
-  console.log(`   Psych Load: ${psychLoad.toFixed(1)}/100 (inverted: ${(100 - psychLoad).toFixed(1)})`);
-  console.log(`   Fear-Avoidance: ${fa.toFixed(1)}/100 (inverted: ${(100 - fa).toFixed(1)})`);
-  console.log(`   Final Continuous SRS: ${continuousSRS.toFixed(1)}/100`);
   
   return {
     pain,
@@ -785,7 +776,7 @@ const storeAssessmentResults = async (patientId: number, assessments: any) => {
             score: pcs4Score
           }
         });
-        console.log(`📊 Stored PCS-4 score: ${pcs4Score}`);
+        console.log('📊 Stored PCS-4 score');
       }
     }
     
@@ -800,7 +791,7 @@ const storeAssessmentResults = async (patientId: number, assessments: any) => {
           score: tsk7Score
         }
       });
-      console.log(`📊 Stored TSK-7 score: ${tsk7Score}`);
+      console.log('📊 Stored TSK-7 score');
     }
   }
   } catch (error) {
@@ -837,7 +828,7 @@ const updateSRSDaily = async (patientId: number, continuousSRS: any) => {
       }
     });
     
-    console.log(`📊 Updated SRSDaily for patient ${patientId}:`, continuousSRS);
+    console.log('📊 Updated daily SRS record');
   } catch (error) {
     console.error('Error updating SRSDaily:', error);
   }
@@ -914,7 +905,7 @@ export const deletePatient = async (req: any, res: any) => {
   }
 
   try {
-    console.log(`Attempting to delete patient with ID: ${patientId}`);
+    console.log('Attempting to delete patient record');
 
     // Use a transaction to ensure all or nothing is deleted
     await prisma.$transaction(async (tx) => {
@@ -923,31 +914,31 @@ export const deletePatient = async (req: any, res: any) => {
       await tx.practitionerAssessment.deleteMany({
         where: { patientId: patientId },
       });
-      console.log(`Deleted practitioner assessments for patient ID: ${patientId}`);
+      console.log('Deleted practitioner assessments');
 
       // 1. Delete all related SRSScore records
       await tx.sRSScore.deleteMany({
         where: { patientId: patientId },
       });
-      console.log(`Deleted SRS scores for patient ID: ${patientId}`);
+      console.log('Deleted SRS scores');
 
       // 2. Delete the related PatientPortal record
       await tx.patientPortal.deleteMany({
         where: { patientId: patientId },
       });
-      console.log(`Deleted patient portal account for patient ID: ${patientId}`);
+      console.log('Deleted patient portal account');
 
       // 3. Finally, delete the patient
       await tx.patient.delete({
         where: { id: patientId },
       });
-      console.log(`Successfully deleted patient with ID: ${patientId}`);
+      console.log('Successfully deleted patient record');
     });
 
     res.status(200).json({ message: "Patient deleted successfully" });
 
   } catch (err) {
-    console.error(`Error deleting patient with ID ${patientId}:`, err);
+    console.error('Error deleting patient record');
     res.status(500).json({
       message: "Failed to delete patient due to a server error.",
       error: (err as Error).message

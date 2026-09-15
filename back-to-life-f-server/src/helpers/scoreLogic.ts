@@ -3,7 +3,6 @@ import { intakeRules, followUpRules, phaseCutoffs, getPhase, scoreRanges } from 
 // Baseline (Intake) SRS Calculation - Range: 0-9 points
 export function computeBaselineSRS(formData: any, clinicianData: any = {}) {
   console.log('🔢 Backend: Starting Baseline SRS Calculation');
-  console.log('📊 Form data:', formData);
   
   let points = 0;
   const breakdown: string[] = [];
@@ -154,8 +153,6 @@ export function computeBaselineSRS(formData: any, clinicianData: any = {}) {
 // Follow-up SRS Calculation - Range: 0-11 points
 export function computeFollowUpSRS(baselineData: any, currentData: any, clinicianData: any = {}) {
   console.log('🔢 Backend: Starting Follow-up SRS Calculation');
-  console.log('📊 Baseline data:', baselineData);
-  console.log('📊 Current data:', currentData);
   
   let points = 0;
   const breakdown: string[] = [];
@@ -281,4 +278,4 @@ export function calculateDisabilityPercentage(ndi: number, odi: number, tdi: num
 export function validateAssessmentData(data: any) {
   // Implementation for data validation
   return true; // Placeholder
-} 
+}

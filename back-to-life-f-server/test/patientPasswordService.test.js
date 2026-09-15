@@ -6,8 +6,17 @@ require('ts-node/register/transpile-only');
 const {
   hashPatientPassword,
   isHashedPatientPassword,
+  isStrongPatientPassword,
   verifyPatientPassword,
 } = require('../src/services/patientPasswordService');
+
+test('new patient passwords meet the server-side security policy', () => {
+  assert.equal(isStrongPatientPassword('LongEnough1!'), true);
+  assert.equal(isStrongPatientPassword('Short1!'), false);
+  assert.equal(isStrongPatientPassword('alllowercase1!'), false);
+  assert.equal(isStrongPatientPassword('NoNumberHere!'), false);
+  assert.equal(isStrongPatientPassword('NoSymbolHere1'), false);
+});
 
 test('new patient passwords are stored as bcrypt hashes', async () => {
   const password = 'Beta portal password 42!';

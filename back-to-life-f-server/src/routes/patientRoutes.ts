@@ -4,16 +4,19 @@ import { findPatientByEmail, getLatestSRSScore } from "../models/patientModel";
 import prisma from "../db";
 import * as clinicianCtrl from "../controllers/clinicianDashboardController";
 import { requirePractitionerAuth } from "../middleware/requirePractitionerAuth";
+import { requirePatientAccess } from "../middleware/requirePatientAuth";
+import { hashPatientPassword, isStrongPatientPassword } from "../services/patientPasswordService";
+import { createRateLimit } from "../middleware/rateLimit";
 
 const router = Router();
-
-// Add logging middleware to this router
-router.use((req, res, next) => {
-  console.log(`PatientRoutes: ${req.method} ${req.path}`);
-  next();
+const intakeRateLimit = createRateLimit({
+  windowMs: 60 * 60_000,
+  max: 20,
+  message: "Too many intake submissions. Please wait and try again.",
 });
 
-router.post("/submit-intake", submitIntake);
+// Add logging middleware to this router
+router.post("/submit-intake", intakeRateLimit, submitIntake);
 router.get("/patient/:id/score", requirePractitionerAuth, getPatientLatestScore);
 router.get("/", requirePractitionerAuth, getAllPatientsWithScores);
 router.delete("/:id", requirePractitionerAuth, deletePatient);
@@ -26,11 +29,14 @@ router.post("/update-portal-password", requirePractitionerAuth, async (req: any,
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required" });
     }
+    if (!isStrongPatientPassword(password)) {
+      return res.status(400).json({ error: "Password does not meet the security requirements" });
+    }
     
     // Update the portal account password
     const portalAccount = await prisma.patientPortal.update({
       where: { email },
-      data: { password }
+      data: { password: await hashPatientPassword(password) }
     });
     
     res.json({
@@ -57,6 +63,9 @@ router.post("/create-portal-account", requirePractitionerAuth, async (req: any, 
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required" });
     }
+    if (!isStrongPatientPassword(password)) {
+      return res.status(400).json({ error: "Password does not meet the security requirements" });
+    }
     
     // Check if portal account already exists
     const existingPortal = await prisma.patientPortal.findUnique({
@@ -72,7 +81,6 @@ router.post("/create-portal-account", requirePractitionerAuth, async (req: any, 
     
     // If patient doesn't exist and we have patientName, create the patient
     if (!patient && patientName) {
-      console.log('Creating new patient for direct signup:', { email, patientName });
       const newPatient = await prisma.patient.create({
         data: {
           name: patientName,
@@ -93,7 +101,7 @@ router.post("/create-portal-account", requirePractitionerAuth, async (req: any, 
       data: {
         patientId: patient.id,
         email,
-        password
+        password: await hashPatientPassword(password)
       }
     });
     
@@ -117,11 +125,9 @@ router.post("/create-portal-account", requirePractitionerAuth, async (req: any, 
 });
 
 // Get patient by email with SRS scores
-router.get("/by-email/:email", async (req: any, res: any) => {
+router.get("/by-email/:email", requirePatientAccess, async (req: any, res: any) => {
   try {
     const { email } = req.params;
-    console.log('Fetching patient by email:', email);
-    
     const patient = await findPatientByEmail(email);
     
     if (!patient) {
@@ -142,7 +148,7 @@ router.get("/by-email/:email", async (req: any, res: any) => {
 });
 
 // Get SRS scores for a patient
-router.get("/:id/srs-scores", async (req: any, res: any) => {
+router.get("/:id/srs-scores", requirePatientAccess, async (req: any, res: any) => {
   try {
     const { id } = req.params;
     const patientId = parseInt(id);
@@ -169,11 +175,9 @@ router.get("/:id/srs-scores", async (req: any, res: any) => {
 });
 
 // Get patient portal data by email
-router.get("/portal-data/:email", async (req: any, res: any) => {
+router.get("/portal-data/:email", requirePatientAccess, async (req: any, res: any) => {
   try {
     const { email } = req.params;
-    console.log('🔍 Fetching portal data for email:', email);
-    
     const patient = await findPatientByEmail(email);
     
     if (!patient) {
@@ -233,11 +237,9 @@ router.get("/portal-data/:email", async (req: any, res: any) => {
 });
 
 // Update patient engagement
-router.post("/update-engagement", async (req: any, res: any) => {
+router.post("/update-engagement", requirePatientAccess, async (req: any, res: any) => {
   try {
     const { email, activityType, data } = req.body;
-    
-    console.log('📊 Updating patient engagement:', { email, activityType, data });
     
     // Find patient by email
     const patient = await findPatientByEmail(email);
@@ -250,8 +252,6 @@ router.post("/update-engagement", async (req: any, res: any) => {
     
     // Store engagement data (you can expand this based on your needs)
     // For now, just log the engagement
-    console.log('✅ Engagement updated successfully for patient:', patient.name);
-    
     res.json({
       success: true,
       message: 'Engagement updated successfully',
@@ -271,11 +271,9 @@ router.post("/update-engagement", async (req: any, res: any) => {
 });
 
 // Submit daily pain and stress assessment
-router.post("/daily-assessment", async (req: any, res: any) => {
+router.post("/daily-assessment", requirePatientAccess, async (req: any, res: any) => {
   try {
     const { patientId, pain, stress, mood, painArea, functionLikert, triggers, stressFactors } = req.body;
-    
-    console.log('📊 Received daily assessment:', { patientId, pain, stress, mood });
     
     // Find patient by email if patientId is email format
     let numericPatientId = parseInt(patientId);
@@ -354,8 +352,6 @@ router.post("/daily-assessment", async (req: any, res: any) => {
       }
     });
     
-    console.log('✅ Daily assessment stored:', dailyRecord);
-    
     res.json({
       success: true,
       data: {
@@ -375,11 +371,9 @@ router.post("/daily-assessment", async (req: any, res: any) => {
 });
 
 // Get latest daily assessment data for recovery insights
-router.get("/daily-data/:email", async (req: any, res: any) => {
+router.get("/daily-data/:email", requirePatientAccess, async (req: any, res: any) => {
   try {
     const { email } = req.params;
-    console.log('📊 Fetching daily data for:', email);
-    
     // Find patient by email
     const patient = await prisma.patient.findUnique({
       where: { email: email }
@@ -447,8 +441,6 @@ router.get("/daily-data/:email", async (req: any, res: any) => {
       Math.min(100, (latestDaily.psychLoad * 2) - pcs4Normalized)
     );
     
-    console.log('✅ Latest daily data found:', latestDaily);
-    
     res.json({
       success: true,
       data: {
@@ -471,11 +463,9 @@ router.get("/daily-data/:email", async (req: any, res: any) => {
 });
 
 // Get patient progress history for trend chart
-router.get('/progress-history/:email', async (req: any, res: any) => {
+router.get('/progress-history/:email', requirePatientAccess, async (req: any, res: any) => {
   try {
     const { email } = req.params;
-    console.log(`📊 Fetching progress history for: ${email}`);
-
     // Find patient by email
     const patient = await prisma.patient.findUnique({
       where: { email },
@@ -516,8 +506,6 @@ router.get('/progress-history/:email', async (req: any, res: any) => {
       };
     });
 
-    console.log(`✅ Found ${progressHistory.length} progress entries for ${email}`);
-
     res.json({
       success: true,
       data: {
@@ -539,11 +527,9 @@ router.get('/progress-history/:email', async (req: any, res: any) => {
 });
 
 // Record patient activity
-router.post("/activity", async (req: any, res: any) => {
+router.post("/activity", requirePatientAccess, async (req: any, res: any) => {
   try {
     const { email, activityType, data } = req.body;
-    
-    console.log('📊 Recording patient activity:', { email, activityType, data });
     
     // Find patient by email
     const patient = await findPatientByEmail(email);
@@ -556,8 +542,6 @@ router.post("/activity", async (req: any, res: any) => {
     
     // Store activity data in database (you can expand this based on your needs)
     // For now, just log the activity
-    console.log('✅ Activity recorded successfully for patient:', patient.name);
-    
     res.json({
       success: true,
       message: 'Activity recorded successfully',

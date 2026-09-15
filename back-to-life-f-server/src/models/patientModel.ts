@@ -31,7 +31,9 @@ export const findPatientByEmail = async (email: string) => {
       srsScores: {
         orderBy: { date: "asc" }, // Return all scores, oldest to newest
       },
-      portalAccount: true
+      portalAccount: {
+        select: { id: true, patientId: true, email: true, createdAt: true }
+      }
     }
   });
 };
@@ -146,7 +148,9 @@ export const getAllPatientsWithScores = async () => {
         orderBy: { date: "desc" },
         take: 1,
       },
-      portalAccount: true,
+      portalAccount: {
+        select: { id: true, patientId: true, email: true, createdAt: true }
+      },
     },
   });
 };
@@ -169,25 +173,21 @@ export const deletePatient = async (patientId: number) => {
 
 // Get assigned exercises for movement session by email
 export const getAssignedExercisesByEmail = async (email: string) => {
-  console.log(`🔍 Looking for patient with email: ${email}`);
+  console.log('🔍 Looking up patient exercises');
   
   // Find patient by email
   const patient = await findPatientByEmail(email);
   if (!patient) {
-    console.log(`❌ No patient found for email: ${email}`);
+    console.log('❌ No patient found for exercise lookup');
     return null;
   }
   
-  console.log(`✅ Found patient: ${patient.name} (ID: ${patient.id})`);
-  console.log(`📊 SRS Scores:`, patient.srsScores);
-
+  console.log('✅ Patient found for exercise lookup');
   // Get latest SRS score to determine phase
   const srsScores = patient.srsScores || [];
   const latestSRS = srsScores.length > 0 ? srsScores[srsScores.length - 1] : null;
   const srsScore = latestSRS?.srsScore || 0;
   
-  console.log(`📈 Latest SRS Score: ${srsScore}`);
-
   // Determine phase based on SRS score
   let phase = "Reset";
   if (srsScore >= 8) phase = "Rebuild";

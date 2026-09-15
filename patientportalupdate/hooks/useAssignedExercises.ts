@@ -15,12 +15,7 @@ export function useAssignedExercises(patientEmail: string) {
   const [error, setError] = useState<string | null>(null);
   const [isStale, setIsStale] = useState(false);
 
-  console.log(`🏃 useAssignedExercises called with email: "${patientEmail}" (type: ${typeof patientEmail}, length: ${patientEmail?.length})`);
-
   useEffect(() => {
-    console.log(`🔄 useEffect triggered for email: "${patientEmail}"`);
-    console.log(`🔍 useEffect dependency check - patientEmail: "${patientEmail}", length: ${patientEmail?.length}`);
-    
     if (!patientEmail) {
       setData(null);
       setIsStale(false);
@@ -36,7 +31,6 @@ export function useAssignedExercises(patientEmail: string) {
 
     const fetchAssignedExercises = async () => {
       try {
-        console.log(`🌐 Making API call to fetch exercises for: ${patientEmail}`);
         setLoading(true);
         setError(null);
 
@@ -53,10 +47,7 @@ export function useAssignedExercises(patientEmail: string) {
         }
 
         const result = await response.json();
-        console.log(`📦 API Response:`, result);
-        
         if (result.success) {
-          console.log(`✅ Setting exercise data:`, result.data);
           setData(result.data);
           setIsStale(false);
           setError(null);
@@ -77,6 +68,5 @@ export function useAssignedExercises(patientEmail: string) {
     fetchAssignedExercises();
   }, [patientEmail]);
 
-  console.log(`📤 useAssignedExercises returning:`, { data, loading, error });
   return { data, loading, error, isStale };
 }

@@ -1,5 +1,8 @@
 import jwt from "jsonwebtoken"
 
+const normalizeEmail = (value: unknown) =>
+  typeof value === "string" ? value.trim().toLowerCase() : ""
+
 export const requirePatientAccess = (req: any, res: any, next: any) => {
   const token = req.cookies?.patientToken
   if (!token) {
@@ -15,19 +18,37 @@ export const requirePatientAccess = (req: any, res: any, next: any) => {
   try {
     const payload = jwt.verify(token, secret) as jwt.JwtPayload
     const authenticatedPatientId = Number(payload.patientId)
-    const requestedPatientId = Number(req.params?.patientId ?? req.body?.patientId)
+    const authenticatedEmail = normalizeEmail(payload.email)
+    const requestedIdentity =
+      req.params?.patientId ??
+      req.params?.id ??
+      req.params?.email ??
+      req.body?.patientId ??
+      req.body?.email
 
-    if (payload.role !== "patient" || !Number.isInteger(authenticatedPatientId)) {
+    if (
+      payload.role !== "patient" ||
+      !Number.isInteger(authenticatedPatientId) ||
+      authenticatedPatientId <= 0 ||
+      !authenticatedEmail
+    ) {
       return res.status(403).json({ error: "Patient access required" })
     }
-    if (!Number.isInteger(requestedPatientId) || requestedPatientId <= 0) {
-      return res.status(400).json({ error: "A valid patient ID is required" })
+
+    const requestedPatientId = Number(requestedIdentity)
+    const requestedEmail = normalizeEmail(requestedIdentity)
+    const identityMatches = Number.isInteger(requestedPatientId) && requestedPatientId > 0
+      ? authenticatedPatientId === requestedPatientId
+      : requestedEmail.includes("@") && authenticatedEmail === requestedEmail
+
+    if (!requestedIdentity || (!Number.isInteger(requestedPatientId) && !requestedEmail.includes("@"))) {
+      return res.status(400).json({ error: "A valid patient identity is required" })
     }
-    if (authenticatedPatientId !== requestedPatientId) {
+    if (!identityMatches) {
       return res.status(403).json({ error: "This patient record is not available to this account" })
     }
 
-    req.patient = { patientId: authenticatedPatientId, email: payload.email }
+    req.patient = { patientId: authenticatedPatientId, email: authenticatedEmail }
     next()
   } catch {
     return res.status(401).json({ error: "Patient session is invalid or expired" })

@@ -42,8 +42,6 @@ const clinicalNotesRoutes = require("./routes/clinicalNotesRoutes").default;
 const recoveryPointsRoutes = require("./routes/recoveryPointsRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const practitionerAssessmentRoutes = require("./routes/practitionerAssessmentRoutes");
-// Use require for getAssignedExercisesByEmail to avoid import issues
-const { getAssignedExercisesByEmail } = require("./models/patientModel");
 import { Request, Response } from "express";
 
 dotenv.config();
@@ -69,18 +67,19 @@ prisma.$connect()
 
 console.log('🚀 Creating Express app...');
 const app = express();
+app.set('trust proxy', 1);
 console.log('✅ Express app created successfully');
 
 console.log('🔧 Setting up logging middleware...');
 // Enhanced logging middleware
 app.use((req, res, next) => {
   const timestamp = new Date().toISOString();
-  console.log(`[${timestamp}] ${req.method} ${req.path} - Origin: ${req.headers.origin || 'none'}`);
+  console.log(`[${timestamp}] ${req.method} request`);
   
   // Log response status
   const originalSend = res.send;
   res.send = function(data) {
-    console.log(`[${timestamp}] Response: ${res.statusCode} for ${req.method} ${req.path}`);
+    console.log(`[${timestamp}] Response: ${res.statusCode} for ${req.method}`);
     return originalSend.call(this, data);
   };
   
@@ -131,52 +130,29 @@ const allowedOrigins = [
   'https://dashboard-vercel.vercel.app',
   'https://dashboard-vercel-theframework.vercel.app',
   'https://back-to-life-f-3-vercel.vercel.app',
-  'https://dashboard-three-taupe-47.vercel.app'
-];
+  'https://dashboard-three-taupe-47.vercel.app',
+  'https://framework-six-umber.vercel.app',
+  'https://dashboard-git-codex-patient-preview-2026-07-29-theframework.vercel.app',
+  'https://patientportal-git-codex-patient-preview-2026-07-29-theframework.vercel.app'
+].concat(
+  (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+);
 
 // Comprehensive CORS origin checker for all Vercel deployments
 const dynamicOriginCheck = function (origin: string | undefined, callback: any) {
   console.log('✅ Running comprehensive CORS middleware');
-  console.log('Incoming Origin:', origin);
-
-  // Multiple regex patterns to catch all Vercel deployment variations
-  const vercelPatterns = [
-    /^https:\/\/dashboard-[\w-]+-[\w-]+\.vercel\.app$/,           // dashboard-xxx-yyy.vercel.app
-    /^https:\/\/dashboard-[\w-]+\.vercel\.app$/,                   // dashboard-xxx.vercel.app
-    /^https:\/\/[\w-]+-[\w-]+\.vercel\.app$/,                      // xxx-yyy.vercel.app
-    /^https:\/\/[\w-]+\.vercel\.app$/,                             // xxx.vercel.app
-    /^https:\/\/[\w-]+-theframework\.vercel\.app$/                 // xxx-theframework.vercel.app
-  ];
-  
-  // Debug logging
-  console.log('🔍 CORS Debug Details:');
-  console.log('   - Origin:', origin);
-  console.log('   - No origin check:', !origin);
-  console.log('   - In allowed origins:', allowedOrigins.includes(origin || ''));
-  
-  // Test against all regex patterns
-  let regexMatch = false;
-  for (let i = 0; i < vercelPatterns.length; i++) {
-    if (vercelPatterns[i].test(origin || '')) {
-      regexMatch = true;
-      console.log(`   - Regex pattern ${i + 1} matched:`, vercelPatterns[i].toString());
-      break;
-    }
-  }
-  console.log('   - Any regex pattern matched:', regexMatch);
-
   if (
     !origin ||                             // Allow non-browser tools
-    allowedOrigins.includes(origin) ||     // Allow exact whitelisted origins
-    regexMatch                             // Allow any Vercel deployment URL
+    allowedOrigins.includes(origin)        // Allow exact whitelisted origins
   ) {
     console.log('✅ CORS: Origin allowed');
     callback(null, true);
   } else {
     console.log('❌ CORS: Origin rejected');
-    console.log('   - Rejected origin:', origin);
     console.log('   - Allowed origins count:', allowedOrigins.length);
-    console.log('   - Regex patterns tested:', vercelPatterns.length);
     callback(new Error(`Not allowed by CORS: ${origin}`));
   }
 };
@@ -194,7 +170,7 @@ console.log(`🔧 CORS Mode: ${isDevelopment ? 'Development' : 'Production'}`);
 console.log(`🐛 Debug Mode: ${isDebugMode ? 'Enabled' : 'Disabled'}`);
 
 // Fallback CORS for development or debug mode
-if (isDevelopment || isDebugMode) {
+if (isDevelopment) {
   console.log('🚨 DEVELOPMENT/DEBUG MODE: Using permissive CORS');
   app.use(cors({
     origin: true, // Allow all origins in dev/debug mode
@@ -228,27 +204,18 @@ if (isDevelopment || isDebugMode) {
 // Note: CORS middleware handles OPTIONS requests automatically
 // No need for explicit OPTIONS handler
 
-// Additional CORS debugging middleware to catch any issues
-app.use((req, res, next) => {
-  // Log CORS-related headers for debugging
-  if (req.headers.origin) {
-    console.log(`🔍 Request CORS Debug:`);
-    console.log(`   - Origin: ${req.headers.origin}`);
-    console.log(`   - Method: ${req.method}`);
-    console.log(`   - Path: ${req.path}`);
-    console.log(`   - Origin in allowed list: ${allowedOrigins.includes(req.headers.origin)}`);
-  }
-  next();
-});
-
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
-// Log the auth route without recording credentials or authorization headers.
+app.disable('x-powered-by');
 app.use((req, res, next) => {
-  if (req.path.includes('/auth/')) {
-    console.log(`Auth request: ${req.method} ${req.path}`);
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  if (req.path.startsWith('/patients') || req.path.startsWith('/api/')) {
+    res.setHeader('Cache-Control', 'no-store');
   }
   next();
 });
@@ -295,7 +262,7 @@ app.get("/health", async (req, res) => {
     res.status(500).json({
       status: "ERROR",
       database: "Disconnected",
-      error: error.message || 'Unknown error',
+      error: 'Database health check failed',
       timestamp: new Date().toISOString(),
       uptime: process.uptime()
     });
@@ -314,57 +281,36 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/practitioner-assessment", practitionerAssessmentRoutes);
 app.use("/api/clinical-notes", clinicalNotesRoutes);
 
-// Direct route for assigned exercises (for Next.js API proxy compatibility)
-app.get("/api/patient-portal/exercises/:email", async (req: any, res: any) => {
-  try {
-    const { email } = req.params;
-    const data = await getAssignedExercisesByEmail(email);
-    if (!data) {
-      return res.status(404).json({ error: "No exercises found for this patient" });
-    }
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch assigned exercises" });
-  }
-});
-
 // Global error handler
 app.use((err: any, req: any, res: any, next: any) => {
-  console.error('Global error handler:', err);
+  console.error('Global error handler:', err?.name || 'Error');
   
   // Special handling for CORS errors
   if (err.message && err.message.includes('CORS')) {
     console.error('🚫 CORS Error Details:');
     console.error('   - Error:', err.message);
     console.error('   - Request Origin:', req.headers.origin);
-    console.error('   - Request Path:', req.path);
     console.error('   - Request Method:', req.method);
-    console.error('   - Allowed Origins:', allowedOrigins);
     console.error('   - Origin in allowed list:', req.headers.origin ? allowedOrigins.includes(req.headers.origin) : 'No origin');
     
     // Send CORS-specific error response
     res.status(403).json({ 
       error: 'CORS Error',
-      message: err.message,
-      origin: req.headers.origin,
-      path: req.path,
-      timestamp: new Date().toISOString()
+      message: 'This origin is not permitted'
     });
   } else {
     res.status(500).json({ 
       error: 'Internal server error',
-      message: err.message,
-      timestamp: new Date().toISOString()
+      message: 'The request could not be completed'
     });
   }
 });
 
 // 404 handler
 app.use((req, res) => {
-  console.log(`404 - Route not found: ${req.method} ${req.path}`);
+  console.log(`404 - Route not found: ${req.method}`);
   res.status(404).json({ 
     error: 'Route not found',
-    path: req.path,
     method: req.method
   });
 });

@@ -131,9 +131,6 @@ export function ScoreBreakdownModal({ score, onClose, intakeData }: ScoreBreakdo
     // Use the score passed from the backend (main dashboard)
     // Create a breakdown display using Amy's real data for transparency
     try {
-      console.log('📊 Using backend SRS score:', score)
-      console.log('📊 Backend intake data:', intakeData)
-
       // Create breakdown structure based on Amy's actual data
       const displayBreakdown: BreakdownItem[] = [
         {

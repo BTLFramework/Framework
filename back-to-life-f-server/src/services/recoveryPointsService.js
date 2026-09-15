@@ -46,7 +46,7 @@ async function checkDailyMindfulness(patientId) {
 
 // Add Recovery Points and update SRS buffer
 async function addRecoveryPoints(patientId, category, action, points) {
-  console.log(`🎯 Adding ${points} RP for patient ${patientId}: ${category} - ${action}`);
+  console.log(`🎯 Adding ${points} recovery points in ${category}`);
   
   try {
     // Special handling for MINDSET category (mindfulness daily cap)
@@ -54,7 +54,7 @@ async function addRecoveryPoints(patientId, category, action, points) {
       const dailyCheck = await checkDailyMindfulness(patientId);
       
       if (dailyCheck.alreadyLogged) {
-        console.log(`⚠️ Daily mindfulness already logged for patient ${patientId}`);
+        console.log('⚠️ Daily mindfulness already logged');
         return {
           success: false,
           message: 'Mindfulness already logged for today',
@@ -180,7 +180,7 @@ async function addRecoveryPoints(patientId, category, action, points) {
 
 // Update SRS Buffer based on RP accumulation
 async function updateSRSBuffer(patientId, category, points) {
-  console.log(`🔄 Updating SRS buffer for patient ${patientId}, category ${category}`);
+  console.log(`🔄 Updating SRS buffer for ${category}`);
   
   const config = bufferConfig[category];
   if (!config) {
@@ -298,7 +298,7 @@ async function getSRSBuffer(patientId) {
 
 // Check 4-week thresholds and set eligibility flags
 async function checkThresholds(patientId) {
-  console.log(`🔍 Checking 4-week thresholds for patient ${patientId}`);
+  console.log('🔍 Checking 4-week recovery thresholds');
   
   const results = {};
   
@@ -401,7 +401,7 @@ async function getRecentActivity(patientId, limit = 10) {
 
 // Reset all recovery points for a patient
 async function resetPatientRecoveryPoints(patientId) {
-  console.log(`🔄 Resetting all recovery points for patient ${patientId}`);
+  console.log('🔄 Resetting all recovery points');
   
   try {
     // Delete all recovery points for this patient
@@ -457,7 +457,7 @@ async function resetPatientRecoveryPoints(patientId) {
 
 // Initialize recovery points system for new patient
 async function initializePatientRecoveryPoints(patientId) {
-  console.log(`🆕 Initializing recovery points for new patient ${patientId}`);
+  console.log('🆕 Initializing recovery points for new patient');
   
   try {
     // Create initial SRS buffer record (all zeros)
@@ -475,7 +475,7 @@ async function initializePatientRecoveryPoints(patientId) {
       }
     });
     
-    console.log(`✅ Recovery points system initialized for patient ${patientId}`);
+    console.log('✅ Recovery points system initialized');
     return buffer;
     
   } catch (error) {

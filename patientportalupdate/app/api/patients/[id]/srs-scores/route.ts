@@ -9,7 +9,10 @@ export async function GET(
     const { id } = await params;
 
     // Fetch SRS scores from backend
-    const response = await fetch(`${backendUrl}/patients/${id}/srs-scores`);
+    const response = await fetch(`${backendUrl}/patients/${id}/srs-scores`, {
+      headers: { 'Cookie': request.headers.get('cookie') || '' },
+      cache: 'no-store',
+    });
     
     if (!response.ok) {
       // If backend doesn't have this endpoint, return empty array
@@ -34,4 +37,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}

@@ -1,20 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// CORS headers for cross-origin requests
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-};
-
-// Handle preflight OPTIONS request
-export async function OPTIONS(request: NextRequest) {
-  return new Response(null, {
-    status: 200,
-    headers: corsHeaders,
-  });
-}
-
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.json();
@@ -77,8 +62,6 @@ export async function POST(request: NextRequest) {
         beliefStatus: backendResult.beliefStatus,
         setupLink: backendResult.setupLink
       }
-    }, {
-      headers: corsHeaders
     });
 
   } catch (error) {
@@ -88,10 +71,7 @@ export async function POST(request: NextRequest) {
       success: false,
       error: error instanceof Error ? error.message : 'Processing failed',
       message: 'Failed to process intake form. Please try again.'
-    }, {
-      status: 500,
-      headers: corsHeaders
-    });
+    }, { status: 500 });
   }
 }
 

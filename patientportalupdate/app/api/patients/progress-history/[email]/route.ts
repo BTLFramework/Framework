@@ -10,7 +10,10 @@ export async function GET(
     const { email } = await params;
 
 
-    const response = await fetch(`${backendUrl}/patients/progress-history/${encodeURIComponent(email)}`);
+    const response = await fetch(`${backendUrl}/patients/progress-history/${encodeURIComponent(email)}`, {
+      headers: { 'Cookie': request.headers.get('cookie') || '' },
+      cache: 'no-store',
+    });
     const data = await response.json();
 
     if (!response.ok) {

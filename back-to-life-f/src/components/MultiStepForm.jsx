@@ -486,7 +486,6 @@ export default function MultiStepForm() {
           phase: normalizedResult.phase
         }));
 
-        localStorage.setItem('btl_patient_data', JSON.stringify(normalizedResult.portalPatientData));
       }
       
       setSubmissionResult(result);
@@ -594,10 +593,11 @@ export default function MultiStepForm() {
                       return;
                     }
 
-                    const params = new URLSearchParams({
-                      patientData: JSON.stringify(patientData)
-                    });
-                    window.location.href = `${patientPortalUrl}/create-account?${params.toString()}`;
+                    if (!patientData.setupToken) {
+                      window.location.href = `${patientPortalUrl}/login`;
+                      return;
+                    }
+                    window.location.href = `${patientPortalUrl}/create-account?token=${encodeURIComponent(patientData.setupToken)}`;
                   } else {
                     const patientPortalUrl = import.meta.env.VITE_PATIENT_PORTAL_URL || 'https://framework-six-umber.vercel.app';
                     window.location.href = patientPortalUrl;

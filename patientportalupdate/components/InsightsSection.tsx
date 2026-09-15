@@ -10,6 +10,7 @@ import { BookOpen, Filter, Trophy, Lock, CheckCircle } from "lucide-react";
 import { insightLibrary, getAllTracks, getInsightsByTrack } from "@/lib/InsightLibrary";
 import InsightCard from "./InsightCard";
 import InsightDialog from "./InsightDialog";
+import { useAuth } from "@/hooks/useAuth";
 
 interface InsightsSectionProps {
   completedInsights?: number[];
@@ -25,18 +26,8 @@ export default function InsightsSection({
   const [selectedTrack, setSelectedTrack] = useState<string>("all");
   const [activeTab, setActiveTab] = useState("all");
   const [todayInsightIndex, setTodayInsightIndex] = useState(0);
-  const [patientId, setPatientId] = useState<string>("");
-
-  useEffect(() => {
-    // Load patientId (email) from localStorage
-    try {
-      const stored = localStorage.getItem('btl_patient_data');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.email) setPatientId(parsed.email);
-      }
-    } catch {}
-  }, []);
+  const { patient } = useAuth();
+  const patientId = patient?.email || "";
 
   const tracks = getAllTracks();
   const totalInsights = insightLibrary.length;
@@ -229,4 +220,4 @@ export default function InsightsSection({
       )}
     </div>
   );
-} 
+}

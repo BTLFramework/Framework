@@ -87,8 +87,6 @@ export default function TodaysTasksPage() {
   }
 
   const handleTaskComplete = (taskData: any) => {
-    console.log('🎯 Task completed:', taskData)
-
     const taskId =
       taskData.taskId === 'recovery-insight' ? 'recovery-insights' :
       taskData.taskId ||
@@ -97,7 +95,7 @@ export default function TodaysTasksPage() {
 
     if (patient?.email && taskId) {
       const today = new Date().toISOString().slice(0, 10)
-      localStorage.setItem(`dailyTaskCompleted_${patient.email}_${today}_${taskId}`, 'true')
+      sessionStorage.setItem(`dailyTaskCompleted_${today}_${taskId}`, 'true')
       setTaskRefreshKey((key) => key + 1)
     }
 

@@ -313,13 +313,6 @@ const insightLibrary: RecoveryInsight[] = [
 function personalizeInsights(patientData: any): RecoveryInsight[] {
   if (!patientData) return insightLibrary.slice(0, 3); // Default fallback
   
-  console.log('🎯 Personalizing insights for patient data:', {
-    vas: patientData.vas,
-    pcs4: patientData.pcs4,
-    tsk11: patientData.tsk11,
-    confidence: patientData.confidence
-  });
-  
   // Calculate patient metrics from intake data
   const vas = parseInt(patientData.vas) || 0;
   const confidence = parseInt(patientData.confidence) || 0;
@@ -378,10 +371,6 @@ function personalizeInsights(patientData: any): RecoveryInsight[] {
             setCurrentPain(dailyPain);
             setRecentStress(dailyStress);
             
-            console.log('📈 Updated with daily assessment data:', {
-              pain: `${vas} → ${dailyPain}`,
-              stress: `2 → ${dailyStress}`
-            });
           }
         }
       } catch (error) {
@@ -391,11 +380,6 @@ function personalizeInsights(patientData: any): RecoveryInsight[] {
     
     fetchDailyData();
   }, [patientData.patient?.email, vas]);
-  
-  console.log('📊 Patient metrics calculated:', {
-    baseline: { vas, pcs4Total, fearAvoidanceScore, confidence },
-    current: { pain: currentPain, stress: recentStress }
-  });
   
   // Filter insights based on patient conditions (use current pain over baseline VAS)
   const personalizedInsights = insightLibrary.filter(insight => {
@@ -468,8 +452,6 @@ export function useRecoveryInsights(patientData: any, refreshKey?: number): Reco
   const [insights, setInsights] = useState<RecoveryInsight[]>([]);
   const [completedInsights, setCompletedInsights] = useState<string[]>([]);
   
-  console.log('🎯 useRecoveryInsights called with:', { patientData, refreshKey });
-
   // Personalize insights based on patient data
   useEffect(() => {
     const personalizedInsights = personalizeInsights(patientData);
@@ -485,8 +467,6 @@ export function useRecoveryInsights(patientData: any, refreshKey?: number): Reco
       }
 
       try {
-        console.log('🔄 Fetching completed insights for patient:', patientData.email);
-        
         // Get patient ID first
         const patientResponse = await fetch(`/api/patients/portal-data/${patientData.email}`);
         if (!patientResponse.ok) {
@@ -499,12 +479,9 @@ export function useRecoveryInsights(patientData: any, refreshKey?: number): Reco
         
         // Get completed insights
         const completionsResponse = await fetch(`/api/v1/insights/complete?patientId=${patientId}`);
-        console.log('🎯 Fetching completions for patient ID:', patientId);
         if (completionsResponse.ok) {
           const completionsResult = await completionsResponse.json();
-          console.log('🎯 Completions API response:', completionsResult);
           setCompletedInsights(completionsResult.data.completedInsights || []);
-          console.log('✅ Completed insights loaded:', completionsResult.data.completedInsights);
         } else {
           console.log('❌ Completions API failed:', completionsResponse.status);
         }

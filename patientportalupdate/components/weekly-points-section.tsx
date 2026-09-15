@@ -35,8 +35,6 @@ export function WeeklyPointsSection({ patientEmail, refreshKey }: WeeklyPointsSe
       
       setLoading(true)
       try {
-        console.log('🔄 Fetching recovery points for:', patientEmail)
-        
         // Get patient data first to get patient ID
         const patientResponse = await fetch(`/api/patients/portal-data/${patientEmail}`)
         if (!patientResponse.ok) {
@@ -53,8 +51,6 @@ export function WeeklyPointsSection({ patientEmail, refreshKey }: WeeklyPointsSe
         const patientData = await patientResponse.json()
         const patientId = patientData.data.patient.id
         
-        console.log('📊 Patient ID:', patientId)
-        
         // Get weekly breakdown
         const weeklyResponse = await fetch(`/api/recovery-points/weekly/${patientId}`)
         if (!weeklyResponse.ok) {
@@ -62,8 +58,6 @@ export function WeeklyPointsSection({ patientEmail, refreshKey }: WeeklyPointsSe
         }
         
         const weeklyPoints = await weeklyResponse.json()
-        console.log('📈 Weekly points data:', weeklyPoints)
-        
         // Get buffer status for additional data
         const bufferResponse = await fetch(`/api/recovery-points/buffer/${patientId}`)
         const bufferData = bufferResponse.ok ? await bufferResponse.json() : null

@@ -10,7 +10,10 @@ export async function GET(
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://framework-production-92f5.up.railway.app';
     const { email } = await params;
 
-    const response = await fetch(`${backendUrl}/patients/portal-data/${encodeURIComponent(email)}`);
+    const response = await fetch(`${backendUrl}/patients/portal-data/${encodeURIComponent(email)}`, {
+      headers: { 'Cookie': request.headers.get('cookie') || '' },
+      cache: 'no-store',
+    });
     const data = await response.json();
 
     if (!response.ok) {

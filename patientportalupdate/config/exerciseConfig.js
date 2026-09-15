@@ -584,11 +584,6 @@ export function getPatientExercises(patientData) {
     finalExercises.push(...fallbackExercises);
   }
 
-  console.log(`✅ Returning ${finalExercises.length} exercises for patient:`, {
-    srsScore, phase, region, 
-    exercises: finalExercises.map(ex => ex.exercise)
-  });
-
   return finalExercises;
 }
 
@@ -640,4 +635,4 @@ export function getPhaseExerciseTarget(phase) {
   };
   
   return targets[phase] || targets["Reset"];
-} 
+}

@@ -38,7 +38,7 @@ router.post('/send', requirePractitionerAuth, async (req, res) => {
       }
     });
 
-    console.log(`📧 Message sent from ${senderName} to ${patient.name}: ${subject}`);
+    console.log('📧 Practitioner message sent');
 
     res.status(201).json({
       success: true,
@@ -226,8 +226,7 @@ router.get('/patient/:patientId', requirePatientAccess, async (req, res) => {
   } catch (error) {
     console.error('Error fetching patient messages:', error);
     res.status(500).json({
-      error: 'Failed to fetch messages',
-      details: error.message
+      error: 'Failed to fetch messages'
     });
   }
 });
@@ -247,7 +246,7 @@ router.patch('/patient/:patientId/mark-read', requirePatientAccess, async (req, 
       data: { isRead: true }
     });
 
-    console.log(`📖 Marked ${result.count} messages as read for patient ${patientId}`);
+    console.log('📖 Patient messages marked as read');
 
     res.json({
       success: true,
@@ -258,8 +257,7 @@ router.patch('/patient/:patientId/mark-read', requirePatientAccess, async (req, 
   } catch (error) {
     console.error('Error marking messages as read:', error);
     res.status(500).json({
-      error: 'Failed to mark messages as read',
-      details: error.message
+      error: 'Failed to mark messages as read'
     });
   }
 });
@@ -286,7 +284,7 @@ router.post('/reply', requirePatientAccess, async (req, res) => {
       }
     });
 
-    console.log(`📧 Reply sent from patient ${senderName}: ${subject}`);
+    console.log('📧 Patient reply sent');
 
     res.status(201).json({
       success: true,

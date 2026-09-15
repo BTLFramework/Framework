@@ -25,7 +25,7 @@ export function CreateAccountForm({ patientEmail, patientName, setupToken, onSuc
 
   // Password validation
   const passwordRequirements = {
-    minLength: password.length >= 8,
+    minLength: password.length >= 10,
     hasUppercase: /[A-Z]/.test(password),
     hasLowercase: /[a-z]/.test(password),
     hasNumber: /\d/.test(password),
@@ -238,7 +238,7 @@ export function CreateAccountForm({ patientEmail, patientName, setupToken, onSuc
               <div className="space-y-2 text-sm">
                 <div className={`flex items-center ${passwordRequirements.minLength ? 'text-green-600' : 'text-btl-500'}`}>
                   <div className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.minLength ? 'bg-green-500' : 'bg-btl-300'}`}></div>
-                  At least 8 characters
+                  At least 10 characters
                 </div>
                 <div className={`flex items-center ${passwordRequirements.hasUppercase ? 'text-green-600' : 'text-btl-500'}`}>
                   <div className={`w-2 h-2 rounded-full mr-2 ${passwordRequirements.hasUppercase ? 'bg-green-500' : 'bg-btl-300'}`}></div>

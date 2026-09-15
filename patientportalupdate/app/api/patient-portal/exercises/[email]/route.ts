@@ -15,6 +15,7 @@ export async function GET(
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Cookie': request.headers.get('cookie') || '',
       },
     });
 

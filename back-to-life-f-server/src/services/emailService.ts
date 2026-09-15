@@ -144,12 +144,12 @@ async function sendWithResend(emailData: EmailData, rendered: RenderedEmail): Pr
     });
 
     if (!response.ok) {
-      const details = await response.text();
-      console.error(`❌ Resend rejected welcome email (${response.status}): ${details}`);
+      await response.text();
+      console.error(`❌ Resend rejected welcome email (${response.status})`);
       return false;
     }
 
-    console.log(`✅ Welcome email accepted for delivery to ${emailData.email}`);
+    console.log('✅ Welcome email accepted for delivery');
     return true;
   } catch (error) {
     console.error('❌ Error sending welcome email through Resend:', error);
@@ -181,7 +181,7 @@ export const sendWelcomeEmail = async (emailData: EmailData): Promise<boolean> =
     };
 
     await createTransporter().sendMail(mailOptions);
-    console.log(`✅ Welcome email sent to ${emailData.email}`);
+    console.log('✅ Welcome email sent');
     return true;
   } catch (error) {
     console.error('❌ Error sending welcome email:', error);
@@ -234,7 +234,7 @@ export const sendPractitionerPasswordResetEmail = async (
           console.error(`❌ Resend rejected password reset email (${response.status})`);
           return false;
         }
-        console.log(`✅ Password reset email accepted for delivery to ${email}`);
+        console.log('✅ Password reset email accepted for delivery');
         return true;
       } finally {
         clearTimeout(timeout);
@@ -252,7 +252,7 @@ export const sendPractitionerPasswordResetEmail = async (
       text: body,
       html: escapeHtml(body).replace(/\n/g, '<br>'),
     });
-    console.log(`✅ Password reset email sent to ${email}`);
+    console.log('✅ Password reset email sent');
     return true;
   } catch (error) {
     console.error('❌ Error sending practitioner password reset email:', error);
@@ -260,15 +260,10 @@ export const sendPractitionerPasswordResetEmail = async (
   }
 };
 
-// For development/testing - log email instead of sending
+// For development/testing - confirm rendering without logging patient content
 export const sendWelcomeEmailDev = async (emailData: EmailData): Promise<boolean> => {
-  const { subject, body } = renderWelcomeEmail(emailData);
-
-  console.log('=== WELCOME EMAIL (DEV MODE) ===');
-  console.log('To:', emailData.email);
-  console.log('Subject:', subject);
-  console.log('Body:', body);
-  console.log('================================');
+  renderWelcomeEmail(emailData);
+  console.log('Welcome email rendered in development mode');
   
   return true;
 };

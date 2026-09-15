@@ -1,7 +1,10 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'back-to-life-jwt-secret-2024-production';
-const SETUP_SECRET = process.env.SETUP_SECRET || 'back-to-life-setup-secret-2024-production';
+const requiredSecret = (name: 'JWT_SECRET' | 'SETUP_SECRET') => {
+  const value = process.env[name];
+  if (!value) throw new Error(`${name} is not configured`);
+  return value;
+};
 
 export interface SetupTokenPayload {
   email: string;
@@ -12,13 +15,17 @@ export interface SetupTokenPayload {
 export const generateToken = (user: any) => {
   return jwt.sign(
     { id: user.id, email: user.email, role: "clinician" },
-    JWT_SECRET,
+    requiredSecret('JWT_SECRET'),
     { expiresIn: "24h" }
   );
 };
 
 export const generateSetupToken = (email: string, patientId: number) => {
-  return jwt.sign({ email, patientId, type: 'setup' }, SETUP_SECRET, { expiresIn: "24h" });
+  return jwt.sign(
+    { email: email.trim().toLowerCase(), patientId, type: 'setup' },
+    requiredSecret('SETUP_SECRET'),
+    { expiresIn: "24h" }
+  );
 };
 
 export const generatePatientToken = (patientPortal: any) => {
@@ -29,14 +36,14 @@ export const generatePatientToken = (patientPortal: any) => {
       patientId: patientPortal.patientId,
       role: "patient" 
     },
-    JWT_SECRET,
+    requiredSecret('JWT_SECRET'),
     { expiresIn: "7d" }
   );
 };
 
 export const verifyToken = (token: string) => {
   try {
-    return jwt.verify(token, JWT_SECRET) as any;
+    return jwt.verify(token, requiredSecret('JWT_SECRET')) as any;
   } catch (error) {
     return null;
   }
@@ -44,7 +51,7 @@ export const verifyToken = (token: string) => {
 
 export const verifySetupToken = (token: string) => {
   try {
-    return jwt.verify(token, SETUP_SECRET) as any;
+    return jwt.verify(token, requiredSecret('SETUP_SECRET')) as any;
   } catch (error) {
     return null;
   }

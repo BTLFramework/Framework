@@ -15,7 +15,6 @@ export const completeInsight = async (
   betaPreview = false
 ) => {
   try {
-    console.log(`🎯 Completing insight ${insightId} for patient ${patientId}`);
     
     const response = await fetch(`${API_BASE_URL}/api/v1/insights/complete`, {
       method: 'POST',

@@ -104,6 +104,11 @@ export const register = async (req: any, res: any) => {
     const email = normalizeEmail(req.body?.email);
     const { password } = req.body;
 
+    if (!isStrongPassword(password)) {
+      res.status(400).send("Password does not meet the security requirements");
+      return;
+    }
+
     if (!email || !password) {
       res.status(400).send("Email and password are required");
       return;
@@ -115,13 +120,13 @@ export const register = async (req: any, res: any) => {
       return;
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 12);
     await prisma.user.create({ data: { email, password: hashedPassword } });
 
     res.status(201).send("User registered");
   } catch (error) {
     console.error("Registration error:", error);
-    res.status(500).send(`Internal server error: ${error}`);
+    res.status(500).send("Internal server error");
   }
 };
 

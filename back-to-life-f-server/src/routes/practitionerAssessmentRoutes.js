@@ -119,8 +119,7 @@ router.post('/save', async (req, res) => {
     console.error('Error saving practitioner assessment:', error);
     res.status(error?.message?.includes('score must be') || error?.message?.includes('assessment is required') ? 400 : 500).json({
       success: false,
-      error: 'Failed to save practitioner assessment',
-      details: error.message
+      error: 'Failed to save practitioner assessment'
     });
   }
 });
@@ -144,8 +143,7 @@ router.get('/patient/:patientId', async (req, res) => {
     console.error('Error fetching practitioner assessment:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch practitioner assessment',
-      details: error.message
+      error: 'Failed to fetch practitioner assessment'
     });
   }
 });

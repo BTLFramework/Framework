@@ -18,7 +18,7 @@ export interface RiskIndexResult {
  */
 export async function calculateRiskIndex(patientId: number): Promise<RiskIndexResult> {
   try {
-    console.log(`🔍 Calculating risk index for patient ${patientId}`);
+    console.log('🔍 Calculating patient risk index');
     
     // Get 7-day stress mean from SRSDaily records
     const sevenDaysAgo = new Date();
@@ -99,15 +99,11 @@ export async function calculateRiskIndex(patientId: number): Promise<RiskIndexRe
       date: new Date()
     };
     
-    console.log(`📊 Risk Index for patient ${patientId}:`, {
-      riskIndex: result.riskIndex,
-      riskLevel: result.riskLevel,
-      components: result.components
-    });
+    console.log('📊 Risk index calculated');
     
     return result;
   } catch (error) {
-    console.error(`Error calculating risk index for patient ${patientId}:`, error);
+    console.error('Error calculating patient risk index');
     throw error;
   }
 }
@@ -144,7 +140,7 @@ export async function calculateRiskIndexForAllPatients(): Promise<RiskIndexResul
         const riskIndex = await calculateRiskIndex(patient.id);
         results.push(riskIndex);
       } catch (error) {
-        console.error(`Failed to calculate risk index for patient ${patient.id}:`, error);
+        console.error('Failed to calculate a patient risk index');
       }
     }
     
@@ -174,7 +170,7 @@ export async function getPatientRiskIndex(patientId: number): Promise<RiskIndexR
   try {
     return await calculateRiskIndex(patientId);
   } catch (error) {
-    console.error(`Error getting risk index for patient ${patientId}:`, error);
+    console.error('Error getting patient risk index');
     return null;
   }
 }
@@ -189,7 +185,7 @@ export async function getPatientRiskIndexHistory(patientId: number): Promise<Ris
     const currentRisk = await calculateRiskIndex(patientId);
     return [currentRisk];
   } catch (error) {
-    console.error(`Error getting risk index history for patient ${patientId}:`, error);
+    console.error('Error getting patient risk index history');
     return [];
   }
-} 
+}

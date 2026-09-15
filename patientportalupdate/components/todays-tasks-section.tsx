@@ -66,7 +66,7 @@ export function TodaysTasksSection({ onTaskClick, refreshKey }: TodaysTasksSecti
     const taskIds = ['movement-session', 'pain-assessment', 'mindfulness-session', 'recovery-insights'];
     setCompletedTaskIds(new Set(
       taskIds.filter((taskId) =>
-        localStorage.getItem(`dailyTaskCompleted_${patient.email}_${today}_${taskId}`) === 'true'
+        sessionStorage.getItem(`dailyTaskCompleted_${today}_${taskId}`) === 'true'
       )
     ));
   }, [patient?.email, refreshKey]);

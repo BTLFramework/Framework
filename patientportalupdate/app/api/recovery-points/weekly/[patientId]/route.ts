@@ -13,6 +13,7 @@ export async function GET(
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Cookie': request.headers.get('cookie') || '',
       },
     });
 
@@ -34,4 +35,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}

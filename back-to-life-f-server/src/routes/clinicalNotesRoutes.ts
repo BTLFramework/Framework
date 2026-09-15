@@ -11,12 +11,6 @@ const router = Router();
 
 router.use(requirePractitionerAuth);
 
-// Add logging middleware to this router
-router.use((req, res, next) => {
-  console.log(`ClinicalNotesRoutes: ${req.method} ${req.path}`);
-  next();
-});
-
 // GET /api/clinical-notes/:patientId - Get all notes for a patient
 router.get('/:patientId', getClinicalNotes as any);
 

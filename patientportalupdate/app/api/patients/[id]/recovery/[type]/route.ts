@@ -4,7 +4,7 @@ import { clinicalRegionFromProfile, normalizeClinicalProfile } from '@/lib/clini
 export const dynamic = 'force-dynamic';
 
 export async function GET(
-  _req: NextRequest,
+  request: NextRequest,
   context: { params: Promise<{ id: string; type: string }> }
 ) {
   const { id, type } = await context.params;
@@ -15,7 +15,10 @@ export async function GET(
   try {
     const response = await fetch(
       `${backendUrl}/patients/portal-data/${encodeURIComponent(id)}`,
-      { cache: 'no-store' }
+      {
+        headers: { 'Cookie': request.headers.get('cookie') || '' },
+        cache: 'no-store',
+      }
     );
 
     if (!response.ok) {
@@ -75,7 +78,10 @@ export async function GET(
 
         const dailyResponse = await fetch(
           `${backendUrl}/patients/daily-data/${encodeURIComponent(id)}`,
-          { cache: 'no-store' }
+          {
+            headers: { 'Cookie': request.headers.get('cookie') || '' },
+            cache: 'no-store',
+          }
         );
 
         if (dailyResponse.ok) {

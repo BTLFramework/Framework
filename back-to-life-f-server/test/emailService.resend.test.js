@@ -25,7 +25,9 @@ test('sends the rendered welcome email through the Resend HTTPS API', async () =
 
     const payload = JSON.parse(options.body);
     assert.deepEqual(payload.to, ['patient@example.com']);
-    assert.match(payload.subject, /RESET/);
+    assert.equal(payload.subject, 'Set up your Back to Life patient portal');
+    assert.doesNotMatch(payload.subject, /RESET|EDUCATE|REBUILD/);
+    assert.doesNotMatch(payload.text, /RESET phase|Signature Recovery Score/);
     assert.match(payload.text, /Beta/);
     assert.match(payload.text, /https:\/\/framework-six-umber\.vercel\.app\/setup\?token=test/);
 

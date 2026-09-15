@@ -17,7 +17,6 @@
  */
 export function calculateContinuousSRS(data) {
   console.log('🔢 Calculating Continuous SRS (0-100)');
-  console.log('📊 Input data:', data);
   
   const domains = {};
   
@@ -200,4 +199,4 @@ export function getSRSInterpretation(composite) {
       description: 'Multiple domains require intervention'
     };
   }
-} 
+}

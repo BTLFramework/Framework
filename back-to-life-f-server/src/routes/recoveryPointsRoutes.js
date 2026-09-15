@@ -10,6 +10,8 @@ const {
   isBetaInsightPreviewPatient
 } = require('../services/insightProgression');
 const { verifyToken } = require('../services/jwtService');
+const { requirePatientAccess } = require('../middleware/requirePatientAuth');
+const { requirePractitionerAuth } = require('../middleware/requirePractitionerAuth');
 
 // Use centralized Prisma instance with fallback
 let prisma;
@@ -229,7 +231,7 @@ router.post('/insights/complete', async (req, res) => {
 });
 
 // Add recovery points
-router.post('/add', async (req, res) => {
+router.post('/add', requirePatientAccess, async (req, res) => {
   try {
     const { patientId, category, action, points } = req.body;
     
@@ -247,7 +249,7 @@ router.post('/add', async (req, res) => {
       });
     }
     
-    console.log(`🎯 API: Adding RP for patient ${patientId}: ${category} - ${action} (+${points})`);
+    console.log(`🎯 API: Adding recovery points in ${category}`);
     
     const result = await recoveryPointsService.addRecoveryPoints(
       parseInt(patientId),
@@ -268,11 +270,11 @@ router.post('/add', async (req, res) => {
 });
 
 // Get weekly breakdown for a patient
-router.get('/weekly/:patientId', async (req, res) => {
+router.get('/weekly/:patientId', requirePatientAccess, async (req, res) => {
   try {
     const { patientId } = req.params;
     
-    console.log(`📊 API: Getting weekly RP breakdown for patient ${patientId}`);
+    console.log('📊 API: Getting weekly recovery-point breakdown');
     
     const breakdown = await recoveryPointsService.getWeeklyBreakdown(
       parseInt(patientId)
@@ -290,11 +292,11 @@ router.get('/weekly/:patientId', async (req, res) => {
 });
 
 // Get SRS buffer for a patient
-router.get('/buffer/:patientId', async (req, res) => {
+router.get('/buffer/:patientId', requirePatientAccess, async (req, res) => {
   try {
     const { patientId } = req.params;
     
-    console.log(`🔄 API: Getting SRS buffer for patient ${patientId}`);
+    console.log('🔄 API: Getting SRS buffer');
     
     const buffer = await recoveryPointsService.getSRSBuffer(
       parseInt(patientId)
@@ -312,7 +314,7 @@ router.get('/buffer/:patientId', async (req, res) => {
 });
 
 // Record task completion
-router.post('/task-completion', async (req, res) => {
+router.post('/task-completion', requirePatientAccess, async (req, res) => {
   try {
     const { patientId, taskType, sessionDuration, pointsEarned } = req.body;
     
@@ -331,7 +333,7 @@ router.post('/task-completion', async (req, res) => {
       });
     }
     
-    console.log(`✅ API: Recording task completion for patient ${patientId}: ${taskType}`);
+    console.log(`✅ API: Recording ${taskType} completion`);
 
     // A daily task can only advance the patient's day once. Recovery points
     // already enforce a daily cap; make the completion record idempotent too
@@ -385,11 +387,11 @@ router.post('/task-completion', async (req, res) => {
 });
 
 // Get weekly task completion statistics for "Biggest Win This Week"
-router.get('/task-stats/:patientId', async (req, res) => {
+router.get('/task-stats/:patientId', requirePatientAccess, async (req, res) => {
   try {
     const { patientId } = req.params;
     
-    console.log(`📈 API: Getting task completion stats for patient ${patientId}`);
+    console.log('📈 API: Getting task completion stats');
     
     // Get current week (Monday to Sunday) and last week
     const now = new Date();
@@ -462,7 +464,7 @@ router.get('/task-stats/:patientId', async (req, res) => {
       }
     };
     
-    console.log(`📊 Task stats calculated:`, result.data);
+    console.log('📊 Task stats calculated');
     res.json(result);
     
   } catch (error) {
@@ -475,11 +477,11 @@ router.get('/task-stats/:patientId', async (req, res) => {
 });
 
 // Check 4-week thresholds for a patient
-router.get('/thresholds/:patientId', async (req, res) => {
+router.get('/thresholds/:patientId', requirePatientAccess, async (req, res) => {
   try {
     const { patientId } = req.params;
     
-    console.log(`🔍 API: Checking thresholds for patient ${patientId}`);
+    console.log('🔍 API: Checking recovery thresholds');
     
     const thresholds = await recoveryPointsService.checkThresholds(
       parseInt(patientId)
@@ -497,12 +499,12 @@ router.get('/thresholds/:patientId', async (req, res) => {
 });
 
 // Get recent activity for a patient
-router.get('/activity/:patientId', async (req, res) => {
+router.get('/activity/:patientId', requirePatientAccess, async (req, res) => {
   try {
     const { patientId } = req.params;
     const { limit = 10 } = req.query;
     
-    console.log(`📝 API: Getting recent RP activity for patient ${patientId}`);
+    console.log('📝 API: Getting recent recovery activity');
     
     const activity = await recoveryPointsService.getRecentActivity(
       parseInt(patientId),
@@ -559,7 +561,7 @@ router.get('/actions', async (req, res) => {
 });
 
 // Bulk add recovery points (for testing/seeding)
-router.post('/bulk-add', async (req, res) => {
+router.post('/bulk-add', requirePractitionerAuth, async (req, res) => {
   try {
     const { patientId, activities } = req.body;
     
@@ -569,7 +571,7 @@ router.post('/bulk-add', async (req, res) => {
       });
     }
     
-    console.log(`🎯 API: Bulk adding RP for patient ${patientId}: ${activities.length} activities`);
+    console.log(`🎯 API: Bulk adding ${activities.length} recovery activities`);
     
     const results = [];
     
@@ -605,11 +607,11 @@ router.post('/bulk-add', async (req, res) => {
 });
 
 // Reset all recovery points for a patient
-router.post('/reset/:patientId', async (req, res) => {
+router.post('/reset/:patientId', requirePractitionerAuth, async (req, res) => {
   try {
     const { patientId } = req.params;
     
-    console.log(`🔄 API: Resetting recovery points for patient ${patientId}`);
+    console.log('🔄 API: Resetting recovery points');
     
     const result = await recoveryPointsService.resetPatientRecoveryPoints(
       parseInt(patientId)
@@ -627,11 +629,11 @@ router.post('/reset/:patientId', async (req, res) => {
 });
 
 // Initialize recovery points for a new patient
-router.post('/initialize/:patientId', async (req, res) => {
+router.post('/initialize/:patientId', requirePractitionerAuth, async (req, res) => {
   try {
     const { patientId } = req.params;
     
-    console.log(`🆕 API: Initializing recovery points for patient ${patientId}`);
+    console.log('🆕 API: Initializing recovery points');
     
     const buffer = await recoveryPointsService.initializePatientRecoveryPoints(
       parseInt(patientId)
@@ -653,7 +655,7 @@ router.post('/initialize/:patientId', async (req, res) => {
 });
 
 // Log mood after mindfulness session
-router.post('/mood', async (req, res) => {
+router.post('/mood', requirePatientAccess, async (req, res) => {
   try {
     const { patientId, mood } = req.body;
     
@@ -663,7 +665,7 @@ router.post('/mood', async (req, res) => {
       });
     }
     
-    console.log(`😊 API: Logging mood for patient ${patientId}: ${mood}`);
+    console.log('😊 API: Logging post-session mood');
     
     // Update today's mindfulness log with mood
     const today = new Date();

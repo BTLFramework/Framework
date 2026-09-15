@@ -26,7 +26,6 @@ export async function addRecoveryPoints(
   points: number
 ): Promise<RecoveryPointsResponse> {
   try {
-    console.log(`🎯 Adding ${points} RP for patient ${patientId}: ${category} - ${action}`);
     
     const response = await fetch('/api/recovery-points/add', {
       method: 'POST',
@@ -65,7 +64,6 @@ export async function bulkAddRecoveryPoints(
   activities: RecoveryPointActivity[]
 ): Promise<RecoveryPointsResponse[]> {
   try {
-    console.log(`🎯 Bulk adding RP for patient ${patientId}: ${activities.length} activities`);
     
     const response = await fetch('/api/recovery-points/bulk-add', {
       method: 'POST',
@@ -143,7 +141,6 @@ export async function getSRSBuffer(patientId: string) {
 // Log mood after mindfulness session
 export async function logMood(patientId: string, mood: string) {
   try {
-    console.log(`😊 Logging mood for patient ${patientId}: ${mood}`);
     
     const response = await fetch('/api/recovery-points/mood', {
       method: 'POST',
@@ -172,4 +169,4 @@ export async function logMood(patientId: string, mood: string) {
       error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
-} 
+}

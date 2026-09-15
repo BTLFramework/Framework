@@ -260,8 +260,6 @@ export default function RecoveryScorePage() {
           return
         }
         setDataError(null)
-        console.log('🔍 Fetching recovery data for', patient.email)
-        
         // Fetch portal data (intake information)
         const portalResponse = await fetch(`/api/patients/portal-data/${encodeURIComponent(patient.email)}`)
         
@@ -274,8 +272,6 @@ export default function RecoveryScorePage() {
         // Process portal data
         if (portalResponse.ok) {
           const portalResult = await portalResponse.json()
-          console.log('📊 Portal data:', portalResult.data)
-          
           // Extract intake data from the portal response
           intakeData = {
             vas: portalResult.data.vas ?? null,
@@ -295,8 +291,6 @@ export default function RecoveryScorePage() {
           if (typeof portalScore === 'number' && Number.isFinite(portalScore)) {
             setCurrentScore(portalScore)
           }
-          console.log('✅ Intake data loaded:', intakeData)
-
           // Calculate next assessment date
           const intakeDateStr = portalResult.data.intakeDate || portalResult.data.patient?.intakeDate;
           const intakeDate = intakeDateStr ? new Date(intakeDateStr) : null;
@@ -311,8 +305,6 @@ export default function RecoveryScorePage() {
         // Process progress history
         if (progressResponse.ok) {
           const progressResult = await progressResponse.json()
-          console.log('📈 Progress history:', progressResult.data)
-          
           const verifiedHistory = Array.isArray(progressResult.data?.progressHistory)
             ? progressResult.data.progressHistory
             : []

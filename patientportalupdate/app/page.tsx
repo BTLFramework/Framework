@@ -26,7 +26,6 @@ const PatientRecoveryDashboard: React.FC = () => {
   // Use proper authentication
   const { patient, loading: authLoading, isAuthenticated } = useAuth()
 
-  console.log('🎯 Dashboard render state:', { patient, authLoading, isAuthenticated })
   console.log('🧩 Build marker:', { BUILD_TAG, BUILD_HINT })
 
   const [showScoreModal, setShowScoreModal] = useState(false)
@@ -54,13 +53,6 @@ const PatientRecoveryDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true) // New state for loading
   const [debugToolkit, setDebugToolkit] = useState(false)
 
-  // Function to completely reset portal data
-  const resetPortalData = () => {
-    console.log('🔄 Resetting portal data to defaults...')
-    localStorage.removeItem('btl_patient_data')
-    // This function is no longer needed as patient data is managed by useAuth
-  }
-
   // Function to fetch current pain/stress snapshot
   const fetchCurrentSnapshot = async () => {
     if (!patient?.email) return
@@ -81,50 +73,14 @@ const PatientRecoveryDashboard: React.FC = () => {
         phase: null,
         region: null,
       })
-      console.log('📊 Updated recovery snapshot:', newSnapshot)
-
     } catch (error) {
       console.error('❌ Error fetching snapshot data:', error)
     }
   }
 
-  // Load patient data from URL parameters or localStorage on component mount
+  // Patient identity is loaded only from the authenticated server session.
   useEffect(() => {
-    try {
-      // Clear any old cached data on initial load
-      const existingData = localStorage.getItem('btl_patient_data')
-      if (existingData) {
-        const data = JSON.parse(existingData)
-        if (data.email && (data.email.includes('bb@hotmail.com') || data.email.includes('sarah@example.com') || data.email.includes('amorea@123.com') || data.email.includes('bb@123.com'))) {
-          localStorage.removeItem('btl_patient_data')
-        }
-      }
-      // First try to get data from URL parameters
-      const urlParams = new URLSearchParams(window.location.search)
-      const urlPatientData = urlParams.get('patientData')
-      if (urlPatientData) {
-        const data = JSON.parse(urlPatientData)
-        localStorage.removeItem('btl_patient_data')
-        // This block is no longer needed as patient data is managed by useAuth
-        // setPatientData(data)
-        // localStorage.setItem('btl_patient_data', JSON.stringify(data))
-        window.history.replaceState({}, document.title, window.location.pathname)
-        return
-      }
-      // Fallback to localStorage if no URL parameters
-      const storedData = localStorage.getItem('btl_patient_data')
-      if (storedData) {
-        const data = JSON.parse(storedData)
-        if (data.email && (data.email.includes('bb@hotmail.com') || data.email.includes('amorea@123.com') || data.email.includes('bb@123.com'))) {
-          localStorage.removeItem('btl_patient_data')
-        } else {
-          // This block is no longer needed as patient data is managed by useAuth
-          // setPatientData(data)
-        }
-      }
-    } catch (error) {
-      localStorage.removeItem('btl_patient_data')
-    }
+    localStorage.removeItem('btl_patient_data')
     try {
       const params = new URLSearchParams(window.location.search)
       if (params.get('debugToolkit') === '1') setDebugToolkit(true)
@@ -147,23 +103,12 @@ const PatientRecoveryDashboard: React.FC = () => {
 
     try {
       setLoading(true)
-      console.log('🔄 Refreshing patient data from backend...')
-
       const response = await fetch(`/api/patients/portal-data/${encodeURIComponent(patient.email)}`)
       if (response.ok) {
         const result = await response.json()
 
         if (result.success && result.data) {
-          const updatedData = {
-            ...patient,
-            ...result.data.patient,
-            score: result.data.srsScore ?? result.data.patient?.srsScore ?? patient.score,
-            phase: result.data.phase ?? result.data.srsScore?.phase ?? result.data.patient?.phase ?? patient.phase,
-            lastUpdated: new Date().toISOString()
-          }
-
-          // Patient data is now managed by useAuth, so we don't need to update it here
-          console.log('✅ Patient data refreshed:', updatedData)
+          // Patient data is managed by useAuth; this refresh updates child sections.
         }
       }
     } catch (error) {
@@ -180,8 +125,6 @@ const PatientRecoveryDashboard: React.FC = () => {
       return
     }
 
-    console.log('🎯 Task completed:', taskData)
-
     try {
       const taskId =
         taskData.taskId === 'recovery-insight' ? 'recovery-insights' :
@@ -191,19 +134,10 @@ const PatientRecoveryDashboard: React.FC = () => {
 
       if (taskId) {
         const today = new Date().toISOString().slice(0, 10)
-        localStorage.setItem(`dailyTaskCompleted_${patient.email}_${today}_${taskId}`, 'true')
+        sessionStorage.setItem(`dailyTaskCompleted_${today}_${taskId}`, 'true')
       }
 
       // Update local patient data immediately (but don't persist since useAuth manages it)
-      const updatedData = {
-        ...patient,
-        score: `${taskData.newSRSScore}/11`,
-        phase: taskData.phase,
-        lastUpdated: new Date().toISOString()
-      }
-
-      console.log('📊 Updated patient data locally:', updatedData)
-
       // Trigger refresh
       setRefreshKey(prev => prev + 1)
 
@@ -505,7 +439,6 @@ const PatientRecoveryDashboard: React.FC = () => {
             onOpenChange={setShowPainDialog}
             patientId={patient.email}
             onComplete={(data: any) => {
-              console.log('Pain & stress check-in completed:', data)
               setShowPainDialog(false)
               refreshPatientData()
             }}
@@ -518,7 +451,6 @@ const PatientRecoveryDashboard: React.FC = () => {
             onOpenChange={setShowMindfulnessDialog}
             patientId={patient.email}
             onComplete={(data: any) => {
-              console.log('Mindfulness completed:', data)
               setShowMindfulnessDialog(false)
               refreshPatientData()
             }}
@@ -531,7 +463,6 @@ const PatientRecoveryDashboard: React.FC = () => {
             onOpenChange={setShowInsightsDialog}
             patientId={patient.email}
             onComplete={(data: any) => {
-              console.log('Recovery insight completed:', data)
               setShowInsightsDialog(false)
               refreshPatientData()
             }}

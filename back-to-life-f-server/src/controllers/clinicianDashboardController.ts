@@ -199,7 +199,7 @@ export async function updateTreatmentPlan(req: any, res: any) {
       },
     });
 
-    console.log(`✅ Auto-created clinical note for treatment plan update: ${updated.name}`);
+    console.log('✅ Auto-created clinical note for treatment plan update');
 
     res.json({ patient: updated });
   } catch (err: any) {

@@ -157,7 +157,7 @@ async function calculateRiskIndex(patientId) {
       }
     };
   } catch (error) {
-    console.error(`Error calculating risk index for patient ${patientId}:`, error);
+    console.error('Error calculating patient risk index');
     return {
       riskIndex: 0,
       riskBand: 'low',
@@ -185,9 +185,9 @@ async function updatePatientRiskBand(patientId, riskData) {
       }
     });
     
-    console.log(`✅ Updated risk band for patient ${patientId}: ${riskData.riskBand} (${riskData.riskIndex})`);
+    console.log('✅ Updated patient risk band');
   } catch (error) {
-    console.error(`❌ Error updating risk band for patient ${patientId}:`, error);
+    console.error('❌ Error updating patient risk band');
   }
 }
 
@@ -220,10 +220,10 @@ async function runRiskIndexCron() {
         
         // Log high-risk patients
         if (riskData.riskBand === 'high') {
-          console.log(`⚠️ High-risk patient: ${patient.name} (${patient.email}) - Risk Index: ${riskData.riskIndex}`);
+          console.log('⚠️ High-risk patient identified for practitioner review');
         }
       } catch (error) {
-        console.error(`❌ Error processing patient ${patient.id}:`, error);
+        console.error('❌ Error processing a patient risk index');
         errorCount++;
       }
     }
@@ -251,10 +251,10 @@ async function runRiskIndexCron() {
  * @param {number} patientId - Patient ID
  */
 async function calculatePatientRiskIndex(patientId) {
-  console.log(`🔍 Calculating risk index for patient ${patientId}...`);
+  console.log('🔍 Calculating patient risk index');
   
   const riskData = await calculateRiskIndex(patientId);
-  console.log('Risk Index Results:', riskData);
+  console.log('Risk index calculation complete');
   
   return riskData;
 }
@@ -264,4 +264,4 @@ module.exports = {
   calculateRiskIndex,
   calculatePatientRiskIndex,
   updatePatientRiskBand
-}; 
+};

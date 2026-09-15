@@ -29,25 +29,14 @@ export function RecoveryInsightsDialog({ open, onClose, patientId }: RecoveryIns
   const [showInsightDialog, setShowInsightDialog] = useState(false);
   const [dailyCompletedInsights, setDailyCompletedInsights] = useState<number>(0);
   
-  console.log('🎯 RecoveryInsightsDialog insights:', insights.map(i => ({ id: i.id, title: i.title, completed: i.completed })));
-
   const viewedInsights = insights.filter(insight => insight.viewed).length;
   const totalInsights = insights.length;
 
   // Load daily completed insights from localStorage
   useEffect(() => {
-    let email = patientId;
-    try {
-      const stored = localStorage.getItem('btl_patient_data');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.email) email = parsed.email;
-      }
-    } catch {}
-    
     const today = new Date().toISOString().slice(0, 10);
-    const key = `dailyInsightsCompleted_${email}_${today}`;
-    const completed = localStorage.getItem(key);
+    const key = `dailyInsightsCompleted_${today}`;
+    const completed = sessionStorage.getItem(key);
     const completedCount = completed ? parseInt(completed) : 0;
     setDailyCompletedInsights(completedCount);
   }, [patientId]);
@@ -238,18 +227,9 @@ export function RecoveryInsightsDialog({ open, onClose, patientId }: RecoveryIns
           setDailyCompletedInsights(newCompletedCount);
           
           // Save to localStorage
-          let email = patientId;
-          try {
-            const stored = localStorage.getItem('btl_patient_data');
-            if (stored) {
-              const parsed = JSON.parse(stored);
-              if (parsed.email) email = parsed.email;
-            }
-          } catch {}
-          
           const today = new Date().toISOString().slice(0, 10);
-          const key = `dailyInsightsCompleted_${email}_${today}`;
-          localStorage.setItem(key, newCompletedCount.toString());
+          const key = `dailyInsightsCompleted_${today}`;
+          sessionStorage.setItem(key, newCompletedCount.toString());
           
           // Refresh insights to show updated completion status
           setRefreshKey(prev => prev + 1);
@@ -258,4 +238,4 @@ export function RecoveryInsightsDialog({ open, onClose, patientId }: RecoveryIns
     )}
   </>
   );
-} 
+}
