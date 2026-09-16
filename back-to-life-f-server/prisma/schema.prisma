@@ -38,6 +38,20 @@ model Patient {
   clinicianAssessments ClinicianAssessment[]
   insightResponses  InsightResponse[]
   setupTokens       PatientSetupToken[]
+  consents          PatientConsent[]
+}
+
+model PatientConsent {
+  id                                String   @id @default(uuid())
+  patientId                         Int
+  version                           String
+  healthInformationConsentAccepted Boolean
+  electronicCommunicationsAccepted Boolean
+  source                            String   @default("intake")
+  consentedAt                       DateTime @default(now())
+  patient                           Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([patientId, consentedAt])
 }
 
 model PatientSetupToken {

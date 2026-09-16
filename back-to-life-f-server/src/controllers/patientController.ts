@@ -10,6 +10,10 @@ import { PrismaClient } from "@prisma/client";
 import { sendWelcomeEmail, sendWelcomeEmailDev } from "../services/emailService";
 import { issuePatientSetupToken } from "../services/patientSetupToken";
 import { getExistingPatientIntakeConflict } from "../services/onboardingIdentity";
+import {
+  getIntakeConsentValidationError,
+  recordPatientConsent
+} from "../services/patientConsent";
 
 // TSK-7 calculation function (standardized across all apps)
 const calculateTSK7Score = (tsk7Data: any) => {
@@ -483,7 +487,8 @@ export const submitIntake = async (req: any, res: any) => {
       groc,
       // Clinical verification
       recoveryMilestone,
-      clinicalProgressVerified
+      clinicalProgressVerified,
+      consent
     } = req.body;
 
     const isNumberInRange = (value: unknown, min: number, max: number) => {
@@ -539,6 +544,8 @@ export const submitIntake = async (req: any, res: any) => {
     if (![1, 2, 3, 4, 5, 6, 7].every(index => isNumberInRange(tsk7?.[index], 1, 4))) {
       validationErrors.push('TSK-7 is incomplete');
     }
+    const consentValidationError = getIntakeConsentValidationError(formType, consent);
+    if (consentValidationError) validationErrors.push(consentValidationError);
 
     if (validationErrors.length > 0) {
       return res.status(400).json({ success: false, error: 'Invalid intake submission', details: validationErrors });
@@ -595,6 +602,10 @@ export const submitIntake = async (req: any, res: any) => {
     
     if (!patient) {
       throw new Error('Failed to create or find patient');
+    }
+
+    if (formType === 'Intake') {
+      await recordPatientConsent(patient.id, consent);
     }
     
     // Calculate SRS score

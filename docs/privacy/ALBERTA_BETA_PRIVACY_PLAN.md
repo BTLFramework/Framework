@@ -64,6 +64,7 @@ Providers to verify: Railway, Vercel, database provider, Resend, Gmail/Google Wo
 - Logs were reduced to avoid names, email addresses, patient IDs, scores, message subjects, and assessment bodies.
 - Practitioner authentication now uses a secure HTTP-only, SameSite session cookie routed through the dashboard origin; bearer tokens are no longer stored in browser storage.
 - Patient account-setup links now use random, hashed, database-backed tokens that expire after 24 hours and are atomically consumed once.
+- Initial intake now includes a plain-language privacy and electronic-communications consent step. Both choices are unchecked and required, the server independently validates the current notice version, and the accepted version and timestamp are retained in a patient-linked audit record.
 
 ## Open items before real-patient beta
 
@@ -73,7 +74,7 @@ Providers to verify: Railway, Vercel, database provider, Resend, Gmail/Google Wo
 4. Set written retention periods for clinical records, messages, audit data, application logs, and backups.
 5. Verify encrypted backups and perform a documented restore test.
 6. Implement a durable security audit trail for practitioner access and changes to clinical records.
-7. Add and test an in-product privacy-notice acknowledgement after the notice is approved.
+7. Complete legal/privacy review of the implemented in-product acknowledgement, fill the legal custodian and contact fields, and advance the notice version before real-patient use.
 8. Run an access/export/correction/deletion procedure using a beta record.
 9. Complete the incident-response tabletop exercise in `INCIDENT_RESPONSE.md`.
 

@@ -15,6 +15,7 @@ import PCS4 from "./steps/PCS4";
 import TSK7 from "./steps/TSK7";
 import GROC from "./steps/GROC";
 import ClinicianInput from './steps/ClinicianInput';
+import Consent, { CURRENT_PATIENT_CONSENT_VERSION } from "./steps/Consent";
 
 // Recovery Score Wheel Component
 const RecoveryScoreWheel = ({ score, maxScore, phase }) => {
@@ -169,6 +170,8 @@ export default function MultiStepForm() {
         confidence: 8, // High confidence
         groc: 0,
         beliefs: ["None of these apply"],
+        healthInformationConsentAccepted: false,
+        electronicCommunicationsAccepted: false,
       };
     }
     
@@ -197,6 +200,8 @@ export default function MultiStepForm() {
       confidence: 0,
       groc: 0,
       beliefs: [],
+      healthInformationConsentAccepted: false,
+      electronicCommunicationsAccepted: false,
     };
   };
 
@@ -227,6 +232,7 @@ export default function MultiStepForm() {
             "Confidence",
             "Pain Beliefs",
             "Fear of Movement",
+            "Consent",
           ];
 
   // Handle simple onChange events for text/select/radio/checkbox
@@ -358,6 +364,11 @@ export default function MultiStepForm() {
         return [1,2,3,4].every(i => formData.pcs4 && formData.pcs4[i] !== undefined && formData.pcs4[i] !== null);
       case 6: // TSK-7
         return [1,2,3,4,5,6,7].every(i => formData.tsk7 && formData.tsk7[i] !== undefined && formData.tsk7[i] !== null);
+      case 7: // Intake consent; follow-up step 7 is GROC
+        return formData.formType === "Follow-Up" || (
+          formData.healthInformationConsentAccepted === true &&
+          formData.electronicCommunicationsAccepted === true
+        );
       default:
         return true;
     }
@@ -446,7 +457,12 @@ export default function MultiStepForm() {
       confidence: formData.confidence,
       groc: 0, // Always 0 for intake
       srsScore: srsResult.score, // Send numeric score
-      phase: srsResult.phase
+      phase: srsResult.phase,
+      consent: {
+        version: CURRENT_PATIENT_CONSENT_VERSION,
+        healthInformationConsentAccepted: formData.healthInformationConsentAccepted,
+        electronicCommunicationsAccepted: formData.electronicCommunicationsAccepted
+      }
     };
 
     setIsSubmitting(true);
@@ -769,9 +785,9 @@ export default function MultiStepForm() {
                 <GROC formData={formData} onChange={handleChange} />
               )}
 
-              {/* Clinician Input for Intake */}
+              {/* Required consent for Intake */}
               {formData.formType === "Intake" && currentStep === 7 && (
-                <ClinicianInput formData={formData} onChange={handleChange} />
+                <Consent formData={formData} onChange={handleChange} />
               )}
 
               {/* Clinician Input for Follow-Up */}
