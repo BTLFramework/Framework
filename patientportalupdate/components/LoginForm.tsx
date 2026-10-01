@@ -9,7 +9,9 @@ export function LoginForm() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isRecovering, setIsRecovering] = useState(false)
   const [error, setError] = useState('')
+  const [recoveryMessage, setRecoveryMessage] = useState('')
   
   const { login } = useAuth()
 
@@ -30,6 +32,32 @@ export function LoginForm() {
       setError('Login failed. Please check your connection and try again.')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handlePasswordReset = async () => {
+    const normalizedEmail = email.trim()
+    setError('')
+    setRecoveryMessage('')
+
+    if (!normalizedEmail) {
+      setRecoveryMessage('Enter your email address above first.')
+      return
+    }
+
+    setIsRecovering(true)
+    try {
+      const response = await fetch('/api/patient-portal/request-password-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: normalizedEmail }),
+      })
+      const result = await response.json().catch(() => ({}))
+      setRecoveryMessage(result.message || result.error || 'If that patient account exists, a password reset link has been emailed.')
+    } catch {
+      setRecoveryMessage('Unable to request a reset link. Please try again.')
+    } finally {
+      setIsRecovering(false)
     }
   }
 
@@ -114,6 +142,21 @@ export function LoginForm() {
                 'Sign In'
               )}
             </button>
+
+            <button
+              type="button"
+              onClick={() => void handlePasswordReset()}
+              disabled={isRecovering}
+              className="w-full text-btl-600 hover:text-btl-800 font-medium underline underline-offset-4 disabled:opacity-50 disabled:cursor-wait"
+            >
+              {isRecovering ? 'Sending reset link…' : 'Forgot password?'}
+            </button>
+
+            {recoveryMessage && (
+              <div className="bg-btl-50 border border-btl-200 rounded-lg p-3" role="status">
+                <p className="text-btl-700 text-sm">{recoveryMessage}</p>
+              </div>
+            )}
           </form>
 
           {/* Help Text */}
