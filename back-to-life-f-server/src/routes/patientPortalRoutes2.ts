@@ -7,7 +7,8 @@ import {
 import { isStrongPatientPassword, verifyPatientPassword } from '../services/patientPasswordService';
 import { requirePatientAccess, requirePatientSession } from '../middleware/requirePatientAuth';
 import { createRateLimit } from '../middleware/rateLimit';
-import { consumePatientSetupToken, verifyPatientSetupToken } from '../services/patientSetupToken';
+import { consumePatientSetupToken, issuePatientSetupToken, verifyPatientSetupToken } from '../services/patientSetupToken';
+import { sendPatientPasswordResetEmail } from '../services/emailService';
 
 const router = express.Router();
 const loginRateLimit = createRateLimit({
@@ -15,6 +16,35 @@ const loginRateLimit = createRateLimit({
   max: 20,
   message: 'Too many sign-in attempts. Please wait and try again.',
   key: (req) => `${req.ip}:${String(req.body?.email || '').trim().toLowerCase()}`,
+});
+const passwordResetRateLimit = createRateLimit({
+  windowMs: 60 * 60_000,
+  max: 5,
+  message: 'Too many password-reset requests. Please wait and try again.',
+  key: (req) => `${req.ip}:${String(req.body?.email || '').trim().toLowerCase()}`,
+});
+const passwordResetResponse = {
+  message: 'If that patient account exists, a password reset link has been emailed.',
+};
+
+router.post('/request-password-reset', passwordResetRateLimit, async (req: any, res: any) => {
+  const email = String(req.body?.email || '').trim().toLowerCase();
+  if (!email) return res.status(400).json({ error: 'Email is required' });
+
+  try {
+    const patientPortal = await findPatientPortalByEmail(email);
+    if (patientPortal) {
+      const token = await issuePatientSetupToken(patientPortal.patientId);
+      const portalUrl = (process.env.PATIENT_PORTAL_URL || 'https://framework-six-umber.vercel.app').replace(/\/$/, '');
+      const resetLink = `${portalUrl}/create-account?token=${encodeURIComponent(token)}`;
+      const delivered = await sendPatientPasswordResetEmail(patientPortal.email, resetLink);
+      if (!delivered) console.error('Patient password-reset email was not accepted for delivery');
+    }
+  } catch (error) {
+    console.error('Patient password-reset request failed:', error);
+  }
+
+  return res.json(passwordResetResponse);
 });
 
 // Verify setup token and get patient info
