@@ -3,20 +3,25 @@ require('ts-node/register/transpile-only')
 const test = require('node:test')
 const assert = require('node:assert/strict')
 const jwt = require('jsonwebtoken')
-const { requirePatientAccess } = require('../src/middleware/requirePatientAuth.ts')
+const { requirePatientAccess, requirePatientSession } = require('../src/middleware/requirePatientAuth.ts')
 
-const invoke = ({ token, params, body } = {}) => {
+const invoke = ({ token, bearerToken, params, body, middleware = requirePatientAccess } = {}) => {
   const previousSecret = process.env.JWT_SECRET
   process.env.JWT_SECRET = 'test-patient-secret'
 
   const result = { statusCode: null, body: null, nextCalled: false, patient: null }
-  const req = { cookies: token ? { patientToken: token } : {}, params: params || {}, body: body || {} }
+  const req = {
+    cookies: token ? { patientToken: token } : {},
+    headers: bearerToken ? { authorization: `Bearer ${bearerToken}` } : {},
+    params: params || {},
+    body: body || {}
+  }
   const res = {
     status(code) { result.statusCode = code; return this },
     json(responseBody) { result.body = responseBody; return this },
   }
 
-  requirePatientAccess(req, res, () => { result.nextCalled = true })
+  middleware(req, res, () => { result.nextCalled = true })
   result.patient = req.patient
 
   if (previousSecret === undefined) delete process.env.JWT_SECRET
@@ -58,6 +63,13 @@ test('patient data routes accept only the signed patient ID or email', () => {
   assert.equal(invoke({ token, params: { email: 'PATIENT@example.com' } }).nextCalled, true)
   assert.equal(invoke({ token, params: { email: 'other@example.com' } }).statusCode, 403)
   assert.equal(invoke({ token, body: { email: 'patient@example.com' } }).nextCalled, true)
+})
+
+test('native bearer sessions use the same patient identity checks', () => {
+  const bearerToken = patientToken(6)
+  assert.equal(invoke({ bearerToken, params: { patientId: '6' } }).nextCalled, true)
+  assert.equal(invoke({ bearerToken, params: { patientId: '7' } }).statusCode, 403)
+  assert.equal(invoke({ bearerToken, middleware: requirePatientSession }).nextCalled, true)
 })
 
 test('expired and practitioner tokens cannot access patient messages', () => {

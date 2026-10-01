@@ -5,7 +5,7 @@ import {
   updatePatientPortalPassword 
 } from '../models/patientModel';
 import { isStrongPatientPassword, verifyPatientPassword } from '../services/patientPasswordService';
-import { requirePatientAccess } from '../middleware/requirePatientAuth';
+import { requirePatientAccess, requirePatientSession } from '../middleware/requirePatientAuth';
 import { createRateLimit } from '../middleware/rateLimit';
 import { consumePatientSetupToken, verifyPatientSetupToken } from '../services/patientSetupToken';
 
@@ -150,23 +150,45 @@ router.post('/login', loginRateLimit, async (req: any, res: any) => {
   }
 });
 
-router.get("/profile", async (req: any, res: any) => {
+// Native apps cannot rely on browser-only HttpOnly cookies. This dedicated
+// endpoint returns the same short-lived patient JWT for storage in the device
+// keychain/keystore. The browser login above continues to expose no token.
+router.post('/mobile/login', loginRateLimit, async (req: any, res: any) => {
   try {
-    // Read token from cookie instead of Authorization header
-    const token = req.cookies.patientToken;
-    
-    if (!token) {
-      return res.status(401).json({ error: 'No token provided' });
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
     }
-    
-    const { verifyToken } = require('../services/jwtService');
-    const payload = verifyToken(token);
-    
-    if (!payload || payload.role !== 'patient') {
-      return res.status(401).json({ error: 'Invalid token' });
+
+    const patientPortal = await findPatientPortalByEmail(email);
+    if (!patientPortal) {
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
-    
-    const patientPortal = await findPatientPortalByEmail(payload.email);
+
+    const passwordCheck = await verifyPatientPassword(patientPortal.password, password);
+    if (!passwordCheck.valid) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+    if (passwordCheck.needsUpgrade) {
+      await updatePatientPortalPassword(patientPortal.email, password);
+    }
+
+    const { generatePatientToken } = require('../services/jwtService');
+    return res.json({
+      message: 'Login successful',
+      accessToken: generatePatientToken(patientPortal),
+      expiresIn: 7 * 24 * 60 * 60,
+      patient: patientPortal.patient
+    });
+  } catch (error) {
+    console.error('❌ Mobile login error:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.get("/profile", requirePatientSession, async (req: any, res: any) => {
+  try {
+    const patientPortal = await findPatientPortalByEmail(req.patient.email);
     
     if (!patientPortal) {
       return res.status(404).json({ error: 'Patient not found' });
